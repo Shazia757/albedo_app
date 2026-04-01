@@ -1,8 +1,12 @@
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/view/forgot_password_page.dart';
+import 'package:albedo_app/widgets/button.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/search_bar.dart';
+import 'package:albedo_app/widgets/sort_sheet.dart';
+import 'package:albedo_app/widgets/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -27,7 +31,21 @@ class SessionPage extends StatelessWidget {
                 children: [
                   _topBar(context, c),
                   const SizedBox(height: 12),
-                  _tabs(c),
+                  Obx(
+                    () => customTabs(
+                        tabs: c.tabs,
+                        selectedIndex: c.selectedTab.value,
+                        getCount: (index) {
+                          if (index == 0) return c.sessions.length;
+                          return c.sessions
+                              .where((e) => e.status == c.statusMap[index])
+                              .length;
+                        },
+                        onTap: (index) {
+                          c.selectedTab.value = index;
+                          c.applyFilters();
+                        }),
+                  ),
                   const SizedBox(height: 12),
                   Expanded(
                     child: Obx(() {
@@ -72,7 +90,10 @@ class SessionPage extends StatelessWidget {
     if (isMobile) {
       return Column(
         children: [
-          _premiumSearch(c),
+          premiumSearch(
+            hint: "Search sessions...",
+            onChanged: (val) => c.searchQuery.value = val,
+          ),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -87,7 +108,12 @@ class SessionPage extends StatelessWidget {
 
     return Row(
       children: [
-        Expanded(flex: 3, child: _premiumSearch(c)),
+        Expanded(
+            flex: 3,
+            child: premiumSearch(
+              hint: "Search sessions...",
+              onChanged: (val) => c.searchQuery.value = val,
+            )),
         const SizedBox(width: 12),
         _filterButton(),
         const SizedBox(width: 8),
@@ -96,31 +122,31 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  Widget _premiumSearch(SessionController c) {
-    return Container(
-      height: 44,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-          )
-        ],
-      ),
-      child: TextField(
-        onChanged: (val) => c.searchQuery.value = val,
-        style: const TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          hintText: "Search sessions...",
-          prefixIcon: const Icon(Icons.search, size: 20),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        ),
-      ),
-    );
-  }
+  // Widget _premiumSearch(SessionController c) {
+  //   return Container(
+  //     height: 44,
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.05),
+  //           blurRadius: 8,
+  //         )
+  //       ],
+  //     ),
+  //     child: TextField(
+  //       onChanged: (val) => c.searchQuery.value = val,
+  //       style: const TextStyle(fontSize: 14),
+  //       decoration: InputDecoration(
+  //         hintText: "Search sessions...",
+  //         prefixIcon: const Icon(Icons.search, size: 20),
+  //         border: InputBorder.none,
+  //         contentPadding: const EdgeInsets.symmetric(vertical: 12),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _actionButton(IconData icon, String label) {
     return Container(
@@ -147,105 +173,14 @@ class SessionPage extends StatelessWidget {
 
   Widget _sortButton(SessionController c) {
     return GestureDetector(
-      onTap: () => _showSortSheet(c),
+      onTap: () => showSortSheet(
+          title: "Sort Sessions",
+          options: _sortOptions,
+          selectedValue: c.sortType.value,
+          onSelected: (val) {
+            c.sortType.value = val;
+          }),
       child: _actionButton(Icons.swap_vert, "Sort"),
-    );
-  }
-
-  void _showSortSheet(SessionController c) {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Obx(() => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 🔥 HANDLE BAR
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-
-                const Text(
-                  "Sort Sessions",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // 🔥 OPTIONS
-                ..._sortOptions.map((e) {
-                  final isSelected = c.sortType.value == e.type;
-
-                  return GestureDetector(
-                    onTap: () {
-                      c.sortType.value = e.type;
-                      Get.back();
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? const Color(0xFF7F00FF).withOpacity(0.08)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected
-                              ? const Color(0xFF7F00FF)
-                              : Colors.grey.shade200,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            e.icon,
-                            size: 18,
-                            color: isSelected
-                                ? const Color(0xFF7F00FF)
-                                : Colors.grey,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              e.label,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
-                                color: isSelected
-                                    ? const Color(0xFF7F00FF)
-                                    : Colors.black87,
-                              ),
-                            ),
-                          ),
-                          if (isSelected)
-                            const Icon(
-                              Icons.check_circle,
-                              color: Color(0xFF7F00FF),
-                              size: 18,
-                            )
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ],
-            )),
-      ),
     );
   }
 
@@ -274,43 +209,43 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  Widget _tabs(SessionController c) {
-    return Obx(() => SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: List.generate(c.tabs.length, (index) {
-              final isActive = c.selectedTab.value == index;
+  // Widget _tabs(SessionController c) {
+  //   return Obx(() => SingleChildScrollView(
+  //         scrollDirection: Axis.horizontal,
+  //         child: Row(
+  //           children: List.generate(c.tabs.length, (index) {
+  //             final isActive = c.selectedTab.value == index;
 
-              final count = c.sessions
-                  .where((e) => e.status == c.statusMap[index])
-                  .length;
+  //             final count = c.sessions
+  //                 .where((e) => e.status == c.statusMap[index])
+  //                 .length;
 
-              return GestureDetector(
-                onTap: () => c.selectedTab.value = index,
-                child: Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isActive
-                        ? const Color(0xFF7F00FF)
-                        : Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    "${c.tabs[index]} ($count)",
-                    style: TextStyle(
-                      color: isActive ? Colors.white : Colors.black87,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ));
-  }
+  //             return GestureDetector(
+  //               onTap: () => c.selectedTab.value = index,
+  //               child: Container(
+  //                 margin: const EdgeInsets.only(right: 8),
+  //                 padding:
+  //                     const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+  //                 decoration: BoxDecoration(
+  //                   color: isActive
+  //                       ? const Color(0xFF7F00FF)
+  //                       : Colors.grey.shade200,
+  //                   borderRadius: BorderRadius.circular(20),
+  //                 ),
+  //                 child: Text(
+  //                   "${c.tabs[index]} ($count)",
+  //                   style: TextStyle(
+  //                     color: isActive ? Colors.white : Colors.black87,
+  //                     fontSize: 12,
+  //                     fontWeight: FontWeight.w500,
+  //                   ),
+  //                 ),
+  //               ),
+  //             );
+  //           }),
+  //         ),
+  //       ));
+  // }
 
   Widget _sessionCard(Session s) {
     final color = getStatusColor(s.status);
@@ -427,9 +362,9 @@ class SessionPage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _iconBtn(Icons.edit, Colors.blue, () {}),
+              iconBtn(icon: Icons.edit, color: Colors.blue, onTap: () {}),
               const SizedBox(width: 6),
-              _iconBtn(Icons.delete, Colors.red, () {}),
+              iconBtn(icon: Icons.delete, color: Colors.red, onTap: () {}),
             ],
           )
         ],
@@ -463,27 +398,27 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  Widget _iconBtn(IconData icon, Color color, VoidCallback onTap) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: color,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _iconBtn(IconData icon, Color color, VoidCallback onTap) {
+  //   return Material(
+  //     color: Colors.transparent,
+  //     child: InkWell(
+  //       onTap: onTap,
+  //       borderRadius: BorderRadius.circular(10),
+  //       child: Container(
+  //         padding: const EdgeInsets.all(8),
+  //         decoration: BoxDecoration(
+  //           color: color.withOpacity(0.1),
+  //           borderRadius: BorderRadius.circular(10),
+  //         ),
+  //         child: Icon(
+  //           icon,
+  //           size: 18,
+  //           color: color,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _personCompact(String label, String name, String id) {
     return Column(
@@ -531,16 +466,12 @@ class SessionPage extends StatelessWidget {
 }
 
 final List<SortOption> _sortOptions = [
-  SortOption("Latest First", SortType.latest, Icons.schedule),
-  SortOption("Oldest First", SortType.oldest, Icons.history),
-  SortOption("Student Name", SortType.student, Icons.person),
-  SortOption("Teacher Name", SortType.teacher, Icons.school),
+  SortOption(
+      label: "Latest First", value: SortType.newest, icon: Icons.schedule),
+  SortOption(
+      label: "Oldest First", value: SortType.oldest, icon: Icons.history),
+  SortOption(
+      label: "Student Name", value: SortType.student, icon: Icons.person),
+  SortOption(
+      label: "Teacher Name", value: SortType.teacher, icon: Icons.school),
 ];
-
-class SortOption {
-  final String label;
-  final SortType type;
-  final IconData icon;
-
-  SortOption(this.label, this.type, this.icon);
-}

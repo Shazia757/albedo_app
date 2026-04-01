@@ -1,12 +1,13 @@
 import 'package:albedo_app/model/session_model.dart';
 import 'package:get/get.dart';
 
-enum SortType { latest, oldest, student, teacher }
+enum SortType { newest, oldest, student, teacher }
 
 class SessionController extends GetxController {
   var selectedTab = 0.obs;
+  var selectedStatus = 0.obs;
   var searchQuery = ''.obs;
-  var sortType = SortType.latest.obs;
+  var sortType = SortType.newest.obs;
   var sessions = <Session>[].obs;
   var selectedTeacher = ''.obs;
 
@@ -18,8 +19,6 @@ class SessionController extends GetxController {
     "Completed",
     "Meets"
   ];
-
-  
 
   List<String> statusMap = [
     "started",
@@ -52,7 +51,7 @@ class SessionController extends GetxController {
 
     // 🔥 Step 2: ADD SORTING HERE (THIS IS WHAT YOU ASKED)
     switch (sortType.value) {
-      case SortType.latest:
+      case SortType.newest:
         filtered.sort((a, b) => b.dateTime.compareTo(a.dateTime));
         break;
       case SortType.oldest:
@@ -153,5 +152,38 @@ class SessionController extends GetxController {
         status: "started",
       ),
     ]);
+  }
+
+  void applyFilters() {
+    List<Session> temp = sessions;
+
+    /// 🔍 Search
+    if (searchQuery.value.isNotEmpty) {
+      temp = temp
+          .where((s) =>
+              s.studentName
+                  .toLowerCase()
+                  .contains(searchQuery.value.toLowerCase()) ||
+              s.teacherName
+                  .toLowerCase()
+                  .contains(searchQuery.value.toLowerCase()))
+          .toList();
+    }
+
+    /// 🎯 Filter (example: status)
+    if (selectedStatus.value != "All") {
+      temp = temp.where((s) => s.status == selectedStatus.value).toList();
+    }
+
+    /// ↕️ Sort
+    if (sortType.value == "new") {
+      temp.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    } else if (sortType.value == "old") {
+      temp.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+    } else if (sortType.value == "name") {
+      temp.sort((a, b) => a.studentName.compareTo(b.studentName));
+    }
+
+    filteredSessions.assignAll(temp);
   }
 }

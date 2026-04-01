@@ -1,3 +1,6 @@
+import 'package:albedo_app/controller/session_controller.dart';
+import 'package:flutter/material.dart';
+
 class Session {
   final String id;
   final String studentName;
@@ -19,5 +22,17 @@ class Session {
     required this.teacherId,
     required this.dateTime,
     required this.status,
+  });
+}
+
+class SortOption {
+  final String label;
+  final SortType value;
+  final IconData icon;
+
+  SortOption({
+    required this.label,
+    required this.value,
+    required this.icon,
   });
 }

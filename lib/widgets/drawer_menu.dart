@@ -1,5 +1,6 @@
 import 'package:albedo_app/view/home_page.dart';
 import 'package:albedo_app/view/session_page.dart';
+import 'package:albedo_app/view/students_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/home_controller.dart';
@@ -210,7 +211,6 @@ class DrawerMenu extends StatelessWidget {
     HomeController c = Get.find();
 
     return Obx(() => ExpansionTile(
-          initiallyExpanded: c.selectedIndex.value == 7,
           tilePadding: const EdgeInsets.symmetric(horizontal: 12),
           childrenPadding: const EdgeInsets.only(left: 12),
           leading: Icon(
@@ -233,17 +233,29 @@ class DrawerMenu extends StatelessWidget {
             ),
           ),
           children: [
-            _subItem("Students", 0),
-            _subItem("Teachers", 1),
-            _subItem("Mentors", 2),
-            _subItem("Asst. Admin", 3),
-            _subItem("Advisor", 4),
-            _subItem("Others", 5),
+            _subItem("Students", 0, () {
+              Get.to(() => StudentsPage());
+            }),
+            _subItem("Teachers", 1, () {
+              Get.to(() => StudentsPage());
+            }),
+            _subItem("Mentors", 2, () {
+              Get.to(() => StudentsPage());
+            }),
+            _subItem("Asst. Admin", 3, () {
+              Get.to(() => StudentsPage());
+            }),
+            _subItem("Advisor", 4, () {
+              Get.to(() => StudentsPage());
+            }),
+            _subItem("Others", 5, () {
+              Get.to(() => StudentsPage());
+            }),
           ],
         ));
   }
 
-  Widget _subItem(String title, int index) {
+  Widget _subItem(String title, int index, VoidCallback onTap) {
     HomeController c = Get.find();
 
     return Obx(() {
@@ -270,7 +282,7 @@ class DrawerMenu extends StatelessWidget {
             c.setIndex(7); // parent "Users"
             c.setSubIndex(index);
             Get.back(); // close drawer
-            Get.to(() => HomeView()); // change page if needed
+            onTap(); // change page if needed
           },
         ),
       );
