@@ -1,6 +1,7 @@
+import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/view/home_page.dart';
 import 'package:albedo_app/view/session_page.dart';
-import 'package:albedo_app/view/students_page.dart';
+import 'package:albedo_app/view/students_trs_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/home_controller.dart';
@@ -234,22 +235,22 @@ class DrawerMenu extends StatelessWidget {
           ),
           children: [
             _subItem("Students", 0, () {
-              Get.to(() => StudentsPage());
+              Get.offAll(() => UsersPage(type: UserPageType.student));
             }),
             _subItem("Teachers", 1, () {
-              Get.to(() => StudentsPage());
+              Get.offAll(() => UsersPage(type: UserPageType.teacher));
             }),
             _subItem("Mentors", 2, () {
-              Get.to(() => StudentsPage());
+              // Get.to(() => StudentsPage());
             }),
             _subItem("Asst. Admin", 3, () {
-              Get.to(() => StudentsPage());
+              // Get.to(() => StudentsPage());
             }),
             _subItem("Advisor", 4, () {
-              Get.to(() => StudentsPage());
+              // Get.to(() => StudentsPage());
             }),
             _subItem("Others", 5, () {
-              Get.to(() => StudentsPage());
+              // Get.to(() => StudentsPage());
             }),
           ],
         ));

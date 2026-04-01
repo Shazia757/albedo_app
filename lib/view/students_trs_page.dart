@@ -2,6 +2,7 @@ import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/controller/user_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/student_model.dart';
+import 'package:albedo_app/model/teacher_model.dart';
 import 'package:albedo_app/view/forgot_password_page.dart';
 import 'package:albedo_app/widgets/button.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
@@ -12,21 +13,26 @@ import 'package:albedo_app/widgets/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class StudentsPage extends StatelessWidget {
-  StudentsPage({super.key});
+class UsersPage extends StatelessWidget {
+  final UserPageType type;
+  UsersPage({super.key, required this.type});
 
-  final c = Get.put(UserController());
+  final studentController = Get.put(UserController(UserPageType.student));
+  final teacherController =
+      Get.put(UserController(UserPageType.teacher), tag: "teacher");
 
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
-    final tabs = [
-      "All",
-      "Active",
-      "Batch",
-      "TBA",
-      "Inactive",
-    ];
+    List<String> getTabs() {
+      if (type == UserPageType.teacher) {
+        return ["All", "Active", "Batch", "Inactive"];
+      }
+      return ["All", "Active", "Batch", "TBA", "Inactive"];
+    }
+
+    final tabs = getTabs();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
@@ -39,9 +45,15 @@ class StudentsPage extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: premiumSearch(
-                      hint: "Search students...",
-                      onChanged: (value) => c.searchQuery.value = value),
+                  child: (type == UserPageType.student)
+                      ? premiumSearch(
+                          hint: "Search students...",
+                          onChanged: (value) =>
+                              studentController.searchQuery.value = value)
+                      : premiumSearch(
+                          hint: "Search teachers...",
+                          onChanged: (value) =>
+                              teacherController.searchQuery.value = value),
                 ),
 
                 const SizedBox(width: 10),
@@ -65,10 +77,17 @@ class StudentsPage extends StatelessWidget {
                           value: SortType.student,
                           icon: Icons.sort_by_alpha),
                     ],
-                    selectedValue: c.sortType.value,
+                    selectedValue: (type == UserPageType.student)
+                        ? studentController.sortType.value
+                        : teacherController.sortType.value,
                     onSelected: (val) {
-                      c.sortType.value = val;
-                      c.applyFilters();
+                      if (type == UserPageType.student) {
+                        studentController.sortType.value = val;
+                        studentController.applyFilters();
+                      } else {
+                        teacherController.sortType.value = val;
+                        teacherController.applyFilters();
+                      }
                     },
                   ),
                   child: const Padding(
@@ -84,25 +103,47 @@ class StudentsPage extends StatelessWidget {
           Obx(
             () => customTabs(
               tabs: tabs,
-              selectedIndex: c.selectedTab.value,
+              selectedIndex: (type == UserPageType.student)
+                  ? studentController.selectedTab.value
+                  : teacherController.selectedTab.value,
               onTap: (index) {
-                c.selectedTab.value = index;
-                c.applyFilters();
+                if (type == UserPageType.student) {
+                  studentController.selectedTab.value = index;
+                  studentController.applyFilters();
+                } else {
+                  teacherController.selectedTab.value = index;
+                  teacherController.applyFilters();
+                }
               },
               getCount: (index) {
-                switch (index) {
-                  case 0:
-                    return c.allCount;
-                  case 1:
-                    return c.activeCount;
-                  case 2:
-                    return c.batchCount;
-                  case 3:
-                    return c.tbaCount;
-                  case 4:
-                    return c.inactiveCount;
-                  default:
-                    return 0;
+                if (type == UserPageType.teacher) {
+                  switch (index) {
+                    case 0:
+                      return teacherController.allCount;
+                    case 1:
+                      return teacherController.activeCount;
+                    case 2:
+                      return teacherController.batchCount;
+                    case 3:
+                      return teacherController.inactiveCount;
+                    default:
+                      return 0;
+                  }
+                } else {
+                  switch (index) {
+                    case 0:
+                      return studentController.allCount;
+                    case 1:
+                      return studentController.activeCount;
+                    case 2:
+                      return studentController.batchCount;
+                    case 3:
+                      return studentController.tbaCount;
+                    case 4:
+                      return studentController.inactiveCount;
+                    default:
+                      return 0;
+                  }
                 }
               },
             ),
@@ -113,15 +154,24 @@ class StudentsPage extends StatelessWidget {
           /// 📋 List
           Expanded(
             child: Obx(() {
-              if (c.filteredStudents.isEmpty) {
-                return const Center(child: Text("No students found"));
+              if (type == UserPageType.student) {
+                if (studentController.filteredStudents.isEmpty) {
+                  return const Center(child: Text("No students found"));
+                }
+              } else {
+                if (teacherController.filteredTeachers.isEmpty) {
+                  return const Center(child: Text("No teachers found"));
+                }
               }
 
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 6),
-                itemCount: c.filteredStudents.length,
+                itemCount: (type == UserPageType.student)
+                    ? studentController.filteredStudents.length
+                    : teacherController.filteredTeachers.length,
                 itemBuilder: (context, index) {
-                  final student = c.filteredStudents[index];
+                  final student = studentController.filteredStudents[index];
+                  final teacher = teacherController.filteredTeachers[index];
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -129,7 +179,7 @@ class StudentsPage extends StatelessWidget {
                       alignment: Alignment.center,
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 700),
-                        child: _studentCard(student),
+                        child: _studentCard(student, teacher),
                       ),
                     ),
                   );
@@ -143,8 +193,10 @@ class StudentsPage extends StatelessWidget {
   }
 
   /// 💎 Premium Card
-  Widget _studentCard(Student s) {
-    final isActive = s.status == "Active";
+  Widget _studentCard(Student? s, TeacherModel? t) {
+    final isActive = (type == UserPageType.student)
+        ? s?.status == "Active"
+        : t?.status == "Active";
     final statusColor = isActive ? Colors.green : Colors.red;
 
     return Container(
@@ -185,7 +237,9 @@ class StudentsPage extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      s.id,
+                      (type == UserPageType.student)
+                          ? s?.id ?? 'NULL'
+                          : t?.id ?? 'NULL',
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -203,7 +257,9 @@ class StudentsPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        s.status,
+                        (type == UserPageType.student)
+                            ? s?.status ?? 'NULL'
+                            : t?.status ?? 'NULL',
                         style: TextStyle(
                           color: statusColor,
                           fontSize: 11,
@@ -218,7 +274,9 @@ class StudentsPage extends StatelessWidget {
 
                 /// Name
                 Text(
-                  s.name,
+                  (type == UserPageType.student)
+                      ? s?.name ?? 'NULL'
+                      : t?.name ?? 'NULL',
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -229,7 +287,9 @@ class StudentsPage extends StatelessWidget {
 
                 /// Email
                 Text(
-                  s.email,
+                  (type == UserPageType.student)
+                      ? s?.email ?? 'NULL'
+                      : t?.email ?? 'NULL',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
@@ -238,14 +298,21 @@ class StudentsPage extends StatelessWidget {
 
                 const SizedBox(height: 6),
 
-                /// Date
-                Text(
-                  "Joined • ${s.joinedAt.toString().substring(0, 16)}",
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey,
-                  ),
-                ),
+                type == UserPageType.student
+                    ? Text(
+                        "Joined • ${s?.joinedAt.toString().substring(0, 16) ?? 'NULL'}",
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
+                      )
+                    : Text(
+                        "Contact • ${t?.phone ?? "N/A"}",
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
+                      ),
 
                 const SizedBox(height: 10),
 
@@ -266,35 +333,6 @@ class StudentsPage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _pillBtn(String title, IconData icon, Color color) {
-    return InkWell(
-      onTap: () {},
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 4),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 11,
-                color: color,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

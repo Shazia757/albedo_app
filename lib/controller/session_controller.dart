@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 
 enum SortType { newest, oldest, student, teacher }
 
+enum UserPageType { student, teacher }
+
 class SessionController extends GetxController {
   var selectedTab = 0.obs;
   var selectedStatus = 0.obs;
@@ -10,6 +12,7 @@ class SessionController extends GetxController {
   var sortType = SortType.newest.obs;
   var sessions = <Session>[].obs;
   var selectedTeacher = ''.obs;
+
 
   List<String> tabs = [
     "Active",
