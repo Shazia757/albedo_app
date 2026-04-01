@@ -46,7 +46,31 @@ class DrawerMenu extends StatelessWidget {
                       Get.to(() => SessionPage());
                     },
                   ),
-                  _usersExpansion(),
+                  DrawerExpansionMenu(
+                      title: 'Users',
+                      leadingIcon: Icons.people,
+                      parentIndex: 7,
+                      selectedParentIndex: c.selectedIndex,
+                      selectedSubIndex: c.selectedSubIndex,
+                      children: [
+                        DrawerSubItem(
+                          title: "Students",
+                          index: 0,
+                          onTap: () =>
+                              Get.offAll(UsersPage(type: UserPageType.student)),
+                        ),
+                        DrawerSubItem(
+                          title: "Teachers",
+                          index: 1,
+                          onTap: () =>
+                              Get.offAll(UsersPage(type: UserPageType.teacher)),
+                        ),
+                        DrawerSubItem(title: "Mentors", index: 2, onTap: () {}),
+                        DrawerSubItem(
+                            title: "Asst. Admin", index: 3, onTap: () {}),
+                        DrawerSubItem(title: "Advisor", index: 4, onTap: () {}),
+                        DrawerSubItem(title: "Others", index: 5, onTap: () {}),
+                      ]),
                   _menuItem(
                     Icons.group,
                     "Batch",
@@ -57,16 +81,16 @@ class DrawerMenu extends StatelessWidget {
                       Get.to(() => HomeView());
                     },
                   ),
-                  _menuItem(
-                    Icons.payment,
-                    "Payments",
-                    active: c.selectedIndex.value == 3,
-                    onPressed: () {
-                      c.setIndex(3);
-                      Get.back(); // close drawer if open
-                      Get.to(() => HomeView());
-                    },
-                  ),
+                  DrawerExpansionMenu(
+                      title: 'Payments',
+                      leadingIcon: Icons.payment,
+                      parentIndex: 8,
+                      selectedParentIndex: c.selectedIndex,
+                      selectedSubIndex: c.selectedSubIndex,
+                      children: [
+                        DrawerSubItem(title: "Student", index: 0, onTap: () {}),
+                        DrawerSubItem(title: "Teacher", index: 1, onTap: () {}),
+                      ]),
                   _menuItem(
                     Icons.bar_chart,
                     "Reports",
@@ -205,91 +229,6 @@ class DrawerMenu extends StatelessWidget {
       ),
     );
   }
-
-  // ================= USERS =================
-
-  Widget _usersExpansion() {
-    HomeController c = Get.find();
-
-    return Obx(() => ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-          childrenPadding: const EdgeInsets.only(left: 12),
-          leading: Icon(
-            Icons.people,
-            size: 20,
-            color: c.selectedIndex.value == 7
-                ? const Color(0xFF7F00FF)
-                : Colors.grey,
-          ),
-          title: Text(
-            "Users",
-            style: TextStyle(
-              fontSize: 13,
-              color: c.selectedIndex.value == 7
-                  ? const Color(0xFF7F00FF)
-                  : Colors.black87,
-              fontWeight: c.selectedIndex.value == 7
-                  ? FontWeight.w600
-                  : FontWeight.w400,
-            ),
-          ),
-          children: [
-            _subItem("Students", 0, () {
-              Get.offAll(() => UsersPage(type: UserPageType.student));
-            }),
-            _subItem("Teachers", 1, () {
-              Get.offAll(() => UsersPage(type: UserPageType.teacher));
-            }),
-            _subItem("Mentors", 2, () {
-              // Get.to(() => StudentsPage());
-            }),
-            _subItem("Asst. Admin", 3, () {
-              // Get.to(() => StudentsPage());
-            }),
-            _subItem("Advisor", 4, () {
-              // Get.to(() => StudentsPage());
-            }),
-            _subItem("Others", 5, () {
-              // Get.to(() => StudentsPage());
-            }),
-          ],
-        ));
-  }
-
-  Widget _subItem(String title, int index, VoidCallback onTap) {
-    HomeController c = Get.find();
-
-    return Obx(() {
-      final isActive = c.selectedSubIndex.value == index;
-
-      return Container(
-        margin: const EdgeInsets.symmetric(vertical: 2),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: isActive ? const Color(0xFFF3E8FF) : Colors.transparent,
-        ),
-        child: ListTile(
-          dense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-          title: Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: isActive ? const Color(0xFF7F00FF) : Colors.black87,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-            ),
-          ),
-          onTap: () {
-            c.setIndex(7); // parent "Users"
-            c.setSubIndex(index);
-            Get.back(); // close drawer
-            onTap(); // change page if needed
-          },
-        ),
-      );
-    });
-  }
-
   // ================= AVATAR =================
 
   Widget _buildAvatar({double size = 32}) {
@@ -313,5 +252,121 @@ class DrawerMenu extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// ================= SUB MENU =================
+
+class DrawerExpansionMenu extends StatelessWidget {
+  final String title;
+  final IconData leadingIcon;
+  final int parentIndex;
+  final RxInt selectedParentIndex;
+  final RxInt selectedSubIndex;
+  final List<DrawerSubItem> children;
+
+  const DrawerExpansionMenu({
+    super.key,
+    required this.title,
+    required this.leadingIcon,
+    required this.parentIndex,
+    required this.selectedParentIndex,
+    required this.selectedSubIndex,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+          childrenPadding: const EdgeInsets.only(left: 12),
+          leading: Icon(
+            leadingIcon,
+            size: 20,
+            color: selectedParentIndex.value == parentIndex
+                ? const Color(0xFF7F00FF)
+                : Colors.grey,
+          ),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 13,
+              color: selectedParentIndex.value == parentIndex
+                  ? const Color(0xFF7F00FF)
+                  : Colors.black87,
+              fontWeight: selectedParentIndex.value == parentIndex
+                  ? FontWeight.w600
+                  : FontWeight.w400,
+            ),
+          ),
+          children: children
+              .map((item) => DrawerSubItemWidget(
+                    item: item,
+                    parentIndex: parentIndex,
+                    selectedParentIndex: selectedParentIndex,
+                    selectedSubIndex: selectedSubIndex,
+                  ))
+              .toList(),
+        ));
+  }
+}
+
+class DrawerSubItem {
+  final String title;
+  final int index;
+  final VoidCallback onTap;
+
+  DrawerSubItem({
+    required this.title,
+    required this.index,
+    required this.onTap,
+  });
+}
+
+class DrawerSubItemWidget extends StatelessWidget {
+  final DrawerSubItem item;
+  final int parentIndex;
+  final RxInt selectedParentIndex;
+  final RxInt selectedSubIndex;
+
+  const DrawerSubItemWidget({
+    super.key,
+    required this.item,
+    required this.parentIndex,
+    required this.selectedParentIndex,
+    required this.selectedSubIndex,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final isActive = selectedSubIndex.value == item.index;
+
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 2),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: isActive ? const Color(0xFFF3E8FF) : Colors.transparent,
+        ),
+        child: ListTile(
+          dense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          title: Text(
+            item.title,
+            style: TextStyle(
+              fontSize: 12,
+              color: isActive ? const Color(0xFF7F00FF) : Colors.black87,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+            ),
+          ),
+          onTap: () {
+            selectedParentIndex.value = parentIndex;
+            selectedSubIndex.value = item.index;
+            Get.back(); // close drawer
+            item.onTap(); // navigate/change page
+          },
+        ),
+      );
+    });
   }
 }
