@@ -1,14 +1,15 @@
+import 'package:albedo_app/view/home_page.dart';
+import 'package:albedo_app/view/session_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/home_controller.dart';
 
 class DrawerMenu extends StatelessWidget {
-  DrawerMenu({super.key});
-
-  final controller = Get.find<HomeController>();
+  const DrawerMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
+    HomeController c = Get.put(HomeController());
     final isDesktop = MediaQuery.of(context).size.width > 800;
 
     final sidebar = Container(
@@ -18,23 +19,85 @@ class DrawerMenu extends StatelessWidget {
         children: [
           _header(),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              children: [
-                _menuItem(Icons.home, "Home"),
-                _menuItem(Icons.video_collection, "Sessions"),
-
-                _usersExpansion(),
-
-                _menuItem(Icons.group, "Batch"),
-                _menuItem(Icons.payment, "Payments"),
-                _menuItem(Icons.bar_chart, "Reports"),
-
-                // 🔥 Supports with badge
-                _menuItem(Icons.support_agent, "Supports", badge: 3),
-
-                _menuItem(Icons.settings, "Settings"),
-              ],
+            child: Obx(
+              () => ListView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                children: [
+                  _menuItem(
+                    Icons.home,
+                    "Home",
+                    active: c.selectedIndex.value == 0,
+                    onPressed: () {
+                      c.setIndex(0);
+                      Get.back(); // close drawer if open
+                      Get.to(() => HomeView());
+                    },
+                  ),
+                  _menuItem(
+                    Icons.video_collection,
+                    "Sessions",
+                    active: c.selectedIndex.value == 1,
+                    onPressed: () {
+                      c.setIndex(1);
+                      Get.back(); // close drawer if open
+                      Get.to(() => SessionPage());
+                    },
+                  ),
+                  _usersExpansion(),
+                  _menuItem(
+                    Icons.group,
+                    "Batch",
+                    active: c.selectedIndex.value == 2,
+                    onPressed: () {
+                      c.setIndex(2);
+                      Get.back(); // close drawer if open
+                      Get.to(() => HomeView());
+                    },
+                  ),
+                  _menuItem(
+                    Icons.payment,
+                    "Payments",
+                    active: c.selectedIndex.value == 3,
+                    onPressed: () {
+                      c.setIndex(3);
+                      Get.back(); // close drawer if open
+                      Get.to(() => HomeView());
+                    },
+                  ),
+                  _menuItem(
+                    Icons.bar_chart,
+                    "Reports",
+                    active: c.selectedIndex.value == 4,
+                    onPressed: () {
+                      c.setIndex(4);
+                      Get.back(); // close drawer if open
+                      Get.to(() => HomeView());
+                    },
+                  ),
+                  _menuItem(
+                    Icons.support_agent,
+                    "Supports",
+                    badge: 3,
+                    active: c.selectedIndex.value == 5,
+                    onPressed: () {
+                      c.setIndex(5);
+                      Get.back();
+                      Get.to(() => HomeView());
+                    },
+                  ),
+                  _menuItem(
+                    Icons.settings,
+                    "Settings",
+                    active: c.selectedIndex.value == 6,
+                    onPressed: () {
+                      c.setIndex(6);
+                      Get.back();
+                      Get.to(() => HomeView());
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -77,8 +140,13 @@ class DrawerMenu extends StatelessWidget {
 
   // ================= MENU ITEM =================
 
-  Widget _menuItem(IconData icon, String title,
-      {bool active = false, int? badge}) {
+  Widget _menuItem(
+    IconData icon,
+    String title, {
+    bool active = false,
+    int? badge,
+    required VoidCallback onPressed,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 3),
       decoration: BoxDecoration(
@@ -131,7 +199,7 @@ class DrawerMenu extends StatelessWidget {
             fontWeight: active ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
-        onTap: () {},
+        onTap: onPressed,
       ),
     );
   }
@@ -139,37 +207,74 @@ class DrawerMenu extends StatelessWidget {
   // ================= USERS =================
 
   Widget _usersExpansion() {
-    return ExpansionTile(
-      tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-      childrenPadding: const EdgeInsets.only(left: 12),
-      leading: const Icon(Icons.people, size: 20, color: Colors.purple),
-      title: const Text("Users", style: TextStyle(fontSize: 13)),
-      iconColor: Colors.purple,
-      collapsedIconColor: Colors.purple,
-      children: [
-        _subItem("Students"),
-        _subItem("Teachers"),
-        _subItem("Mentors"),
-        _subItem("Asst. Admin"),
-        _subItem("Advisor"),
-        _subItem("Others"),
-      ],
-    );
+    HomeController c = Get.find();
+
+    return Obx(() => ExpansionTile(
+          initiallyExpanded: c.selectedIndex.value == 7,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+          childrenPadding: const EdgeInsets.only(left: 12),
+          leading: Icon(
+            Icons.people,
+            size: 20,
+            color: c.selectedIndex.value == 7
+                ? const Color(0xFF7F00FF)
+                : Colors.grey,
+          ),
+          title: Text(
+            "Users",
+            style: TextStyle(
+              fontSize: 13,
+              color: c.selectedIndex.value == 7
+                  ? const Color(0xFF7F00FF)
+                  : Colors.black87,
+              fontWeight: c.selectedIndex.value == 7
+                  ? FontWeight.w600
+                  : FontWeight.w400,
+            ),
+          ),
+          children: [
+            _subItem("Students", 0),
+            _subItem("Teachers", 1),
+            _subItem("Mentors", 2),
+            _subItem("Asst. Admin", 3),
+            _subItem("Advisor", 4),
+            _subItem("Others", 5),
+          ],
+        ));
   }
 
-  Widget _subItem(String title) {
-    return ListTile(
-      dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 12,
-          color: Colors.grey,
+  Widget _subItem(String title, int index) {
+    HomeController c = Get.find();
+
+    return Obx(() {
+      final isActive = c.selectedSubIndex.value == index;
+
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 2),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: isActive ? const Color(0xFFF3E8FF) : Colors.transparent,
         ),
-      ),
-      onTap: () {},
-    );
+        child: ListTile(
+          dense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: isActive ? const Color(0xFF7F00FF) : Colors.black87,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+            ),
+          ),
+          onTap: () {
+            c.setIndex(7); // parent "Users"
+            c.setSubIndex(index);
+            Get.back(); // close drawer
+            Get.to(() => HomeView()); // change page if needed
+          },
+        ),
+      );
+    });
   }
 
   // ================= AVATAR =================

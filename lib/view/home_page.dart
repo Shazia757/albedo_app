@@ -1,3 +1,4 @@
+import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,135 +8,14 @@ import '../../widgets/drawer_menu.dart';
 class HomeView extends StatelessWidget {
   HomeView({super.key});
 
-  final controller = Get.put(HomeController());
+  HomeController c = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MediaQuery.of(context).size.width > 800 ? null : DrawerMenu(),
       backgroundColor: const Color(0xFFF2F4F8),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 3,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: Row(
-          children: [
-            Image.asset("assets/images/logo.png",
-                height: 28), // replace with your logo
-            const SizedBox(width: 8),
-            // const Text("albedo", style: TextStyle(color: Colors.black)),
-          ],
-        ),
-        actions: [
-          Icon(Icons.dark_mode, color: Colors.black),
-          SizedBox(width: 12),
-          Icon(Icons.notifications_none, color: Colors.black),
-          SizedBox(width: 12),
-          PopupMenuButton(
-            padding: EdgeInsets.zero,
-            offset: const Offset(0, 45),
-            color: Colors.transparent,
-            elevation: 0,
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                enabled: false,
-                padding: EdgeInsets.zero,
-                child: Container(
-                  width: 220,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 20,
-                        color: Colors.black.withOpacity(0.1),
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 🔥 PROFILE HEADER
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            ClipOval(
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Image.asset(
-                                  "assets/images/logo.png",
-                                  width: 36,
-                                  height: 36,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text("Albedo Admin",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w600)),
-                                Text("admin@albedo.com",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey)),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-
-                      Divider(height: 1),
-
-                      // 🔥 PROFILE BUTTON
-                      Row(
-                        children: [
-                          _menuItem(
-                            icon: Icons.person_outline,
-                            text: "Profile",
-                            onTap: () {
-                              Navigator.pop(context);
-                              // Navigate to profile
-                            },
-                          ),
-                          _menuItem(
-                            icon: Icons.logout,
-                            text: "Logout",
-                            isDanger: true,
-                            onTap: () {
-                              Navigator.pop(context);
-                              // Logout logic
-                            },
-                          ),
-                        ],
-                      ),
-
-                      // 🔥 LOGOUT BUTTON
-                    ],
-                  ),
-                ),
-              ),
-            ],
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.withOpacity(0.3)),
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  "assets/images/logo.png",
-                  fit: BoxFit.fitWidth,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
+      appBar: CustomAppBar(),
       body: Row(
         children: [
           if (MediaQuery.of(context).size.width > 800) DrawerMenu(),
@@ -147,7 +27,7 @@ class HomeView extends StatelessWidget {
                   _chartCard(
                     title: "Students Count",
                     count: "1034",
-                    data: controller.studentData,
+                    data: c.studentData,
                     color: Colors.blue,
                   ),
                   const SizedBox(height: 16),
@@ -156,14 +36,14 @@ class HomeView extends StatelessWidget {
                   _chartCard(
                     title: "Women Count",
                     count: "10",
-                    data: controller.womenData,
+                    data: c.womenData,
                     color: Colors.purple,
                   ),
                   const SizedBox(height: 16),
                   _chartCard(
                     title: "Assistants Count",
                     count: "4",
-                    data: controller.assistantData,
+                    data: c.assistantData,
                     color: Colors.blueAccent,
                   ),
                   const SizedBox(height: 16),
