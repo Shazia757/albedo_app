@@ -6,6 +6,7 @@ import 'package:albedo_app/view/payment_page.dart';
 import 'package:albedo_app/view/report_page.dart';
 import 'package:albedo_app/view/session_page.dart';
 import 'package:albedo_app/view/students_trs_page.dart';
+import 'package:albedo_app/view/support_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/home_controller.dart';
@@ -121,7 +122,7 @@ class DrawerMenu extends StatelessWidget {
                     onPressed: () {
                       c.setIndex(5);
                       Get.back();
-                      Get.to(() => HomeView());
+                      Get.to(() => SupportsPage());
                     },
                   ),
                   _menuItem(
