@@ -3,6 +3,7 @@ import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/view/batch_page.dart';
 import 'package:albedo_app/view/home_page.dart';
 import 'package:albedo_app/view/payment_page.dart';
+import 'package:albedo_app/view/report_page.dart';
 import 'package:albedo_app/view/session_page.dart';
 import 'package:albedo_app/view/students_trs_page.dart';
 import 'package:flutter/material.dart';
@@ -109,7 +110,7 @@ class DrawerMenu extends StatelessWidget {
                     onPressed: () {
                       c.setIndex(4);
                       Get.back(); // close drawer if open
-                      Get.to(() => HomeView());
+                      Get.to(() => ReportsPage());
                     },
                   ),
                   _menuItem(

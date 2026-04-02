@@ -6,6 +6,13 @@ class TeacherModel {
   final String type; // Batch / TBA
   final DateTime joinedAt;
   final String phone;
+  int? totalStudents;
+  int? totalPackages;
+  int? salary;
+  int? paid;
+  double? balance;
+  double? totalSessions;
+  double? totalHours;
 
   TeacherModel({
     required this.id,
@@ -15,5 +22,12 @@ class TeacherModel {
     required this.type,
     required this.joinedAt,
     required this.phone,
+    this.totalStudents,
+    this.totalPackages,
+    this.totalSessions,
+    this.totalHours,
+    this.salary,
+    this.paid,
+    this.balance,
   });
 }

@@ -54,7 +54,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  // 🔥 PROFILE MENU (same as before)
   Widget _profileMenu(BuildContext context) {
     return Container(
       width: 220,

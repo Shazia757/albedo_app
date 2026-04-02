@@ -90,7 +90,7 @@ class UserController extends GetxController {
     students.assignAll([
       Student(
         admissionDate: DateTime.parse('2023-01-15 12:00:00'),
-        id: "STU1001",
+        studentId: "STU1001",
         name: "Riya Shah",
         email: "riya@email.com",
         status: "Active",
@@ -99,7 +99,7 @@ class UserController extends GetxController {
       ),
       Student(
         admissionDate: DateTime.parse('2023-01-15 12:00:00'),
-        id: "STU1002",
+        studentId: "STU1002",
         name: "Ameen",
         email: "ameen@email.com",
         status: "Inactive",
@@ -135,13 +135,15 @@ class UserController extends GetxController {
       if (searchQuery.value.isNotEmpty) {
         temp = temp
             .where((s) =>
-                s.name
+                s.name!
                     .toLowerCase()
                     .contains(searchQuery.value.toLowerCase()) ||
-                s.email
+                s.email!
                     .toLowerCase()
                     .contains(searchQuery.value.toLowerCase()) ||
-                s.id.toLowerCase().contains(searchQuery.value.toLowerCase()))
+                s.studentId!
+                    .toLowerCase()
+                    .contains(searchQuery.value.toLowerCase()))
             .toList();
       }
 
@@ -151,7 +153,7 @@ class UserController extends GetxController {
       } else if (sortType.value == "Oldest") {
         temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
       } else {
-        temp.sort((a, b) => a.name.compareTo(b.name));
+        temp.sort((a, b) => a.name!.compareTo(b.name!));
       }
 
       filteredStudents.assignAll(temp);

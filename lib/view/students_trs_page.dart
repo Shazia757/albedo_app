@@ -238,7 +238,7 @@ class UsersPage extends StatelessWidget {
                   children: [
                     Text(
                       (type == UserPageType.student)
-                          ? s?.id ?? 'NULL'
+                          ? s?.studentId ?? 'NULL'
                           : t?.id ?? 'NULL',
                       style: const TextStyle(
                         fontSize: 11,

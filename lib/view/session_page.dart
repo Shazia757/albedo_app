@@ -14,6 +14,8 @@ import 'package:get/get.dart';
 class SessionPage extends StatelessWidget {
   final c = Get.put(SessionController());
 
+  SessionPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
