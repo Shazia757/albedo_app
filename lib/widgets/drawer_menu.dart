@@ -1,6 +1,8 @@
 import 'package:albedo_app/controller/session_controller.dart';
+import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/view/batch_page.dart';
 import 'package:albedo_app/view/home_page.dart';
+import 'package:albedo_app/view/payment_page.dart';
 import 'package:albedo_app/view/session_page.dart';
 import 'package:albedo_app/view/students_trs_page.dart';
 import 'package:flutter/material.dart';
@@ -89,8 +91,16 @@ class DrawerMenu extends StatelessWidget {
                       selectedParentIndex: c.selectedIndex,
                       selectedSubIndex: c.selectedSubIndex,
                       children: [
-                        DrawerSubItem(title: "Student", index: 0, onTap: () {}),
-                        DrawerSubItem(title: "Teacher", index: 1, onTap: () {}),
+                        DrawerSubItem(
+                            title: "Student",
+                            index: 0,
+                            onTap: () => Get.offAll(() =>
+                                PaymentPage(type: PaymentUserType.student))),
+                        DrawerSubItem(
+                            title: "Teacher",
+                            index: 1,
+                            onTap: () => Get.offAll(() =>
+                                PaymentPage(type: PaymentUserType.teacher))),
                       ]),
                   _menuItem(
                     Icons.bar_chart,
