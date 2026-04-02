@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
-Widget iconBtn({IconData? icon, required Color color, VoidCallback? onTap, String? title}) {
+Widget iconBtn(
+    {IconData? icon,
+    required Color color,
+    VoidCallback? onTap,
+    String? title}) {
   return Material(
     color: Colors.transparent,
     child: InkWell(

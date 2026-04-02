@@ -3,6 +3,7 @@ import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/view/forgot_password_page.dart';
 import 'package:albedo_app/widgets/button.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
+import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/search_bar.dart';
 import 'package:albedo_app/widgets/sort_sheet.dart';
@@ -71,7 +72,70 @@ class SessionPage extends StatelessWidget {
                           mainAxisSpacing: 12,
                           childAspectRatio: 1.2,
                         ),
-                        itemBuilder: (_, i) => _sessionCard(data[i]),
+                        itemBuilder: (_, i) => InfoCard(
+                          id: data[i].id,
+                          status: data[i].status,
+                          statusColor: getStatusColor(data[i].status),
+                          infoRows: [
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: _personCompact(
+                                        "Student",
+                                        data[i].studentName,
+                                        data[i].studentId)),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                    child: _personCompact(
+                                        "Teacher",
+                                        data[i].teacherName,
+                                        data[i].teacherId)),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          child: _miniInfo(
+                                              "Subject", data[i].subject)),
+                                      Expanded(
+                                          child: _miniInfo(
+                                              "Class", data[i].className)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          child: _miniInfo("Date",
+                                              "${data[i].dateTime.day}/${data[i].dateTime.month}/${data[i].dateTime.year}")),
+                                      Expanded(
+                                          child: _miniInfo("Time",
+                                              _formatTime(data[i].dateTime))),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          actions: [
+                            iconBtn(
+                                icon: Icons.edit,
+                                color: Colors.blue,
+                                onTap: () {}),
+                            iconBtn(
+                                icon: Icons.delete,
+                                color: Colors.red,
+                                onTap: () {}),
+                          ],
+                        ),
                       );
                     }),
                   )
@@ -121,32 +185,6 @@ class SessionPage extends StatelessWidget {
       ],
     );
   }
-
-  // Widget _premiumSearch(SessionController c) {
-  //   return Container(
-  //     height: 44,
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(12),
-  //       boxShadow: [
-  //         BoxShadow(
-  //           color: Colors.black.withOpacity(0.05),
-  //           blurRadius: 8,
-  //         )
-  //       ],
-  //     ),
-  //     child: TextField(
-  //       onChanged: (val) => c.searchQuery.value = val,
-  //       style: const TextStyle(fontSize: 14),
-  //       decoration: InputDecoration(
-  //         hintText: "Search sessions...",
-  //         prefixIcon: const Icon(Icons.search, size: 20),
-  //         border: InputBorder.none,
-  //         contentPadding: const EdgeInsets.symmetric(vertical: 12),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _actionButton(IconData icon, String label) {
     return Container(
@@ -209,168 +247,130 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  // Widget _tabs(SessionController c) {
-  //   return Obx(() => SingleChildScrollView(
-  //         scrollDirection: Axis.horizontal,
-  //         child: Row(
-  //           children: List.generate(c.tabs.length, (index) {
-  //             final isActive = c.selectedTab.value == index;
+  // Widget _sessionCard(Session s) {
+  //   final color = getStatusColor(s.status);
 
-  //             final count = c.sessions
-  //                 .where((e) => e.status == c.statusMap[index])
-  //                 .length;
-
-  //             return GestureDetector(
-  //               onTap: () => c.selectedTab.value = index,
-  //               child: Container(
-  //                 margin: const EdgeInsets.only(right: 8),
-  //                 padding:
-  //                     const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-  //                 decoration: BoxDecoration(
-  //                   color: isActive
-  //                       ? const Color(0xFF7F00FF)
-  //                       : Colors.grey.shade200,
-  //                   borderRadius: BorderRadius.circular(20),
-  //                 ),
-  //                 child: Text(
-  //                   "${c.tabs[index]} ($count)",
-  //                   style: TextStyle(
-  //                     color: isActive ? Colors.white : Colors.black87,
-  //                     fontSize: 12,
-  //                     fontWeight: FontWeight.w500,
-  //                   ),
+  //   return Container(
+  //     padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+  //     margin: const EdgeInsets.only(bottom: 20),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(16),
+  //       border: Border.all(color: Colors.grey.shade200),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         // 🔥 TOP ROW
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Text(
+  //               "ID: ${s.id}",
+  //               style: const TextStyle(
+  //                 fontSize: 12,
+  //                 color: Colors.grey,
+  //               ),
+  //             ),
+  //             Container(
+  //               padding:
+  //                   const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+  //               decoration: BoxDecoration(
+  //                 color: color.withOpacity(0.1),
+  //                 borderRadius: BorderRadius.circular(20),
+  //               ),
+  //               child: Text(
+  //                 s.status.replaceAll("_", " "),
+  //                 style: TextStyle(
+  //                   fontSize: 11,
+  //                   fontWeight: FontWeight.w600,
+  //                   color: color,
   //                 ),
   //               ),
-  //             );
-  //           }),
+  //             )
+  //           ],
   //         ),
-  //       ));
+
+  //         const SizedBox(height: 10),
+
+  //         // 🔥 STUDENT + TEACHER (tight layout)
+  //         Row(
+  //           children: [
+  //             Expanded(
+  //               child: _personCompact(
+  //                 "Student",
+  //                 s.studentName,
+  //                 s.studentId,
+  //               ),
+  //             ),
+  //             const SizedBox(width: 10),
+  //             Expanded(
+  //               child: _personCompact(
+  //                 "Teacher",
+  //                 s.teacherName,
+  //                 s.teacherId,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+
+  //         const SizedBox(height: 10),
+
+  //         // 🔥 SUBJECT + CLASS + TIME (merged)
+  //         Container(
+  //           padding: const EdgeInsets.all(10),
+  //           decoration: BoxDecoration(
+  //             color: Colors.grey.shade50,
+  //             borderRadius: BorderRadius.circular(12),
+  //           ),
+  //           child: Column(
+  //             children: [
+  //               Row(
+  //                 children: [
+  //                   Expanded(
+  //                     child: _miniInfo("Subject", s.subject),
+  //                   ),
+  //                   Expanded(
+  //                     child: _miniInfo("Class", s.className),
+  //                   ),
+  //                 ],
+  //               ),
+  //               const SizedBox(height: 6),
+  //               Row(
+  //                 children: [
+  //                   Expanded(
+  //                     child: _miniInfo(
+  //                       "Date",
+  //                       "${s.dateTime.day}/${s.dateTime.month}/${s.dateTime.year}",
+  //                     ),
+  //                   ),
+  //                   Expanded(
+  //                     child: _miniInfo(
+  //                       "Time",
+  //                       _formatTime(s.dateTime),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+
+  //         const SizedBox(height: 4),
+
+  //         // 🔥 ACTIONS
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.end,
+  //           children: [
+  //             iconBtn(icon: Icons.edit, color: Colors.blue, onTap: () {}),
+  //             const SizedBox(width: 6),
+  //             iconBtn(icon: Icons.delete, color: Colors.red, onTap: () {}),
+  //           ],
+  //         )
+  //       ],
+  //     ),
+  //   );
   // }
-
-  Widget _sessionCard(Session s) {
-    final color = getStatusColor(s.status);
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 🔥 TOP ROW
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "ID: ${s.id}",
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  s.status.replaceAll("_", " "),
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
-                ),
-              )
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          // 🔥 STUDENT + TEACHER (tight layout)
-          Row(
-            children: [
-              Expanded(
-                child: _personCompact(
-                  "Student",
-                  s.studentName,
-                  s.studentId,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _personCompact(
-                  "Teacher",
-                  s.teacherName,
-                  s.teacherId,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          // 🔥 SUBJECT + CLASS + TIME (merged)
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _miniInfo("Subject", s.subject),
-                    ),
-                    Expanded(
-                      child: _miniInfo("Class", s.className),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _miniInfo(
-                        "Date",
-                        "${s.dateTime.day}/${s.dateTime.month}/${s.dateTime.year}",
-                      ),
-                    ),
-                    Expanded(
-                      child: _miniInfo(
-                        "Time",
-                        _formatTime(s.dateTime),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 4),
-
-          // 🔥 ACTIONS
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              iconBtn(icon: Icons.edit, color: Colors.blue, onTap: () {}),
-              const SizedBox(width: 6),
-              iconBtn(icon: Icons.delete, color: Colors.red, onTap: () {}),
-            ],
-          )
-        ],
-      ),
-    );
-  }
 
   String _formatTime(DateTime dt) {
     final hour = dt.hour > 12 ? dt.hour - 12 : dt.hour;
@@ -397,28 +397,6 @@ class SessionPage extends StatelessWidget {
       ],
     );
   }
-
-  // Widget _iconBtn(IconData icon, Color color, VoidCallback onTap) {
-  //   return Material(
-  //     color: Colors.transparent,
-  //     child: InkWell(
-  //       onTap: onTap,
-  //       borderRadius: BorderRadius.circular(10),
-  //       child: Container(
-  //         padding: const EdgeInsets.all(8),
-  //         decoration: BoxDecoration(
-  //           color: color.withOpacity(0.1),
-  //           borderRadius: BorderRadius.circular(10),
-  //         ),
-  //         child: Icon(
-  //           icon,
-  //           size: 18,
-  //           color: color,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _personCompact(String label, String name, String id) {
     return Column(

@@ -1,4 +1,5 @@
 import 'package:albedo_app/controller/session_controller.dart';
+import 'package:albedo_app/view/batch_page.dart';
 import 'package:albedo_app/view/home_page.dart';
 import 'package:albedo_app/view/session_page.dart';
 import 'package:albedo_app/view/students_trs_page.dart';
@@ -78,7 +79,7 @@ class DrawerMenu extends StatelessWidget {
                     onPressed: () {
                       c.setIndex(2);
                       Get.back(); // close drawer if open
-                      Get.to(() => HomeView());
+                      Get.to(() => BatchesPage());
                     },
                   ),
                   DrawerExpansionMenu(
