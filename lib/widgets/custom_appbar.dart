@@ -13,8 +13,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final RxBool isDark = Get.isDarkMode.obs;
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 3,
       iconTheme: const IconThemeData(color: Colors.black),
 
@@ -33,7 +34,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
       // ✅ KEEP ACTIONS HERE
       actions: [
-        const Icon(Icons.dark_mode, color: Colors.black),
+        Obx(
+          () => InkWell(
+              onTap: () {
+                Get.changeThemeMode(
+                    isDark.value ? ThemeMode.light : ThemeMode.dark);
+                isDark.value = !isDark.value;
+              },
+              child: Icon(isDark.value ? Icons.light_mode : Icons.dark_mode,
+                  color: Colors.black)),
+        ),
         const SizedBox(width: 12),
         const Icon(Icons.notifications_none, color: Colors.black),
         const SizedBox(width: 12),

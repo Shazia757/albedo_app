@@ -14,7 +14,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MediaQuery.of(context).size.width > 800 ? null : DrawerMenu(),
-      backgroundColor: const Color(0xFFF2F4F8),
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: CustomAppBar(),
       body: Row(
         children: [
@@ -25,26 +25,29 @@ class HomeView extends StatelessWidget {
               child: Column(
                 children: [
                   _chartCard(
+                    context,
                     title: "Students Count",
                     count: "1034",
                     data: c.studentData,
-                    color: Colors.blue,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   const SizedBox(height: 16),
-                  _summaryCard(),
+                  _summaryCard(context),
                   const SizedBox(height: 16),
                   _chartCard(
+                    context,
                     title: "Women Count",
                     count: "10",
                     data: c.womenData,
-                    color: Colors.purple,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                   const SizedBox(height: 16),
                   _chartCard(
+                    context,
                     title: "Assistants Count",
                     count: "4",
                     data: c.assistantData,
-                    color: Colors.blueAccent,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -58,7 +61,8 @@ class HomeView extends StatelessWidget {
 
   // ================= CHART =================
 
-  Widget _chartCard({
+  Widget _chartCard(
+    BuildContext context, {
     required String title,
     required String count,
     required List<double> data,
@@ -67,7 +71,7 @@ class HomeView extends StatelessWidget {
     return Container(
       height: 220,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-      decoration: _cardDecoration(),
+      decoration: _cardDecoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -78,8 +82,8 @@ class HomeView extends StatelessWidget {
               )),
           const SizedBox(height: 2),
           Text(title,
-              style: const TextStyle(
-                color: Colors.grey,
+              style: TextStyle(
+                color: context.theme.colorScheme.outline,
                 fontSize: 13,
               )),
           const SizedBox(height: 12),
@@ -93,7 +97,7 @@ class HomeView extends StatelessWidget {
                   drawVerticalLine: false,
                   horizontalInterval: 10,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.grey.withOpacity(0.15),
+                    color: context.theme.colorScheme.outline.withOpacity(0.4),
                     strokeWidth: 1,
                   ),
                 ),
@@ -108,9 +112,9 @@ class HomeView extends StatelessWidget {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           value.toInt().toString(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
-                            color: Colors.grey,
+                            color: context.theme.colorScheme.outline,
                           ),
                         );
                       },
@@ -131,9 +135,9 @@ class HomeView extends StatelessWidget {
                         ];
                         return Text(
                           labels[value.toInt()],
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
-                            color: Colors.grey,
+                            color: context.theme.colorScheme.outline,
                           ),
                         );
                       },
@@ -155,7 +159,7 @@ class HomeView extends StatelessWidget {
                       return spots.map((spot) {
                         return LineTooltipItem(
                           "${spot.y}",
-                          const TextStyle(color: Colors.white),
+                          TextStyle(color: context.theme.colorScheme.onPrimary),
                         );
                       }).toList();
                     },
@@ -196,10 +200,10 @@ class HomeView extends StatelessWidget {
   }
   // ================= SUMMARY =================
 
-  Widget _summaryCard() {
+  Widget _summaryCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(),
+      decoration: _cardDecoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -213,17 +217,17 @@ class HomeView extends StatelessWidget {
                 sections: [
                   PieChartSectionData(
                     value: 40,
-                    color: Colors.purple,
+                    color: context.theme.colorScheme.primary,
                     showTitle: false,
                   ),
                   PieChartSectionData(
                     value: 30,
-                    color: Colors.orange,
+                    color: context.theme.colorScheme.secondary,
                     showTitle: false,
                   ),
                   PieChartSectionData(
                     value: 30,
-                    color: Colors.blue,
+                    color: context.theme.colorScheme.tertiary,
                     showTitle: false,
                   ),
                 ],
@@ -241,9 +245,9 @@ class HomeView extends StatelessWidget {
 
   // ================= COMMON =================
 
-  BoxDecoration _cardDecoration() {
+  BoxDecoration _cardDecoration(BuildContext context) {
     return BoxDecoration(
-      color: Colors.white,
+      color: context.theme.cardColor,
       borderRadius: BorderRadius.circular(20),
       boxShadow: [
         BoxShadow(
@@ -252,34 +256,6 @@ class HomeView extends StatelessWidget {
           offset: const Offset(0, 4),
         )
       ],
-    );
-  }
-
-  Widget _menuItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-    bool isDanger = false,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Row(
-          children: [
-            Icon(icon,
-                size: 18, color: isDanger ? Colors.red : Colors.grey[700]),
-            const SizedBox(width: 12),
-            Text(
-              text,
-              style: TextStyle(
-                color: isDanger ? Colors.red : null,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
