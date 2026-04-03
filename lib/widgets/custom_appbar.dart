@@ -1,3 +1,5 @@
+import 'package:albedo_app/view/login_page.dart';
+import 'package:albedo_app/view/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -103,15 +105,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               _menuItem(
                 icon: Icons.person_outline,
                 text: "Profile",
-                onTap: () {
-                  Navigator.pop(context);
-                },
+                onTap: () => Get.offAll(ProfilePage()),
               ),
               _menuItem(
                 icon: Icons.logout,
                 text: "Logout",
                 isDanger: true,
-                onTap: () => Get.offAllNamed('/login'),
+                onTap: () => Get.offAll(LoginView()),
               ),
             ],
           ),

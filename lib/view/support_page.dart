@@ -1,5 +1,4 @@
 import 'package:albedo_app/controller/support_controller.dart';
-import 'package:albedo_app/model/support_model.dart';
 import 'package:albedo_app/widgets/button.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
