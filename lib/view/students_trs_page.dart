@@ -195,20 +195,23 @@ class UsersPage extends StatelessWidget {
 
   /// 💎 Premium Card
   Widget _studentCard(BuildContext context, Student? s, TeacherModel? t) {
+    final cs = Theme.of(context).colorScheme;
+
     final isActive = (type == UserPageType.student)
         ? s?.status == "Active"
         : t?.status == "Active";
-    final statusColor = isActive ? Colors.green : Colors.red;
+
+    final statusColor = isActive ? cs.primary : cs.error;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: cs.surface,
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
+            color: cs.shadow.withOpacity(0.08),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -217,7 +220,7 @@ class UsersPage extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// 🔥 Left Accent Bar (Premium feel)
+          /// 🔥 Left Accent Bar
           Container(
             width: 4,
             height: 70,
@@ -241,10 +244,10 @@ class UsersPage extends StatelessWidget {
                       (type == UserPageType.student)
                           ? s?.studentId ?? 'NULL'
                           : t?.id ?? 'NULL',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey,
+                        color: cs.onSurface.withOpacity(0.6),
                       ),
                     ),
                     const Spacer(),
@@ -254,7 +257,7 @@ class UsersPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.1),
+                        color: statusColor.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -278,9 +281,10 @@ class UsersPage extends StatelessWidget {
                   (type == UserPageType.student)
                       ? s?.name ?? 'NULL'
                       : t?.name ?? 'NULL',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
+                    color: cs.onSurface,
                   ),
                 ),
 
@@ -291,43 +295,50 @@ class UsersPage extends StatelessWidget {
                   (type == UserPageType.student)
                       ? s?.email ?? 'NULL'
                       : t?.email ?? 'NULL',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: cs.onSurface.withOpacity(0.6),
                   ),
                 ),
 
                 const SizedBox(height: 6),
 
-                type == UserPageType.student
-                    ? Text(
-                        "Joined • ${s?.joinedAt.toString().substring(0, 16) ?? 'NULL'}",
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey,
-                        ),
-                      )
-                    : Text(
-                        "Contact • ${t?.phone ?? "N/A"}",
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey,
-                        ),
-                      ),
+                /// Extra Info
+                Text(
+                  type == UserPageType.student
+                      ? "Joined • ${s?.joinedAt.toString().substring(0, 16) ?? 'NULL'}"
+                      : "Contact • ${t?.phone ?? "N/A"}",
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: cs.onSurface.withOpacity(0.5),
+                  ),
+                ),
 
                 const SizedBox(height: 10),
 
-                /// 🔘 Actions (pill style)
+                /// 🔘 Actions
                 Row(
-                  spacing: 8,
                   children: [
                     iconBtn(
-                        title: "Dashboard",
-                        icon: Icons.dashboard,
-                        color: Colors.blue),
-                    iconBtn(icon: Icons.edit, color: Colors.orange),
-                    iconBtn(icon: Icons.block, color: Colors.red),
-                    iconBtn(icon: Icons.delete, color: Colors.grey),
+                      title: "Dashboard",
+                      icon: Icons.dashboard,
+                      color: cs.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    iconBtn(
+                      icon: Icons.edit,
+                      color: cs.secondary,
+                    ),
+                    const SizedBox(width: 8),
+                    iconBtn(
+                      icon: Icons.block,
+                      color: cs.error,
+                    ),
+                    const SizedBox(width: 8),
+                    iconBtn(
+                      icon: Icons.delete,
+                      color: cs.onSurface.withOpacity(0.4),
+                    ),
                   ],
                 )
               ],

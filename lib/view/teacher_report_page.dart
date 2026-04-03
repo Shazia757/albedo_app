@@ -54,14 +54,16 @@ Widget _summaryCard(BuildContext context, String title, String value) {
       color: Theme.of(context).colorScheme.onPrimary,
       borderRadius: BorderRadius.circular(14),
       boxShadow: [
-        BoxShadow(color: Theme.of(context).colorScheme.shadow, blurRadius: 10)
+        BoxShadow(color: Theme.of(context).colorScheme.shadow, blurRadius: 1)
       ],
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(title, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        Text(title,
+            style: TextStyle(
+                fontSize: 11, color: Theme.of(context).colorScheme.outline)),
         const SizedBox(height: 4),
         Text(value,
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),

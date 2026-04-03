@@ -5,8 +5,8 @@ class InfoCard extends StatelessWidget {
   final String status;
   final Color statusColor;
 
-  final List<Widget>? infoRows; // custom layouts
-  final List<Map<String, String>>? infoColumns; // simple key-value pairs
+  final List<Widget>? infoRows;
+  final List<Map<String, String>>? infoColumns;
 
   final List<Widget>? actions;
 
@@ -22,13 +22,23 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: cs.outline.withOpacity(0.3),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: cs.shadow.withOpacity(0.05),
+            blurRadius: 10,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,13 +49,16 @@ class InfoCard extends StatelessWidget {
             children: [
               Text(
                 "ID: $id",
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: cs.onSurface.withOpacity(0.6),
+                ),
               ),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -62,12 +75,12 @@ class InfoCard extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          /// 🔥 INFO COLUMNS (AUTO GRID)
+          /// 🔥 INFO COLUMNS
           if (infoColumns != null && infoColumns!.isNotEmpty)
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: cs.primaryContainer.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Wrap(
@@ -76,13 +89,14 @@ class InfoCard extends StatelessWidget {
                 children: infoColumns!
                     .map((item) => ConstrainedBox(
                           constraints: const BoxConstraints(minWidth: 120),
-                          child: _miniInfo(item['label']!, item['value']!),
+                          child: _miniInfo(
+                              context, item['label']!, item['value']!),
                         ))
                     .toList(),
               ),
             ),
 
-          /// 🔥 CUSTOM INFO ROWS (if provided)
+          /// 🔥 CUSTOM INFO ROWS
           if (infoRows != null)
             ...infoRows!.map((w) => Padding(
                   padding: const EdgeInsets.only(top: 10),
@@ -102,27 +116,34 @@ class InfoCard extends StatelessWidget {
                     )),
               ],
             ),
+
           const SizedBox(height: 10),
         ],
       ),
     );
   }
 
-  /// 🔥 MINI INFO WIDGET
-  Widget _miniInfo(String label, String value) {
+  /// 🔥 MINI INFO
+  Widget _miniInfo(BuildContext context, String label, String value) {
+    final cs = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: Colors.grey),
+          style: TextStyle(
+            fontSize: 11,
+            color: cs.onSurface.withOpacity(0.6),
+          ),
         ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
+            color: cs.onSurface,
           ),
         ),
       ],

@@ -21,7 +21,7 @@ class DrawerMenu extends StatelessWidget {
 
     final sidebar = Container(
       width: 240, // 👈 reduced width (premium feel)
-      color: const Color(0xFFF8FAFC),
+      color: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
           _header(context),
@@ -156,13 +156,16 @@ class DrawerMenu extends StatelessWidget {
   // ================= HEADER =================
 
   Widget _header(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: cs.surface,
         border: Border(
-          bottom: BorderSide(color: Color(0xFFE5E7EB)),
+          bottom: BorderSide(
+            color: cs.outline.withOpacity(0.3),
+          ),
         ),
       ),
       child: Row(
@@ -171,11 +174,16 @@ class DrawerMenu extends StatelessWidget {
           const SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text("Admin",
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-              Text("admin@albedo.com",
-                  style: TextStyle(fontSize: 11, color: Colors.grey)),
+              Text(
+                "admin@albedo.com",
+                style: TextStyle(
+                  fontSize: 11,
+                  color: cs.onSurface.withOpacity(0.6),
+                ),
+              ),
             ],
           )
         ],
@@ -193,11 +201,13 @@ class DrawerMenu extends StatelessWidget {
     int? badge,
     required VoidCallback onPressed,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 3),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: active ? const Color(0xFFF3E8FF) : Colors.transparent,
+        color:
+            active ? cs.primaryContainer.withOpacity(0.5) : Colors.transparent,
       ),
       child: ListTile(
         dense: true, // 👈 tighter spacing
@@ -206,7 +216,7 @@ class DrawerMenu extends StatelessWidget {
             Icon(
               icon,
               size: 20,
-              color: active ? const Color(0xFF7F00FF) : Colors.grey,
+              color: active ? cs.primary : cs.onSurface.withOpacity(0.6),
             ),
 
             // 🔥 BADGE
@@ -217,7 +227,7 @@ class DrawerMenu extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.red,
+                    color: Theme.of(context).colorScheme.onTertiaryContainer,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   constraints: const BoxConstraints(
@@ -241,7 +251,7 @@ class DrawerMenu extends StatelessWidget {
           title,
           style: TextStyle(
             fontSize: 13,
-            color: active ? const Color(0xFF7F00FF) : Colors.black87,
+            color: active ? cs.primary : cs.onSurface,
             fontWeight: active ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
@@ -251,7 +261,7 @@ class DrawerMenu extends StatelessWidget {
   }
   // ================= AVATAR =================
 
-  Widget _buildAvatar(BuildContext context,{double size = 32}) {
+  Widget _buildAvatar(BuildContext context, {double size = 32}) {
     return Container(
       width: size,
       height: size,
@@ -259,7 +269,7 @@ class DrawerMenu extends StatelessWidget {
         shape: BoxShape.circle,
         color: Theme.of(context).colorScheme.onPrimary,
         border: Border.all(
-          color: Colors.grey.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
         ),
       ),
       child: ClipOval(
@@ -304,16 +314,16 @@ class DrawerExpansionMenu extends StatelessWidget {
             leadingIcon,
             size: 20,
             color: selectedParentIndex.value == parentIndex
-                ? const Color(0xFF7F00FF)
-                : Colors.grey,
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           ),
           title: Text(
             title,
             style: TextStyle(
               fontSize: 13,
               color: selectedParentIndex.value == parentIndex
-                  ? const Color(0xFF7F00FF)
-                  : Colors.black87,
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurface,
               fontWeight: selectedParentIndex.value == parentIndex
                   ? FontWeight.w600
                   : FontWeight.w400,
@@ -361,12 +371,15 @@ class DrawerSubItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final isActive = selectedSubIndex.value == item.index;
+      final cs = Theme.of(context).colorScheme;
 
       return Container(
         margin: const EdgeInsets.symmetric(vertical: 2),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          color: isActive ? const Color(0xFFF3E8FF) : Colors.transparent,
+          color: isActive
+              ? cs.primaryContainer.withOpacity(0.5)
+              : Colors.transparent,
         ),
         child: ListTile(
           dense: true,
@@ -375,7 +388,7 @@ class DrawerSubItemWidget extends StatelessWidget {
             item.title,
             style: TextStyle(
               fontSize: 12,
-              color: isActive ? const Color(0xFF7F00FF) : Colors.black87,
+              color: isActive ? cs.primary : cs.onSurface,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
             ),
           ),

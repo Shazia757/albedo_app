@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 Widget studentsTab(BuildContext context) {
-  return Obx(() {
+
     final ReportsController c = Get.put(ReportsController());
 
     final data = c.filteredStudents;
@@ -52,7 +52,11 @@ Widget studentsTab(BuildContext context) {
                           style: const TextStyle(fontWeight: FontWeight.w600)),
                       Text(s.studentId,
                           style: TextStyle(
-                              color: Colors.grey.shade600, fontSize: 12)),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.6),
+                              fontSize: 12)),
                     ],
                   )),
                   DataCell(Text(s.course)),
@@ -104,5 +108,5 @@ Widget studentsTab(BuildContext context) {
         ),
       ),
     );
-  });
+ 
 }

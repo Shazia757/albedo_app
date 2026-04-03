@@ -17,9 +17,6 @@ class AccountController extends GetxController {
     rememberMe.value = value ?? false;
   }
 
-  void togglePassword() {
-    obscurePassword.value = !obscurePassword.value;
-  }
 
   Future<void> login() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {

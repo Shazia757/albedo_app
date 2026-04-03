@@ -7,6 +7,8 @@ Widget customTabs(
   required Function(int) onTap,
   required int Function(int index) getCount,
 }) {
+  final cs = Theme.of(context).colorScheme;
+
   return SingleChildScrollView(
     scrollDirection: Axis.horizontal,
     child: Padding(
@@ -18,22 +20,31 @@ Widget customTabs(
 
           return GestureDetector(
             onTap: () => onTap(index),
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color:
-                    isActive ? const Color(0xFF7F00FF) : Colors.grey.shade200,
+                color: isActive ? cs.primary : cs.surface,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isActive ? cs.primary : cs.outline.withOpacity(0.4),
+                ),
+                boxShadow: [
+                  if (isActive)
+                    BoxShadow(
+                      color: cs.primary.withOpacity(0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    )
+                ],
               ),
               child: Text(
                 "${tabs[index]} ($count)",
                 style: TextStyle(
-                  color: isActive
-                      ? Theme.of(context).colorScheme.onPrimary
-                      : Colors.black87,
+                  color: isActive ? cs.onPrimary : cs.onSurface,
                   fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
             ),

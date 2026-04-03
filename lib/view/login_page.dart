@@ -84,21 +84,19 @@ class LoginView extends StatelessWidget {
                                   style: TextStyle(color: Color(0xFF6B7280))),
                               const SizedBox(height: 28),
                               CustomTextField(
-                                prefixIcon: Icon(Icons.email_outlined,
-                                    color: Color(0xFF9CA3AF)),
+                                prefixIcon: Icons.email_outlined,
                                 hint: "Email address",
                                 controller: c.emailController,
                               ),
                               const SizedBox(height: 18),
-                              Obx(() => CustomTextField(
-                                    prefixIcon: Icon(Icons.lock_outline,
-                                        color: Color(0xFF9CA3AF)),
-                                    hint: "Password",
-                                    controller: c.passwordController,
-                                    isPassword: true,
-                                    obscure: c.obscurePassword.value,
-                                    toggle: c.togglePassword,
-                                  )),
+                              CustomTextField(
+                                prefixIcon: Icons.lock_outline,
+                                hint: "Password",
+                                controller: c.passwordController,
+                                isPassword: true,
+                                obscure:
+                                    c.obscurePassword, // ✅ pass RxBool directly
+                              ),
                               const SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment:
@@ -274,5 +272,3 @@ class LoginView extends StatelessWidget {
     );
   }
 }
-
-

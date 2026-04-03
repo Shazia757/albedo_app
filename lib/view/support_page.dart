@@ -18,7 +18,7 @@ class SupportsPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Column(
@@ -33,7 +33,7 @@ class SupportsPage extends StatelessWidget {
           const SizedBox(height: 10),
           _tabs(context),
           const SizedBox(height: 10),
-          Expanded(child: _list()),
+          Expanded(child: _list(context)),
         ],
       ),
     );
@@ -43,8 +43,10 @@ class SupportsPage extends StatelessWidget {
 
   // 📊 Tabs
   Widget _tabs(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Obx(() => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Row(
             children: List.generate(2, (index) {
               final isSelected = c.selectedTab.value == index;
@@ -61,17 +63,17 @@ class SupportsPage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFF7F00FF)
-                          : Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(8),
+                          ? cs.primary
+                          : cs.primaryContainer.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
                       child: Text(
                         "$title (${c.getCount(index)})",
                         style: TextStyle(
                           color: isSelected
-                              ? Theme.of(context).colorScheme.onPrimary
-                              : Theme.of(context).colorScheme.shadow,
+                              ? cs.onPrimary
+                              : cs.onSurface.withOpacity(0.7),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -85,7 +87,7 @@ class SupportsPage extends StatelessWidget {
   }
 
   // 📋 List
-  Widget _list() {
+  Widget _list(BuildContext context) {
     return Obx(() => ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           itemCount: c.supports.length,
@@ -97,7 +99,9 @@ class SupportsPage extends StatelessWidget {
               child: InfoCard(
                 id: s.id,
                 status: isOpen ? "Open" : "Closed",
-                statusColor: isOpen ? Colors.green : Colors.red,
+                statusColor: isOpen
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onTertiaryContainer,
 
                 /// ✅ Use infoColumns for structured data
                 infoColumns: [
@@ -111,7 +115,10 @@ class SupportsPage extends StatelessWidget {
                     s.description,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade700,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.7),
                     ),
                   ),
                 ],
@@ -119,17 +126,19 @@ class SupportsPage extends StatelessWidget {
                 /// ✅ Actions
                 actions: [
                   iconBtn(
-                      icon: Icons.edit,
-                      onTap: () {
-                        // TODO: Edit logic
-                      },
-                      color: Colors.blue),
+                    icon: Icons.edit,
+                    onTap: () {
+                      // TODO: Edit logic
+                    },
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   iconBtn(
-                      icon: Icons.delete,
-                      onTap: () {
-                        // TODO: Delete logic
-                      },
-                      color: Colors.red),
+                    icon: Icons.delete,
+                    onTap: () {
+                      // TODO: Delete logic
+                    },
+                    color: Theme.of(context).colorScheme.onTertiaryContainer,
+                  ),
                 ],
               ),
             );

@@ -22,7 +22,7 @@ class SessionPage extends StatelessWidget {
 
     return Scaffold(
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -35,20 +35,17 @@ class SessionPage extends StatelessWidget {
                   _topBar(context, c),
                   const SizedBox(height: 12),
                   Obx(
-                    () => customTabs(
-                      context,
+                    () => customTabs(context,
                         tabs: c.tabs,
-                        selectedIndex: c.selectedTab.value,
-                        getCount: (index) {
-                          if (index == 0) return c.sessions.length;
-                          return c.sessions
-                              .where((e) => e.status == c.statusMap[index])
-                              .length;
-                        },
-                        onTap: (index) {
-                          c.selectedTab.value = index;
-                          c.applyFilters();
-                        }),
+                        selectedIndex: c.selectedTab.value, getCount: (index) {
+                      if (index == 0) return c.sessions.length;
+                      return c.sessions
+                          .where((e) => e.status == c.statusMap[index])
+                          .length;
+                    }, onTap: (index) {
+                      c.selectedTab.value = index;
+                      c.applyFilters();
+                    }),
                   ),
                   const SizedBox(height: 12),
                   Expanded(

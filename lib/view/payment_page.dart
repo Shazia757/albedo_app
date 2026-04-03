@@ -6,7 +6,6 @@ import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 
 class PaymentPage extends StatelessWidget {
   final PaymentUserType type;
@@ -27,7 +26,7 @@ class PaymentPage extends StatelessWidget {
     final isStudent = type == PaymentUserType.student;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Column(
@@ -135,7 +134,7 @@ class PaymentPage extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 20),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(Get.context!).colorScheme.onPrimary,
+          color: Theme.of(Get.context!).colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(

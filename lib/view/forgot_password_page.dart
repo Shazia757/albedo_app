@@ -82,8 +82,7 @@ class ForgotPasswordPage extends StatelessWidget {
                                     style: TextStyle(color: Color(0xFF6B7280))),
                                 const SizedBox(height: 28),
                                 CustomTextField(
-                                  prefixIcon: const Icon(Icons.email_outlined,
-                                      color: Color(0xFF9CA3AF)),
+                                  prefixIcon: Icons.email_outlined,
                                   hint: "Email address",
                                   controller: c.emailController,
                                 ),

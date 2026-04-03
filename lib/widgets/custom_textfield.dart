@@ -1,95 +1,100 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class CustomTextField extends StatefulWidget {
+class CustomTextField extends StatelessWidget {
   final String hint;
   final TextEditingController controller;
   final bool isPassword;
-  final bool obscure;
-  final VoidCallback? toggle;
-  final Icon prefixIcon;
+  final RxBool obscure; // 👈 reactive
+  final IconData prefixIcon;
 
-  const CustomTextField({
+  CustomTextField({
     super.key,
     required this.hint,
     required this.controller,
     this.isPassword = false,
-    this.obscure = false,
-    this.toggle,
+    RxBool? obscure,
     required this.prefixIcon,
-  });
+  }) : obscure = obscure ?? false.obs;
 
-  @override
-  State<CustomTextField> createState() => _CustomTextFieldState();
-}
-
-class _CustomTextFieldState extends State<CustomTextField> {
-  bool isFocused = false;
+  final RxBool isFocused = false.obs;
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Focus(
-      onFocusChange: (value) {
-        setState(() {
-          isFocused = value;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: const Color(0xFFF9FAFB), // soft background
-          border: Border.all(
-            color: isFocused
-                ? const Color(0xFF7F00FF) // focus border
-                : const Color(0xFFE5E7EB),
-            width: 1.2,
+      onFocusChange: (value) => isFocused.value = value,
+      child: Obx(
+        () => AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+
+            /// 🔥 BACKGROUND
+            color: cs.primaryContainer.withOpacity(0.25),
+
+            /// 🔥 BORDER
+            border: Border.all(
+              color: isFocused.value ? cs.primary : cs.outline.withOpacity(0.5),
+              width: 1.2,
+            ),
+
+            /// 🔥 SHADOW
+            boxShadow: [
+              if (isFocused.value)
+                BoxShadow(
+                  color: cs.primary.withOpacity(0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                )
+              else
+                BoxShadow(
+                  color: cs.shadow.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+            ],
           ),
-          boxShadow: [
-            if (isFocused)
-              BoxShadow(
-                color: const Color(0xFF7F00FF).withOpacity(0.15),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              )
-            else
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
+          child: TextField(
+            controller: controller,
+            obscureText: isPassword ? obscure.value : false,
+            style: TextStyle(
+              color: cs.onSurface,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                prefixIcon,
+                color: isFocused.value
+                    ? cs.primary
+                    : cs.onSurface.withOpacity(0.6),
               ),
-          ],
-        ),
-        child: TextField(
-          controller: widget.controller,
-          obscureText: widget.isPassword ? widget.obscure : false,
-          style: const TextStyle(
-            color: Color(0xFF111827),
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
-          decoration: InputDecoration(
-            prefixIcon: widget.prefixIcon,
-            hintText: widget.hint,
-            hintStyle: const TextStyle(
-              color: Color(0xFF9CA3AF),
-              fontSize: 14,
+              hintText: hint,
+              hintStyle: TextStyle(
+                color: cs.onSurface.withOpacity(0.5),
+                fontSize: 14,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 16,
+              ),
+
+              /// 🔥 PASSWORD TOGGLE
+              suffixIcon: isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        obscure.value
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        color: cs.onSurface.withOpacity(0.6),
+                      ),
+                      onPressed: () => obscure.value = !obscure.value,
+                    )
+                  : null,
             ),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 18,
-              vertical: 16,
-            ),
-            suffixIcon: widget.isPassword
-                ? IconButton(
-                    icon: Icon(
-                      widget.obscure
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                      color: const Color(0xFF6B7280),
-                    ),
-                    onPressed: widget.toggle,
-                  )
-                : null,
           ),
         ),
       ),
