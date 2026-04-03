@@ -31,7 +31,7 @@ class ReportsPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8FC),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Padding(
@@ -39,11 +39,11 @@ class ReportsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _tabs(),
+            _tabs(context),
             const SizedBox(height: 16),
-            _filters(),
+            _filters(context),
             const SizedBox(height: 16),
-            Expanded(child: Obx(() => _tabView())),
+            Expanded(child: Obx(() => _tabView(context))),
           ],
         ),
       ),
@@ -51,7 +51,7 @@ class ReportsPage extends StatelessWidget {
   }
 
   // PREMIUM TABS
-  Widget _tabs() {
+  Widget _tabs(BuildContext context) {
     return Obx(() => SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -64,14 +64,23 @@ class ReportsPage extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                 decoration: BoxDecoration(
                   gradient: isSelected
-                      ? const LinearGradient(
-                          colors: [Color(0xFF6C5CE7), Color(0xFF8E7CFF)])
+                      ? LinearGradient(colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.secondary,
+                        ])
                       : null,
-                  color: isSelected ? null : Colors.white,
+                  color: isSelected
+                      ? null
+                      : Theme.of(context).colorScheme.onPrimary,
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05), blurRadius: 8)
+                      color: Theme.of(context)
+                          .colorScheme
+                          .shadow
+                          .withOpacity(0.08),
+                      blurRadius: 5,
+                    )
                   ],
                 ),
                 child: GestureDetector(
@@ -80,7 +89,12 @@ class ReportsPage extends StatelessWidget {
                     tabs[index],
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      color: isSelected ? Colors.white : Colors.grey.shade700,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
                     ),
                   ),
                 ),
@@ -91,11 +105,11 @@ class ReportsPage extends StatelessWidget {
   }
 
   // FILTER BAR
-  Widget _filters() {
+  Widget _filters(BuildContext context) {
     return Row(
       children: [
         Expanded(
-          child: premiumSearch(
+          child: premiumSearch(context,
               hint: 'Search reports...',
               onChanged: (val) => c.searchQuery.value = val),
         ),
@@ -103,7 +117,7 @@ class ReportsPage extends StatelessWidget {
         Obx(() => PopupMenuButton(
               padding: EdgeInsets.zero,
               offset: const Offset(0, 45),
-              color: Colors.transparent,
+              color: Theme.of(context).colorScheme.surface,
               elevation: 0,
               itemBuilder: (context) => [
                 PopupMenuItem(
@@ -116,11 +130,15 @@ class ReportsPage extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.06), blurRadius: 10)
+                        color: Theme.of(context)
+                            .colorScheme
+                            .shadow
+                            .withOpacity(0.08),
+                        blurRadius: 10)
                   ],
                 ),
                 child: Row(
@@ -151,12 +169,12 @@ class ReportsPage extends StatelessWidget {
     return Container(
       width: 220,
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             blurRadius: 20,
-            color: Colors.black.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
           )
         ],
       ),
@@ -193,6 +211,7 @@ class ReportsPage extends StatelessWidget {
                         children: [
                           // START DATE
                           _dateField(
+                            context,
                             label: "Start Date",
                             value: startDate,
                             onTap: () async {
@@ -211,6 +230,7 @@ class ReportsPage extends StatelessWidget {
 
                           // END DATE
                           _dateField(
+                            context,
                             label: "End Date",
                             value: endDate,
                             onTap: () async {
@@ -267,21 +287,26 @@ class ReportsPage extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF6C5CE7).withOpacity(0.08) : null,
+          color: isSelected
+              ? Theme.of(context).colorScheme.secondary.withOpacity(0.1)
+              : null,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           text,
           style: TextStyle(
             fontWeight: FontWeight.w500,
-            color: isSelected ? const Color(0xFF6C5CE7) : Colors.black,
+            color: isSelected
+                ? Theme.of(context).colorScheme.secondary
+                : Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ),
     );
   }
 
-  Widget _dateField({
+  Widget _dateField(
+    BuildContext context, {
     required String label,
     required DateTime? value,
     required VoidCallback onTap,
@@ -291,7 +316,7 @@ class ReportsPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -302,7 +327,9 @@ class ReportsPage extends StatelessWidget {
                   ? label
                   : "${value.day}/${value.month}/${value.year}",
               style: TextStyle(
-                color: value == null ? Colors.grey : Colors.black,
+                color: value == null
+                    ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+                    : Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const Icon(Icons.calendar_today, size: 18),
@@ -312,27 +339,27 @@ class ReportsPage extends StatelessWidget {
     );
   }
 
-  Widget _tabView() {
+  Widget _tabView(BuildContext context) {
     return IndexedStack(
       index: c.selectedTab.value,
       children: [
-        _packagesTable(),
-        studentsTab(),
+        _packagesTable(context),
+        studentsTab(context),
         teachersTab(),
-        _placeholder("Advisors"),
-        _placeholder("Recommendations"),
-        _placeholder("Star of the Month"),
+        _placeholder(context, "Advisors"),
+        _placeholder(context, "Recommendations"),
+        _placeholder(context, "Star of the Month"),
       ],
     );
   }
 
-  Widget _placeholder(String title) {
+  Widget _placeholder(BuildContext context, String title) {
     return Center(
       child: Text(
         "$title - Coming Soon",
         style: TextStyle(
           fontSize: 16,
-          color: Colors.grey.shade600,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -340,17 +367,19 @@ class ReportsPage extends StatelessWidget {
   }
 
   // PREMIUM TABLE
-  Widget _packagesTable() {
+  Widget _packagesTable(BuildContext context) {
     return Obx(() {
       final data = c.filteredPackages;
 
       return Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 14)
+            BoxShadow(
+                color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
+                blurRadius: 14)
           ],
         ),
         child: ClipRRect(
@@ -361,8 +390,9 @@ class ReportsPage extends StatelessWidget {
               columnSpacing: 28,
               headingRowHeight: 50,
               dataRowHeight: 68,
-              headingRowColor:
-                  MaterialStateProperty.all(const Color(0xFFF4F6FB)),
+              headingRowColor: MaterialStateProperty.all(
+                Theme.of(context).colorScheme.primaryContainer,
+              ),
               columns: const [
                 DataColumn(label: Text("Student Info")),
                 DataColumn(label: Text("Contact")),
@@ -379,17 +409,21 @@ class ReportsPage extends StatelessWidget {
                   DataCell(_studentCell(e)),
                   DataCell(Text(e.contact)),
                   DataCell(Text(e.whatsapp)),
-                  DataCell(_badge(e.classHours.toString(), Colors.blue)),
-                  DataCell(
-                      _badge(e.classesTaken.toString(), Colors.deepPurple)),
+                  DataCell(_badge(context, e.classHours.toString(),
+                      Theme.of(context).colorScheme.primary)),
+                  DataCell(_badge(context, e.classesTaken.toString(),
+                      Theme.of(context).colorScheme.secondary)),
                   DataCell(Text("₹${e.amount}")),
                   DataCell(Text("₹${e.totalAmount}")),
                   DataCell(Text("₹${e.totalPaid}")),
                   DataCell(Text(
                     "₹${e.balance}",
                     style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: e.balance > 0 ? Colors.red : Colors.green),
+                      fontWeight: FontWeight.w600,
+                      color: e.balance > 0
+                          ? Theme.of(context).colorScheme.onTertiaryContainer
+                          : Theme.of(context).colorScheme.primary,
+                    ),
                   )),
                 ]);
               }).toList(),
@@ -409,12 +443,15 @@ class ReportsPage extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: 4),
         Text(e.studentId,
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+            style: TextStyle(
+                color:
+                    Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.08),
+                fontSize: 12)),
       ],
     );
   }
 
-  Widget _badge(String text, Color color) {
+  Widget _badge(BuildContext context, String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(

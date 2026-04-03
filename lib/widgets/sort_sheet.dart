@@ -14,8 +14,8 @@ void showSortSheet({
   Get.bottomSheet(
     Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(Get.context!).colorScheme.onPrimary,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: StatefulBuilder(

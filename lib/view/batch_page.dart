@@ -30,6 +30,7 @@ class BatchesPage extends StatelessWidget {
                   child: Column(
                     children: [
                       premiumSearch(
+                        context,
                           hint: "Search batches...",
                           onChanged: (value) {
                             c.searchQuery.value = value;

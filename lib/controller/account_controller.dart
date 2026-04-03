@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AccountController extends GetxController {
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
+  final contactController = TextEditingController();
   final passwordController = TextEditingController();
 
   var rememberMe = false.obs;
@@ -53,6 +55,10 @@ class AccountController extends GetxController {
 
   void toggleEdit() {
     isEditing.value = !isEditing.value;
+
+    if (isEditing.value) {
+      user(); // preload values when editing starts
+    }
   }
 
   void updateUser(

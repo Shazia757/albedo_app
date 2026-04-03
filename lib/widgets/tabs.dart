@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-Widget customTabs({
+Widget customTabs(
+  BuildContext context, {
   required List<String> tabs,
   required int selectedIndex,
   required Function(int) onTap,
@@ -28,7 +29,9 @@ Widget customTabs({
               child: Text(
                 "${tabs[index]} ($count)",
                 style: TextStyle(
-                  color: isActive ? Colors.white : Colors.black87,
+                  color: isActive
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Colors.black87,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),

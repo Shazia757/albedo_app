@@ -25,14 +25,13 @@ class SupportsPage extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: premiumSearch(
-                hint: 'Search...',
-                onChanged: (value) {
-                  c.searchQuery.value = value;
-                }),
+            child:
+                premiumSearch(context, hint: 'Search...', onChanged: (value) {
+              c.searchQuery.value = value;
+            }),
           ),
           const SizedBox(height: 10),
-          _tabs(),
+          _tabs(context),
           const SizedBox(height: 10),
           Expanded(child: _list()),
         ],
@@ -43,7 +42,7 @@ class SupportsPage extends StatelessWidget {
   // 🔍 Custom Search Bar
 
   // 📊 Tabs
-  Widget _tabs() {
+  Widget _tabs(BuildContext context) {
     return Obx(() => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
@@ -70,7 +69,9 @@ class SupportsPage extends StatelessWidget {
                       child: Text(
                         "$title (${c.getCount(index)})",
                         style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black87,
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Colors.black87,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

@@ -1,6 +1,7 @@
 import 'package:albedo_app/model/report_model.dart';
 import 'package:albedo_app/model/student_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class StudentDetailsPage extends StatelessWidget {
   final PackageReportModel student; // replace with your model
@@ -18,7 +19,7 @@ class StudentDetailsPage extends StatelessWidget {
         ),
         body: Column(
           children: [
-            _header(),
+            _header(context),
             _tabs(),
             Expanded(
               child: TabBarView(
@@ -36,12 +37,12 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   // HEADER
-  Widget _header() {
+  Widget _header(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(blurRadius: 10, color: Colors.black.withOpacity(0.05))
@@ -53,7 +54,7 @@ class StudentDetailsPage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(student.studentName ,
+              Text(student.studentName,
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
@@ -70,7 +71,7 @@ class StudentDetailsPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              student.status??'',
+              student.status ?? '',
               style: TextStyle(
                   color:
                       student.status == "Active" ? Colors.green : Colors.red),
@@ -102,18 +103,18 @@ class StudentDetailsPage extends StatelessWidget {
       child: Column(
         children: [
           _sectionCard("Academic Info", [
-            _infoTile("Mentor", student.advisor??''),
-            _infoTile("Coordinator", student.advisor??''),
-            _infoTile("Subjects", student.subjects??''),
-            _infoTile("Syllabus", student.syllabus??''),
-            _infoTile("Category", student.category??''),
-            _infoTile("Course", student.course??''),
+            _infoTile("Mentor", student.advisor ?? ''),
+            _infoTile("Coordinator", student.advisor ?? ''),
+            _infoTile("Subjects", student.subjects ?? ''),
+            _infoTile("Syllabus", student.syllabus ?? ''),
+            _infoTile("Category", student.category ?? ''),
+            _infoTile("Course", student.course ?? ''),
             _infoTile("Standard", student.standard.toString()),
           ]),
           const SizedBox(height: 16),
           _sectionCard("Package Info", [
             _infoTile("Reg Fee", "₹${student.regFee}"),
-            _infoTile("Package Amount", "₹${student.totalAmount??'0'}"),
+            _infoTile("Package Amount", "₹${student.totalAmount ?? '0'}"),
             _infoTile("Amount/Hour", "₹${student.amountPerHour}"),
             _infoTile("Total Hour", "${student.totalHour}"),
             _infoTile("Total Session", "${student.totalSession}"),
@@ -122,8 +123,8 @@ class StudentDetailsPage extends StatelessWidget {
           ]),
           const SizedBox(height: 16),
           _sectionCard("Contact Info", [
-            _infoTile("Contact Number", student.contact??''),
-            _infoTile("WhatsApp", student.whatsapp??''),
+            _infoTile("Contact Number", student.contact ?? ''),
+            _infoTile("WhatsApp", student.whatsapp ?? ''),
           ]),
         ],
       ),
@@ -136,7 +137,7 @@ class StudentDetailsPage extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(Get.context!).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(blurRadius: 10, color: Colors.black.withOpacity(0.05))

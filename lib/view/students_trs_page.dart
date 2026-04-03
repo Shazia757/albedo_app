@@ -46,11 +46,11 @@ class UsersPage extends StatelessWidget {
               children: [
                 Expanded(
                   child: (type == UserPageType.student)
-                      ? premiumSearch(
+                      ? premiumSearch(context,
                           hint: "Search students...",
                           onChanged: (value) =>
                               studentController.searchQuery.value = value)
-                      : premiumSearch(
+                      : premiumSearch(context,
                           hint: "Search teachers...",
                           onChanged: (value) =>
                               teacherController.searchQuery.value = value),
@@ -102,6 +102,7 @@ class UsersPage extends StatelessWidget {
           /// 🧭 Tabs
           Obx(
             () => customTabs(
+              context,
               tabs: tabs,
               selectedIndex: (type == UserPageType.student)
                   ? studentController.selectedTab.value
@@ -179,7 +180,7 @@ class UsersPage extends StatelessWidget {
                       alignment: Alignment.center,
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 700),
-                        child: _studentCard(student, teacher),
+                        child: _studentCard(context, student, teacher),
                       ),
                     ),
                   );
@@ -193,7 +194,7 @@ class UsersPage extends StatelessWidget {
   }
 
   /// 💎 Premium Card
-  Widget _studentCard(Student? s, TeacherModel? t) {
+  Widget _studentCard(BuildContext context, Student? s, TeacherModel? t) {
     final isActive = (type == UserPageType.student)
         ? s?.status == "Active"
         : t?.status == "Active";
@@ -204,7 +205,7 @@ class UsersPage extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onPrimary,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),

@@ -36,6 +36,7 @@ class SessionPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   Obx(
                     () => customTabs(
+                      context,
                         tabs: c.tabs,
                         selectedIndex: c.selectedTab.value,
                         getCount: (index) {
@@ -162,6 +163,7 @@ class SessionPage extends StatelessWidget {
       return Column(
         children: [
           premiumSearch(
+            context,
             hint: "Search sessions...",
             onChanged: (val) => c.searchQuery.value = val,
           ),
@@ -182,6 +184,7 @@ class SessionPage extends StatelessWidget {
         Expanded(
             flex: 3,
             child: premiumSearch(
+              context,
               hint: "Search sessions...",
               onChanged: (val) => c.searchQuery.value = val,
             )),

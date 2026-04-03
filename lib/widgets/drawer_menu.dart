@@ -24,7 +24,7 @@ class DrawerMenu extends StatelessWidget {
       color: const Color(0xFFF8FAFC),
       child: Column(
         children: [
-          _header(),
+          _header(context),
           Expanded(
             child: Obx(
               () => ListView(
@@ -32,6 +32,7 @@ class DrawerMenu extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 children: [
                   _menuItem(
+                    context,
                     Icons.home,
                     "Home",
                     active: c.selectedIndex.value == 0,
@@ -42,6 +43,7 @@ class DrawerMenu extends StatelessWidget {
                     },
                   ),
                   _menuItem(
+                    context,
                     Icons.video_collection,
                     "Sessions",
                     active: c.selectedIndex.value == 1,
@@ -77,6 +79,7 @@ class DrawerMenu extends StatelessWidget {
                         DrawerSubItem(title: "Others", index: 5, onTap: () {}),
                       ]),
                   _menuItem(
+                    context,
                     Icons.group,
                     "Batch",
                     active: c.selectedIndex.value == 2,
@@ -105,6 +108,7 @@ class DrawerMenu extends StatelessWidget {
                                 PaymentPage(type: PaymentUserType.teacher))),
                       ]),
                   _menuItem(
+                    context,
                     Icons.bar_chart,
                     "Reports",
                     active: c.selectedIndex.value == 4,
@@ -115,6 +119,7 @@ class DrawerMenu extends StatelessWidget {
                     },
                   ),
                   _menuItem(
+                    context,
                     Icons.support_agent,
                     "Supports",
                     badge: 3,
@@ -126,6 +131,7 @@ class DrawerMenu extends StatelessWidget {
                     },
                   ),
                   _menuItem(
+                    context,
                     Icons.settings,
                     "Settings",
                     active: c.selectedIndex.value == 6,
@@ -149,19 +155,19 @@ class DrawerMenu extends StatelessWidget {
 
   // ================= HEADER =================
 
-  Widget _header() {
+  Widget _header(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onPrimary,
         border: Border(
           bottom: BorderSide(color: Color(0xFFE5E7EB)),
         ),
       ),
       child: Row(
         children: [
-          _buildAvatar(size: 32),
+          _buildAvatar(context, size: 32),
           const SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,6 +186,7 @@ class DrawerMenu extends StatelessWidget {
   // ================= MENU ITEM =================
 
   Widget _menuItem(
+    BuildContext context,
     IconData icon,
     String title, {
     bool active = false,
@@ -219,8 +226,8 @@ class DrawerMenu extends StatelessWidget {
                   ),
                   child: Text(
                     badge.toString(),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                     ),
@@ -244,13 +251,13 @@ class DrawerMenu extends StatelessWidget {
   }
   // ================= AVATAR =================
 
-  Widget _buildAvatar({double size = 32}) {
+  Widget _buildAvatar(BuildContext context,{double size = 32}) {
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onPrimary,
         border: Border.all(
           color: Colors.grey.withOpacity(0.2),
         ),

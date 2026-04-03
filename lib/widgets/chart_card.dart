@@ -18,22 +18,19 @@ class ChartCard extends StatelessWidget {
     return Container(
       height: 200,
       padding: const EdgeInsets.all(16),
-      decoration: _decoration(),
+      decoration: _decoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("$count  $title",
               style: const TextStyle(fontWeight: FontWeight.bold)),
-
           const SizedBox(height: 10),
-
           Expanded(
             child: LineChart(
               LineChartData(
                 gridData: FlGridData(show: false),
                 titlesData: FlTitlesData(show: false),
                 borderData: FlBorderData(show: false),
-
                 lineBarsData: [
                   LineChartBarData(
                     isCurved: true,
@@ -52,14 +49,16 @@ class ChartCard extends StatelessWidget {
   }
 
   List<FlSpot> _buildSpots() {
-    return data.asMap().entries
+    return data
+        .asMap()
+        .entries
         .map((e) => FlSpot(e.key.toDouble(), e.value))
         .toList();
   }
 
-  BoxDecoration _decoration() {
+  BoxDecoration _decoration(BuildContext context) {
     return BoxDecoration(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.onPrimary,
       borderRadius: BorderRadius.circular(20),
       boxShadow: [
         BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)

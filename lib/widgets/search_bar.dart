@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-Widget premiumSearch({
+Widget premiumSearch(
+  BuildContext context, {
   required String hint,
   required Function(String) onChanged,
   TextEditingController? controller,
@@ -8,7 +9,7 @@ Widget premiumSearch({
   return Container(
     height: 44,
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.onPrimary,
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(

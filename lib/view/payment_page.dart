@@ -36,6 +36,7 @@ class PaymentPage extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: premiumSearch(
+              context,
               hint: isStudent ? "Search students..." : "Search teachers...",
               onChanged: (p0) => c.searchQuery.value = p0,
             ),

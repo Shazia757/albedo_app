@@ -3,7 +3,7 @@ import 'package:albedo_app/view/student_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-Widget studentsTab() {
+Widget studentsTab(BuildContext context) {
   return Obx(() {
     final ReportsController c = Get.put(ReportsController());
 
@@ -12,7 +12,7 @@ Widget studentsTab() {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 14)
