@@ -23,9 +23,10 @@ const lightColorScheme = ColorScheme(
   shadow: Colors.black,
   scrim: Colors.black,
   inverseSurface: Color(0xFF2C2C2C),
-  onInverseSurface: Colors.white,
+  onInverseSurface: Colors.green,
   inversePrimary: Color(0xFF8FD3F4),
   tertiary: Colors.orange,
+  onTertiary: Colors.red,
 );
 
 /// 🌙 DARK THEME
@@ -47,7 +48,8 @@ const darkColorScheme = ColorScheme(
   shadow: Colors.black,
   scrim: Colors.black,
   inverseSurface: Color(0xFFEAF6FF),
-  onInverseSurface: Color(0xFF0B1E2D),
+  onInverseSurface: Colors.green,
   inversePrimary: primaryBlue,
   tertiary: Colors.orange,
+  onTertiary: Colors.red,
 );

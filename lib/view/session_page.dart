@@ -77,18 +77,20 @@ class SessionPage extends StatelessWidget {
                         itemBuilder: (_, i) => InfoCard(
                           id: data[i].id,
                           status: data[i].status,
-                          statusColor: getStatusColor(data[i].status),
+                          statusColor: getStatusColor(context, data[i].status),
                           infoRows: [
                             Row(
                               children: [
                                 Expanded(
                                     child: _personCompact(
+                                        context,
                                         "Student",
                                         data[i].studentName,
                                         data[i].studentId)),
                                 const SizedBox(width: 10),
                                 Expanded(
                                     child: _personCompact(
+                                        context,
                                         "Teacher",
                                         data[i].teacherName,
                                         data[i].teacherId)),
@@ -97,7 +99,10 @@ class SessionPage extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant
+                                    .withOpacity(0.03),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Column(
@@ -105,21 +110,21 @@ class SessionPage extends StatelessWidget {
                                   Row(
                                     children: [
                                       Expanded(
-                                          child: _miniInfo(
-                                              "Subject", data[i].subject)),
+                                          child: _miniInfo(context, "Subject",
+                                              data[i].subject)),
                                       Expanded(
-                                          child: _miniInfo(
-                                              "Class", data[i].className)),
+                                          child: _miniInfo(context, "Class",
+                                              data[i].className)),
                                     ],
                                   ),
                                   const SizedBox(height: 6),
                                   Row(
                                     children: [
                                       Expanded(
-                                          child: _miniInfo("Date",
+                                          child: _miniInfo(context, "Date",
                                               "${data[i].dateTime.day}/${data[i].dateTime.month}/${data[i].dateTime.year}")),
                                       Expanded(
-                                          child: _miniInfo("Time",
+                                          child: _miniInfo(context, "Time",
                                               _formatTime(data[i].dateTime))),
                                     ],
                                   ),
@@ -130,11 +135,11 @@ class SessionPage extends StatelessWidget {
                           actions: [
                             iconBtn(
                                 icon: Icons.edit,
-                                color: Colors.blue,
+                                color: Theme.of(context).colorScheme.primary,
                                 onTap: () {}),
                             iconBtn(
                                 icon: Icons.delete,
-                                color: Colors.red,
+                                color: Theme.of(context).colorScheme.onTertiary,
                                 onTap: () {}),
                           ],
                         ),
@@ -163,9 +168,9 @@ class SessionPage extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             children: [
-              Expanded(child: _filterButton()),
+              Expanded(child: _filterButton(context)),
               const SizedBox(width: 10),
-              Expanded(child: _sortButton(c)),
+              Expanded(child: _sortButton(context, c)),
             ],
           )
         ],
@@ -181,21 +186,22 @@ class SessionPage extends StatelessWidget {
               onChanged: (val) => c.searchQuery.value = val,
             )),
         const SizedBox(width: 12),
-        _filterButton(),
+        _filterButton(context),
         const SizedBox(width: 8),
-        _sortButton(c),
+        _sortButton(context, c),
       ],
     );
   }
 
-  Widget _actionButton(IconData icon, String label) {
+  Widget _actionButton(BuildContext context, IconData icon, String label) {
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.theme.colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(
+            color: context.theme.colorScheme.outline.withOpacity(0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -211,7 +217,7 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  Widget _sortButton(SessionController c) {
+  Widget _sortButton(BuildContext context, SessionController c) {
     return GestureDetector(
       onTap: () => showSortSheet(
           title: "Sort Sessions",
@@ -220,18 +226,19 @@ class SessionPage extends StatelessWidget {
           onSelected: (val) {
             c.sortType.value = val;
           }),
-      child: _actionButton(Icons.swap_vert, "Sort"),
+      child: _actionButton(context, Icons.swap_vert, "Sort"),
     );
   }
 
-  Widget _filterButton() {
+  Widget _filterButton(BuildContext context) {
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
       ),
       child: InkWell(
         onTap: () {
@@ -249,144 +256,20 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  // Widget _sessionCard(Session s) {
-  //   final color = getStatusColor(s.status);
-
-  //   return Container(
-  //     padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
-  //     margin: const EdgeInsets.only(bottom: 20),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(16),
-  //       border: Border.all(color: Colors.grey.shade200),
-  //     ),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         // 🔥 TOP ROW
-  //         Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             Text(
-  //               "ID: ${s.id}",
-  //               style: const TextStyle(
-  //                 fontSize: 12,
-  //                 color: Colors.grey,
-  //               ),
-  //             ),
-  //             Container(
-  //               padding:
-  //                   const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  //               decoration: BoxDecoration(
-  //                 color: color.withOpacity(0.1),
-  //                 borderRadius: BorderRadius.circular(20),
-  //               ),
-  //               child: Text(
-  //                 s.status.replaceAll("_", " "),
-  //                 style: TextStyle(
-  //                   fontSize: 11,
-  //                   fontWeight: FontWeight.w600,
-  //                   color: color,
-  //                 ),
-  //               ),
-  //             )
-  //           ],
-  //         ),
-
-  //         const SizedBox(height: 10),
-
-  //         // 🔥 STUDENT + TEACHER (tight layout)
-  //         Row(
-  //           children: [
-  //             Expanded(
-  //               child: _personCompact(
-  //                 "Student",
-  //                 s.studentName,
-  //                 s.studentId,
-  //               ),
-  //             ),
-  //             const SizedBox(width: 10),
-  //             Expanded(
-  //               child: _personCompact(
-  //                 "Teacher",
-  //                 s.teacherName,
-  //                 s.teacherId,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-
-  //         const SizedBox(height: 10),
-
-  //         // 🔥 SUBJECT + CLASS + TIME (merged)
-  //         Container(
-  //           padding: const EdgeInsets.all(10),
-  //           decoration: BoxDecoration(
-  //             color: Colors.grey.shade50,
-  //             borderRadius: BorderRadius.circular(12),
-  //           ),
-  //           child: Column(
-  //             children: [
-  //               Row(
-  //                 children: [
-  //                   Expanded(
-  //                     child: _miniInfo("Subject", s.subject),
-  //                   ),
-  //                   Expanded(
-  //                     child: _miniInfo("Class", s.className),
-  //                   ),
-  //                 ],
-  //               ),
-  //               const SizedBox(height: 6),
-  //               Row(
-  //                 children: [
-  //                   Expanded(
-  //                     child: _miniInfo(
-  //                       "Date",
-  //                       "${s.dateTime.day}/${s.dateTime.month}/${s.dateTime.year}",
-  //                     ),
-  //                   ),
-  //                   Expanded(
-  //                     child: _miniInfo(
-  //                       "Time",
-  //                       _formatTime(s.dateTime),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-
-  //         const SizedBox(height: 4),
-
-  //         // 🔥 ACTIONS
-  //         Row(
-  //           mainAxisAlignment: MainAxisAlignment.end,
-  //           children: [
-  //             iconBtn(icon: Icons.edit, color: Colors.blue, onTap: () {}),
-  //             const SizedBox(width: 6),
-  //             iconBtn(icon: Icons.delete, color: Colors.red, onTap: () {}),
-  //           ],
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
-
   String _formatTime(DateTime dt) {
     final hour = dt.hour > 12 ? dt.hour - 12 : dt.hour;
     final ampm = dt.hour >= 12 ? "PM" : "AM";
     return "$hour:${dt.minute.toString().padLeft(2, '0')} $ampm";
   }
 
-  Widget _miniInfo(String label, String value) {
+  Widget _miniInfo(BuildContext context, String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 10, color: Colors.grey),
+          style: TextStyle(
+              fontSize: 10, color: Theme.of(context).colorScheme.outline),
         ),
         const SizedBox(height: 2),
         Text(
@@ -400,13 +283,15 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  Widget _personCompact(String label, String name, String id) {
+  Widget _personCompact(
+      BuildContext context, String label, String name, String id) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label.toUpperCase(),
-          style: const TextStyle(fontSize: 10, color: Colors.grey),
+          style: TextStyle(
+              fontSize: 10, color: Theme.of(context).colorScheme.outline),
         ),
         const SizedBox(height: 2),
         Text(
@@ -419,28 +304,29 @@ class SessionPage extends StatelessWidget {
         ),
         Text(
           id,
-          style: const TextStyle(fontSize: 11, color: Colors.blueGrey),
+          style: TextStyle(
+              fontSize: 11, color: Theme.of(context).colorScheme.outline),
         ),
       ],
     );
   }
 
-  Color getStatusColor(String status) {
+  Color getStatusColor(BuildContext context, String status) {
     switch (status) {
       case "started":
-        return Colors.green;
+        return Theme.of(context).colorScheme.onInverseSurface;
       case "no_balance":
-        return Colors.red;
+        return Theme.of(context).colorScheme.onTertiary;
       case "upcoming":
-        return Colors.blue;
+        return Theme.of(context).colorScheme.primary;
       case "pending":
-        return Colors.orange;
+        return Theme.of(context).colorScheme.tertiary;
       case "completed":
-        return Colors.grey;
+        return Theme.of(context).colorScheme.outline;
       case "meet_done":
-        return Colors.purple;
+        return Theme.of(context).colorScheme.secondary;
       default:
-        return Colors.black;
+        return Theme.of(context).colorScheme.shadow;
     }
   }
 }

@@ -252,7 +252,7 @@ class HomeView extends StatelessWidget {
       boxShadow: [
         BoxShadow(
           blurRadius: 12,
-          color: Colors.black.withOpacity(0.05),
+          color: context.theme.colorScheme.shadow.withOpacity(0.1),
           offset: const Offset(0, 4),
         )
       ],

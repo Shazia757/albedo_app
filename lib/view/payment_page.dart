@@ -6,6 +6,7 @@ import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 class PaymentPage extends StatelessWidget {
   final PaymentUserType type;
@@ -47,6 +48,7 @@ class PaymentPage extends StatelessWidget {
                       ? c.filteredStudentPayments.length
                       : c.filteredTeacherPayments.length,
                   itemBuilder: (_, i) => _card(
+                    context,
                     (type == PaymentUserType.student)
                         ? c.filteredStudentPayments[i]
                         : null,
@@ -67,11 +69,12 @@ class PaymentPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(Get.context!).colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color:
+                  Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 4),
             )
@@ -109,7 +112,9 @@ class PaymentPage extends StatelessWidget {
               child: Text(
                 title,
                 style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black87,
+                  color: isSelected
+                      ? Theme.of(Get.context!).colorScheme.onPrimary
+                      : Theme.of(Get.context!).colorScheme.outline,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -120,7 +125,8 @@ class PaymentPage extends StatelessWidget {
     );
   }
 
-  Widget _card(StudentPaymentModel? s, TeacherPaymentModel? t) {
+  Widget _card(
+      BuildContext context, StudentPaymentModel? s, TeacherPaymentModel? t) {
     final isStudent = (type == PaymentUserType.student);
 
     return Center(
@@ -128,11 +134,12 @@ class PaymentPage extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 20),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(Get.context!).colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color:
+                  Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.06),
               blurRadius: 16,
               offset: const Offset(0, 6),
             )
@@ -155,7 +162,9 @@ class PaymentPage extends StatelessWidget {
                   child: Center(
                     child: Text(
                       isStudent ? s!.name[0] : t!.name[0],
-                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontSize: 20),
                     ),
                   ),
                 ),
@@ -169,7 +178,9 @@ class PaymentPage extends StatelessWidget {
                           fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                     Text(isStudent ? s!.id : t!.id,
-                        style: TextStyle(color: Colors.grey.shade600)),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.outline,
+                            fontSize: 11)),
                   ],
                 )
               ],
@@ -195,28 +206,36 @@ class PaymentPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text("Current Balance",
-                    style: TextStyle(color: Colors.black54)),
+                Text("Current Balance",
+                    style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .shadow
+                            .withOpacity(0.8),
+                        fontSize: 12)),
                 const SizedBox(height: 8),
-                Divider(color: Colors.grey.shade300),
+                Divider(
+                    color:
+                        Theme.of(context).colorScheme.outline.withOpacity(0.5)),
                 if (type == PaymentUserType.student)
-                  _fullTile("₹${s?.admissionFee}", "Adm. Fee"),
+                  _fullTile(context, "₹${s?.admissionFee}", "Adm. Fee"),
                 const SizedBox(height: 8),
                 _rowTiles(
+                    context,
                     isStudent ? s!.depTxns.toString() : t!.total.toString(),
                     isStudent ? "Dep Txns" : "Total",
                     isStudent ? s!.credTxns.toString() : t!.pending.toString(),
                     isStudent ? "Cred Txns" : "Pending"),
                 const SizedBox(height: 8),
                 if (isStudent)
-                  _rowTiles("₹${s?.deposited}", "Deposited",
+                  _rowTiles(context, "₹${s?.deposited}", "Deposited",
                       "₹${s?.creditLimit}", "Credit Limit"),
                 if (isStudent) const SizedBox(height: 8),
                 if (isStudent)
-                  _rowTiles("₹${s?.depPending}", "Dep Pending",
+                  _rowTiles(context, "₹${s?.depPending}", "Dep Pending",
                       "₹${s?.creditAmount}", "Credit"),
                 if (!isStudent)
-                  _fullTile("${t?.totalWithdawal}", 'Total Withdrawal')
+                  _fullTile(context, "${t?.totalWithdawal}", 'Total Withdrawal')
               ]),
             )
           ],
@@ -225,12 +244,12 @@ class PaymentPage extends StatelessWidget {
     );
   }
 
-  Widget _fullTile(String value, String label) {
+  Widget _fullTile(BuildContext context, String value, String label) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -240,27 +259,30 @@ class PaymentPage extends StatelessWidget {
               style:
                   const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
           const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.black54))
+          Text(label,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.outline, fontSize: 12))
         ],
       ),
     );
   }
 
-  Widget _rowTiles(String v1, String l1, String v2, String l2) {
+  Widget _rowTiles(
+      BuildContext context, String v1, String l1, String v2, String l2) {
     return Row(
       children: [
-        Expanded(child: _smallTile(v1, l1)),
+        Expanded(child: _smallTile(context, v1, l1)),
         const SizedBox(width: 12),
-        Expanded(child: _smallTile(v2, l2)),
+        Expanded(child: _smallTile(context, v2, l2)),
       ],
     );
   }
 
-  Widget _smallTile(String value, String label) {
+  Widget _smallTile(BuildContext context, String value, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -269,7 +291,9 @@ class PaymentPage extends StatelessWidget {
               style:
                   const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
           const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.black54))
+          Text(label,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.outline, fontSize: 11))
         ],
       ),
     );
