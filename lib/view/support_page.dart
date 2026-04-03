@@ -71,7 +71,7 @@ class SupportsPage extends StatelessWidget {
                         style: TextStyle(
                           color: isSelected
                               ? Theme.of(context).colorScheme.onPrimary
-                              : Colors.black87,
+                              : Theme.of(context).colorScheme.shadow,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -135,21 +135,5 @@ class SupportsPage extends StatelessWidget {
             );
           },
         ));
-  }
-
-  // ✏️ Icon Button
-  Widget _iconBtn(IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(left: 8),
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Icon(icon, size: 16),
-      ),
-    );
   }
 }

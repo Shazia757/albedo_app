@@ -15,19 +15,19 @@ class StudentDetailsPage extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF6F8FC),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: CustomAppBar(),
         drawer: DrawerMenu(),
         body: Column(
           children: [
             _header(context),
-            _tabs(),
+            _tabs(context),
             Expanded(
               child: TabBarView(
                 children: [
-                  _generalInfo(),
-                  _placeholder("Insights"),
-                  _placeholder("Refund Insights"),
+                  _generalInfo(context),
+                  _placeholder(context, "Insights"),
+                  _placeholder(context, "Refund Insights"),
                 ],
               ),
             )
@@ -39,16 +39,21 @@ class StudentDetailsPage extends StatelessWidget {
 
   // HEADER
   Widget _header(BuildContext context) {
+    final isActive = student.status == "Active";
+    final color = isActive
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.error;
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              blurRadius: 10,
-              color: Theme.of(context).colorScheme.shadow.withOpacity(0.08))
+            blurRadius: 10,
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
+          )
         ],
       ),
       child: Row(
@@ -57,27 +62,32 @@ class StudentDetailsPage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(student.studentName,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              Text("ID: ${student.studentId}",
-                  style: const TextStyle(color: Colors.grey)),
+              Text(
+                student.studentName,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              Text(
+                "ID: ${student.studentId}",
+                style: TextStyle(
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
             ],
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: student.status == "Active"
-                  ? Colors.green.withOpacity(0.1)
-                  : Colors.red.withOpacity(0.1),
+              color: color.withOpacity(0.12),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               student.status ?? '',
-              style: TextStyle(
-                  color:
-                      student.status == "Active" ? Colors.green : Colors.red),
+              style: TextStyle(color: color, fontWeight: FontWeight.w500),
             ),
           )
         ],
@@ -86,12 +96,14 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   // TABS
-  Widget _tabs() {
-    return const TabBar(
-      labelColor: Color(0xFF6C5CE7),
-      unselectedLabelColor: Colors.grey,
-      indicatorColor: Color(0xFF6C5CE7),
-      tabs: [
+  Widget _tabs(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return TabBar(
+      labelColor: cs.primary,
+      unselectedLabelColor: cs.onSurface.withOpacity(0.6),
+      indicatorColor: cs.primary,
+      tabs: const [
         Tab(text: "General Info"),
         Tab(text: "Insights"),
         Tab(text: "Refund Insights"),
@@ -100,34 +112,35 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   // GENERAL INFO
-  Widget _generalInfo() {
+  Widget _generalInfo(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _sectionCard("Academic Info", [
-            _infoTile("Mentor", student.advisor ?? ''),
-            _infoTile("Coordinator", student.advisor ?? ''),
-            _infoTile("Subjects", student.subjects ?? ''),
-            _infoTile("Syllabus", student.syllabus ?? ''),
-            _infoTile("Category", student.category ?? ''),
-            _infoTile("Course", student.course ?? ''),
-            _infoTile("Standard", student.standard.toString()),
+          _sectionCard(context, "Academic Info", [
+            _infoTile(context, "Mentor", student.advisor ?? ''),
+            _infoTile(context, "Coordinator", student.advisor ?? ''),
+            _infoTile(context, "Subjects", student.subjects ?? ''),
+            _infoTile(context, "Syllabus", student.syllabus ?? ''),
+            _infoTile(context, "Category", student.category ?? ''),
+            _infoTile(context, "Course", student.course ?? ''),
+            _infoTile(context, "Standard", student.standard.toString()),
           ]),
           const SizedBox(height: 16),
-          _sectionCard("Package Info", [
-            _infoTile("Reg Fee", "₹${student.regFee}"),
-            _infoTile("Package Amount", "₹${student.totalAmount ?? '0'}"),
-            _infoTile("Amount/Hour", "₹${student.amountPerHour}"),
-            _infoTile("Total Hour", "${student.totalHour}"),
-            _infoTile("Total Session", "${student.totalSession}"),
-            _infoTile("Hour/Session", "${student.totalHour}"),
-            _infoTile("Duration", "${student.classHours} days"),
+          _sectionCard(context, "Package Info", [
+            _infoTile(context, "Reg Fee", "₹${student.regFee}"),
+            _infoTile(
+                context, "Package Amount", "₹${student.totalAmount ?? '0'}"),
+            _infoTile(context, "Amount/Hour", "₹${student.amountPerHour}"),
+            _infoTile(context, "Total Hour", "${student.totalHour}"),
+            _infoTile(context, "Total Session", "${student.totalSession}"),
+            _infoTile(context, "Hour/Session", "${student.totalHour}"),
+            _infoTile(context, "Duration", "${student.classHours} days"),
           ]),
           const SizedBox(height: 16),
-          _sectionCard("Contact Info", [
-            _infoTile("Contact Number", student.contact ?? ''),
-            _infoTile("WhatsApp", student.whatsapp ?? ''),
+          _sectionCard(context, "Contact Info", [
+            _infoTile(context, "Contact Number", student.contact ?? ''),
+            _infoTile(context, "WhatsApp", student.whatsapp ?? ''),
           ]),
         ],
       ),
@@ -135,26 +148,32 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   // SECTION CARD
-  Widget _sectionCard(String title, List<Widget> children) {
+  Widget _sectionCard(
+      BuildContext context, String title, List<Widget> children) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(Get.context!).colorScheme.onPrimary,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              blurRadius: 10,
-              color:
-                  Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.08))
+            blurRadius: 10,
+            color: cs.shadow.withOpacity(0.08),
+          )
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title,
-              style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface,
+              )),
           const SizedBox(height: 12),
           Wrap(
             spacing: 12,
@@ -167,30 +186,46 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   // INFO TILE
-  Widget _infoTile(String title, String value) {
+  Widget _infoTile(BuildContext context, String title, String value) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       width: 220,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FD),
+        color: cs.primaryContainer.withOpacity(0.4),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: cs.onSurface.withOpacity(0.6),
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: cs.onSurface,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _placeholder(String text) {
+  Widget _placeholder(BuildContext context, String text) {
     return Center(
       child: Text(
         "$text - Coming Soon",
-        style: TextStyle(color: Colors.grey.shade600),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+        ),
       ),
     );
   }

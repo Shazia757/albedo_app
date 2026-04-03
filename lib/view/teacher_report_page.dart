@@ -54,7 +54,7 @@ Widget _summaryCard(BuildContext context, String title, String value) {
       color: Theme.of(context).colorScheme.onPrimary,
       borderRadius: BorderRadius.circular(14),
       boxShadow: [
-        BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)
+        BoxShadow(color: Theme.of(context).colorScheme.shadow, blurRadius: 10)
       ],
     ),
     child: Column(
