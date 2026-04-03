@@ -35,7 +35,7 @@ class BatchesPage extends StatelessWidget {
                             c.searchQuery.value = value;
                           }),
                       const SizedBox(height: 12),
-                      Obx(() => _tabs()),
+                      _tabs(),
                       const SizedBox(height: 12),
                       Expanded(child: Obx(() {
                         final batches = c.filteredBatches;
@@ -61,7 +61,8 @@ class BatchesPage extends StatelessWidget {
                           itemBuilder: (_, i) => InfoCard(
                             id: batches[i].id,
                             status: batches[i].status,
-                            statusColor: getStatusColor(batches[i].status),
+                            statusColor:
+                                getStatusColor(context, batches[i].status),
                             infoColumns: [
                               {"label": "Batch Name", "value": batches[i].name},
                               {"label": "Batch Code", "value": batches[i].code},
@@ -69,11 +70,12 @@ class BatchesPage extends StatelessWidget {
                             actions: [
                               iconBtn(
                                   icon: Icons.edit,
-                                  color: Colors.blue,
+                                  color: Theme.of(context).colorScheme.primary,
                                   onTap: () {}),
                               iconBtn(
                                   icon: Icons.delete,
-                                  color: Colors.red,
+                                  color:
+                                      Theme.of(context).colorScheme.onTertiary,
                                   onTap: () {}),
                             ],
                           ),
@@ -91,77 +93,75 @@ class BatchesPage extends StatelessWidget {
   }
 
   Widget _tabs() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: List.generate(2, (index) {
-          final isSelected = c.selectedTab.value == index;
-          final tabName = index == 0 ? "Active" : "Inactive";
-          final count =
-              c.batches.where((b) => b.status == c.statusMap[index]).length;
-
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => c.selectedTab.value = index,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color:
-                      isSelected ? const Color(0xFF7F00FF) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      tabName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: isSelected ? Colors.white : Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.white.withOpacity(0.2)
-                            : Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        "$count",
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.white : Colors.grey[700],
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: Theme.of(Get.context!).colorScheme.onPrimary,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color:
+                  Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: Row(
+          children: [
+            _tabItem("Pending", 0),
+            _tabItem("Approved", 1),
+          ],
+        ),
       ),
     );
   }
 
-  Color getStatusColor(String status) {
+  Widget _tabItem(String title, int index) {
+    return Expanded(
+      child: Obx(() {
+        final isSelected = c.selectedTab.value == index;
+
+        return GestureDetector(
+          onTap: () => c.selectedTab.value = index,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              gradient: isSelected
+                  ? const LinearGradient(
+                      colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
+                    )
+                  : null,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: isSelected
+                      ? Theme.of(Get.context!).colorScheme.onPrimary
+                      : Theme.of(Get.context!).colorScheme.outline,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Color getStatusColor(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case "active":
-        return Colors.green;
+        return Theme.of(context).colorScheme.onInverseSurface;
       case "inactive":
-        return Colors.red;
+        return Theme.of(context).colorScheme.onTertiary;
       default:
-        return Colors.grey;
+        return Theme.of(context).colorScheme.shadow;
     }
   }
 }
