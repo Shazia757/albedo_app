@@ -34,7 +34,7 @@ class UsersPage extends StatelessWidget {
     final tabs = getTabs();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Column(
@@ -208,7 +208,7 @@ class UsersPage extends StatelessWidget {
         color: Theme.of(context).colorScheme.onPrimary,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),

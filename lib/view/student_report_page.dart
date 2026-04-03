@@ -15,7 +15,9 @@ Widget studentsTab(BuildContext context) {
         color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 14)
+          BoxShadow(
+              color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
+              blurRadius: 14)
         ],
       ),
       child: ClipRRect(

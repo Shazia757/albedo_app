@@ -1,5 +1,7 @@
 import 'package:albedo_app/model/report_model.dart';
 import 'package:albedo_app/model/student_model.dart';
+import 'package:albedo_app/widgets/custom_appbar.dart';
+import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,9 +16,8 @@ class StudentDetailsPage extends StatelessWidget {
       length: 3,
       child: Scaffold(
         backgroundColor: const Color(0xFFF6F8FC),
-        appBar: AppBar(
-          title: const Text("Student Details"),
-        ),
+        appBar: CustomAppBar(),
+        drawer: DrawerMenu(),
         body: Column(
           children: [
             _header(context),
@@ -45,7 +46,9 @@ class StudentDetailsPage extends StatelessWidget {
         color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(blurRadius: 10, color: Colors.black.withOpacity(0.05))
+          BoxShadow(
+              blurRadius: 10,
+              color: Theme.of(context).colorScheme.shadow.withOpacity(0.08))
         ],
       ),
       child: Row(
@@ -140,7 +143,10 @@ class StudentDetailsPage extends StatelessWidget {
         color: Theme.of(Get.context!).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(blurRadius: 10, color: Colors.black.withOpacity(0.05))
+          BoxShadow(
+              blurRadius: 10,
+              color:
+                  Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.08))
         ],
       ),
       child: Column(
