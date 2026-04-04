@@ -64,13 +64,13 @@ class ProfilePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      user.name,
+                      user.name ?? 'NA',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                     ),
                     Text(
-                      user.role,
+                      user.role ?? 'Student',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: cs.onSurface.withOpacity(0.6),
                           ),
@@ -89,7 +89,7 @@ class ProfilePage extends StatelessWidget {
                     _infoTile(
                       context,
                       title: "Employee ID",
-                      value: user.employeeId,
+                      value: user.employeeId ?? 'NA',
                       icon: Icons.badge_outlined,
                     ),
                     _editableTile(
@@ -132,7 +132,7 @@ class ProfilePage extends StatelessWidget {
                         onPressed: () {
                           if (c.isEditing.value) {
                             c.updateUser(
-                              name: user.name,
+                              name: user.name ?? 'NA',
                               email: c.emailController.text,
                               contact: c.contactController.text,
                             );

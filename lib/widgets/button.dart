@@ -51,3 +51,60 @@ Widget iconBtn({
     ),
   );
 }
+
+Widget buildActionButton({
+  IconData? icon,
+  required BuildContext context,
+  required String text,
+  String? loadingText,
+  Color? color,
+  required VoidCallback onPressed,
+  EdgeInsetsGeometry padding = EdgeInsets.zero,
+  Color foregroundColor = Colors.white,
+  bool isLoading = false,
+}) {
+  return Padding(
+    padding: padding,
+    child: ElevatedButton(
+      onPressed: () {
+        if (!isLoading) {
+          onPressed();
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        foregroundColor: foregroundColor,
+        backgroundColor: color ?? Theme.of(context).colorScheme.secondary,
+        minimumSize: const Size(double.infinity, 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (isLoading) ...[
+            const SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              isLoading ? loadingText ?? '' : text,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ] else ...[
+            if (icon != null) ...[
+              Icon(icon, color: Colors.white),
+              const SizedBox(width: 8),
+            ],
+            Text(text, style: const TextStyle(fontSize: 16)),
+          ]
+        ],
+      ),
+    ),
+  );
+}

@@ -1,4 +1,6 @@
 import 'package:albedo_app/controller/account_controller.dart';
+import 'package:albedo_app/view/login_page.dart';
+import 'package:albedo_app/widgets/button.dart';
 import 'package:albedo_app/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,21 +20,11 @@ class ForgotPasswordPage extends StatelessWidget {
             Expanded(
               flex: 1,
               child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Albedo LMS",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
+                decoration: const BoxDecoration(color: Colors.white),
+                child: Center(
+                  child: Image.asset(
+                    "assets/images/logo.png",
+                    height: 120, // adjust as needed
                   ),
                 ),
               ),
@@ -71,11 +63,12 @@ class ForgotPasswordPage extends StatelessWidget {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text("Forgot Password",
+                                Text("Forgot Password?",
                                     style: TextStyle(
-                                        color: Color(0xFF111827),
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold)),
+                                      color: Color(0xFF374151),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18,
+                                    )),
                                 const SizedBox(height: 8),
                                 const Text(
                                     "Enter your email to receive reset token",
@@ -87,62 +80,27 @@ class ForgotPasswordPage extends StatelessWidget {
                                   controller: c.emailController,
                                 ),
                                 const SizedBox(height: 18),
-                                Obx(() => GestureDetector(
-                                      child: Container(
-                                        height: 55,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(14),
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color(0xFF7F00FF),
-                                              Color(0xFFE100FF),
-                                            ],
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Color(0xFF7F00FF)
-                                                  .withOpacity(0.2),
-                                              blurRadius: 15,
-                                              offset: Offset(0, 8),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Center(
-                                          child: c.isLoading.value
-                                              ? const CircularProgressIndicator(
-                                                  color: Colors.white)
-                                              : const Text("Send Request",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 16,
-                                                  )),
-                                        ),
-                                      ),
-                                    )),
+                                Obx(
+                                  () => buildActionButton(
+                                    context: context,
+                                    text: 'Send Request',
+                                    loadingText: 'Sending Request...',
+                                    isLoading: c.isLoading.value,
+                                    onPressed: () => c.forgotPassword(),
+                                  ),
+                                ),
                                 const SizedBox(height: 12),
-                                InkWell(
-                                    onTap: () => Get.back(),
-                                    child: Container(
-                                      height: 55,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: const Color(0xFFE5E7EB)),
-                                      ),
-                                      child: const Center(
-                                        child: Text(
-                                          "Back to Login",
-                                          style: TextStyle(
-                                            color: Color(0xFF374151),
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    ))
+                                buildActionButton(
+                                  context: context,
+                                  text: 'Back to Login',
+                                  onPressed: () => Get.offAll(LoginView()),
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                  foregroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .shadow
+                                      .withOpacity(0.8),
+                                ),
                               ]),
                         ),
                       ],

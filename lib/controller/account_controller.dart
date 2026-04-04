@@ -2,6 +2,7 @@ import 'package:albedo_app/model/user_model.dart';
 import 'package:albedo_app/view/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class AccountController extends GetxController {
   final nameController = TextEditingController();
@@ -12,26 +13,32 @@ class AccountController extends GetxController {
   var rememberMe = false.obs;
   var obscurePassword = true.obs;
   var isLoading = false.obs;
+  final box = GetStorage();
 
   void toggleRemember(bool? value) {
     rememberMe.value = value ?? false;
   }
-
 
   Future<void> login() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       Get.snackbar("Error", "Please fill all fields");
       return;
     }
-
+    isLoading.value = true;
     try {
-      isLoading.value = true;
-
       // TODO: API CALL HERE
       await Future.delayed(const Duration(seconds: 2));
 
+      if (rememberMe.value) {
+        box.write('isLoggedIn', true);
+        box.write('user', {
+          'name': 'Test',
+          'employeeId': 'EMP001',
+        });
+      }
+
       Get.snackbar("Success", "Login Successful");
-      Get.to(() => HomeView());
+      Get.offAll(() => HomeView());
     } catch (e) {
       Get.snackbar("Error", "Login Failed");
     } finally {
@@ -41,7 +48,7 @@ class AccountController extends GetxController {
 
   var isEditing = false.obs;
 
-  var user = UserModel(
+  var user = Users(
     name: "Shazia",
     employeeId: "EMP123",
     role: "Software Developer",
@@ -74,5 +81,30 @@ class AccountController extends GetxController {
 
   void resetPassword() {
     Get.snackbar("Reset Password", "Password reset link sent to email");
+  }
+
+  void logout() {
+    box.erase(); // clears saved login
+  }
+
+  void forgotPassword() async {
+    if (emailController.text.isEmpty) {
+      Get.snackbar("Error", "Please enter your email address");
+      return;
+    }
+    isLoading.value = true;
+    try {
+      // Call your API here
+      await Future.delayed(Duration(seconds: 2));
+
+      Get.snackbar(
+        "Success",
+        "Password reset link sent to your email",
+      );
+    } catch (e) {
+      Get.snackbar("Error", "Something went wrong");
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

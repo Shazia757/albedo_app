@@ -32,11 +32,13 @@ class CustomTextField extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
 
             /// 🔥 BACKGROUND
-            color: cs.primaryContainer.withOpacity(0.25),
+            color: cs.secondaryContainer.withOpacity(0),
 
             /// 🔥 BORDER
             border: Border.all(
-              color: isFocused.value ? cs.primary : cs.outline.withOpacity(0.5),
+              color: isFocused.value
+                  ? cs.secondary.withOpacity(0.5)
+                  : cs.outline.withOpacity(0.5),
               width: 1.2,
             ),
 
@@ -44,7 +46,7 @@ class CustomTextField extends StatelessWidget {
             boxShadow: [
               if (isFocused.value)
                 BoxShadow(
-                  color: cs.primary.withOpacity(0.2),
+                  color: cs.secondary.withOpacity(0.2),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 )
@@ -57,6 +59,8 @@ class CustomTextField extends StatelessWidget {
             ],
           ),
           child: TextField(
+            cursorColor:
+                Theme.of(context).colorScheme.secondary.withOpacity(0.8),
             controller: controller,
             obscureText: isPassword ? obscure.value : false,
             style: TextStyle(
@@ -68,7 +72,7 @@ class CustomTextField extends StatelessWidget {
               prefixIcon: Icon(
                 prefixIcon,
                 color: isFocused.value
-                    ? cs.primary
+                    ? cs.secondary
                     : cs.onSurface.withOpacity(0.6),
               ),
               hintText: hint,

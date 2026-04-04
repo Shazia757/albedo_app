@@ -1,7 +1,6 @@
-import 'dart:ui';
-
 import 'package:albedo_app/controller/account_controller.dart';
 import 'package:albedo_app/view/forgot_password_page.dart';
+import 'package:albedo_app/widgets/button.dart';
 import 'package:albedo_app/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,6 +11,7 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AccountController c = Get.put(AccountController());
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: Row(
@@ -21,21 +21,11 @@ class LoginView extends StatelessWidget {
             Expanded(
               flex: 1,
               child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Albedo LMS",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
+                decoration: BoxDecoration(color: Colors.white),
+                child: Center(
+                  child: Image.asset(
+                    "assets/images/logo.png",
+                    height: 120, // adjust as needed
                   ),
                 ),
               ),
@@ -51,7 +41,8 @@ class LoginView extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        Image.asset("assets/images/logo.png", height: 80),
+                        if (Responsive.isMobile(context))
+                          Image.asset("assets/images/logo.png", height: 80),
                         Container(
                           width: Responsive.isDesktop(context)
                               ? 400
@@ -60,9 +51,10 @@ class LoginView extends StatelessWidget {
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
-                            color: Colors.white.withOpacity(0.6),
+                            color: cs.surface.withOpacity(0.7),
                             border: Border.all(
-                                color: Colors.white.withOpacity(0.3)),
+                              color: cs.outline.withOpacity(0.2),
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.08),
@@ -74,14 +66,15 @@ class LoginView extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Login",
+                              Text("Login",
                                   style: TextStyle(
                                       fontSize: 28,
-                                      color: Color(0xFF111827),
+                                      color: cs.onSurface,
                                       fontWeight: FontWeight.bold)),
                               const SizedBox(height: 5),
-                              const Text("Glad you're back.!",
-                                  style: TextStyle(color: Color(0xFF6B7280))),
+                              Text("Glad you're back.!",
+                                  style: TextStyle(
+                                      color: cs.onSurface.withOpacity(0.6))),
                               const SizedBox(height: 28),
                               CustomTextField(
                                 prefixIcon: Icons.email_outlined,
@@ -107,7 +100,7 @@ class LoginView extends StatelessWidget {
                                       children: [
                                         Checkbox(
                                           value: c.rememberMe.value,
-                                          activeColor: Color(0xFF7F00FF),
+                                          activeColor: cs.secondary,
                                           onChanged: c.toggleRemember,
                                         ),
                                         const Text("Remember me",
@@ -126,40 +119,15 @@ class LoginView extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 10),
-                              Obx(() => GestureDetector(
-                                    onTap: c.login,
-                                    child: Container(
-                                      height: 55,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color(0xFF7F00FF),
-                                            Color(0xFFE100FF),
-                                          ],
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Color(0xFF7F00FF)
-                                                .withOpacity(0.2),
-                                            blurRadius: 15,
-                                            offset: Offset(0, 8),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Center(
-                                        child: c.isLoading.value
-                                            ? const CircularProgressIndicator(
-                                                color: Colors.white)
-                                            : const Text("Login",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 16,
-                                                )),
-                                      ),
-                                    ),
-                                  )),
+                              Obx(
+                                () => buildActionButton(
+                                  context: context,
+                                  text: 'Login',
+                                  color: cs.secondary,
+                                  isLoading: c.isLoading.value,
+                                  onPressed: () => c.login(),
+                                ),
+                              ),
                               const SizedBox(height: 18),
                               Row(
                                 children: const [
