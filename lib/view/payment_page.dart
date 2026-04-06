@@ -1,9 +1,9 @@
 import 'package:albedo_app/controller/payment_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
-import 'package:albedo_app/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -34,7 +34,7 @@ class PaymentPage extends StatelessWidget {
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: premiumSearch(
+            child: CustomWidgets().premiumSearch(
               context,
               hint: isStudent ? "Search students..." : "Search teachers...",
               onChanged: (p0) => c.searchQuery.value = p0,

@@ -1,13 +1,10 @@
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/view/forgot_password_page.dart';
-import 'package:albedo_app/widgets/button.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
-import 'package:albedo_app/widgets/search_bar.dart';
-import 'package:albedo_app/widgets/sort_sheet.dart';
-import 'package:albedo_app/widgets/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -35,7 +32,7 @@ class SessionPage extends StatelessWidget {
                   _topBar(context, c),
                   const SizedBox(height: 12),
                   Obx(
-                    () => customTabs(context,
+                    () => CustomWidgets(). customTabs(context,
                         tabs: c.tabs,
                         selectedIndex: c.selectedTab.value, getCount: (index) {
                       if (index == 0) return c.sessions.length;
@@ -131,11 +128,11 @@ class SessionPage extends StatelessWidget {
                             ),
                           ],
                           actions: [
-                            iconBtn(
+                            CustomWidgets(). iconBtn(
                                 icon: Icons.edit,
                                 color: Theme.of(context).colorScheme.primary,
                                 onTap: () {}),
-                            iconBtn(
+                            CustomWidgets(). iconBtn(
                                 icon: Icons.delete,
                                 color: Theme.of(context).colorScheme.onTertiary,
                                 onTap: () {}),
@@ -159,7 +156,7 @@ class SessionPage extends StatelessWidget {
     if (isMobile) {
       return Column(
         children: [
-          premiumSearch(
+          CustomWidgets(). premiumSearch(
             context,
             hint: "Search sessions...",
             onChanged: (val) => c.searchQuery.value = val,
@@ -180,7 +177,7 @@ class SessionPage extends StatelessWidget {
       children: [
         Expanded(
             flex: 3,
-            child: premiumSearch(
+            child: CustomWidgets(). premiumSearch(
               context,
               hint: "Search sessions...",
               onChanged: (val) => c.searchQuery.value = val,
@@ -219,7 +216,7 @@ class SessionPage extends StatelessWidget {
 
   Widget _sortButton(BuildContext context, SessionController c) {
     return GestureDetector(
-      onTap: () => showSortSheet(
+      onTap: () => CustomWidgets(). showSortSheet(
           title: "Sort Sessions",
           options: _sortOptions,
           selectedValue: c.sortType.value,

@@ -1,6 +1,6 @@
 import 'package:albedo_app/controller/account_controller.dart';
 import 'package:albedo_app/view/login_page.dart';
-import 'package:albedo_app/widgets/button.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -81,7 +81,7 @@ class ForgotPasswordPage extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 18),
                                 Obx(
-                                  () => buildActionButton(
+                                  () => CustomWidgets().buildActionButton(
                                     context: context,
                                     text: 'Send Request',
                                     loadingText: 'Sending Request...',
@@ -90,7 +90,7 @@ class ForgotPasswordPage extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 12),
-                                buildActionButton(
+                                CustomWidgets().buildActionButton(
                                   context: context,
                                   text: 'Back to Login',
                                   onPressed: () => Get.offAll(LoginView()),

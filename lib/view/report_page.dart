@@ -1,14 +1,11 @@
 // PREMIUM + RESPONSIVE REPORTS PAGE (IMPROVED UI)
-import 'dart:developer';
-
 import 'package:albedo_app/controller/report_controller.dart';
-import 'package:albedo_app/view/student_details_page.dart';
 import 'package:albedo_app/view/student_report_page.dart';
 import 'package:albedo_app/view/teacher_report_page.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
-import 'package:albedo_app/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -109,7 +106,7 @@ class ReportsPage extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: premiumSearch(context,
+          child: CustomWidgets().premiumSearch(context,
               hint: 'Search reports...',
               onChanged: (val) => c.searchQuery.value = val),
         ),

@@ -122,7 +122,6 @@ class DrawerMenu extends StatelessWidget {
                     context,
                     Icons.support_agent,
                     "Supports",
-                    badge: 3,
                     active: c.selectedIndex.value == 5,
                     onPressed: () {
                       c.setIndex(5);

@@ -1,10 +1,9 @@
 import 'package:albedo_app/controller/support_controller.dart';
-import 'package:albedo_app/widgets/button.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
-import 'package:albedo_app/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,8 +24,8 @@ class SupportsPage extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child:
-                premiumSearch(context, hint: 'Search...', onChanged: (value) {
+            child: CustomWidgets().premiumSearch(context, hint: 'Search...',
+                onChanged: (value) {
               c.searchQuery.value = value;
             }),
           ),
@@ -125,14 +124,14 @@ class SupportsPage extends StatelessWidget {
 
                 /// ✅ Actions
                 actions: [
-                  iconBtn(
+                  CustomWidgets().iconBtn(
                     icon: Icons.edit,
                     onTap: () {
                       // TODO: Edit logic
                     },
                     color: Theme.of(context).colorScheme.primary,
                   ),
-                  iconBtn(
+                  CustomWidgets().iconBtn(
                     icon: Icons.delete,
                     onTap: () {
                       // TODO: Delete logic

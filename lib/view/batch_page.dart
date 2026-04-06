@@ -1,10 +1,9 @@
 import 'package:albedo_app/controller/batch_controller.dart';
-import 'package:albedo_app/widgets/button.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
-import 'package:albedo_app/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -29,12 +28,10 @@ class BatchesPage extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      premiumSearch(
-                        context,
-                          hint: "Search batches...",
-                          onChanged: (value) {
-                            c.searchQuery.value = value;
-                          }),
+                      CustomWidgets().premiumSearch(context,
+                          hint: "Search batches...", onChanged: (value) {
+                        c.searchQuery.value = value;
+                      }),
                       const SizedBox(height: 12),
                       _tabs(),
                       const SizedBox(height: 12),
@@ -69,11 +66,11 @@ class BatchesPage extends StatelessWidget {
                               {"label": "Batch Code", "value": batches[i].code},
                             ],
                             actions: [
-                              iconBtn(
+                             CustomWidgets(). iconBtn(
                                   icon: Icons.edit,
                                   color: Theme.of(context).colorScheme.primary,
                                   onTap: () {}),
-                              iconBtn(
+                              CustomWidgets(). iconBtn(
                                   icon: Icons.delete,
                                   color:
                                       Theme.of(context).colorScheme.onTertiary,

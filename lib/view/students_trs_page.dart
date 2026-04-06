@@ -4,12 +4,9 @@ import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/student_model.dart';
 import 'package:albedo_app/model/teacher_model.dart';
 import 'package:albedo_app/view/forgot_password_page.dart';
-import 'package:albedo_app/widgets/button.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
-import 'package:albedo_app/widgets/search_bar.dart';
-import 'package:albedo_app/widgets/sort_sheet.dart';
-import 'package:albedo_app/widgets/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -46,11 +43,11 @@ class UsersPage extends StatelessWidget {
               children: [
                 Expanded(
                   child: (type == UserPageType.student)
-                      ? premiumSearch(context,
+                      ? CustomWidgets().premiumSearch(context,
                           hint: "Search students...",
                           onChanged: (value) =>
                               studentController.searchQuery.value = value)
-                      : premiumSearch(context,
+                      : CustomWidgets().premiumSearch(context,
                           hint: "Search teachers...",
                           onChanged: (value) =>
                               teacherController.searchQuery.value = value),
@@ -61,7 +58,7 @@ class UsersPage extends StatelessWidget {
                 /// Sort
                 InkWell(
                   borderRadius: BorderRadius.circular(8),
-                  onTap: () => showSortSheet(
+                  onTap: () => CustomWidgets().showSortSheet(
                     title: "Sort Students",
                     options: [
                       SortOption(
@@ -101,7 +98,7 @@ class UsersPage extends StatelessWidget {
 
           /// 🧭 Tabs
           Obx(
-            () => customTabs(
+            () => CustomWidgets().customTabs(
               context,
               tabs: tabs,
               selectedIndex: (type == UserPageType.student)
@@ -319,23 +316,23 @@ class UsersPage extends StatelessWidget {
                 /// 🔘 Actions
                 Row(
                   children: [
-                    iconBtn(
+                    CustomWidgets().iconBtn(
                       title: "Dashboard",
                       icon: Icons.dashboard,
                       color: cs.primary,
                     ),
                     const SizedBox(width: 8),
-                    iconBtn(
+                    CustomWidgets().iconBtn(
                       icon: Icons.edit,
                       color: cs.secondary,
                     ),
                     const SizedBox(width: 8),
-                    iconBtn(
+                    CustomWidgets().iconBtn(
                       icon: Icons.block,
                       color: cs.error,
                     ),
                     const SizedBox(width: 8),
-                    iconBtn(
+                    CustomWidgets().iconBtn(
                       icon: Icons.delete,
                       color: cs.onSurface.withOpacity(0.4),
                     ),

@@ -1,6 +1,6 @@
 import 'package:albedo_app/controller/account_controller.dart';
 import 'package:albedo_app/view/forgot_password_page.dart';
-import 'package:albedo_app/widgets/button.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -120,7 +120,7 @@ class LoginView extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               Obx(
-                                () => buildActionButton(
+                                () => CustomWidgets().buildActionButton(
                                   context: context,
                                   text: 'Login',
                                   color: cs.secondary,
