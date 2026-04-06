@@ -7,10 +7,12 @@ class HomeController extends GetxController {
   var studentCount = 0.obs;
   var teacherCount = 0.obs;
   var assistantCount = 0.obs;
+  var mentorCount = 0.obs;
 
   var studentData = <double>[].obs;
   var teacherData = <double>[].obs;
   var assistantData = <double>[].obs;
+  var mentorData = <double>[].obs;
   var isLoading = true.obs;
   var isUsersExpanded = false.obs;
   var selectedIndex = 0.obs;
@@ -32,12 +34,14 @@ class HomeController extends GetxController {
   var studentRange = "All".obs;
   var teacherRange = "All".obs;
   var assistantRange = "All".obs;
+  var mentorRange = "All".obs;
   var summaryRange = "All".obs;
   var expenseRange = "All".obs;
 
   var studentLabels = <String>[].obs;
   var teacherLabels = <String>[].obs;
   var assistantLabels = <String>[].obs;
+  var mentorLabels = <String>[].obs;
   var expenseLabels = <String>[].obs;
 
   void updateStudentData({TimeFilter? filter, String? range}) {
@@ -99,6 +103,26 @@ class HomeController extends GetxController {
       case "This Year":
         assistantData.assignAll([5, 10, 15, 20, 25, 30]);
         assistantLabels
+            .assignAll(["2019", "2020", "2021", "2022", "2023", "2024"]);
+        break;
+    }
+  }
+
+  void updateMentorData({String? range}) {
+    switch (range) {
+      case "All":
+        mentorData.assignAll([1, 2, 1, 3, 2, 4]);
+        mentorLabels.assignAll(["Jan", "Feb", "Mar", "Apr", "May", "Jun"]);
+        break;
+
+      case "This Month":
+        mentorData.assignAll([1, 1, 2, 1, 2, 2]);
+        mentorLabels.assignAll(["W1", "W2", "W3", "W4", "W5", "W6"]);
+        break;
+
+      case "This Year":
+        mentorData.assignAll([5, 10, 15, 20, 25, 30]);
+        mentorLabels
             .assignAll(["2019", "2020", "2021", "2022", "2023", "2024"]);
         break;
     }
@@ -202,6 +226,7 @@ class HomeController extends GetxController {
       studentCount.value = 1034;
       teacherCount.value = 10;
       assistantCount.value = 4;
+      mentorCount.value = 18;
 
       studentData.assignAll([10, 30, 20, 40, 35, 50]);
       teacherData.assignAll([2, 5, 3, 6, 4, 7]);

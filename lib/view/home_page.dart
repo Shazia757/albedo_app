@@ -68,7 +68,24 @@ class HomeView extends StatelessWidget {
                     const SizedBox(height: 16),
                     _chartCard(
                       context,
-                      title: "Assistants Count",
+                      title: "Mentors Count",
+                      count: c.mentorCount.value.toString(),
+                      data: c.mentorData,
+                      color: Theme.of(context).colorScheme.primary,
+                      selectedFilter: c.selectedFilter.value,
+                      onFilterChanged: (p0) {
+                        c.selectedFilter.value = p0;
+                        c.updateMentorData();
+                      },
+                      selectedRange: c.mentorRange,
+                      onRangeChanged: (p0) {
+                        c.mentorRange.value = p0;
+                        c.updateMentorData(range: p0);
+                      },
+                    ),
+                    _chartCard(
+                      context,
+                      title: "Assistant Admins Count",
                       count: c.assistantCount.value.toString(),
                       data: c.assistantData,
                       color: Theme.of(context).colorScheme.primary,
