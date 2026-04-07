@@ -17,17 +17,35 @@ class BatchesController extends GetxController {
   void loadDummyData() {
     batches.value = [
       Batch(
-          id: 'B001', name: 'Flutter Basics', code: 'FL101', status: 'active'),
-      Batch(id: 'B002', name: 'Advanced Dart', code: 'DR201', status: 'active'),
+          teacherName: '',
+          id: 'B001',
+          batchName: 'Flutter Basics',
+          batchID: 'FL101',
+          status: 'active'),
       Batch(
+          teacherName: '',
+          id: 'B002',
+          batchName: 'Advanced Dart',
+          batchID: 'DR201',
+          status: 'active'),
+      Batch(
+          teacherName: '',
           id: 'B003',
-          name: 'Web Development',
-          code: 'WD301',
+          batchName: 'Web Development',
+          batchID: 'WD301',
           status: 'inactive'),
       Batch(
-          id: 'B004', name: 'Mobile App Dev', code: 'MA401', status: 'active'),
+          teacherName: '',
+          id: 'B004',
+          batchName: 'Mobile App Dev',
+          batchID: 'MA401',
+          status: 'active'),
       Batch(
-          id: 'B005', name: 'UI/UX Design', code: 'UX501', status: 'inactive'),
+          teacherName: '',
+          id: 'B005',
+          batchName: 'UI/UX Design',
+          batchID: 'UX501',
+          status: 'inactive'),
     ];
   }
 

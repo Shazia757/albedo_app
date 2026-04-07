@@ -11,6 +11,8 @@ class Session {
   final String teacherId;
   final DateTime dateTime;
   final String status;
+  int? duration;
+  double? teacherSalary;
 
   Session({
     required this.id,
@@ -22,6 +24,8 @@ class Session {
     required this.teacherId,
     required this.dateTime,
     required this.status,
+    this.duration,
+    this.teacherSalary,
   });
 }
 

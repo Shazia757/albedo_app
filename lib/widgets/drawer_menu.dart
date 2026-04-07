@@ -1,6 +1,7 @@
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/view/batch_page.dart';
+import 'package:albedo_app/view/batches_list_page.dart';
 import 'package:albedo_app/view/home_page.dart';
 import 'package:albedo_app/view/payment_page.dart';
 import 'package:albedo_app/view/report_page.dart';
@@ -42,17 +43,35 @@ class DrawerMenu extends StatelessWidget {
                       Get.to(() => HomeView());
                     },
                   ),
-                  _menuItem(
-                    context,
-                    Icons.video_collection,
-                    "Sessions",
-                    active: c.selectedIndex.value == 1,
-                    onPressed: () {
-                      c.setIndex(1);
-                      Get.back(); // close drawer if open
-                      Get.to(() => SessionPage());
-                    },
-                  ),
+                  DrawerExpansionMenu(
+                      title: 'Sessions',
+                      leadingIcon: Icons.video_collection,
+                      parentIndex: 1,
+                      selectedParentIndex: c.selectedIndex,
+                      selectedSubIndex: c.selectedSubIndex,
+                      children: [
+                        DrawerSubItem(
+                          title: 'Sessions',
+                          index: 0,
+                          onTap: () => Get.offAll(SessionPage()),
+                        ),
+                        DrawerSubItem(
+                          title: 'Batches',
+                          index: 1,
+                          onTap: () => Get.offAll(BatchesListPage()),
+                        ),
+                      ]),
+                  // _menuItem(
+                  //   context,
+                  //   Icons.video_collection,
+                  //   "Sessions",
+                  //   active: c.selectedIndex.value == 1,
+                  //   onPressed: () {
+                  //     c.setIndex(1);
+                  //     Get.back(); // close drawer if open
+                  //     Get.to(() => SessionPage());
+                  //   },
+                  // ),
                   DrawerExpansionMenu(
                       title: 'Users',
                       leadingIcon: Icons.people,

@@ -32,7 +32,7 @@ class SessionPage extends StatelessWidget {
                   _topBar(context, c),
                   const SizedBox(height: 12),
                   Obx(
-                    () => CustomWidgets(). customTabs(context,
+                    () => CustomWidgets().customTabs(context,
                         tabs: c.tabs,
                         selectedIndex: c.selectedTab.value, getCount: (index) {
                       if (index == 0) return c.sessions.length;
@@ -128,14 +128,19 @@ class SessionPage extends StatelessWidget {
                             ),
                           ],
                           actions: [
-                            CustomWidgets(). iconBtn(
-                                icon: Icons.edit,
-                                color: Theme.of(context).colorScheme.primary,
-                                onTap: () {}),
-                            CustomWidgets(). iconBtn(
+                            CustomWidgets().iconBtn(
+                              icon: Icons.edit,
+                              color: Theme.of(context).colorScheme.primary,
+                              onTap: () => showEditDialog(context, data[i]),
+                            ),
+                            CustomWidgets().iconBtn(
                                 icon: Icons.delete,
                                 color: Theme.of(context).colorScheme.onTertiary,
-                                onTap: () {}),
+                                onTap: () => CustomWidgets().showDeleteDialog(
+                                      onConfirm: () {
+                                        // c.delete(data[i].id);
+                                      },
+                                    )),
                           ],
                         ),
                       );
@@ -156,7 +161,7 @@ class SessionPage extends StatelessWidget {
     if (isMobile) {
       return Column(
         children: [
-          CustomWidgets(). premiumSearch(
+          CustomWidgets().premiumSearch(
             context,
             hint: "Search sessions...",
             onChanged: (val) => c.searchQuery.value = val,
@@ -177,7 +182,7 @@ class SessionPage extends StatelessWidget {
       children: [
         Expanded(
             flex: 3,
-            child: CustomWidgets(). premiumSearch(
+            child: CustomWidgets().premiumSearch(
               context,
               hint: "Search sessions...",
               onChanged: (val) => c.searchQuery.value = val,
@@ -216,7 +221,7 @@ class SessionPage extends StatelessWidget {
 
   Widget _sortButton(BuildContext context, SessionController c) {
     return GestureDetector(
-      onTap: () => CustomWidgets(). showSortSheet(
+      onTap: () => CustomWidgets().showSortSheet(
           title: "Sort Sessions",
           options: _sortOptions,
           selectedValue: c.sortType.value,
@@ -325,6 +330,320 @@ class SessionPage extends StatelessWidget {
       default:
         return Theme.of(context).colorScheme.shadow;
     }
+  }
+
+  void showEditDialog(BuildContext context, Session data) {
+    c.initEdit(data);
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Form(
+          key: c.formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// 🔷 HEADER
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Get.theme.colorScheme.secondary,
+                      Get.theme.colorScheme.secondary.withOpacity(0.8),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(28),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.edit, color: Colors.white),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Text(
+                        "Edit Session",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.close, color: Colors.white),
+                    )
+                  ],
+                ),
+              ),
+
+              /// 🔷 BODY
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
+                child: Column(
+                  children: [
+                    /// 🔹 SECTION: DATE & TIME
+                    _sectionCard(
+                      icon: Icons.schedule,
+                      title: "Schedule",
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _inputField(
+                              controller: c.dateController,
+                              label: "Date",
+                              icon: Icons.calendar_today_outlined,
+                              readOnly: true,
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: Get.context!,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                );
+                                if (picked != null) {
+                                  c.dateController.text =
+                                      "${picked.day}/${picked.month}/${picked.year}";
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _inputField(
+                              controller: c.timeController,
+                              label: "Time",
+                              icon: Icons.access_time_outlined,
+                              readOnly: true,
+                              onTap: () async {
+                                final picked = await showTimePicker(
+                                  context: Get.context!,
+                                  initialTime: TimeOfDay.now(),
+                                );
+                                if (picked != null) {
+                                  c.timeController.text =
+                                      "${picked.hour}:${picked.minute}";
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    /// 🔹 SECTION: SESSION DETAILS
+                    _sectionCard(
+                      icon: Icons.school,
+                      title: "Session Details",
+                      child: Column(
+                        children: [
+                          /// Duration
+                          Obx(() => DropdownButtonFormField<int>(
+                                style: TextStyle(fontSize: 13),
+                                value: c.durationOptions
+                                        .contains(c.selectedDuration.value)
+                                    ? c.selectedDuration.value
+                                    : null,
+                                items: c.durationOptions
+                                    .map((e) => DropdownMenuItem(
+                                          value: e,
+                                          child: Text("$e mins",
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Get.theme.colorScheme
+                                                    .onSurface,
+                                              )),
+                                        ))
+                                    .toList(),
+                                onChanged: (val) =>
+                                    c.selectedDuration.value = val,
+                                decoration: _dropdownDecoration("Duration"),
+                                validator: (v) => v == null ? "Required" : null,
+                              )),
+
+                          const SizedBox(height: 12),
+
+                          /// Teacher
+                          Obx(() => DropdownButtonFormField<String>(
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Get.theme.colorScheme.onSurface,
+                                ),
+                                value: c.teacherList
+                                        .contains(c.selectedTeacher.value)
+                                    ? c.selectedTeacher.value
+                                    : null,
+                                items: c.teacherList
+                                    .toSet()
+                                    .map((e) => DropdownMenuItem(
+                                          value: e,
+                                          child: Text(e),
+                                        ))
+                                    .toList(),
+                                onChanged: (val) =>
+                                    c.selectedTeacher.value = val,
+                                decoration: _dropdownDecoration("Teacher"),
+                                validator: (v) =>
+                                    v == null || v.isEmpty ? "Required" : null,
+                              )),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    /// 🔹 SECTION: PAYMENT
+                    _sectionCard(
+                      icon: Icons.payments_outlined,
+                      title: "Payment",
+                      child: _inputField(
+                        controller: c.salaryController,
+                        label: "Teacher Salary (Optional)",
+                        icon: Icons.currency_rupee,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// 🔷 ACTIONS
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.03),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(28),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text("Cancel"),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (!c.formKey.currentState!.validate()) return;
+
+                          Get.back();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text("Save Changes"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionCard({
+    required IconData icon,
+    required String title,
+    required Widget child,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _inputField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    TextInputType? keyboardType,
+  }) {
+    return TextFormField(
+      style: TextStyle(fontSize: 13),
+      controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
+      keyboardType: keyboardType,
+      validator: (v) => (v == null || v.isEmpty) ? "Required" : null,
+      decoration: InputDecoration(
+        labelStyle: TextStyle(fontSize: 12),
+        hintStyle: TextStyle(fontSize: 12),
+        labelText: label,
+        prefixIcon: Icon(icon),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _dropdownDecoration(String label) {
+    return InputDecoration(
+      isDense: true,
+      labelText: label,
+      labelStyle: TextStyle(fontSize: 12),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
   }
 }
 

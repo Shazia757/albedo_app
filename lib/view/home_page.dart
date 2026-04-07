@@ -26,7 +26,8 @@ class HomeView extends StatelessWidget {
               }
 
               return SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                 child: Column(
                   children: [
                     _expenseChartCard(context),
@@ -68,6 +69,8 @@ class HomeView extends StatelessWidget {
                     const SizedBox(height: 16),
                     _chartCard(
                       context,
+                      icon: Icons.people_outline,
+                      iconColor: context.theme.colorScheme.secondary,
                       title: "Mentors Count",
                       count: c.mentorCount.value.toString(),
                       data: c.mentorData,
@@ -83,12 +86,15 @@ class HomeView extends StatelessWidget {
                         c.updateMentorData(range: p0);
                       },
                     ),
+                    const SizedBox(height: 16),
                     _chartCard(
                       context,
                       title: "Assistant Admins Count",
                       count: c.assistantCount.value.toString(),
                       data: c.assistantData,
                       color: Theme.of(context).colorScheme.primary,
+                      icon: Icons.people_outline,
+                      iconColor: context.theme.colorScheme.primary,
                       selectedFilter: c.selectedFilter.value,
                       onFilterChanged: (filter) {
                         c.selectedFilter.value = filter;
@@ -116,8 +122,10 @@ class HomeView extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String count,
+    IconData? icon,
     required List<double> data,
     required Color color,
+    Color? iconColor,
     required TimeFilter selectedFilter,
     required Function(TimeFilter) onFilterChanged,
     required RxString selectedRange,
@@ -165,26 +173,36 @@ class HomeView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 children: [
-                  Text(count,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      )),
-                  const SizedBox(height: 2),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: context.theme.colorScheme.outline,
-                      fontSize: 13,
-                    ),
+                  if (icon != null) ...[
+                    Icon(icon, size: 24, color: iconColor),
+                    const SizedBox(width: 8),
+                  ],
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        count,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: context.theme.colorScheme.outline,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
 
-              // ✅ Popup
+              // ✅ Popup stays right
               Obx(() => PopupMenuButton(
                     padding: EdgeInsets.zero,
                     offset: const Offset(0, 45),
@@ -514,14 +532,37 @@ class HomeView extends StatelessWidget {
                     // PROGRESS BAR
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: LinearProgressIndicator(
-                        value: percent,
-                        minHeight: 6,
-                        backgroundColor: Colors.grey.shade300,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(item['color']),
+                      child: Stack(
+                        children: [
+                          // Background
+                          Container(
+                            height: 12,
+                            color: Colors.grey.shade300,
+                          ),
+
+                          // Gradient Progress
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              return Container(
+                                height: 12,
+                                width: constraints.maxWidth * percent,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      item['color']
+                                          .withOpacity(0.3), // light shade
+                                      item['color'], // full color
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    ),
+                    )
                   ],
                 ),
               )

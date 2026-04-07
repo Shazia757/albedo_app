@@ -57,20 +57,26 @@ class BatchesPage extends StatelessWidget {
                             mainAxisExtent: 180,
                           ),
                           itemBuilder: (_, i) => InfoCard(
-                            id: batches[i].id,
-                            status: batches[i].status,
-                            statusColor:
-                                getStatusColor(context, batches[i].status),
+                            id: batches[i].id ?? '',
+                            status: batches[i].status ?? '',
+                            statusColor: getStatusColor(
+                                context, batches[i].status ?? ''),
                             infoColumns: [
-                              {"label": "Batch Name", "value": batches[i].name},
-                              {"label": "Batch Code", "value": batches[i].code},
+                              {
+                                "label": "Batch Name",
+                                "value": batches[i].batchName ?? ''
+                              },
+                              {
+                                "label": "Batch Code",
+                                "value": batches[i].batchID ?? ''
+                              },
                             ],
                             actions: [
-                             CustomWidgets(). iconBtn(
+                              CustomWidgets().iconBtn(
                                   icon: Icons.edit,
                                   color: Theme.of(context).colorScheme.primary,
                                   onTap: () {}),
-                              CustomWidgets(). iconBtn(
+                              CustomWidgets().iconBtn(
                                   icon: Icons.delete,
                                   color:
                                       Theme.of(context).colorScheme.onTertiary,
