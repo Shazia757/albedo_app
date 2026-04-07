@@ -1,6 +1,5 @@
 import 'package:albedo_app/controller/account_controller.dart';
 import 'package:albedo_app/view/login_page.dart';
-import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,101 +12,107 @@ class ForgotPasswordPage extends StatelessWidget {
     AccountController c = Get.put(AccountController());
 
     return Scaffold(
-      body: Row(
+      backgroundColor: const Color(0xFF0D0D1B), // Matches your new theme
+      body: Stack(
         children: [
-          // 🌟 LEFT SIDE (Only Tablet/Desktop)
-          if (!Responsive.isMobile(context))
-            Expanded(
-              flex: 1,
-              child: Container(
-                decoration: const BoxDecoration(color: Colors.white),
-                child: Center(
-                  child: Image.asset(
-                    "assets/images/logo.png",
-                    height: 120, // adjust as needed
-                  ),
-                ),
-              ),
-            ),
+          _background(),
+          Center(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Logo
+                  Image.asset("assets/images/logo.png", height: 80),
+                  const SizedBox(height: 20),
 
-          // 🔐 RIGHT SIDE (Login Form)
-          Expanded(
-            flex: 1,
-            child: Stack(
-              children: [
-                _background(),
-                Center(
-                  child: SingleChildScrollView(
+                  Container(
+                    width: 400,
+                    margin: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      // Glassmorphism effect
+                      color: Colors.white.withOpacity(0.05),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1.5,
+                      ),
+                    ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.asset("assets/images/logo.png", height: 80),
-                        Container(
-                          width: Responsive.isDesktop(context)
-                              ? 400
-                              : double.infinity,
-                          margin: const EdgeInsets.all(20),
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24),
-                            color: Colors.white.withOpacity(0.6),
-                            border: Border.all(
-                                color: Colors.white.withOpacity(0.3)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
-                                blurRadius: 30,
-                                offset: const Offset(0, 15),
-                              ),
-                            ],
+                        const Text(
+                          "Forgot Password?",
+                          style: TextStyle(
+                            fontSize: 28,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Forgot Password?",
-                                    style: TextStyle(
-                                      color: Color(0xFF374151),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 18,
-                                    )),
-                                const SizedBox(height: 8),
-                                const Text(
-                                    "Enter your email to receive reset token",
-                                    style: TextStyle(color: Color(0xFF6B7280))),
-                                const SizedBox(height: 28),
-                                CustomTextField(
-                                  prefixIcon: Icons.email_outlined,
-                                  hint: "Email address",
-                                  controller: c.emailController,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Please enter your email address to receive a password reset token.",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        
+                        // Email Input
+                        CustomTextField(
+                          prefixIcon: Icons.email_outlined,
+                          hint: "Enter your email",
+                          controller: c.emailController,
+                        ),
+                        
+                        const SizedBox(height: 25),
+                        
+                        // Send Request Button (Vibrant Purple)
+                        Obx(() => SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF9D50FF),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            onPressed: () => c.forgotPassword(),
+                            child: c.isLoading.value 
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text(
+                                  "Send Request", 
+                                  style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)
                                 ),
-                                const SizedBox(height: 18),
-                                Obx(
-                                  () => CustomWidgets().buildActionButton(
-                                    context: context,
-                                    text: 'Send Request',
-                                    loadingText: 'Sending Request...',
-                                    isLoading: c.isLoading.value,
-                                    onPressed: () => c.forgotPassword(),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                CustomWidgets().buildActionButton(
-                                  context: context,
-                                  text: 'Back to Login',
-                                  onPressed: () => Get.offAll(LoginView()),
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  foregroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .shadow
-                                      .withOpacity(0.8),
-                                ),
-                              ]),
+                          ),
+                        )),
+                        
+                        const SizedBox(height: 15),
+                        
+                        // Back to Login Button (Blueish tint to match screenshot)
+                        SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF2D32C1), // Deeper blue
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            onPressed: () => Get.offAll(() => const LoginView()),
+                            child: const Text(
+                              "Back to Login", 
+                              style: TextStyle(fontSize: 16, color: Colors.white)
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -118,60 +123,36 @@ class ForgotPasswordPage extends StatelessWidget {
   Widget _background() {
     return Stack(
       children: [
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFF8F9FF),
-                Color(0xFFEDEBFF),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-        ),
-
-        // Glow effect
+        // Main Glow behind the card
         Positioned(
-          top: 100,
-          left: -50,
-          child: _glow(),
+          top: 150,
+          left: -80,
+          child: _glow(350, const Color(0xFF6200EA).withOpacity(0.5)),
         ),
+        // Secondary subtle glow
         Positioned(
-          bottom: 100,
+          bottom: 50,
           right: -50,
-          child: _glow(),
+          child: _glow(250, const Color(0xFF9D50FF).withOpacity(0.3)),
         ),
       ],
     );
   }
 
-  Widget _glow() {
+  Widget _glow(double size, Color color) {
     return Container(
-      width: 300,
-      height: 300,
-      decoration: const BoxDecoration(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            Color(0x337F00FF), // 👈 very light purple (20% opacity)
-            Colors.transparent,
-          ],
-          stops: [0.2, 1.0], // 👈 smooth spread
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: color,
+            blurRadius: 120,
+            spreadRadius: 10,
+          ),
+        ],
       ),
     );
   }
-}
-
-class Responsive {
-  static bool isMobile(BuildContext context) =>
-      MediaQuery.of(context).size.width < 600;
-
-  static bool isTablet(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 600 &&
-      MediaQuery.of(context).size.width < 1024;
-
-  static bool isDesktop(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 1024;
 }

@@ -1,13 +1,9 @@
-import 'package:albedo_app/controller/report_controller.dart';
-import 'package:albedo_app/model/teacher_model.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 Widget teachersTab() {
   return Obx(() {
-    final ReportsController c = Get.put(ReportsController());
-
-    final data = c.filteredTeachers;
 
     return Column(
       children: [

@@ -40,86 +40,92 @@ class InfoCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// 🔥 TOP ROW
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: LayoutBuilder(builder: (context, constraints) {
+        return ConstrainedBox(
+          constraints: BoxConstraints(minHeight: 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "ID: $id",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: cs.onSurface.withOpacity(0.6),
-                ),
+              /// 🔥 TOP ROW
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "ID: $id",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: cs.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      status.replaceAll("_", " "),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: statusColor,
+                      ),
+                    ),
+                  )
+                ],
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  status.replaceAll("_", " "),
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: statusColor,
+
+              const SizedBox(height: 10),
+
+              /// 🔥 INFO COLUMNS
+              if (infoColumns != null && infoColumns!.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: cs.primaryContainer.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Wrap(
+                    runSpacing: 10,
+                    spacing: 10,
+                    children: infoColumns!
+                        .map((item) => ConstrainedBox(
+                              constraints: const BoxConstraints(minWidth: 120),
+                              child: _miniInfo(
+                                  context, item['label']!, item['value']!),
+                            ))
+                        .toList(),
                   ),
                 ),
-              )
+
+              /// 🔥 CUSTOM INFO ROWS
+              if (infoRows != null)
+                ...infoRows!.map((w) => Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: w,
+                    )),
+
+              const SizedBox(height: 6),
+
+              /// 🔥 ACTIONS
+              if (actions != null && actions!.isNotEmpty)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ...actions!.map((a) => Padding(
+                          padding: const EdgeInsets.only(left: 6),
+                          child: a,
+                        )),
+                  ],
+                ),
+
+              const SizedBox(height: 10),
             ],
           ),
-
-          const SizedBox(height: 10),
-
-          /// 🔥 INFO COLUMNS
-          if (infoColumns != null && infoColumns!.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: cs.primaryContainer.withOpacity(0.4),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Wrap(
-                runSpacing: 10,
-                spacing: 10,
-                children: infoColumns!
-                    .map((item) => ConstrainedBox(
-                          constraints: const BoxConstraints(minWidth: 120),
-                          child: _miniInfo(
-                              context, item['label']!, item['value']!),
-                        ))
-                    .toList(),
-              ),
-            ),
-
-          /// 🔥 CUSTOM INFO ROWS
-          if (infoRows != null)
-            ...infoRows!.map((w) => Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: w,
-                )),
-
-          const SizedBox(height: 6),
-
-          /// 🔥 ACTIONS
-          if (actions != null && actions!.isNotEmpty)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ...actions!.map((a) => Padding(
-                      padding: const EdgeInsets.only(left: 6),
-                      child: a,
-                    )),
-              ],
-            ),
-
-          const SizedBox(height: 10),
-        ],
-      ),
+        );
+      }),
     );
   }
 

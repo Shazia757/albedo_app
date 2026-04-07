@@ -1,6 +1,6 @@
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/view/forgot_password_page.dart';
+import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
@@ -34,15 +34,14 @@ class SessionPage extends StatelessWidget {
                   Obx(
                     () => CustomWidgets().customTabs(context,
                         tabs: c.tabs,
-                        selectedIndex: c.selectedTab.value, getCount: (index) {
-                      if (index == 0) return c.sessions.length;
-                      return c.sessions
-                          .where((e) => e.status == c.statusMap[index])
-                          .length;
-                    }, onTap: (index) {
-                      c.selectedTab.value = index;
-                      c.applyFilters();
-                    }),
+                        selectedIndex: c.selectedTab.value,
+                        getCount: (index) => c.sessions
+                            .where((e) => e.status == c.statusMap[index])
+                            .length,
+                        onTap: (index) {
+                          c.selectedTab.value = index;
+                          c.applyFilters();
+                        }),
                   ),
                   const SizedBox(height: 12),
                   Expanded(
@@ -63,11 +62,10 @@ class SessionPage extends StatelessWidget {
 
                       return GridView.builder(
                         itemCount: data.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 380,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
-                          childAspectRatio: 1.2,
                         ),
                         itemBuilder: (_, i) => InfoCard(
                           id: data[i].id,

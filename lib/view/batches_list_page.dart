@@ -1,7 +1,6 @@
-import 'package:albedo_app/controller/batch_controller.dart';
 import 'package:albedo_app/controller/batch_list_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
-import 'package:albedo_app/view/forgot_password_page.dart';
+import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
@@ -35,15 +34,14 @@ class BatchesListPage extends StatelessWidget {
                   Obx(
                     () => CustomWidgets().customTabs(context,
                         tabs: c.tabs,
-                        selectedIndex: c.selectedTab.value, getCount: (index) {
-                      if (index == 0) return c.batches.length;
-                      return c.batches
-                          .where((e) => e.status == c.statusMap[index])
-                          .length;
-                    }, onTap: (index) {
-                      c.selectedTab.value = index;
-                      c.applyFilters();
-                    }),
+                        selectedIndex: c.selectedTab.value,
+                        getCount: (index) => c.batches
+                            .where((e) => e.status == c.statusMap[index])
+                            .length,
+                        onTap: (index) {
+                          c.selectedTab.value = index;
+                          c.applyFilters();
+                        }),
                   ),
                   const SizedBox(height: 12),
                   Expanded(
@@ -64,11 +62,10 @@ class BatchesListPage extends StatelessWidget {
 
                       return GridView.builder(
                         itemCount: data.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 380,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
-                          childAspectRatio: 1.2,
                         ),
                         itemBuilder: (_, i) => InfoCard(
                           id: data[i].id ?? '',
@@ -172,7 +169,10 @@ class BatchesListPage extends StatelessWidget {
       CustomWidgets().premiumSearch(
         context,
         hint: "Search batches...",
-        onChanged: (val) => c.searchQuery.value = val,
+        onChanged: (val) {
+          c.searchQuery.value = val;
+          c.applyFilters();
+        },
       );
     }
 
@@ -183,16 +183,13 @@ class BatchesListPage extends StatelessWidget {
             child: CustomWidgets().premiumSearch(
               context,
               hint: "Search batches...",
-              onChanged: (val) => c.searchQuery.value = val,
+              onChanged: (val) {
+                c.searchQuery.value = val;
+                c.applyFilters();
+              },
             )),
       ],
     );
-  }
-
-  String _formatTime(DateTime dt) {
-    final hour = dt.hour > 12 ? dt.hour - 12 : dt.hour;
-    final ampm = dt.hour >= 12 ? "PM" : "AM";
-    return "$hour:${dt.minute.toString().padLeft(2, '0')} $ampm";
   }
 
   Widget _miniInfo(

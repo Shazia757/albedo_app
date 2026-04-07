@@ -1,9 +1,7 @@
 import 'package:albedo_app/model/report_model.dart';
-import 'package:albedo_app/model/student_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class StudentDetailsPage extends StatelessWidget {
   final PackageReportModel student; // replace with your model
