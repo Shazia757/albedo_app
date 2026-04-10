@@ -13,6 +13,7 @@ class UserController extends GetxController {
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
   final UserPageType userType;
+  RxBool isLoading = true.obs;
 
   UserController(this.userType);
 
@@ -57,56 +58,75 @@ class UserController extends GetxController {
 
   /// 🔌 Replace with API call
   void fetchTeachers() async {
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      isLoading.value = true;
 
-    teachers.assignAll([
-      TeacherModel(
-        id: "TEA1001",
-        name: "Mr. John",
-        email: "john@email.com",
-        status: "Active",
-        type: "Batch",
-        phone: "+1234567890",
-        joinedAt: DateTime.parse('2022-12-01 09:00:00'),
-      ),
-      TeacherModel(
-        id: "TEA1002",
-        name: "Ms. Smith",
-        email: "smith@email.com",
-        status: "Inactive",
-        type: "Batch",
-        phone: "+9876543210",
-        joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-      ),
-    ]);
+      // 🔥 Replace with your API call
+      await Future.delayed(const Duration(seconds: 2));
+      teachers.assignAll([
+        TeacherModel(
+          id: "TEA1001",
+          name: "Mr. John",
+          email: "john@email.com",
+          status: "Active",
+          type: "Batch",
+          phone: "+1234567890",
+          joinedAt: DateTime.parse('2022-12-01 09:00:00'),
+        ),
+        TeacherModel(
+          id: "TEA1002",
+          name: "Ms. Smith",
+          email: "smith@email.com",
+          status: "Inactive",
+          type: "Batch",
+          phone: "+9876543210",
+          joinedAt: DateTime.parse('2024-12-01 09:00:00'),
+        ),
+      ]);
+      filteredTeachers.assignAll(teachers);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
 
     applyFilters();
   }
 
   /// 🔌 Replace with API call
   void fetchStudents() async {
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      isLoading.value = true;
 
-    students.assignAll([
-      Student(
-        admissionDate: DateTime.parse('2023-01-15 12:00:00'),
-        studentId: "STU1001",
-        name: "Riya Shah",
-        email: "riya@email.com",
-        status: "Active",
-        type: "Batch",
-        joinedAt: DateTime.now(),
-      ),
-      Student(
-        admissionDate: DateTime.parse('2023-01-15 12:00:00'),
-        studentId: "STU1002",
-        name: "Ameen",
-        email: "ameen@email.com",
-        status: "Inactive",
-        type: "TBA",
-        joinedAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-    ]);
+      // 🔥 Replace with your API call
+      await Future.delayed(const Duration(seconds: 2));
+
+      students.assignAll([
+        Student(
+          admissionDate: DateTime.parse('2023-01-15 12:00:00'),
+          studentId: "STU1001",
+          name: "Riya Shah",
+          email: "riya@email.com",
+          status: "Active",
+          type: "Batch",
+          joinedAt: DateTime.now(),
+        ),
+        Student(
+          admissionDate: DateTime.parse('2023-01-15 12:00:00'),
+          studentId: "STU1002",
+          name: "Ameen",
+          email: "ameen@email.com",
+          status: "Inactive",
+          type: "TBA",
+          joinedAt: DateTime.now().subtract(const Duration(days: 2)),
+        ),
+      ]);
+      filteredStudents.assignAll(students);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
 
     applyFilters();
   }

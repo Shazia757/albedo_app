@@ -49,7 +49,7 @@ class SessionController extends GetxController {
   final teacherList = ["Teacher A", "Teacher B", "Teacher C"];
 
   TextEditingController teacherController = TextEditingController();
-  RxBool isLoading = false.obs;
+  RxBool isLoading = true.obs;
   RxBool isDeleteButtonLoading = false.obs;
 
   List<Session> get filteredSessions {
@@ -95,86 +95,101 @@ class SessionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchData();
+  }
 
-    sessions.assignAll([
-      Session(
-        id: "S001",
-        studentName: "Aisha",
-        studentId: "ST01",
-        subject: "Math",
-        className: "10A",
-        teacherName: "John",
-        teacherId: "T01",
-        dateTime: DateTime.now().subtract(const Duration(days: 1)),
-        status: "started",
-      ),
-      Session(
-        id: "S002",
-        studentName: "Rahul",
-        studentId: "ST02",
-        subject: "Science",
-        className: "9B",
-        teacherName: "David",
-        teacherId: "T02",
-        dateTime: DateTime.now().add(const Duration(days: 1)),
-        status: "upcoming",
-      ),
-      Session(
-        id: "S003",
-        studentName: "Fatima",
-        studentId: "ST03",
-        subject: "English",
-        className: "8C",
-        teacherName: "John",
-        teacherId: "T01",
-        dateTime: DateTime.now(),
-        status: "pending",
-      ),
-      Session(
-        id: "S004",
-        studentName: "Arjun",
-        studentId: "ST04",
-        subject: "Physics",
-        className: "11A",
-        teacherName: "Meera",
-        teacherId: "T03",
-        dateTime: DateTime.now().subtract(const Duration(days: 3)),
-        status: "completed",
-      ),
-      Session(
-        id: "S005",
-        studentName: "Nisha",
-        studentId: "ST05",
-        subject: "Chemistry",
-        className: "12B",
-        teacherName: "David",
-        teacherId: "T02",
-        dateTime: DateTime.now(),
-        status: "no_balance",
-      ),
-      Session(
-        id: "S006",
-        studentName: "Ali",
-        studentId: "ST06",
-        subject: "Biology",
-        className: "10A",
-        teacherName: "Meera",
-        teacherId: "T03",
-        dateTime: DateTime.now().subtract(const Duration(hours: 5)),
-        status: "meet_done",
-      ),
-      Session(
-        id: "S007",
-        studentName: "Sneha",
-        studentId: "ST07",
-        subject: "Math",
-        className: "9A",
-        teacherName: "John",
-        teacherId: "T01",
-        dateTime: DateTime.now().add(const Duration(hours: 3)),
-        status: "started",
-      ),
-    ]);
+  Future<void> fetchData() async {
+    try {
+      isLoading.value = true;
+
+      // 🔥 Replace with your API call
+      await Future.delayed(const Duration(seconds: 2));
+
+      sessions.assignAll([
+        Session(
+          id: "S001",
+          studentName: "Aisha",
+          studentId: "ST01",
+          subject: "Math",
+          className: "10A",
+          teacherName: "John",
+          teacherId: "T01",
+          dateTime: DateTime.now().subtract(const Duration(days: 1)),
+          status: "started",
+        ),
+        Session(
+          id: "S002",
+          studentName: "Rahul",
+          studentId: "ST02",
+          subject: "Science",
+          className: "9B",
+          teacherName: "David",
+          teacherId: "T02",
+          dateTime: DateTime.now().add(const Duration(days: 1)),
+          status: "upcoming",
+        ),
+        Session(
+          id: "S003",
+          studentName: "Fatima",
+          studentId: "ST03",
+          subject: "English",
+          className: "8C",
+          teacherName: "John",
+          teacherId: "T01",
+          dateTime: DateTime.now(),
+          status: "pending",
+        ),
+        Session(
+          id: "S004",
+          studentName: "Arjun",
+          studentId: "ST04",
+          subject: "Physics",
+          className: "11A",
+          teacherName: "Meera",
+          teacherId: "T03",
+          dateTime: DateTime.now().subtract(const Duration(days: 3)),
+          status: "completed",
+        ),
+        Session(
+          id: "S005",
+          studentName: "Nisha",
+          studentId: "ST05",
+          subject: "Chemistry",
+          className: "12B",
+          teacherName: "David",
+          teacherId: "T02",
+          dateTime: DateTime.now(),
+          status: "no_balance",
+        ),
+        Session(
+          id: "S006",
+          studentName: "Ali",
+          studentId: "ST06",
+          subject: "Biology",
+          className: "10A",
+          teacherName: "Meera",
+          teacherId: "T03",
+          dateTime: DateTime.now().subtract(const Duration(hours: 5)),
+          status: "meet_done",
+        ),
+        Session(
+          id: "S007",
+          studentName: "Sneha",
+          studentId: "ST07",
+          subject: "Math",
+          className: "9A",
+          teacherName: "John",
+          teacherId: "T01",
+          dateTime: DateTime.now().add(const Duration(hours: 3)),
+          status: "started",
+        ),
+      ]);
+      filteredSessions.assignAll(sessions);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void applyFilters() {

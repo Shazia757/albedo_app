@@ -325,36 +325,41 @@ class DrawerExpansionMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-          childrenPadding: const EdgeInsets.only(left: 12),
-          leading: Icon(
-            leadingIcon,
-            size: 20,
-            color: selectedParentIndex.value == parentIndex
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+    return Obx(() => Theme(
+          data: Theme.of(context).copyWith(
+            dividerColor: Colors.transparent,
           ),
-          title: Text(
-            title,
-            style: TextStyle(
-              fontSize: 13,
+          child: ExpansionTile(
+            tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+            childrenPadding: const EdgeInsets.only(left: 12),
+            leading: Icon(
+              leadingIcon,
+              size: 20,
               color: selectedParentIndex.value == parentIndex
                   ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurface,
-              fontWeight: selectedParentIndex.value == parentIndex
-                  ? FontWeight.w600
-                  : FontWeight.w400,
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
             ),
+            title: Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                color: selectedParentIndex.value == parentIndex
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurface,
+                fontWeight: selectedParentIndex.value == parentIndex
+                    ? FontWeight.w600
+                    : FontWeight.w400,
+              ),
+            ),
+            children: children
+                .map((item) => DrawerSubItemWidget(
+                      item: item,
+                      parentIndex: parentIndex,
+                      selectedParentIndex: selectedParentIndex,
+                      selectedSubIndex: selectedSubIndex,
+                    ))
+                .toList(),
           ),
-          children: children
-              .map((item) => DrawerSubItemWidget(
-                    item: item,
-                    parentIndex: parentIndex,
-                    selectedParentIndex: selectedParentIndex,
-                    selectedSubIndex: selectedSubIndex,
-                  ))
-              .toList(),
         ));
   }
 }

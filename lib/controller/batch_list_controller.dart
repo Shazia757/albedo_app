@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BatchListController extends GetxController {
+  var isLoading = true.obs;
+
   var selectedTab = 0.obs;
   var batches = <Batch>[].obs;
   RxList<Batch> filteredBatches = <Batch>[].obs;
@@ -35,79 +37,94 @@ class BatchListController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchData();
+  }
 
-    batches.assignAll([
-      Batch(
-        id: "S001",
-        batchName: "10A",
-        batchID: "BT01",
-        subject: "Math",
-        teacherName: "John",
-        teacherId: "T01",
-        date: DateTime.now().subtract(const Duration(days: 1)),
-        status: "started",
-      ),
-      Batch(
-        id: "S002",
-        batchName: "Rahul",
-        batchID: "BT02",
-        subject: "Science",
-        teacherName: "David",
-        teacherId: "T02",
-        date: DateTime.now().add(const Duration(days: 1)),
-        status: "upcoming",
-      ),
-      Batch(
-        id: "S003",
-        batchName: "9B",
-        batchID: "ST03",
-        subject: "English",
-        teacherName: "John",
-        teacherId: "T01",
-        date: DateTime.now(),
-        status: "pending",
-      ),
-      Batch(
-        id: "S004",
-        batchID: "ST04",
-        subject: "Physics",
-        batchName: "11A",
-        teacherName: "Meera",
-        teacherId: "T03",
-        date: DateTime.now().subtract(const Duration(days: 3)),
-        status: "completed",
-      ),
-      Batch(
-        id: "S005",
-        batchID: "ST05",
-        subject: "Chemistry",
-        batchName: "12B",
-        teacherName: "David",
-        teacherId: "T02",
-        date: DateTime.now(),
-        status: "no_balance",
-      ),
-      Batch(
-        id: "S006",
-        batchID: "ST06",
-        subject: "Biology",
-        batchName: "10A",
-        teacherName: "Meera",
-        teacherId: "T03",
-        date: DateTime.now().subtract(const Duration(hours: 5)),
-        status: "meet_done",
-      ),
-      Batch(
-        id: "S007",
-        batchID: "ST07",
-        subject: "Math",
-        batchName: "9A",
-        teacherName: "John",
-        teacherId: "T01",
-        date: DateTime.now().add(const Duration(hours: 3)),
-        status: "started",
-      ),
-    ]);
+  Future<void> fetchData() async {
+    try {
+      isLoading.value = true;
+
+      // 🔥 Replace with your API call
+      await Future.delayed(const Duration(seconds: 2));
+
+      batches.assignAll([
+        Batch(
+          id: "S001",
+          batchName: "10A",
+          batchID: "BT01",
+          subject: "Math",
+          teacherName: "John",
+          teacherId: "T01",
+          date: DateTime.now().subtract(const Duration(days: 1)),
+          status: "started",
+        ),
+        Batch(
+          id: "S002",
+          batchName: "Rahul",
+          batchID: "BT02",
+          subject: "Science",
+          teacherName: "David",
+          teacherId: "T02",
+          date: DateTime.now().add(const Duration(days: 1)),
+          status: "upcoming",
+        ),
+        Batch(
+          id: "S003",
+          batchName: "9B",
+          batchID: "ST03",
+          subject: "English",
+          teacherName: "John",
+          teacherId: "T01",
+          date: DateTime.now(),
+          status: "pending",
+        ),
+        Batch(
+          id: "S004",
+          batchID: "ST04",
+          subject: "Physics",
+          batchName: "11A",
+          teacherName: "Meera",
+          teacherId: "T03",
+          date: DateTime.now().subtract(const Duration(days: 3)),
+          status: "completed",
+        ),
+        Batch(
+          id: "S005",
+          batchID: "ST05",
+          subject: "Chemistry",
+          batchName: "12B",
+          teacherName: "David",
+          teacherId: "T02",
+          date: DateTime.now(),
+          status: "no_balance",
+        ),
+        Batch(
+          id: "S006",
+          batchID: "ST06",
+          subject: "Biology",
+          batchName: "10A",
+          teacherName: "Meera",
+          teacherId: "T03",
+          date: DateTime.now().subtract(const Duration(hours: 5)),
+          status: "meet_done",
+        ),
+        Batch(
+          id: "S007",
+          batchID: "ST07",
+          subject: "Math",
+          batchName: "9A",
+          teacherName: "John",
+          teacherId: "T01",
+          date: DateTime.now().add(const Duration(hours: 3)),
+          status: "started",
+        ),
+      ]);
+      filteredBatches.assignAll(batches);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void initEdit(Batch data) {

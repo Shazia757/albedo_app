@@ -1,18 +1,13 @@
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 Widget teachersTab() {
-  return Obx(() {
-
-    return Column(
-      children: [
-        _teacherSummary(),
-        const SizedBox(height: 16),
-        // Expanded(child: _teacherTable(data)),
-      ],
-    );
-  });
+  return Column(
+    children: [
+      _teacherSummary(),
+      const SizedBox(height: 16),
+      // Expanded(child: _teacherTable(data)),
+    ],
+  );
 }
 
 Widget _teacherSummary() {

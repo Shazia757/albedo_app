@@ -153,10 +153,16 @@ class UsersPage extends StatelessWidget {
           Expanded(
             child: Obx(() {
               if (type == UserPageType.student) {
+                if (studentController.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 if (studentController.filteredStudents.isEmpty) {
                   return const Center(child: Text("No students found"));
                 }
               } else {
+                if (teacherController.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 if (teacherController.filteredTeachers.isEmpty) {
                   return const Center(child: Text("No teachers found"));
                 }

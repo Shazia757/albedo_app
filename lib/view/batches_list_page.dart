@@ -48,6 +48,9 @@ class BatchesListPage extends StatelessWidget {
                     child: Obx(() {
                       final data = c.filteredBatches;
 
+                      if (c.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
                       if (data.isEmpty) {
                         return const Center(child: Text("No batches found"));
                       }

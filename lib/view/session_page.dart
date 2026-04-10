@@ -78,7 +78,6 @@ class SessionPage extends StatelessWidget {
                     items: c.teacherList,
                     onChanged: (p0) => c.selectedTeacher.value = p0,
                   ),
-                 
                   const SizedBox(height: 20),
                   CustomWidgets().labelWithAsterisk('Teacher Salary'),
                   const SizedBox(height: 20),
@@ -152,7 +151,9 @@ class SessionPage extends StatelessWidget {
                   Expanded(
                     child: Obx(() {
                       final data = c.filteredSessions;
-
+                      if (c.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
                       if (data.isEmpty) {
                         return const Center(child: Text("No sessions found"));
                       }

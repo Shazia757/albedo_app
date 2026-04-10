@@ -34,6 +34,6 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         themeMode: ThemeMode.system,
-        home: isLoggedIn ? HomeView() : LoginView());
+        home: isLoggedIn ? HomeView() : HomeView());
   }
 }
