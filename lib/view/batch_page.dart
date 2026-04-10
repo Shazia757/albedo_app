@@ -78,8 +78,7 @@ class BatchesPage extends StatelessWidget {
                                   onTap: () {}),
                               CustomWidgets().iconBtn(
                                   icon: Icons.delete,
-                                  color:
-                                      Theme.of(context).colorScheme.onTertiary,
+                                  color: Theme.of(context).colorScheme.error,
                                   onTap: () {}),
                             ],
                           ),

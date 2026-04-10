@@ -1,11 +1,13 @@
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/widgets/custom_textfield.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class SessionPage extends StatelessWidget {
@@ -21,6 +23,109 @@ class SessionPage extends StatelessWidget {
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       drawer: isDesktop ? null : const DrawerMenu(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => CustomWidgets().showCustomDialog(
+          context: context,
+          title: 'Add Session',
+          formKey: GlobalKey<FormState>(),
+          onSubmit: () {},
+          sections: [
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  Obx(
+                    () => Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile(
+                            dense: true,
+                            title: Text('Class Session'),
+                            value: SessionType.classSession,
+                            groupValue: c.selectedSessionType.value,
+                            onChanged: (value) =>
+                                c.selectedSessionType.value = value!,
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile(
+                            title: Text('Meet'),
+                            value: SessionType.meet,
+                            groupValue: c.selectedSessionType.value,
+                            onChanged: (value) =>
+                                c.selectedSessionType.value = value!,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  CustomWidgets()
+                      .labelWithAsterisk('Select Student', required: true),
+                  const SizedBox(height: 20),
+                  CustomWidgets().customDropdownField(
+                    context: context,
+                    hint: 'Select Student',
+                    items: c.studentOptions,
+                    onChanged: (p0) => c.selectedStudent.value = p0,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomWidgets().labelWithAsterisk('Search and Select Teacher',
+                      required: true),
+                  const SizedBox(height: 20),
+                  CustomWidgets().customDropdownField(
+                    context: context,
+                    hint: 'Select Teacher',
+                    items: c.teacherList,
+                    onChanged: (p0) => c.selectedTeacher.value = p0,
+                  ),
+                 
+                  const SizedBox(height: 20),
+                  CustomWidgets().labelWithAsterisk('Teacher Salary'),
+                  const SizedBox(height: 20),
+                  dropdownStyledTextField(
+                      context: context, hint: 'Teacher Salary'),
+                  const SizedBox(height: 20),
+                  CustomWidgets()
+                      .labelWithAsterisk('Session Date', required: true),
+                  const SizedBox(height: 20),
+                  CustomWidgets()
+                      .labelWithAsterisk('Select Duration', required: true),
+                  const SizedBox(height: 20),
+                  Obx(() => DropdownButtonFormField<int>(
+                        hint: Text('Select Duration'),
+                        style: TextStyle(fontSize: 13),
+                        value:
+                            c.durationOptions.contains(c.selectedDuration.value)
+                                ? c.selectedDuration.value
+                                : null,
+                        items: c.durationOptions
+                            .toSet()
+                            .map((e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text("$e mins",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Get.theme.colorScheme.onSurface,
+                                      )),
+                                ))
+                            .toList(),
+                        onChanged: (val) => c.selectedDuration.value = val,
+                        decoration:
+                            _dropdownDecoration(context: context, "Duration"),
+                        validator: (v) => v == null ? "Required" : null,
+                      )),
+                ],
+              ),
+            ),
+          ],
+        ),
+        mini: true,
+        backgroundColor: context.theme.colorScheme.primary,
+        child: Icon(
+          Icons.add,
+          color: context.theme.colorScheme.onPrimary,
+        ),
+      ),
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
@@ -60,87 +165,48 @@ class SessionPage extends StatelessWidget {
                         crossAxisCount = 3;
                       }
 
-                      return GridView.builder(
-                        itemCount: data.length,
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 380,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
-                        itemBuilder: (_, i) => InfoCard(
-                          id: data[i].id,
-                          status: data[i].status,
-                          statusColor: getStatusColor(context, data[i].status),
-                          infoRows: [
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: _personCompact(
-                                        context,
-                                        "Student",
-                                        data[i].studentName,
-                                        data[i].studentId)),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                    child: _personCompact(
-                                        context,
-                                        "Teacher",
-                                        data[i].teacherName,
-                                        data[i].teacherId)),
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount = 1;
+
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
+
+                          return MasonryGridView.count(
+                            padding: const EdgeInsets.all(12),
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            itemBuilder: (_, i) => InfoCard(
+                              id: data[i].id,
+                              status: data[i].status,
+                              statusColor:
+                                  getStatusColor(context, data[i].status),
+                              infoRows: [
+                                _buildPersonSection(context, data[i]),
+                                _buildDetailsSection(context, data[i]),
+                              ],
+                              actions: [
+                                CustomWidgets().iconBtn(
+                                  icon: Icons.edit,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  onTap: () => showEditDialog(context, data[i]),
+                                ),
+                                CustomWidgets().iconBtn(
+                                  icon: Icons.delete,
+                                  color: Theme.of(context).colorScheme.error,
+                                  onTap: () => CustomWidgets().showDeleteDialog(
+                                    onConfirm: () {},
+                                  ),
+                                ),
                               ],
                             ),
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .outlineVariant
-                                    .withOpacity(0.03),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                          child: _miniInfo(context, "Subject",
-                                              data[i].subject)),
-                                      Expanded(
-                                          child: _miniInfo(context, "Class",
-                                              data[i].className)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                          child: _miniInfo(context, "Date",
-                                              "${data[i].dateTime.day}/${data[i].dateTime.month}/${data[i].dateTime.year}")),
-                                      Expanded(
-                                          child: _miniInfo(context, "Time",
-                                              _formatTime(data[i].dateTime))),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                          actions: [
-                            CustomWidgets().iconBtn(
-                              icon: Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                              onTap: () => showEditDialog(context, data[i]),
-                            ),
-                            CustomWidgets().iconBtn(
-                                icon: Icons.delete,
-                                color: Theme.of(context).colorScheme.onTertiary,
-                                onTap: () => CustomWidgets().showDeleteDialog(
-                                      onConfirm: () {
-                                        // c.delete(data[i].id);
-                                      },
-                                    )),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     }),
                   )
@@ -151,6 +217,120 @@ class SessionPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildPersonSection(BuildContext context, data) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmall = constraints.maxWidth < 320;
+
+        return isSmall
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _personCompact(
+                      context, "Student", data.studentName, data.studentId),
+                  const SizedBox(height: 8),
+                  _personCompact(
+                      context, "Teacher", data.teacherName, data.teacherId),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                    child: _personCompact(
+                        context, "Student", data.studentName, data.studentId),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _personCompact(
+                        context, "Teacher", data.teacherName, data.teacherId),
+                  ),
+                ],
+              );
+      },
+    );
+  }
+
+  Widget _buildDetailsSection(BuildContext context, data) {
+    final cs = Theme.of(context).colorScheme;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmall = constraints.maxWidth < 320;
+
+        return Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: cs.outlineVariant.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: isSmall
+
+              /// 🔥 MOBILE → STACK EVERYTHING
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _miniInfo(context, "Subject", data.subject),
+                        SizedBox(height: 10),
+                        _miniInfo(context, "Class", data.className),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _miniInfo(context, "Date", _formatDate(data.dateTime)),
+                        SizedBox(height: 10),
+                        _miniInfo(context, "Time", _formatTime(data.dateTime)),
+                      ],
+                    ),
+                  ],
+                )
+
+              /// 🔥 TABLET / DESKTOP → PROPER 2 COLUMN LAYOUT
+              : Row(
+                  children: [
+                    /// LEFT COLUMN
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _miniInfo(context, "Subject", data.subject),
+                          const SizedBox(height: 6),
+                          _miniInfo(context, "Class", data.className),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    /// RIGHT COLUMN
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _miniInfo(
+                              context, "Date", _formatDate(data.dateTime)),
+                          const SizedBox(height: 6),
+                          _miniInfo(
+                              context, "Time", _formatTime(data.dateTime)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return "${dateTime.day.toString().padLeft(2, '0')}/"
+        "${dateTime.month.toString().padLeft(2, '0')}/"
+        "${dateTime.year}";
   }
 
   Widget _topBar(BuildContext context, SessionController c) {
@@ -316,7 +496,7 @@ class SessionPage extends StatelessWidget {
       case "started":
         return Theme.of(context).colorScheme.onInverseSurface;
       case "no_balance":
-        return Theme.of(context).colorScheme.onTertiary;
+        return Theme.of(context).colorScheme.tertiary;
       case "upcoming":
         return Theme.of(context).colorScheme.primary;
       case "pending":
@@ -364,25 +544,28 @@ class SessionPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: context.theme.colorScheme.onPrimary
+                            .withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.edit, color: Colors.white),
+                      child: Icon(Icons.edit,
+                          color: context.theme.colorScheme.onPrimary),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         "Edit Session",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: context.theme.colorScheme.onPrimary,
                         ),
                       ),
                     ),
                     IconButton(
                       onPressed: () => Get.back(),
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: Icon(Icons.close,
+                          color: context.theme.colorScheme.onPrimary),
                     )
                   ],
                 ),
@@ -401,6 +584,7 @@ class SessionPage extends StatelessWidget {
                         children: [
                           Expanded(
                             child: _inputField(
+                              context: context,
                               controller: c.dateController,
                               label: "Date",
                               icon: Icons.calendar_today_outlined,
@@ -422,6 +606,7 @@ class SessionPage extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: _inputField(
+                              context: context,
                               controller: c.timeController,
                               label: "Time",
                               icon: Icons.access_time_outlined,
@@ -470,7 +655,8 @@ class SessionPage extends StatelessWidget {
                                     .toList(),
                                 onChanged: (val) =>
                                     c.selectedDuration.value = val,
-                                decoration: _dropdownDecoration("Duration"),
+                                decoration: _dropdownDecoration(
+                                    context: context, "Duration"),
                                 validator: (v) => v == null ? "Required" : null,
                               )),
 
@@ -495,7 +681,8 @@ class SessionPage extends StatelessWidget {
                                     .toList(),
                                 onChanged: (val) =>
                                     c.selectedTeacher.value = val,
-                                decoration: _dropdownDecoration("Teacher"),
+                                decoration: _dropdownDecoration(
+                                    context: context, "Teacher"),
                                 validator: (v) =>
                                     v == null || v.isEmpty ? "Required" : null,
                               )),
@@ -510,6 +697,7 @@ class SessionPage extends StatelessWidget {
                       icon: Icons.payments_outlined,
                       title: "Payment",
                       child: _inputField(
+                        context: context,
                         controller: c.salaryController,
                         label: "Teacher Salary (Optional)",
                         icon: Icons.currency_rupee,
@@ -603,6 +791,7 @@ class SessionPage extends StatelessWidget {
   }
 
   Widget _inputField({
+    required BuildContext context,
     required TextEditingController controller,
     required String label,
     required IconData icon,
@@ -623,7 +812,7 @@ class SessionPage extends StatelessWidget {
         labelText: label,
         prefixIcon: Icon(icon),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: context.theme.colorScheme.onPrimary,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -631,13 +820,63 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  InputDecoration _dropdownDecoration(String label) {
+  Widget dropdownStyledTextField({
+    required BuildContext context,
+    required String hint,
+    TextEditingController? controller,
+    bool readOnly = false,
+    VoidCallback? onTap,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    return TextFormField(
+      controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(
+          fontSize: 12,
+          color: context.theme.colorScheme.shadow.withOpacity(0.6),
+        ),
+        isDense: true,
+        filled: true,
+        fillColor: cs.onPrimary,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 11,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: cs.onPrimary,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: cs.tertiaryContainer,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: cs.onPrimary,
+            width: 1.5,
+          ),
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _dropdownDecoration(String label,
+      {required BuildContext context}) {
     return InputDecoration(
       isDense: true,
       labelText: label,
       labelStyle: TextStyle(fontSize: 12),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: context.theme.colorScheme.onPrimary,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
       ),

@@ -4,11 +4,14 @@ import 'package:get/get.dart';
 
 enum SortType { newest, oldest, student, teacher }
 
+enum SessionType { classSession, meet }
+
 enum UserPageType { student, teacher }
 
 class SessionController extends GetxController {
   var selectedTab = 0.obs;
   var selectedStatus = 0.obs;
+  var selectedSessionType = SessionType.classSession.obs;
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
   var sessions = <Session>[].obs;
@@ -34,13 +37,18 @@ class SessionController extends GetxController {
     "meet_done"
   ];
 
-  late TextEditingController dateController;
-  late TextEditingController timeController;
-  late TextEditingController salaryController;
+  TextEditingController dateController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
+  TextEditingController salaryController = TextEditingController();
   var selectedDuration = RxnInt();
+  var selectedStudent = RxnString();
+  var selectedPackage = RxnString();
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
+  final studentOptions = ['Student A', 'Student B', 'Student C'];
+  final packageOptions = ['Package A', 'Package B', 'Package C'];
   final teacherList = ["Teacher A", "Teacher B", "Teacher C"];
 
+  TextEditingController teacherController = TextEditingController();
   RxBool isLoading = false.obs;
   RxBool isDeleteButtonLoading = false.obs;
 

@@ -1,5 +1,6 @@
 import 'package:albedo_app/model/user_model.dart';
 import 'package:albedo_app/view/home_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -14,9 +15,15 @@ class AccountController extends GetxController {
   var obscurePassword = true.obs;
   var isLoading = false.obs;
   final box = GetStorage();
+  @override
+  
+  onInit() {
+    if (kDebugMode) {
+      emailController.text = 'test@gmail.com';
+      passwordController.text = '0000';
+    }
 
-  void toggleRemember(bool? value) {
-    rememberMe.value = value ?? false;
+    super.onInit();
   }
 
   Future<void> login() async {

@@ -74,27 +74,6 @@ class LoginView extends StatelessWidget {
                           obscure: c.obscurePassword,
                         ),
 
-                        const SizedBox(height: 12),
-
-                        Obx(() => Row(
-                              children: [
-                                Theme(
-                                  data: ThemeData(
-                                      unselectedWidgetColor: Colors.white54),
-                                  child: Checkbox(
-                                    value: c.rememberMe.value,
-                                    activeColor: const Color(0xFF9D50FF),
-                                    checkColor: Colors.white,
-                                    onChanged: (val) => c.toggleRemember(val),
-                                  ),
-                                ),
-                                const Text(
-                                  "Remember me",
-                                  style: TextStyle(color: Colors.white70),
-                                ),
-                              ],
-                            )),
-
                         const SizedBox(height: 20),
 
                         // Login Button

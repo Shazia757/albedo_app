@@ -1,7 +1,10 @@
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
+
+typedef StringValueOf<T> = String Function(T item);
 
 class CustomWidgets {
   Widget iconBtn({
@@ -474,10 +477,183 @@ class CustomWidgets {
     );
   }
 
-  void editDialog(c){
-  final formKey = GlobalKey<FormState>();
+  Widget customDropdownField<T>({
+    required BuildContext context,
+    required String hint,
+    required List<T> items,
+    T? value,
+    required Function(T) onChanged,
+  }) {
+    final cs = Theme.of(context).colorScheme;
 
- Get.dialog(
+    final LayerLink layerLink = LayerLink();
+
+    // ✅ persistent variables (closure-based)
+    OverlayEntry? overlayEntry;
+    final textController = TextEditingController(
+      text: value?.toString() ?? "",
+    );
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        bool isOpen = overlayEntry != null;
+
+        void closeDropdown() {
+          overlayEntry?.remove();
+          overlayEntry = null;
+          setState(() {});
+        }
+
+        void openDropdown(BuildContext fieldContext) {
+          final renderBox = fieldContext.findRenderObject() as RenderBox;
+          final size = renderBox.size;
+
+          overlayEntry = OverlayEntry(
+            builder: (_) {
+              return GestureDetector(
+                onTap: closeDropdown,
+                behavior: HitTestBehavior.translucent,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      width: size.width,
+                      child: CompositedTransformFollower(
+                        link: layerLink,
+                        offset: Offset(0, size.height + 4),
+                        child: Material(
+                          elevation: 4,
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              maxHeight:
+                                  items.length > 5 ? 240 : items.length * 48.0,
+                            ),
+                            decoration: BoxDecoration(
+                              color: cs.onPrimary,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: items.length,
+                              itemBuilder: (_, index) {
+                                final item = items[index];
+
+                                return InkWell(
+                                  onTap: () {
+                                    onChanged(item);
+
+                                    textController.text = item.toString();
+
+                                    closeDropdown();
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      item.toString(),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: cs.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+
+          Overlay.of(fieldContext).insert(overlayEntry!);
+          setState(() {});
+        }
+
+        return Builder(
+          builder: (fieldContext) {
+            return CompositedTransformTarget(
+              link: layerLink,
+              child: GestureDetector(
+                onTap: () {
+                  if (overlayEntry == null) {
+                    openDropdown(fieldContext);
+                  } else {
+                    closeDropdown();
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: textController,
+                    style: TextStyle(
+                      // ✅ ADD THIS
+                      fontSize: 13, // change this to whatever you want
+                      color: cs.onSurface,
+                    ),
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      hintText: hint,
+                      hintStyle: TextStyle(
+                        fontSize: 12,
+                        color: cs.shadow.withOpacity(0.6),
+                      ),
+                      isDense: true,
+                      filled: true,
+                      fillColor: cs.onPrimary,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 11,
+                      ),
+                      suffixIcon: Icon(
+                        isOpen
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        size: 20,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: cs.onPrimary),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: cs.tertiaryContainer),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: cs.onPrimary,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void showCustomDialog({
+    required BuildContext context,
+    required String title,
+    IconData? icon,
+    required GlobalKey<FormState> formKey,
+    required List<Widget> sections,
+    required VoidCallback onSubmit,
+    String submitText = "Save",
+  }) {
+    Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
@@ -505,28 +681,31 @@ class CustomWidgets {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        shape: BoxShape.circle,
+                    if (icon != null)
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: context.theme.colorScheme.onPrimary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(icon,
+                            color: context.theme.colorScheme.onPrimary),
                       ),
-                      child: const Icon(Icons.edit, color: Colors.white),
-                    ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        "Edit Session",
+                        title,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: context.theme.colorScheme.onPrimary,
                         ),
                       ),
                     ),
                     IconButton(
                       onPressed: () => Get.back(),
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: Icon(Icons.close,
+                          color: context.theme.colorScheme.onPrimary),
                     )
                   ],
                 ),
@@ -535,140 +714,14 @@ class CustomWidgets {
               /// 🔷 BODY
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
-                child: Column(
-                  children: [
-                    /// 🔹 SECTION: DATE & TIME
-                    sectionCard(
-                      icon: Icons.schedule,
-                      title: "Schedule",
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: inputField(
-                              controller: c.dateController,
-                              label: "Date",
-                              icon: Icons.calendar_today_outlined,
-                              readOnly: true,
-                              onTap: () async {
-                                final picked = await showDatePicker(
-                                  context: Get.context!,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (picked != null) {
-                                  c.dateController.text =
-                                      "${picked.day}/${picked.month}/${picked.year}";
-                                }
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: inputField(
-                              controller: c.timeController,
-                              label: "Time",
-                              icon: Icons.access_time_outlined,
-                              readOnly: true,
-                              onTap: () async {
-                                final picked = await showTimePicker(
-                                  context: Get.context!,
-                                  initialTime: TimeOfDay.now(),
-                                );
-                                if (picked != null) {
-                                  c.timeController.text =
-                                      "${picked.hour}:${picked.minute}";
-                                }
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    /// 🔹 SECTION: SESSION DETAILS
-                    sectionCard(
-                      icon: Icons.school,
-                      title: "Session Details",
-                      child: Column(
-                        children: [
-                          /// Duration
-                          Obx(() => DropdownButtonFormField<int>(
-                                style: TextStyle(fontSize: 13),
-                                value: c.durationOptions
-                                        .contains(c.selectedDuration.value)
-                                    ? c.selectedDuration.value
-                                    : null,
-                                items: c.durationOptions
-                                    .map((e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text("$e mins",
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                color: Get.theme.colorScheme
-                                                    .onSurface,
-                                              )),
-                                        ))
-                                    .toList(),
-                                onChanged: (val) =>
-                                    c.selectedDuration.value = val,
-                                decoration: dropdownDecoration("Duration"),
-                                validator: (v) => v == null ? "Required" : null,
-                              )),
-
-                          const SizedBox(height: 12),
-
-                          /// Teacher
-                          Obx(() => DropdownButtonFormField<String>(
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Get.theme.colorScheme.onSurface,
-                                ),
-                                value: c.teacherList
-                                        .contains(c.selectedTeacher.value)
-                                    ? c.selectedTeacher.value
-                                    : null,
-                                items: c.teacherList
-                                    .toSet()
-                                    .map((e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
-                                        ))
-                                    .toList(),
-                                onChanged: (val) =>
-                                    c.selectedTeacher.value = val,
-                                decoration: dropdownDecoration("Teacher"),
-                                validator: (v) =>
-                                    v == null || v.isEmpty ? "Required" : null,
-                              )),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    /// 🔹 SECTION: PAYMENT
-                    sectionCard(
-                      icon: Icons.payments_outlined,
-                      title: "Payment",
-                      child: inputField(
-                        controller: c.salaryController,
-                        label: "Teacher Salary (Optional)",
-                        icon: Icons.currency_rupee,
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
+                child: Column(children: sections),
               ),
 
               /// 🔷 ACTIONS
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.03),
+                  color: context.theme.colorScheme.outline.withOpacity(0.03),
                   borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(28),
                   ),
@@ -678,12 +731,6 @@ class CustomWidgets {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Get.back(),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
                         child: const Text("Cancel"),
                       ),
                     ),
@@ -691,17 +738,11 @@ class CustomWidgets {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          if (!c.formKey.currentState!.validate()) return;
-
+                          if (!formKey.currentState!.validate()) return;
+                          onSubmit();
                           Get.back();
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: const Text("Save Changes"),
+                        child: Text(submitText),
                       ),
                     ),
                   ],
@@ -711,10 +752,33 @@ class CustomWidgets {
           ),
         ),
       ),
-    );  
+    );
   }
 
-    Widget sectionCard({
+  Widget labelWithAsterisk(String text, {bool required = false}) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: RichText(
+        text: TextSpan(
+          text: text,
+          style: TextStyle(
+            color: Get.theme.colorScheme.onSurface,
+            fontSize: 13,
+          ),
+          children: required
+              ? [
+                  const TextSpan(
+                    text: " *",
+                    style: TextStyle(color: Colors.red),
+                  )
+                ]
+              : [],
+        ),
+      ),
+    );
+  }
+
+  Widget sectionCard({
     required IconData icon,
     required String title,
     required Widget child,
@@ -746,37 +810,139 @@ class CustomWidgets {
     );
   }
 
-  Widget inputField({
+  static searchableDropDown<T>({
     required TextEditingController controller,
+    required StringValueOf<T> stringValueOf,
+    required void Function(T) onSelected,
+    void Function(String)? onChanged,
+    required List<T> selectionList,
+    TextInputType? keyboardType,
     required String label,
-    required IconData icon,
+    bool show = true,
+    EdgeInsets margin = const EdgeInsets.symmetric(vertical: 5),
+    double elevation = 2,
+    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 10),
+  }) {
+    return Visibility(
+      visible: show,
+      child: TypeAheadField<T>(
+        hideKeyboardOnDrag: true,
+        debounceDuration: const Duration(milliseconds: 500),
+        builder: (context, controller, focusNode) {
+          return CustomWidgets()
+              .dropdownStyledTextField(context: context, hint: label);
+          // return TextField(
+          //   keyboardType: keyboardType,
+          //   controller: controller,
+          //   focusNode: focusNode,
+          //   onChanged: (value) {
+          //     if (onChanged != null) {
+          //       onChanged(value);
+          //     }
+          //   },
+          //   decoration: InputDecoration(
+          //     labelText: label,
+          //     border: InputBorder.none,
+          //   ),
+          // );
+        },
+        suggestionsCallback: (search) => selectionList
+            .where((element) => stringValueOf(element).toLowerCase().contains(
+                  search.trim().toLowerCase(),
+                ))
+            .toList(),
+        itemBuilder: (context, itemData) =>
+            ListTile(title: Text(stringValueOf(itemData))),
+        controller: controller,
+        onSelected: (value) => onSelected(value),
+      ),
+    );
+  }
+
+  Widget dropdownStyledTextField({
+    required BuildContext context,
+    required String hint,
+    TextEditingController? controller,
     bool readOnly = false,
     VoidCallback? onTap,
-    TextInputType? keyboardType,
   }) {
+    final cs = Theme.of(context).colorScheme;
+
     return TextFormField(
-      style: TextStyle(fontSize: 13),
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
-      keyboardType: keyboardType,
-      validator: (v) => (v == null || v.isEmpty) ? "Required" : null,
       decoration: InputDecoration(
-        labelStyle: TextStyle(fontSize: 12),
-        hintStyle: TextStyle(fontSize: 12),
-        labelText: label,
-        prefixIcon: Icon(icon),
+        hintText: hint,
+        hintStyle: TextStyle(
+          fontSize: 12,
+          color: context.theme.colorScheme.shadow.withOpacity(0.6),
+        ),
+        isDense: true,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: cs.onPrimary,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 11,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: cs.onPrimary,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: cs.tertiaryContainer,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: cs.onPrimary,
+            width: 1.5,
+          ),
         ),
       ),
     );
   }
 
-  InputDecoration dropdownDecoration(String label) {
-    return InputDecoration(
+  Widget inputField({
+    required TextEditingController controller,
+    required String label,
+    bool required = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        label: RichText(
+          text: TextSpan(
+            text: label,
+            style: TextStyle(color: Colors.black),
+            children: required
+                ? [
+                    const TextSpan(
+                      text: " *",
+                      style: TextStyle(color: Colors.red),
+                    )
+                  ]
+                : [],
+          ),
+        ),
+      ),
+      validator: (val) {
+        if (required && (val == null || val.isEmpty)) {
+          return "Required";
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget dropdownDecoration(String label) {
+    return TextFormField(
+        decoration: InputDecoration(
       isDense: true,
       labelText: label,
       labelStyle: TextStyle(fontSize: 12),
@@ -785,7 +951,6 @@ class CustomWidgets {
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-    );
+    ));
   }
-
 }

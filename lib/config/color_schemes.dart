@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 /// 🔵 BRAND COLORS
-const primaryBlue = Color(0xFF1C84B5);
-const secondaryPurple = Color(0xFF7A2E7A);
+const primaryBlue = Color(0xFF058DCE);
+const secondaryPurple = Color(0xFF793078);
 
 /// 🌞 LIGHT THEME
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
-  primary: Colors.blue,
+  primary: primaryBlue,
   onPrimary: Colors.white,
   primaryContainer: Color(0xFFD6EEFA),
   onPrimaryContainer: Color(0xFF002B3D),
-  secondary: Color.fromARGB(255, 121, 48, 190),
+  secondary: secondaryPurple,
   onSecondary: Colors.white,
   secondaryContainer: Color(0xFFF1D8F1),
   onSecondaryContainer: Color(0xFF2A0E2A),
@@ -26,17 +26,18 @@ const lightColorScheme = ColorScheme(
   onInverseSurface: Colors.green,
   inversePrimary: Color(0xFF8FD3F4),
   tertiary: Colors.orange,
-  onTertiary: Colors.red,
+  onTertiary: Colors.white,
+  tertiaryContainer: Color(0xFFFFE0B2),
 );
 
 /// 🌙 DARK THEME
 const darkColorScheme = ColorScheme(
   brightness: Brightness.dark,
-  primary: Color(0xFF4FB3E8),
+  primary: primaryBlue,
   onPrimary: Color(0xFF00344C),
   primaryContainer: Color(0xFF004C6D),
   onPrimaryContainer: Color(0xFFC8E6FF),
-  secondary: Color(0xFFD58AD5),
+  secondary: secondaryPurple,
   onSecondary: Color(0xFF3A0F3A),
   secondaryContainer: Color(0xFF5A1F5A),
   onSecondaryContainer: Color(0xFFF1D8F1),
@@ -51,5 +52,6 @@ const darkColorScheme = ColorScheme(
   onInverseSurface: Colors.green,
   inversePrimary: primaryBlue,
   tertiary: Colors.orange,
-  onTertiary: Colors.red,
+  onTertiary: Colors.black,
+  tertiaryContainer: Color(0xFF4E342E),
 );

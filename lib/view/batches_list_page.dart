@@ -1,11 +1,11 @@
 import 'package:albedo_app/controller/batch_list_controller.dart';
-import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class BatchesListPage extends StatelessWidget {
@@ -52,104 +52,49 @@ class BatchesListPage extends StatelessWidget {
                         return const Center(child: Text("No batches found"));
                       }
 
-                      int crossAxisCount = 1;
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount = 1;
 
-                      if (Responsive.isTablet(context)) {
-                        crossAxisCount = 2;
-                      } else if (Responsive.isDesktop(context)) {
-                        crossAxisCount = 3;
-                      }
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
 
-                      return GridView.builder(
-                        itemCount: data.length,
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 380,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
-                        itemBuilder: (_, i) => InfoCard(
-                          id: data[i].id ?? '',
-                          status: data[i].status ?? '',
-                          statusColor:
-                              getStatusColor(context, data[i].status ?? ''),
-                          infoRows: [
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: _personCompact(
-                                        context,
-                                        "Batch",
-                                        data[i].batchName ?? '',
-                                        data[i].batchID ?? '')),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                    child: _personCompact(
-                                        context,
-                                        "Teacher",
-                                        data[i].teacherName ?? '',
-                                        data[i].teacherId ?? '')),
+                          return MasonryGridView.count(
+                            padding: const EdgeInsets.all(12),
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            itemBuilder: (_, i) => InfoCard(
+                              id: data[i].id ?? '',
+                              status: data[i].status ?? '',
+                              statusColor:
+                                  getStatusColor(context, data[i].status ?? ''),
+                              infoRows: [
+                                _buildBatchPersonSection(context, data[i]),
+                                _buildBatchDetailsSection(context, data[i]),
+                              ],
+                              actions: [
+                                CustomWidgets().iconBtn(
+                                  icon: Icons.edit,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  onTap: () =>
+                                      _showEditDialog(context, data[i]),
+                                ),
+                                CustomWidgets().iconBtn(
+                                  icon: Icons.delete,
+                                  color: Theme.of(context).colorScheme.error,
+                                  onTap: () => CustomWidgets().showDeleteDialog(
+                                    onConfirm: () {},
+                                  ),
+                                ),
                               ],
                             ),
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .outlineVariant
-                                    .withOpacity(0.03),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                          child: _miniInfo(
-                                              context: context,
-                                              label: "Subject",
-                                              value: data[i].subject ?? '')),
-                                      Expanded(
-                                          child: _miniInfo(
-                                              context: context,
-                                              label: "Time",
-                                              value: data[i].date.toString())),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                          child: _miniInfo(
-                                              context: context,
-                                              value: data[i].syllabus ?? '')),
-                                      if (data[i].startTime != null)
-                                        Expanded(
-                                            child: _miniInfo(
-                                                context: context,
-                                                value:
-                                                    '${data[i].startTime} - ${data[i].endTime}')),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                          actions: [
-                            CustomWidgets().iconBtn(
-                              icon: Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                              onTap: () => showEditDialog(context, data[i]),
-                            ),
-                            CustomWidgets().iconBtn(
-                                icon: Icons.delete,
-                                color: Theme.of(context).colorScheme.onTertiary,
-                                onTap: () => CustomWidgets().showDeleteDialog(
-                                      onConfirm: () {
-                                        // c.delete(data[i].id);
-                                      },
-                                    )),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     }),
                   )
@@ -159,6 +104,193 @@ class BatchesListPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildBatchPersonSection(BuildContext context, data) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmall = constraints.maxWidth < 320;
+
+        return isSmall
+            ? Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _personCompact(
+                        context,
+                        "Batch",
+                        data.batchName ?? '',
+                        data.batchID ?? '',
+                      ),
+                      const SizedBox(height: 8),
+                      _personCompact(
+                        context,
+                        "Teacher",
+                        data.teacherName ?? '',
+                        data.teacherId ?? '',
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                    child: _personCompact(
+                      context,
+                      "Batch",
+                      data.batchName ?? '',
+                      data.batchID ?? '',
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _personCompact(
+                      context,
+                      "Teacher",
+                      data.teacherName ?? '',
+                      data.teacherId ?? '',
+                    ),
+                  ),
+                ],
+              );
+      },
+    );
+  }
+
+  Widget _buildBatchDetailsSection(BuildContext context, data) {
+    final cs = Theme.of(context).colorScheme;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmall = constraints.maxWidth < 320;
+
+        return Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: cs.outlineVariant.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: isSmall
+
+              /// 🔥 MOBILE → STACK
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _miniInfo(
+                            context: context,
+                            label: "Subject",
+                            value: data.subject ?? ''),
+                        _miniInfo(
+                            context: context,
+                            // label: "Syllabus",
+                            value: data.syllabus ?? ''),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _miniInfo(
+                            context: context,
+                            label: "Date",
+                            value: data.date.toString()),
+                        _miniInfo(
+                          context: context,
+                          label: "Time",
+                          value: "${data.startTime} - ${data.endTime}",
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+
+              /// 🔥 DESKTOP/TABLET → 2 COLUMN STRUCTURE
+              : Row(
+                  children: [
+                    /// LEFT COLUMN
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _miniInfo(
+                              context: context,
+                              label: "Subject",
+                              value: data.subject ?? ''),
+                          const SizedBox(height: 6),
+                          _miniInfo(
+                              context: context,
+                              label: "Syllabus",
+                              value: data.syllabus ?? ''),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    /// RIGHT COLUMN
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _miniInfo(
+                              context: context,
+                              label: "Date",
+                              value: data.date.toString()),
+                          const SizedBox(height: 6),
+                          if (data.startTime != null)
+                            _miniInfo(
+                              context: context,
+                              label: "Time",
+                              value: "${data.startTime} - ${data.endTime}",
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+
+  void _showEditDialog(BuildContext context, data) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: "Edit Session",
+      icon: Icons.edit,
+      formKey: GlobalKey<FormState>(),
+      submitText: "Save Changes",
+      onSubmit: () {},
+      sections: [
+        CustomWidgets().sectionCard(
+          icon: Icons.schedule,
+          title: "Schedule",
+          child: Row(
+            children: [
+              Expanded(
+                child: CustomWidgets().inputField(
+                  controller: c.dateController,
+                  label: "Date",
+                  required: true,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: CustomWidgets().inputField(
+                  controller: c.timeController,
+                  label: "Time",
+                  required: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -259,10 +391,5 @@ class BatchesListPage extends StatelessWidget {
       default:
         return Theme.of(context).colorScheme.shadow;
     }
-  }
-
-  void showEditDialog(BuildContext context, Batch data) {
-    c.initEdit(data);
-    CustomWidgets().editDialog(c);
   }
 }

@@ -14,9 +14,9 @@ class BatchListController extends GetxController {
 
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
 
-  late TextEditingController dateController;
-  late TextEditingController timeController;
-  late TextEditingController salaryController;
+  TextEditingController dateController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
+  TextEditingController salaryController = TextEditingController();
 
   List<String> tabs = [
     "Active",
