@@ -276,20 +276,12 @@ class BatchesListPage extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: CustomWidgets().inputField(
-                  controller: c.dateController,
-                  label: "Date",
-                  required: true,
-                ),
-              ),
+                  child: CustomWidgets().dropdownStyledTextField(
+                      context: context, hint: 'Enter Date')),
               const SizedBox(width: 10),
               Expanded(
-                child: CustomWidgets().inputField(
-                  controller: c.timeController,
-                  label: "Time",
-                  required: true,
-                ),
-              ),
+                  child: CustomWidgets().dropdownStyledTextField(
+                      context: context, hint: 'Enter Date')),
             ],
           ),
         ),

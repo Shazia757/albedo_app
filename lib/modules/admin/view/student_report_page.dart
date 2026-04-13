@@ -1,5 +1,5 @@
 import 'package:albedo_app/controller/report_controller.dart';
-import 'package:albedo_app/view/student_details_page.dart';
+import 'package:albedo_app/modules/admin/view/student_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

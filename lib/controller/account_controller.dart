@@ -1,5 +1,5 @@
 import 'package:albedo_app/model/user_model.dart';
-import 'package:albedo_app/view/home_page.dart';
+import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

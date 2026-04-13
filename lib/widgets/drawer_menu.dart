@@ -1,13 +1,15 @@
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
-import 'package:albedo_app/view/batch_page.dart';
-import 'package:albedo_app/view/batches_list_page.dart';
-import 'package:albedo_app/view/home_page.dart';
-import 'package:albedo_app/view/payment_page.dart';
-import 'package:albedo_app/view/report_page.dart';
-import 'package:albedo_app/view/session_page.dart';
-import 'package:albedo_app/view/students_trs_page.dart';
-import 'package:albedo_app/view/support_page.dart';
+import 'package:albedo_app/modules/admin/view/batch_page.dart';
+import 'package:albedo_app/modules/admin/view/batches_list_page.dart';
+import 'package:albedo_app/modules/admin/view/home_page.dart';
+import 'package:albedo_app/modules/admin/view/payment_page.dart';
+import 'package:albedo_app/modules/admin/view/report_page.dart';
+import 'package:albedo_app/modules/admin/view/session_page.dart';
+import 'package:albedo_app/modules/admin/view/students_page.dart';
+import 'package:albedo_app/modules/admin/view/students_trs_page.dart';
+import 'package:albedo_app/modules/admin/view/support_page.dart';
+import 'package:albedo_app/modules/admin/view/teachers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/home_controller.dart';
@@ -82,18 +84,16 @@ class DrawerMenu extends StatelessWidget {
                         DrawerSubItem(
                           title: "Students",
                           index: 0,
-                          onTap: () =>
-                              Get.offAll(UsersPage(type: UserPageType.student)),
+                          onTap: () => Get.offAll(StudentsPage()),
                         ),
                         DrawerSubItem(
                           title: "Teachers",
                           index: 1,
-                          onTap: () =>
-                              Get.offAll(UsersPage(type: UserPageType.teacher)),
+                          onTap: () => Get.offAll(TeachersPage()),
                         ),
                         DrawerSubItem(title: "Mentors", index: 2, onTap: () {}),
                         DrawerSubItem(
-                            title: "Asst. Admin", index: 3, onTap: () {}),
+                            title: "Coordinator", index: 3, onTap: () {}),
                         DrawerSubItem(title: "Advisor", index: 4, onTap: () {}),
                         DrawerSubItem(title: "Others", index: 5, onTap: () {}),
                       ]),

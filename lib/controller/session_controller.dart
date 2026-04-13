@@ -6,7 +6,7 @@ enum SortType { newest, oldest, student, teacher }
 
 enum SessionType { classSession, meet }
 
-enum UserPageType { student, teacher }
+// enum UserPageType { student, teacher }
 
 class SessionController extends GetxController {
   var selectedTab = 0.obs;
@@ -196,10 +196,8 @@ class SessionController extends GetxController {
     List<Session> temp = sessions;
 
     /// 🎯 Tab-based status filter
-    if (selectedTab.value != 0) {
-      final status = statusMap[selectedTab.value];
-      temp = temp.where((s) => s.status == status).toList();
-    }
+    final status = statusMap[selectedTab.value];
+    temp = temp.where((s) => s.status == status).toList();
 
     /// 🔍 Search
     if (searchQuery.value.isNotEmpty) {

@@ -1,5 +1,5 @@
-import 'package:albedo_app/view/login_page.dart';
-import 'package:albedo_app/view/profile_page.dart';
+import 'package:albedo_app/common_views/login_page.dart';
+import 'package:albedo_app/modules/admin/view/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

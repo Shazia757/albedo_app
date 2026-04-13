@@ -1,4 +1,6 @@
-class TeacherModel {
+import 'package:flutter/material.dart';
+
+class Teacher {
   final String id;
   final String name;
   final String email;
@@ -14,7 +16,7 @@ class TeacherModel {
   double? totalSessions;
   double? totalHours;
 
-  TeacherModel({
+  Teacher({
     required this.id,
     required this.name,
     required this.email,
@@ -30,4 +32,13 @@ class TeacherModel {
     this.paid,
     this.balance,
   });
+}
+
+class ExperienceModel {
+  TextEditingController? companyController = TextEditingController();
+  TextEditingController? yearController = TextEditingController();
+  TextEditingController? monthController = TextEditingController();
+
+  ExperienceModel(
+      {this.companyController, this.monthController, this.yearController});
 }

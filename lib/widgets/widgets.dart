@@ -488,7 +488,6 @@ class CustomWidgets {
 
     final LayerLink layerLink = LayerLink();
 
-    // ✅ persistent variables (closure-based)
     OverlayEntry? overlayEntry;
     final textController = TextEditingController(
       text: value?.toString() ?? "",
@@ -529,7 +528,7 @@ class CustomWidgets {
                                   items.length > 5 ? 240 : items.length * 48.0,
                             ),
                             decoration: BoxDecoration(
-                              color: cs.onPrimary,
+                              color: cs.outline.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: ListView.builder(
@@ -548,6 +547,7 @@ class CustomWidgets {
                                     closeDropdown();
                                   },
                                   child: Container(
+                                    color: cs.outline.withOpacity(0.1),
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16,
                                       vertical: 12,
@@ -594,8 +594,7 @@ class CustomWidgets {
                   child: TextFormField(
                     controller: textController,
                     style: TextStyle(
-                      // ✅ ADD THIS
-                      fontSize: 13, // change this to whatever you want
+                      fontSize: 13,
                       color: cs.onSurface,
                     ),
                     readOnly: true,
@@ -603,11 +602,11 @@ class CustomWidgets {
                       hintText: hint,
                       hintStyle: TextStyle(
                         fontSize: 12,
-                        color: cs.shadow.withOpacity(0.6),
+                        color: cs.onSurface,
                       ),
                       isDense: true,
                       filled: true,
-                      fillColor: cs.onPrimary,
+                      fillColor: cs.outline.withOpacity(0.1),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 11,
@@ -620,16 +619,16 @@ class CustomWidgets {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: cs.onPrimary),
+                        borderSide: BorderSide(color: Colors.transparent),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: cs.tertiaryContainer),
+                        borderSide: BorderSide(color: Colors.transparent),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: cs.onPrimary,
+                          color: Colors.transparent,
                           width: 1.5,
                         ),
                       ),
@@ -671,8 +670,8 @@ class CustomWidgets {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Get.theme.colorScheme.secondary,
-                      Get.theme.colorScheme.secondary.withOpacity(0.8),
+                      Get.theme.colorScheme.primary,
+                      Get.theme.colorScheme.secondary.withOpacity(0.4),
                     ],
                   ),
                   borderRadius: const BorderRadius.vertical(
@@ -685,11 +684,10 @@ class CustomWidgets {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: context.theme.colorScheme.onPrimary,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(icon,
-                            color: context.theme.colorScheme.onPrimary),
+                            color: context.theme.colorScheme.inverseSurface),
                       ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -698,7 +696,7 @@ class CustomWidgets {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: context.theme.colorScheme.onPrimary,
+                          color: context.theme.colorScheme.inverseSurface,
                         ),
                       ),
                     ),
@@ -731,18 +729,29 @@ class CustomWidgets {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Get.back(),
-                        child: const Text("Cancel"),
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                              color: context.theme.colorScheme.onSurface),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                context.theme.colorScheme.secondary),
                         onPressed: () {
                           if (!formKey.currentState!.validate()) return;
                           onSubmit();
                           Get.back();
                         },
-                        child: Text(submitText),
+                        child: Text(
+                          submitText,
+                          style: TextStyle(
+                              color: context.theme.colorScheme.inverseSurface),
+                        ),
                       ),
                     ),
                   ],
@@ -862,7 +871,10 @@ class CustomWidgets {
   Widget dropdownStyledTextField({
     required BuildContext context,
     required String hint,
+    String? label,
     TextEditingController? controller,
+    int? minlines,
+    bool isMultiline = false,
     bool readOnly = false,
     VoidCallback? onTap,
   }) {
@@ -870,17 +882,24 @@ class CustomWidgets {
 
     return TextFormField(
       controller: controller,
+      style: TextStyle(fontSize: 12),
       readOnly: readOnly,
       onTap: onTap,
+      minLines: isMultiline ? 3 : 1,
+      maxLines: isMultiline ? null : 1,
+      keyboardType: isMultiline ? TextInputType.multiline : TextInputType.text,
+      textInputAction:
+          isMultiline ? TextInputAction.newline : TextInputAction.done,
       decoration: InputDecoration(
+        labelText: label,
         hintText: hint,
         hintStyle: TextStyle(
           fontSize: 12,
-          color: context.theme.colorScheme.shadow.withOpacity(0.6),
+          color: context.theme.colorScheme.onSurface,
         ),
         isDense: true,
         filled: true,
-        fillColor: cs.onPrimary,
+        fillColor: cs.outline.withOpacity(0.1),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 11,
@@ -888,19 +907,19 @@ class CustomWidgets {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: cs.onPrimary,
+            color: Colors.transparent,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: cs.tertiaryContainer,
+            color: Colors.transparent,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: cs.onPrimary,
+            color: Colors.transparent,
             width: 1.5,
           ),
         ),
@@ -908,37 +927,37 @@ class CustomWidgets {
     );
   }
 
-  Widget inputField({
-    required TextEditingController controller,
-    required String label,
-    bool required = false,
-  }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        label: RichText(
-          text: TextSpan(
-            text: label,
-            style: TextStyle(color: Colors.black),
-            children: required
-                ? [
-                    const TextSpan(
-                      text: " *",
-                      style: TextStyle(color: Colors.red),
-                    )
-                  ]
-                : [],
-          ),
-        ),
-      ),
-      validator: (val) {
-        if (required && (val == null || val.isEmpty)) {
-          return "Required";
-        }
-        return null;
-      },
-    );
-  }
+  // Widget inputField({
+  //   required TextEditingController controller,
+  //   required String label,
+  //   bool required = false,
+  // }) {
+  //   return TextFormField(
+  //     controller: controller,
+  //     decoration: InputDecoration(
+  //       label: RichText(
+  //         text: TextSpan(
+  //           text: label,
+  //           style: TextStyle(color: Colors.black),
+  //           children: required
+  //               ? [
+  //                   const TextSpan(
+  //                     text: " *",
+  //                     style: TextStyle(color: Colors.red),
+  //                   )
+  //                 ]
+  //               : [],
+  //         ),
+  //       ),
+  //     ),
+  //     validator: (val) {
+  //       if (required && (val == null || val.isEmpty)) {
+  //         return "Required";
+  //       }
+  //       return null;
+  //     },
+  //   );
+  // }
 
   Widget dropdownDecoration(String label) {
     return TextFormField(

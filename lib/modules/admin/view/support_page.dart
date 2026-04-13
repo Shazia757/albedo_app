@@ -136,7 +136,7 @@ class SupportsPage extends StatelessWidget {
                     onTap: () {
                       // TODO: Delete logic
                     },
-                    color: Theme.of(context).colorScheme.onTertiaryContainer,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                 ],
               ),

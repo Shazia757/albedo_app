@@ -1,6 +1,5 @@
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/widgets/custom_textfield.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
@@ -23,108 +22,7 @@ class SessionPage extends StatelessWidget {
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       drawer: isDesktop ? null : const DrawerMenu(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => CustomWidgets().showCustomDialog(
-          context: context,
-          title: 'Add Session',
-          formKey: GlobalKey<FormState>(),
-          onSubmit: () {},
-          sections: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  Obx(
-                    () => Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile(
-                            dense: true,
-                            title: Text('Class Session'),
-                            value: SessionType.classSession,
-                            groupValue: c.selectedSessionType.value,
-                            onChanged: (value) =>
-                                c.selectedSessionType.value = value!,
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile(
-                            title: Text('Meet'),
-                            value: SessionType.meet,
-                            groupValue: c.selectedSessionType.value,
-                            onChanged: (value) =>
-                                c.selectedSessionType.value = value!,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  CustomWidgets()
-                      .labelWithAsterisk('Select Student', required: true),
-                  const SizedBox(height: 20),
-                  CustomWidgets().customDropdownField(
-                    context: context,
-                    hint: 'Select Student',
-                    items: c.studentOptions,
-                    onChanged: (p0) => c.selectedStudent.value = p0,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomWidgets().labelWithAsterisk('Search and Select Teacher',
-                      required: true),
-                  const SizedBox(height: 20),
-                  CustomWidgets().customDropdownField(
-                    context: context,
-                    hint: 'Select Teacher',
-                    items: c.teacherList,
-                    onChanged: (p0) => c.selectedTeacher.value = p0,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomWidgets().labelWithAsterisk('Teacher Salary'),
-                  const SizedBox(height: 20),
-                  dropdownStyledTextField(
-                      context: context, hint: 'Teacher Salary'),
-                  const SizedBox(height: 20),
-                  CustomWidgets()
-                      .labelWithAsterisk('Session Date', required: true),
-                  const SizedBox(height: 20),
-                  CustomWidgets()
-                      .labelWithAsterisk('Select Duration', required: true),
-                  const SizedBox(height: 20),
-                  Obx(() => DropdownButtonFormField<int>(
-                        hint: Text('Select Duration'),
-                        style: TextStyle(fontSize: 13),
-                        value:
-                            c.durationOptions.contains(c.selectedDuration.value)
-                                ? c.selectedDuration.value
-                                : null,
-                        items: c.durationOptions
-                            .toSet()
-                            .map((e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text("$e mins",
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Get.theme.colorScheme.onSurface,
-                                      )),
-                                ))
-                            .toList(),
-                        onChanged: (val) => c.selectedDuration.value = val,
-                        decoration:
-                            _dropdownDecoration(context: context, "Duration"),
-                        validator: (v) => v == null ? "Required" : null,
-                      )),
-                ],
-              ),
-            ),
-          ],
-        ),
-        mini: true,
-        backgroundColor: context.theme.colorScheme.primary,
-        child: Icon(
-          Icons.add,
-          color: context.theme.colorScheme.onPrimary,
-        ),
-      ),
+      floatingActionButton: addSessionBtn(context),
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
@@ -216,6 +114,111 @@ class SessionPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  FloatingActionButton addSessionBtn(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () => CustomWidgets().showCustomDialog(
+        context: context,
+        title: 'Add Session',
+        formKey: GlobalKey<FormState>(),
+        onSubmit: () {},
+        sections: [
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Obx(
+                  () => Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile(
+                          dense: true,
+                          title: Text('Class Session'),
+                          value: SessionType.classSession,
+                          groupValue: c.selectedSessionType.value,
+                          onChanged: (value) =>
+                              c.selectedSessionType.value = value!,
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile(
+                          title: Text('Meet'),
+                          value: SessionType.meet,
+                          groupValue: c.selectedSessionType.value,
+                          onChanged: (value) =>
+                              c.selectedSessionType.value = value!,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                CustomWidgets()
+                    .labelWithAsterisk('Select Student', required: true),
+                const SizedBox(height: 10),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select Student',
+                  items: c.studentOptions,
+                  onChanged: (p0) => c.selectedStudent.value = p0,
+                ),
+                const SizedBox(height: 10),
+                CustomWidgets().labelWithAsterisk(
+                  'Search and Select Teacher',
+                  required: true,
+                ),
+                const SizedBox(height: 10),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select Teacher',
+                  items: c.teacherList,
+                  onChanged: (p0) => c.selectedTeacher.value = p0,
+                ),
+                const SizedBox(height: 10),
+                CustomWidgets().labelWithAsterisk('Teacher Salary'),
+                const SizedBox(height: 10),
+                CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Teacher Salary',
+                    controller: c.salaryController),
+                const SizedBox(height: 10),
+                CustomWidgets()
+                    .labelWithAsterisk('Session Date', required: true),
+                const SizedBox(height: 10),
+                CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Select Date',
+                    controller: c.dateController),
+                const SizedBox(height: 10),
+                CustomWidgets()
+                    .labelWithAsterisk('Session Time', required: true),
+                const SizedBox(height: 10),
+                CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Select Time',
+                    controller: c.timeController),
+                const SizedBox(height: 10),
+                CustomWidgets()
+                    .labelWithAsterisk('Select Duration', required: true),
+                const SizedBox(height: 20),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select Duration',
+                  items: [],
+                  onChanged: (p0) {},
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      mini: true,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: Icon(
+        Icons.add,
+        color: context.theme.colorScheme.onPrimary,
       ),
     );
   }
@@ -404,9 +407,7 @@ class SessionPage extends StatelessWidget {
           title: "Sort Sessions",
           options: _sortOptions,
           selectedValue: c.sortType.value,
-          onSelected: (val) {
-            c.sortType.value = val;
-          }),
+          onSelected: (val) => c.sortType.value = val),
       child: _actionButton(context, Icons.swap_vert, "Sort"),
     );
   }
@@ -584,46 +585,18 @@ class SessionPage extends StatelessWidget {
                       child: Row(
                         children: [
                           Expanded(
-                            child: _inputField(
-                              context: context,
-                              controller: c.dateController,
-                              label: "Date",
-                              icon: Icons.calendar_today_outlined,
-                              readOnly: true,
-                              onTap: () async {
-                                final picked = await showDatePicker(
-                                  context: Get.context!,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (picked != null) {
-                                  c.dateController.text =
-                                      "${picked.day}/${picked.month}/${picked.year}";
-                                }
-                              },
-                            ),
-                          ),
+                              child: CustomWidgets().dropdownStyledTextField(
+                            label: 'Date',
+                            context: context,
+                            hint: 'Date',
+                            controller: c.dateController,
+                          )),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: _inputField(
-                              context: context,
-                              controller: c.timeController,
-                              label: "Time",
-                              icon: Icons.access_time_outlined,
-                              readOnly: true,
-                              onTap: () async {
-                                final picked = await showTimePicker(
-                                  context: Get.context!,
-                                  initialTime: TimeOfDay.now(),
-                                );
-                                if (picked != null) {
-                                  c.timeController.text =
-                                      "${picked.hour}:${picked.minute}";
-                                }
-                              },
-                            ),
-                          ),
+                              child: CustomWidgets().dropdownStyledTextField(
+                                  context: context,
+                                  hint: 'Enter Time',
+                                  controller: c.timeController)),
                         ],
                       ),
                     ),
@@ -637,56 +610,20 @@ class SessionPage extends StatelessWidget {
                       child: Column(
                         children: [
                           /// Duration
-                          Obx(() => DropdownButtonFormField<int>(
-                                style: TextStyle(fontSize: 13),
-                                value: c.durationOptions
-                                        .contains(c.selectedDuration.value)
-                                    ? c.selectedDuration.value
-                                    : null,
-                                items: c.durationOptions
-                                    .map((e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text("$e mins",
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                color: Get.theme.colorScheme
-                                                    .onSurface,
-                                              )),
-                                        ))
-                                    .toList(),
-                                onChanged: (val) =>
-                                    c.selectedDuration.value = val,
-                                decoration: _dropdownDecoration(
-                                    context: context, "Duration"),
-                                validator: (v) => v == null ? "Required" : null,
-                              )),
+                          CustomWidgets().customDropdownField(
+                              context: context,
+                              hint: 'Select Duration',
+                              items: [],
+                              onChanged: (p0) => c.selectedDuration.value = p0),
 
                           const SizedBox(height: 12),
 
                           /// Teacher
-                          Obx(() => DropdownButtonFormField<String>(
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Get.theme.colorScheme.onSurface,
-                                ),
-                                value: c.teacherList
-                                        .contains(c.selectedTeacher.value)
-                                    ? c.selectedTeacher.value
-                                    : null,
-                                items: c.teacherList
-                                    .toSet()
-                                    .map((e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
-                                        ))
-                                    .toList(),
-                                onChanged: (val) =>
-                                    c.selectedTeacher.value = val,
-                                decoration: _dropdownDecoration(
-                                    context: context, "Teacher"),
-                                validator: (v) =>
-                                    v == null || v.isEmpty ? "Required" : null,
-                              )),
+                          CustomWidgets().customDropdownField(
+                              context: context,
+                              hint: 'Select Teacher',
+                              items: [],
+                              onChanged: (p0) => c.selectedTeacher.value = p0),
                         ],
                       ),
                     ),
@@ -697,13 +634,8 @@ class SessionPage extends StatelessWidget {
                     _sectionCard(
                       icon: Icons.payments_outlined,
                       title: "Payment",
-                      child: _inputField(
-                        context: context,
-                        controller: c.salaryController,
-                        label: "Teacher Salary (Optional)",
-                        icon: Icons.currency_rupee,
-                        keyboardType: TextInputType.number,
-                      ),
+                      child: CustomWidgets().dropdownStyledTextField(
+                          context: context, hint: 'Enter Teacher Salary'),
                     ),
                   ],
                 ),
@@ -767,9 +699,9 @@ class SessionPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.04),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Colors.transparent),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -813,62 +745,62 @@ class SessionPage extends StatelessWidget {
         labelText: label,
         prefixIcon: Icon(icon),
         filled: true,
-        fillColor: context.theme.colorScheme.onPrimary,
+        fillColor: context.theme.colorScheme.outline.withOpacity(0.1),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.transparent)),
       ),
     );
   }
 
-  Widget dropdownStyledTextField({
-    required BuildContext context,
-    required String hint,
-    TextEditingController? controller,
-    bool readOnly = false,
-    VoidCallback? onTap,
-  }) {
-    final cs = Theme.of(context).colorScheme;
+  // Widget dropdownStyledTextField({
+  //   required BuildContext context,
+  //   required String hint,
+  //   TextEditingController? controller,
+  //   bool readOnly = false,
+  //   VoidCallback? onTap,
+  // }) {
+  //   final cs = Theme.of(context).colorScheme;
 
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(
-          fontSize: 12,
-          color: context.theme.colorScheme.shadow.withOpacity(0.6),
-        ),
-        isDense: true,
-        filled: true,
-        fillColor: cs.onPrimary,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 11,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: cs.onPrimary,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: cs.tertiaryContainer,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: cs.onPrimary,
-            width: 1.5,
-          ),
-        ),
-      ),
-    );
-  }
+  //   return TextFormField(
+  //     controller: controller,
+  //     readOnly: readOnly,
+  //     onTap: onTap,
+  //     decoration: InputDecoration(
+  //       hintText: hint,
+  //       hintStyle: TextStyle(
+  //         fontSize: 12,
+  //         color: context.theme.colorScheme.shadow.withOpacity(0.6),
+  //       ),
+  //       isDense: true,
+  //       filled: true,
+  //       fillColor: cs.onPrimary,
+  //       contentPadding: const EdgeInsets.symmetric(
+  //         horizontal: 12,
+  //         vertical: 11,
+  //       ),
+  //       border: OutlineInputBorder(
+  //         borderRadius: BorderRadius.circular(12),
+  //         borderSide: BorderSide(
+  //           color: cs.onPrimary,
+  //         ),
+  //       ),
+  //       enabledBorder: OutlineInputBorder(
+  //         borderRadius: BorderRadius.circular(12),
+  //         borderSide: BorderSide(
+  //           color: cs.tertiaryContainer,
+  //         ),
+  //       ),
+  //       focusedBorder: OutlineInputBorder(
+  //         borderRadius: BorderRadius.circular(12),
+  //         borderSide: BorderSide(
+  //           color: cs.onPrimary,
+  //           width: 1.5,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   InputDecoration _dropdownDecoration(String label,
       {required BuildContext context}) {

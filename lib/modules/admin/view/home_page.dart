@@ -2,8 +2,8 @@ import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controller/home_controller.dart';
-import '../../widgets/drawer_menu.dart';
+import '../../../../controller/home_controller.dart';
+import '../../../../widgets/drawer_menu.dart';
 
 class HomeView extends StatelessWidget {
   HomeView({super.key});
@@ -89,21 +89,21 @@ class HomeView extends StatelessWidget {
                     const SizedBox(height: 16),
                     _chartCard(
                       context,
-                      title: "Assistant Admins Count",
-                      count: c.assistantCount.value.toString(),
-                      data: c.assistantData,
+                      title: "Coordinators Count",
+                      count: c.coordinatorCount.value.toString(),
+                      data: c.coordinatorData,
                       color: Theme.of(context).colorScheme.primary,
                       icon: Icons.people_outline,
                       iconColor: context.theme.colorScheme.primary,
                       selectedFilter: c.selectedFilter.value,
                       onFilterChanged: (filter) {
                         c.selectedFilter.value = filter;
-                        c.updateAssistantData();
+                        c.updatecoordinatorData();
                       },
-                      selectedRange: c.assistantRange,
+                      selectedRange: c.coordinatorRange,
                       onRangeChanged: (value) {
-                        c.assistantRange.value = value;
-                        c.updateAssistantData(range: value);
+                        c.coordinatorRange.value = value;
+                        c.updatecoordinatorData(range: value);
                       },
                     ),
                   ],

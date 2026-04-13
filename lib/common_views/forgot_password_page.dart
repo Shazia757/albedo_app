@@ -1,5 +1,5 @@
 import 'package:albedo_app/controller/account_controller.dart';
-import 'package:albedo_app/view/login_page.dart';
+import 'package:albedo_app/common_views/login_page.dart';
 import 'package:albedo_app/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -1,7 +1,7 @@
 // PREMIUM + RESPONSIVE REPORTS PAGE (IMPROVED UI)
 import 'package:albedo_app/controller/report_controller.dart';
-import 'package:albedo_app/view/student_report_page.dart';
-import 'package:albedo_app/view/teacher_report_page.dart';
+import 'package:albedo_app/modules/admin/view/student_report_page.dart';
+import 'package:albedo_app/modules/admin/view/teacher_report_page.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
