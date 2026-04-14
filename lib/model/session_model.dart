@@ -9,7 +9,8 @@ class Session {
   final String className;
   final String teacherName;
   final String teacherId;
-  final DateTime dateTime;
+  final DateTime date;
+  final DateTime time;
   final String status;
   int? duration;
   double? teacherSalary;
@@ -22,7 +23,8 @@ class Session {
     required this.className,
     required this.teacherName,
     required this.teacherId,
-    required this.dateTime,
+    required this.date,
+    required this.time,
     required this.status,
     this.duration,
     this.teacherSalary,

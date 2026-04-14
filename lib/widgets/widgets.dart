@@ -3,6 +3,7 @@ import 'package:albedo_app/model/session_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
+import 'package:flutter/services.dart';
 
 typedef StringValueOf<T> = String Function(T item);
 
@@ -604,7 +605,7 @@ class CustomWidgets {
                         fontSize: 12,
                         color: cs.onSurface,
                       ),
-                      isDense: true,
+                      // isDense: true,
                       filled: true,
                       fillColor: cs.outline.withOpacity(0.1),
                       contentPadding: const EdgeInsets.symmetric(
@@ -643,9 +644,200 @@ class CustomWidgets {
     );
   }
 
+  Widget customMultiDropdownField<T>({
+    required BuildContext context,
+    required String hint,
+    required List<T> items,
+    required RxList<T> selectedItems, // 🔥 important change
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    final LayerLink layerLink = LayerLink();
+    OverlayEntry? overlayEntry;
+
+    final textController = TextEditingController();
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        bool isOpen = overlayEntry != null;
+
+        void updateText() {
+          textController.text =
+              selectedItems.isEmpty ? "" : "${selectedItems.length} selected";
+        }
+
+        void toggleItem(T item) {
+          if (selectedItems.contains(item)) {
+            selectedItems.remove(item);
+          } else {
+            selectedItems.add(item);
+          }
+          updateText();
+          setState(() {});
+        }
+
+        void closeDropdown() {
+          overlayEntry?.remove();
+          overlayEntry = null;
+          setState(() {});
+        }
+
+        void openDropdown(BuildContext fieldContext) {
+          final renderBox = fieldContext.findRenderObject() as RenderBox;
+          final size = renderBox.size;
+
+          overlayEntry = OverlayEntry(
+            builder: (_) {
+              return GestureDetector(
+                onTap: closeDropdown,
+                behavior: HitTestBehavior.translucent,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      width: size.width,
+                      child: CompositedTransformFollower(
+                        link: layerLink,
+                        offset: Offset(0, size.height + 4),
+                        child: Material(
+                          elevation: 4,
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              maxHeight:
+                                  items.length > 5 ? 240 : items.length * 48.0,
+                            ),
+                            decoration: BoxDecoration(
+                              color: cs.outline.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Obx(() {
+                              updateText(); // 🔥 keep text synced
+
+                              return ListView.builder(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                itemCount: items.length,
+                                itemBuilder: (_, index) {
+                                  final item = items[index];
+                                  final isSelected =
+                                      selectedItems.contains(item);
+
+                                  return InkWell(
+                                    onTap: () => toggleItem(item),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 10,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Checkbox(
+                                            value: isSelected,
+                                            onChanged: (_) => toggleItem(item),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              item.toString(),
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: cs.onSurface,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+
+          Overlay.of(fieldContext).insert(overlayEntry!);
+          setState(() {});
+        }
+
+        return Builder(
+          builder: (fieldContext) {
+            return CompositedTransformTarget(
+              link: layerLink,
+              child: GestureDetector(
+                onTap: () {
+                  if (overlayEntry == null) {
+                    openDropdown(fieldContext);
+                  } else {
+                    closeDropdown();
+                  }
+                },
+                child: AbsorbPointer(
+                  child: Obx(() {
+                    updateText(); // 🔥 update UI
+
+                    return TextFormField(
+                      controller: textController,
+                      readOnly: true,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: cs.onSurface,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: hint,
+                        hintStyle: TextStyle(
+                          fontSize: 12,
+                          color: cs.onSurface,
+                        ),
+                        filled: true,
+                        fillColor: cs.outline.withOpacity(0.1),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 11,
+                        ),
+                        suffixIcon: Icon(
+                          isOpen
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          size: 20,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Colors.transparent),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Colors.transparent),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.transparent,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void showCustomDialog({
     required BuildContext context,
-    required String title,
+    required Widget title,
     IconData? icon,
     required GlobalKey<FormState> formKey,
     required List<Widget> sections,
@@ -691,13 +883,13 @@ class CustomWidgets {
                       ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        title,
+                      child: DefaultTextStyle(
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: context.theme.colorScheme.inverseSurface,
                         ),
+                        child: title,
                       ),
                     ),
                     IconButton(
@@ -897,7 +1089,7 @@ class CustomWidgets {
           fontSize: 12,
           color: context.theme.colorScheme.onSurface,
         ),
-        isDense: true,
+        // isDense: true,
         filled: true,
         fillColor: cs.outline.withOpacity(0.1),
         contentPadding: const EdgeInsets.symmetric(
@@ -927,49 +1119,572 @@ class CustomWidgets {
     );
   }
 
-  // Widget inputField({
-  //   required TextEditingController controller,
-  //   required String label,
-  //   bool required = false,
-  // }) {
-  //   return TextFormField(
-  //     controller: controller,
-  //     decoration: InputDecoration(
-  //       label: RichText(
-  //         text: TextSpan(
-  //           text: label,
-  //           style: TextStyle(color: Colors.black),
-  //           children: required
-  //               ? [
-  //                   const TextSpan(
-  //                     text: " *",
-  //                     style: TextStyle(color: Colors.red),
-  //                   )
-  //                 ]
-  //               : [],
-  //         ),
-  //       ),
-  //     ),
-  //     validator: (val) {
-  //       if (required && (val == null || val.isEmpty)) {
-  //         return "Required";
-  //       }
-  //       return null;
-  //     },
-  //   );
-  // }
+  Widget customDatePickerField({
+    required BuildContext context,
+    required TextEditingController controller,
+    required Rxn<DateTime> selectedDate,
+  }) {
+    final LayerLink layerLink = LayerLink();
+    OverlayEntry? overlayEntry;
 
-  Widget dropdownDecoration(String label) {
-    return TextFormField(
+    void showOverlay() {
+      final renderBox = context.findRenderObject() as RenderBox;
+      final size = renderBox.size;
+      final offset = renderBox.localToGlobal(Offset.zero);
+
+      final screenHeight = MediaQuery.of(context).size.height;
+      const popupHeight = 320;
+
+      final showAbove = (offset.dy + size.height + popupHeight > screenHeight);
+
+      overlayEntry = OverlayEntry(
+        builder: (context) => Stack(
+          children: [
+            /// 🔴 Background
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => overlayEntry?.remove(),
+                behavior: HitTestBehavior.translucent,
+                child: const SizedBox(),
+              ),
+            ),
+
+            /// 🟢 Calendar
+            Positioned(
+              width: 280,
+              child: CompositedTransformFollower(
+                link: layerLink,
+                offset: Offset(
+                  0,
+                  showAbove ? -popupHeight - 10 : 55, // 👈 dynamic position
+                ),
+                child: Material(
+                  elevation: 8,
+                  borderRadius: BorderRadius.circular(12),
+                  child: calendarPopupWidget(
+                    context: context,
+                    selectedDate: selectedDate.value,
+                    onDateSelected: (date) {
+                      controller.text =
+                          "${date.day} ${monthName(date.month)} ${date.year}";
+                      selectedDate.value = date;
+                      overlayEntry?.remove();
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      Overlay.of(context).insert(overlayEntry!);
+    }
+
+    return CompositedTransformTarget(
+      link: layerLink,
+      child: TextFormField(
+        controller: controller,
+        readOnly: true,
+        onTap: showOverlay,
+        style: const TextStyle(fontSize: 12),
         decoration: InputDecoration(
-      isDense: true,
-      labelText: label,
-      labelStyle: TextStyle(fontSize: 12),
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+          hintText: "Select Date",
+          hintStyle: TextStyle(
+            fontSize: 12,
+            color: context.theme.colorScheme.onSurface,
+          ),
+          filled: true,
+          fillColor: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+          suffixIcon: const Icon(Icons.calendar_today, size: 18),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+        ),
       ),
-    ));
+    );
+  }
+
+  Widget calendarPopupWidget({
+    required BuildContext context,
+    required Function(DateTime) onDateSelected,
+    DateTime? selectedDate,
+  }) {
+    DateTime currentMonth = selectedDate ?? DateTime.now();
+
+    bool showMonthPicker = false;
+    bool showYearPicker = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        final firstDay = DateTime(currentMonth.year, currentMonth.month, 1);
+
+        final daysInMonth =
+            DateUtils.getDaysInMonth(currentMonth.year, currentMonth.month);
+
+        final startWeekday = firstDay.weekday % 7;
+
+        /// 🔷 MONTH PICKER
+        if (showMonthPicker) {
+          return _monthPicker(
+            context,
+            currentMonth,
+            (month) {
+              setState(() {
+                currentMonth = DateTime(currentMonth.year, month, 1);
+                showMonthPicker = false;
+              });
+            },
+          );
+        }
+
+        /// 🔷 YEAR PICKER
+        if (showYearPicker) {
+          return _yearPicker(
+            context,
+            currentMonth,
+            (year) {
+              setState(() {
+                currentMonth = DateTime(year, currentMonth.month, 1);
+                showYearPicker = false;
+              });
+            },
+          );
+        }
+
+        /// 🔷 MAIN CALENDAR
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: context.theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// 🔷 HEADER (clickable)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left, size: 18),
+                    onPressed: () {
+                      setState(() {
+                        currentMonth =
+                            DateTime(currentMonth.year, currentMonth.month - 1);
+                      });
+                    },
+                  ),
+
+                  /// 🔥 MONTH CLICK
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        showMonthPicker = true;
+                      });
+                    },
+                    child: Text(
+                      monthName(currentMonth.month),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                  ),
+
+                  /// 🔥 YEAR CLICK
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        showYearPicker = true;
+                      });
+                    },
+                    child: Text(
+                      "${currentMonth.year}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                  ),
+
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right, size: 18),
+                    onPressed: () {
+                      setState(() {
+                        currentMonth =
+                            DateTime(currentMonth.year, currentMonth.month + 1);
+                      });
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 6),
+
+              /// WEEKDAYS
+              Row(
+                children: ["S", "M", "T", "W", "T", "F", "S"]
+                    .map((d) => Expanded(
+                          child: Center(
+                            child: Text(
+                              d,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: context.theme.colorScheme.onSurface
+                                    .withOpacity(0.5),
+                              ),
+                            ),
+                          ),
+                        ))
+                    .toList(),
+              ),
+
+              const SizedBox(height: 6),
+
+              /// GRID
+              GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: daysInMonth + startWeekday,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 7,
+                  ),
+                  itemBuilder: (context, index) {
+                    if (index < startWeekday) return const SizedBox();
+
+                    final day = index - startWeekday + 1;
+                    final date =
+                        DateTime(currentMonth.year, currentMonth.month, day);
+
+                    final now = DateTime.now();
+                    final today = DateTime(now.year, now.month, now.day);
+
+                    final isPast = date.isBefore(today);
+                    final isToday = date.year == today.year &&
+                        date.month == today.month &&
+                        date.day == today.day;
+
+                    final isSelected = selectedDate != null &&
+                        selectedDate.day == day &&
+                        selectedDate.month == currentMonth.month &&
+                        selectedDate.year == currentMonth.year;
+
+                    return GestureDetector(
+                      onTap: isPast
+                          ? null // ❌ disable past
+                          : () => onDateSelected(date),
+                      child: Center(
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          alignment: Alignment.center,
+
+                          /// 🎯 DECORATION LOGIC
+                          decoration: isSelected
+                              ? BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: context.theme.colorScheme.primary,
+                                )
+                              : isToday
+                                  ? BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color:
+                                            context.theme.colorScheme.primary,
+                                      ),
+                                    )
+                                  : null,
+
+                          child: Text(
+                            "$day",
+                            style: TextStyle(
+                              fontSize: 11,
+
+                              /// 🎨 TEXT COLOR LOGIC
+                              color: isPast
+                                  ? context.theme.colorScheme.onSurface
+                                      .withOpacity(0.3) // faded
+                                  : isSelected
+                                      ? context.theme.colorScheme.onPrimary
+                                      : context.theme.colorScheme.onSurface,
+
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _monthPicker(
+      BuildContext context, DateTime current, Function(int) onSelect) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      child: GridView.count(
+        shrinkWrap: true,
+        crossAxisCount: 3,
+        children: List.generate(12, (i) {
+          return InkWell(
+            onTap: () => onSelect(i + 1),
+            child: Center(
+              child: Text(
+                monthName(i + 1),
+                style: const TextStyle(fontSize: 12),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _yearPicker(
+      BuildContext context, DateTime current, Function(int) onSelect) {
+    final startYear = DateTime.now().year;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(3, (i) {
+          final year = startYear + i;
+          return ListTile(
+            title: Center(child: Text("$year")),
+            onTap: () => onSelect(year),
+          );
+        }),
+      ),
+    );
+  }
+
+  String monthName(int month) {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ];
+    return months[month - 1];
+  }
+
+  Widget timePickerStyledField({
+    required BuildContext context,
+    required TextEditingController controller,
+    required Rxn<TimeOfDay> selectedTime,
+    String hint = "Select Time",
+    String? label,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    Future<void> pickTime() async {
+      final TimeOfDay? picked = await showTimePicker(
+        context: context,
+        initialTime: selectedTime.value ?? TimeOfDay.now(),
+        initialEntryMode: TimePickerEntryMode.input,
+        builder: (context, child) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              timePickerTheme: TimePickerThemeData(
+                dayPeriodColor: cs.primary,
+              ),
+            ),
+            child: child!,
+          );
+        },
+      );
+
+      if (picked != null) {
+        selectedTime.value = picked;
+        controller.text = picked.format(context);
+      }
+    }
+
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      onTap: pickTime,
+      style: const TextStyle(fontSize: 12),
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        hintStyle: TextStyle(
+          fontSize: 12,
+          color: context.theme.colorScheme.onSurface,
+        ),
+        filled: true,
+        fillColor: cs.outline.withOpacity(0.1),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 11,
+        ),
+        suffixIcon: const Icon(Icons.access_time),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.transparent),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.transparent),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  Widget durationPickerStyledField({
+    required BuildContext context,
+    required TextEditingController controller,
+    required Rxn<int> selectedDuration, // in minutes
+    String hint = "Select Duration",
+    String? label,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    Future<void> pickDuration() async {
+      int totalMinutes = selectedDuration.value ?? 0;
+
+      await showModalBottomSheet(
+        context: context,
+        builder: (_) {
+          int hours = totalMinutes ~/ 60;
+          int minutes = totalMinutes % 60;
+
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return Container(
+                padding: const EdgeInsets.all(16),
+                height: 250,
+                child: Column(
+                  children: [
+                    const Text(
+                      "Select Duration",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Hours
+                        Column(
+                          children: [
+                            const Text("Hours"),
+                            DropdownButton<int>(
+                              value: hours,
+                              items: List.generate(
+                                24,
+                                (i) => DropdownMenuItem(
+                                  value: i,
+                                  child: Text(i.toString()),
+                                ),
+                              ),
+                              onChanged: (val) => setState(() => hours = val!),
+                            ),
+                          ],
+                        ),
+
+                        // Minutes
+                        Column(
+                          children: [
+                            const Text("Minutes"),
+                            DropdownButton<int>(
+                              value: minutes,
+                              items: List.generate(
+                                60,
+                                (i) => DropdownMenuItem(
+                                  value: i,
+                                  child: Text(i.toString().padLeft(2, '0')),
+                                ),
+                              ),
+                              onChanged: (val) =>
+                                  setState(() => minutes = val!),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      onPressed: () {
+                        final int total = hours * 60 + minutes;
+
+                        if (selectedDuration != null) {
+                          selectedDuration.value = total;
+                        }
+
+                        // format text
+                        if (hours > 0 && minutes > 0) {
+                          controller.text = "${hours}h ${minutes}m";
+                        } else if (hours > 0) {
+                          controller.text = "${hours}h";
+                        } else {
+                          controller.text = "${minutes}m";
+                        }
+
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Done"),
+                    )
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      );
+    }
+
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      onTap: pickDuration,
+      style: const TextStyle(fontSize: 12),
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        hintStyle: TextStyle(
+          fontSize: 12,
+          color: context.theme.colorScheme.onSurface,
+        ),
+        filled: true,
+        fillColor: cs.outline.withOpacity(0.1),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 11,
+        ),
+        suffixIcon: const Icon(Icons.timer),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.transparent),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.transparent),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
+        ),
+      ),
+    );
   }
 }

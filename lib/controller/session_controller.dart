@@ -1,23 +1,59 @@
+import 'package:albedo_app/model/mentor_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum SortType { newest, oldest, student, teacher }
 
-enum SessionType { classSession, meet }
-
 // enum UserPageType { student, teacher }
 
 class SessionController extends GetxController {
   var selectedTab = 0.obs;
   var selectedStatus = 0.obs;
-  var selectedSessionType = SessionType.classSession.obs;
   var searchQuery = ''.obs;
+  var selectAllMentors=false.obs;
+  var selectAllTeachers=false.obs;
+  var selectAllStudents=false.obs;
+  var selectAllCoordinators=false.obs;
+  var selectAllAdvisors=false.obs;
+  var selectAllOtherUsers=false.obs;
   var sortType = SortType.newest.obs;
   var sessions = <Session>[].obs;
   var selectedTeacher = RxnString();
+  RxList<String> selectedStudents = <String>[].obs;
+  RxList<String> selectedTeachers = <String>[].obs;
+  RxList<String> selectedMentors = <String>[].obs;
+  RxList<String> selectedCoordinators = <String>[].obs;
+  RxList<String> selectedAdvisors = <String>[].obs;
+  RxList<String> selectedOtherUsers = <String>[].obs;
   var selectedTeacherEdit = RxnString();
   final formKey = GlobalKey<FormState>();
+  var selectedDuration = Rxn<int>();
+  var selectedStudent = RxnString();
+  var selectedPackage = RxnString();
+  var selectedDate = Rxn<DateTime>();
+  var selectedTime = Rxn<TimeOfDay>();
+  RxString selectedType = "session".obs;
+RxList<String> mentorsList = <String>[].obs;
+RxList<String> coordinatorsList = <String>[].obs;
+RxList<String> advisorsList = <String>[].obs;
+RxList<String> otherUsersList = <String>[].obs;
+
+
+  TextEditingController dateController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
+  TextEditingController salaryController = TextEditingController();
+  TextEditingController teacherController = TextEditingController();
+  TextEditingController meetTitleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
+  final durationOptions = [30, 45, 60, 75, 90, 105, 120];
+  final studentList = ['Student A', 'Student B', 'Student C'];
+  final packageOptions = ['Package A', 'Package B', 'Package C'];
+  final teacherList = ["Teacher A", "Teacher B", "Teacher C"];
+
+  RxBool isLoading = true.obs;
+  RxBool isDeleteButtonLoading = false.obs;
 
   List<String> tabs = [
     "Active",
@@ -36,21 +72,6 @@ class SessionController extends GetxController {
     "completed",
     "meet_done"
   ];
-
-  TextEditingController dateController = TextEditingController();
-  TextEditingController timeController = TextEditingController();
-  TextEditingController salaryController = TextEditingController();
-  var selectedDuration = RxnInt();
-  var selectedStudent = RxnString();
-  var selectedPackage = RxnString();
-  final durationOptions = [30, 45, 60, 75, 90, 105, 120];
-  final studentOptions = ['Student A', 'Student B', 'Student C'];
-  final packageOptions = ['Package A', 'Package B', 'Package C'];
-  final teacherList = ["Teacher A", "Teacher B", "Teacher C"];
-
-  TextEditingController teacherController = TextEditingController();
-  RxBool isLoading = true.obs;
-  RxBool isDeleteButtonLoading = false.obs;
 
   List<Session> get filteredSessions {
     final status = statusMap[selectedTab.value];
@@ -75,10 +96,10 @@ class SessionController extends GetxController {
     // 🔥 Step 2: ADD SORTING HERE (THIS IS WHAT YOU ASKED)
     switch (sortType.value) {
       case SortType.newest:
-        filtered.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+        filtered.sort((a, b) => b.date.compareTo(a.date));
         break;
       case SortType.oldest:
-        filtered.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+        filtered.sort((a, b) => a.date.compareTo(b.date));
         break;
       case SortType.student:
         filtered.sort((a, b) => a.studentName.compareTo(b.studentName));
@@ -114,7 +135,8 @@ class SessionController extends GetxController {
           className: "10A",
           teacherName: "John",
           teacherId: "T01",
-          dateTime: DateTime.now().subtract(const Duration(days: 1)),
+          date: DateTime.now().subtract(const Duration(days: 1)),
+          time: DateTime.now(),
           status: "started",
         ),
         Session(
@@ -125,7 +147,8 @@ class SessionController extends GetxController {
           className: "9B",
           teacherName: "David",
           teacherId: "T02",
-          dateTime: DateTime.now().add(const Duration(days: 1)),
+          date: DateTime.now().add(const Duration(days: 1)),
+          time: DateTime.now(),
           status: "upcoming",
         ),
         Session(
@@ -136,7 +159,8 @@ class SessionController extends GetxController {
           className: "8C",
           teacherName: "John",
           teacherId: "T01",
-          dateTime: DateTime.now(),
+          date: DateTime.now(),
+          time: DateTime.now(),
           status: "pending",
         ),
         Session(
@@ -147,7 +171,8 @@ class SessionController extends GetxController {
           className: "11A",
           teacherName: "Meera",
           teacherId: "T03",
-          dateTime: DateTime.now().subtract(const Duration(days: 3)),
+          date: DateTime.now().subtract(const Duration(days: 3)),
+          time: DateTime.now(),
           status: "completed",
         ),
         Session(
@@ -158,7 +183,8 @@ class SessionController extends GetxController {
           className: "12B",
           teacherName: "David",
           teacherId: "T02",
-          dateTime: DateTime.now(),
+          date: DateTime.now(),
+          time: DateTime.now(),
           status: "no_balance",
         ),
         Session(
@@ -169,7 +195,8 @@ class SessionController extends GetxController {
           className: "10A",
           teacherName: "Meera",
           teacherId: "T03",
-          dateTime: DateTime.now().subtract(const Duration(hours: 5)),
+          time: DateTime.now(),
+          date: DateTime.now().subtract(const Duration(hours: 5)),
           status: "meet_done",
         ),
         Session(
@@ -178,9 +205,10 @@ class SessionController extends GetxController {
           studentId: "ST07",
           subject: "Math",
           className: "9A",
+          time: DateTime.now(),
           teacherName: "John",
           teacherId: "T01",
-          dateTime: DateTime.now().add(const Duration(hours: 3)),
+          date: DateTime.now().add(const Duration(hours: 3)),
           status: "started",
         ),
       ]);
@@ -211,15 +239,35 @@ class SessionController extends GetxController {
 
     /// ↕️ Sort (keep if needed)
     if (sortType.value == "new") {
-      temp.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+      temp.sort((a, b) => b.date.compareTo(a.date));
     } else if (sortType.value == "old") {
-      temp.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+      temp.sort((a, b) => a.date.compareTo(b.date));
     } else if (sortType.value == "name") {
       temp.sort((a, b) => a.studentName.compareTo(b.studentName));
     }
 
     /// ✅ Final update
     filteredSessions.assignAll(temp);
+  }
+
+  Future<void> pickTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime.value ?? TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.input,
+      builder: (context, child) {
+        return Theme(
+            data: Theme.of(context).copyWith(
+                timePickerTheme: TimePickerThemeData(
+                    dayPeriodColor: Theme.of(context).colorScheme.primary)),
+            child: child!);
+      },
+    );
+
+    if (picked != null) {
+      selectedTime.value = picked;
+      timeController.text = picked.format(context);
+    }
   }
 
   void initEdit(Session data) {
@@ -238,11 +286,11 @@ class SessionController extends GetxController {
 
     // Controllers
     dateController = TextEditingController(
-      text: "${data.dateTime.day}/${data.dateTime.month}/${data.dateTime.year}",
+      text: "${data.date.day}/${data.date.month}/${data.date.year}",
     );
 
     timeController = TextEditingController(
-      text: "${data.dateTime.hour}:${data.dateTime.minute}",
+      text: "${data.date.hour}:${data.date.minute}",
     );
 
     salaryController =
@@ -265,5 +313,28 @@ class SessionController extends GetxController {
     //     }
     //   },
     // );
+  }
+
+  void loadSession(Session session) {
+    dateController.text = session.date.toString();
+    timeController.text = session.time.toString();
+
+    selectedDuration.value = session.duration;
+    selectedTeacher.value = session.teacherName;
+
+    salaryController.text = session.teacherSalary?.toString() ?? '';
+  }
+
+  void updateSession(String id) {
+    final updatedData = {
+      "date": dateController.text,
+      "time": timeController.text,
+      "duration": selectedDuration.value,
+      "teacher": selectedTeacher.value,
+      "salary": salaryController.text,
+    };
+
+    // API / DB update
+    print("Updating session $id with $updatedData");
   }
 }

@@ -263,7 +263,7 @@ class TeachersPage extends StatelessWidget {
                       color: cs.secondary,
                       onTap: () => CustomWidgets().showCustomDialog(
                         context: context,
-                        title: 'Edit Teacher',
+                        title:Text( 'Edit Teacher'),
                         icon: Icons.edit,
                         formKey: GlobalKey<FormState>(),
                         sections: [

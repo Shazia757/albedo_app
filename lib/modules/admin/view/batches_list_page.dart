@@ -264,7 +264,7 @@ class BatchesListPage extends StatelessWidget {
   void _showEditDialog(BuildContext context, data) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: "Edit Session",
+      title:Text( "Edit Session"),
       icon: Icons.edit,
       formKey: GlobalKey<FormState>(),
       submitText: "Save Changes",
