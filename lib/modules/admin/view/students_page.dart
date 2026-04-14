@@ -22,6 +22,7 @@ class StudentsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
+      floatingActionButton: addStudent(context),
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Column(
         children: [
@@ -144,6 +145,7 @@ class StudentsPage extends StatelessWidget {
     final isActive = s?.status == "Active";
 
     final statusColor = isActive ? cs.primary : cs.error;
+    final data = c.filteredStudents;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
@@ -259,238 +261,32 @@ class StudentsPage extends StatelessWidget {
                       onTap: () {},
                     ),
                     const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.edit,
-                      color: cs.secondary,
-                      onTap: () => CustomWidgets().showCustomDialog(
-                        context: context,
-                        title: Text('Edit Student'),
+                    if (s?.status != 'Inactive')
+                      CustomWidgets().iconBtn(
                         icon: Icons.edit,
-                        formKey: GlobalKey<FormState>(),
-                        sections: [
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.5,
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    Text('Profile Photo (Max: 50 MB)'),
-                                    const SizedBox(height: 10),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: CircleAvatar(
-                                        radius: 35,
-                                        child: ClipOval(
-                                          child: SizedBox(
-                                            width: 60,
-                                            height: 60,
-                                            child: Image.asset(
-                                              'assets/images/logo.png',
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk('Name',
-                                        required: true),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.nameController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk('Email',
-                                        required: true),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.emailController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk(
-                                        'Phone Number',
-                                        required: true),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.phoneController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('WhatsApp Number'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.whatsappController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Parent Name'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.parentNameController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Parent Occupation'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller:
-                                            c.parentOccupationController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk('Gender'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.genderController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk('Place'),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.placeController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Pincode'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.pincodeController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Address'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.addressController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Time Zone'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.timezoneController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk('Mentor'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.mentorController),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      children: [
-                                        Obx(
-                                          () => Checkbox(
-                                            value: c.isAdmissionFeePaid.value,
-                                            onChanged: (value) =>
-                                                c.isAdmissionFeePaid.value =
-                                                    !c.isAdmissionFeePaid.value,
-                                          ),
-                                        ),
-                                        Text('Admission Fee Paid'),
-                                      ],
-                                    ),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Comment'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: 'Enter any additional comments',
-                                        controller: c.commentController,
-                                        isMultiline: true),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Referred By'),
-                                    Obx(() {
-                                      final role = c.selectedRole.value;
-
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: RadioListTile<String>(
-                                                  title: const Text("Mentor"),
-                                                  value: "mentor",
-                                                  groupValue: role,
-                                                  onChanged: (value) => c
-                                                      .selectedRole
-                                                      .value = value!,
-                                                  dense: true,
-                                                  contentPadding:
-                                                      EdgeInsets.zero,
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: RadioListTile<String>(
-                                                  title: const Text("Advisor"),
-                                                  value: "advisor",
-                                                  groupValue: role,
-                                                  onChanged: (value) => c
-                                                      .selectedRole
-                                                      .value = value!,
-                                                  dense: true,
-                                                  contentPadding:
-                                                      EdgeInsets.zero,
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: RadioListTile<String>(
-                                                  title: const Text("Others"),
-                                                  value: "others",
-                                                  groupValue: role,
-                                                  onChanged: (value) => c
-                                                      .selectedRole
-                                                      .value = value!,
-                                                  dense: true,
-                                                  contentPadding:
-                                                      EdgeInsets.zero,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 10),
-                                          if (role.isNotEmpty) ...[
-                                            CustomWidgets().labelWithAsterisk(
-                                                role[0].toUpperCase() +
-                                                    role.substring(1)),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets().customDropdownField(
-                                              context: context,
-                                              hint: '',
-                                              items: [],
-                                              onChanged: (p0) {},
-                                            ),
-                                          ]
-                                        ],
-                                      );
-                                    }),
-                                  ],
-                                ),
-                              ))
-                        ],
-                        onSubmit: () {},
+                        color: cs.secondary,
+                        onTap: () {
+                          if (s != null) {
+                            c.loadStudents(s);
+                            editStudent(context);
+                          }
+                        },
                       ),
-                    ),
                     const SizedBox(width: 8),
                     CustomWidgets().iconBtn(
                       icon: Icons.block,
                       color: cs.error,
+                      onTap: () => CustomWidgets().showDeactivateDialog(
+                        onConfirm: () {},
+                      ),
                     ),
                     const SizedBox(width: 8),
                     CustomWidgets().iconBtn(
                       icon: Icons.delete,
                       color: cs.error,
+                      onTap: () => CustomWidgets().showDeleteDialog(
+                        onConfirm: () => c.delete(s!.studentId!),
+                      ),
                     ),
                   ],
                 )
@@ -498,6 +294,440 @@ class StudentsPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void editStudent(BuildContext context) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text('Edit Student'),
+      icon: Icons.edit,
+      formKey: GlobalKey<FormState>(),
+      sections: [
+        SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text('Profile Photo (Max: 50 MB)'),
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: () {},
+                    child: CircleAvatar(
+                      radius: 35,
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Name', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context, hint: '', controller: c.nameController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Email', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.emailController),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Phone Number', required: true),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.phoneController,
+                      isNumber: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('WhatsApp Number'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.whatsappController,
+                      isNumber: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Parent Name'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.parentNameController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Parent Occupation'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.parentOccupationController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Gender'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                    context: context,
+                    hint: 'Select Gender',
+                    items: ['Male', 'Female'],
+                    onChanged: (p0) {},
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Place'),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.placeController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Pincode'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.pincodeController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Address'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.addressController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Time Zone'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                    context: context,
+                    hint: 'Select Time Zone',
+                    items: [],
+                    onChanged: (p0) {},
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Mentor'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                    context: context,
+                    hint: 'Select Mentor',
+                    items: c.mentorsList,
+                    onChanged: (p0) {},
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Obx(
+                        () => Checkbox(
+                          value: c.isAdmissionFeePaid.value,
+                          onChanged: (value) => c.isAdmissionFeePaid.value =
+                              !c.isAdmissionFeePaid.value,
+                        ),
+                      ),
+                      Text('Admission Fee Paid'),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Comment'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Enter any additional comments',
+                      controller: c.commentController,
+                      isMultiline: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Referred By'),
+                  Obx(() {
+                    final role = c.selectedRole.value;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: RadioListTile<String>(
+                                title: const Text("Mentor"),
+                                value: "mentor",
+                                groupValue: role,
+                                onChanged: (value) =>
+                                    c.selectedRole.value = value!,
+                                dense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                            Expanded(
+                              child: RadioListTile<String>(
+                                title: const Text("Advisor"),
+                                value: "advisor",
+                                groupValue: role,
+                                onChanged: (value) =>
+                                    c.selectedRole.value = value!,
+                                dense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                            Expanded(
+                              child: RadioListTile<String>(
+                                title: const Text("Others"),
+                                value: "others",
+                                groupValue: role,
+                                onChanged: (value) =>
+                                    c.selectedRole.value = value!,
+                                dense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        if (role.isNotEmpty) ...[
+                          CustomWidgets().labelWithAsterisk(
+                              role[0].toUpperCase() + role.substring(1)),
+                          const SizedBox(height: 10),
+                          CustomWidgets().customDropdownField(
+                            context: context,
+                            hint: 'Select',
+                            items: [],
+                            onChanged: (p0) {},
+                          ),
+                        ]
+                      ],
+                    );
+                  }),
+                ],
+              ),
+            ))
+      ],
+      onSubmit: () {},
+    );
+  }
+
+  FloatingActionButton addStudent(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () => CustomWidgets().showCustomDialog(
+        context: context,
+        title: Text('Add Student'),
+        formKey: GlobalKey<FormState>(),
+        sections: [
+          SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Text('Profile Photo (Max: 50 MB)'),
+                    const SizedBox(height: 10),
+                    InkWell(
+                      onTap: () {},
+                      child: CircleAvatar(
+                        radius: 35,
+                        child: ClipOval(
+                          child: SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Name', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter student name',
+                        controller: c.nameController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Email', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter email address',
+                        controller: c.emailController),
+                    const SizedBox(height: 10),
+                    CustomWidgets()
+                        .labelWithAsterisk('Phone Number', required: true),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '+1234567890',
+                        controller: c.phoneController,
+                        isNumber: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('WhatsApp Number'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '+1234567890',
+                        controller: c.whatsappController,
+                        isNumber: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Parent Name'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter parent name',
+                        controller: c.parentNameController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Parent Occupation'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter parent occupation',
+                        controller: c.parentOccupationController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Gender'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Gender',
+                      items: ['Male', 'Female'],
+                      onChanged: (p0) {},
+                    ),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Place'),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter place',
+                        controller: c.placeController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Pincode'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter pincode/postal code',
+                        controller: c.pincodeController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Address'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter address',
+                        controller: c.addressController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Time Zone'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Time Zone',
+                      items: [],
+                      onChanged: (p0) {},
+                    ),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Mentor'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Mentor',
+                      items: c.mentorsList,
+                      onChanged: (p0) {},
+                    ),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Advisor'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Advisor',
+                      items: c.advisorsList,
+                      onChanged: (p0) {},
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Obx(
+                          () => Checkbox(
+                            value: c.isAdmissionFeePaid.value,
+                            onChanged: (value) => c.isAdmissionFeePaid.value =
+                                !c.isAdmissionFeePaid.value,
+                          ),
+                        ),
+                        Text('Admission Fee Paid'),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Comment'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter any additional comments',
+                        controller: c.commentController,
+                        isMultiline: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Referred By'),
+                    Obx(() {
+                      final role = c.selectedRole.value;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: RadioListTile<String>(
+                                  title: const Text("Mentor"),
+                                  value: "mentor",
+                                  groupValue: role,
+                                  onChanged: (value) =>
+                                      c.selectedRole.value = value!,
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                              ),
+                              Expanded(
+                                child: RadioListTile<String>(
+                                  title: const Text("Advisor"),
+                                  value: "advisor",
+                                  groupValue: role,
+                                  onChanged: (value) =>
+                                      c.selectedRole.value = value!,
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                              ),
+                              Expanded(
+                                child: RadioListTile<String>(
+                                  title: const Text("Others"),
+                                  value: "others",
+                                  groupValue: role,
+                                  onChanged: (value) =>
+                                      c.selectedRole.value = value!,
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          if (role.isNotEmpty) ...[
+                            CustomWidgets().labelWithAsterisk(
+                                role[0].toUpperCase() + role.substring(1)),
+                            const SizedBox(height: 10),
+                            CustomWidgets().customDropdownField(
+                              context: context,
+                              hint: 'Select',
+                              items: [],
+                              onChanged: (p0) {},
+                            ),
+                          ]
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+              ))
+        ],
+        onSubmit: () {},
+      ),
+      mini: true,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: Icon(
+        Icons.add,
+        color: context.theme.colorScheme.onPrimary,
       ),
     );
   }

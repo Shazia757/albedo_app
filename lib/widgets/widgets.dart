@@ -478,6 +478,142 @@ class CustomWidgets {
     );
   }
 
+  void showDeactivateDialog({
+    required VoidCallback onConfirm,
+  }) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Stack(
+          children: [
+            /// 🔷 MAIN CARD
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(26),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // /// 🗑️ ICON
+                  // Image.asset(
+                  //   "assets/icons/delete.png", // 👈 use your asset
+                  //   height: 70,
+                  // ),
+
+                  // const SizedBox(height: 16),
+
+                  /// 🔹 TITLE
+                  const Text(
+                    "Are you sure?",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1F2937),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// 🔹 MESSAGE
+                  const Text(
+                    "Are you sure you want to deactivate this student?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF6B7280),
+                      height: 1.5,
+                    ),
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  /// 🔹 BUTTONS
+                  Row(
+                    children: [
+                      /// NO BUTTON
+                      Expanded(
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE5E7EB),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: TextButton(
+                            onPressed: () => Get.back(),
+                            child: const Text(
+                              "No",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF111827),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      /// YES BUTTON
+                      Expanded(
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEF4444),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              onConfirm();
+                              Get.back();
+                            },
+                            child: const Text(
+                              "Yes",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            /// ❌ CLOSE BUTTON (TOP RIGHT)
+            Positioned(
+              right: 8,
+              top: 8,
+              child: GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  height: 36,
+                  width: 36,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE5E7EB),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    size: 20,
+                    color: Color(0xFF374151),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget customDropdownField<T>({
     required BuildContext context,
     required String hint,

@@ -1,8 +1,17 @@
 class Student {
   String? studentId;
-  String? contact;
+  String? phone;
   String? whatsapp;
+  String? parentName;
+  String? parentOccupation;
+  String? gender;
+  String? mentor;
+  String? timezone;
+  String? address;
+  String? place;
+  String? referredBy;
   int? classHours;
+  int? pincode;
   int? classesTaken;
   int? standard;
   int? totalHour;
@@ -29,17 +38,25 @@ class Student {
     this.name,
     this.email,
     this.admissionDate,
+    this.parentName,
+    this.parentOccupation,
     this.status,
+    this.mentor,
     this.type,
-   required this.joinedAt,
+    this.address,
+    this.gender,
+    this.timezone,
+    this.place,
+    required this.joinedAt,
     this.studentId,
-    this.contact,
+    this.phone,
     this.whatsapp,
     this.classHours,
     this.classesTaken,
     this.standard,
     this.amount,
     this.totalAmount,
+    this.referredBy,
     this.totalPaid,
     this.balance,
     this.course,
@@ -50,5 +67,6 @@ class Student {
     this.regFee,
     this.amountPerHour,
     this.totalHour,
-    this.totalSession,});
+    this.totalSession,
+  });
 }

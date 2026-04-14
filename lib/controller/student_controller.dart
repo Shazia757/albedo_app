@@ -11,6 +11,7 @@ class StudentController extends GetxController {
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
   var isLoading = true.obs;
+  var isDeleteButtonLoading = true.obs;
 
   // --------------------------
   // Counts for tabs
@@ -36,6 +37,8 @@ class StudentController extends GetxController {
   // 🎯 Student-specific fields
   RxBool isAdmissionFeePaid = false.obs;
   var selectedRole = ''.obs;
+  RxList<String> mentorsList = <String>[].obs;
+  RxList<String> advisorsList = <String>[].obs;
 
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -51,6 +54,8 @@ class StudentController extends GetxController {
   TextEditingController parentNameController = TextEditingController();
   TextEditingController parentOccupationController = TextEditingController();
   TextEditingController mentorController = TextEditingController();
+  TextEditingController advisorController = TextEditingController();
+  TextEditingController referredByController = TextEditingController();
 
   @override
   void onInit() {
@@ -140,5 +145,41 @@ class StudentController extends GetxController {
     }
 
     filteredStudents.assignAll(temp);
+  }
+
+  void loadStudents(Student student) {
+    nameController.text = student.name.toString();
+    emailController.text = student.email.toString();
+    phoneController.text = student.phone.toString();
+    whatsappController.text = student.whatsapp.toString();
+    parentNameController.text = student.parentName.toString();
+    parentOccupationController.text = student.parentOccupation.toString();
+    whatsappController.text = student.whatsapp.toString();
+    genderController.text = student.gender.toString();
+    placeController.text = student.place.toString();
+    pincodeController.text = student.pincode.toString();
+    addressController.text = student.address.toString();
+    timezoneController.text = student.timezone.toString();
+    mentorController.text = student.mentor.toString();
+    advisorController.text = student.advisor.toString();
+    referredByController.text = student.referredBy.toString();
+  }
+
+  delete(String id) {
+    isDeleteButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
   }
 }
