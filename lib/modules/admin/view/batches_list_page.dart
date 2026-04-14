@@ -20,6 +20,7 @@ class BatchesListPage extends StatelessWidget {
     return Scaffold(
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      floatingActionButton: addSessionBtn(context),
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -81,19 +82,27 @@ class BatchesListPage extends StatelessWidget {
                                 _buildBatchDetailsSection(context, data[i]),
                               ],
                               actions: [
-                                CustomWidgets().iconBtn(
-                                  icon: Icons.edit,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  onTap: () =>
-                                      _showEditDialog(context, data[i]),
-                                ),
-                                CustomWidgets().iconBtn(
-                                  icon: Icons.delete,
-                                  color: Theme.of(context).colorScheme.error,
-                                  onTap: () => CustomWidgets().showDeleteDialog(
-                                    onConfirm: () {},
+                                if (data[i].status != 'completed')
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.edit,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    onTap: () {
+                                      final batch = data[i];
+                                      c.loadBatch(batch);
+                                      editSession(context);
+                                    },
                                   ),
-                                ),
+                                if (data[i].status != 'completed')
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.delete,
+                                    color: Theme.of(context).colorScheme.error,
+                                    onTap: () =>
+                                        CustomWidgets().showDeleteDialog(
+                                      onConfirm: () =>
+                                          c.delete(data[i].id ?? ''),
+                                    ),
+                                  ),
                               ],
                             ),
                           );
@@ -106,6 +115,89 @@ class BatchesListPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  FloatingActionButton addSessionBtn(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () => CustomWidgets().showCustomDialog(
+        context: context,
+        title: Text("Add Session"),
+        formKey: GlobalKey<FormState>(),
+        onSubmit: () {},
+        sections: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.75,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  CustomWidgets()
+                      .labelWithAsterisk('Select Batch', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                    context: context,
+                    hint: 'Select Batch',
+                    items: c.batchList,
+                    onChanged: (p0) => c.selectedBatch.value = p0,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Select Teacher', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                    context: context,
+                    hint: 'Select Teacher',
+                    items: c.teacherList,
+                    onChanged: (p0) => c.selectedTeacher.value = p0,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk(
+                      'Teacher Salary (per hour - optional)',
+                      required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Teacher Salary',
+                      controller: c.salaryController,
+                      isNumber: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Class Date', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDatePickerField(
+                    context: context,
+                    controller: c.dateController,
+                    selectedDate: c.selectedDate,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Class Time', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().timePickerStyledField(
+                      context: context,
+                      controller: c.timeController,
+                      selectedTime: c.selectedTime),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Select Duration', required: true),
+                  const SizedBox(height: 20),
+                  CustomWidgets().durationPickerStyledField(
+                      context: context,
+                      hint: 'Select Duration',
+                      controller: c.durationController,
+                      selectedDuration: c.selectedDuration)
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      mini: true,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: Icon(
+        Icons.add,
+        color: context.theme.colorScheme.onPrimary,
       ),
     );
   }
@@ -261,31 +353,141 @@ class BatchesListPage extends StatelessWidget {
     );
   }
 
-  void _showEditDialog(BuildContext context, data) {
+  void editSession(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title:Text( "Edit Session"),
+      title: Text('Edit Batch Session'),
       icon: Icons.edit,
       formKey: GlobalKey<FormState>(),
-      submitText: "Save Changes",
-      onSubmit: () {},
       sections: [
-        CustomWidgets().sectionCard(
-          icon: Icons.schedule,
-          title: "Schedule",
-          child: Row(
-            children: [
-              Expanded(
-                  child: CustomWidgets().dropdownStyledTextField(
-                      context: context, hint: 'Enter Date')),
-              const SizedBox(width: 10),
-              Expanded(
-                  child: CustomWidgets().dropdownStyledTextField(
-                      context: context, hint: 'Enter Date')),
-            ],
-          ),
+        Column(
+          children: [
+            /// 🔹 SECTION: DATE & TIME
+            _sectionCard(
+              icon: Icons.schedule,
+              title: "Schedule",
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomWidgets()
+                          .labelWithAsterisk('Session Date', required: true),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                          width: 150,
+                          child: CustomWidgets().dropdownStyledTextField(
+                            context: context,
+                            hint: 'Date',
+                            controller: c.dateController,
+                          )),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomWidgets()
+                          .labelWithAsterisk('Session Time', required: true),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                          width: 150,
+                          child: CustomWidgets().dropdownStyledTextField(
+                              context: context,
+                              hint: 'Enter Time',
+                              controller: c.timeController)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            /// 🔹 SECTION: SESSION DETAILS
+            _sectionCard(
+              icon: Icons.school,
+              title: "Session Details",
+              child: Column(
+                children: [
+                  CustomWidgets().labelWithAsterisk('Duration', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Duration',
+                      value: c.selectedDuration.value,
+                      items: [],
+                      onChanged: (p0) => c.selectedDuration.value = p0),
+                  const SizedBox(height: 12),
+                  CustomWidgets().labelWithAsterisk('Teacher', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Teacher',
+                      items: [],
+                      value: c.selectedTeacher.value,
+                      onChanged: (p0) => c.selectedTeacher.value = p0),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            /// 🔹 SECTION: PAYMENT
+            _sectionCard(
+              icon: Icons.payments_outlined,
+              title: "Payment",
+              child: Column(
+                children: [
+                  CustomWidgets().labelWithAsterisk(
+                    'Teacher Salary (per hour - optional)',
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      isNumber: true,
+                      context: context,
+                      hint: 'Enter Teacher Salary',
+                      controller: c.salaryController),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
+      onSubmit: () {},
+    );
+  }
+
+  Widget _sectionCard({
+    required IconData icon,
+    required String title,
+    required Widget child,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.transparent),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          child,
+        ],
+      ),
     );
   }
 

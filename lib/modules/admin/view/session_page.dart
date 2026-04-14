@@ -91,166 +91,29 @@ class SessionPage extends StatelessWidget {
                                 _buildDetailsSection(context, data[i]),
                               ],
                               actions: [
-                                CustomWidgets().iconBtn(
-                                    icon: Icons.edit,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    onTap: () {
-                                      final session = data[i];
+                                if (data[i].status != 'completed' &&
+                                    data[i].status != 'meet_done')
+                                  CustomWidgets().iconBtn(
+                                      icon: Icons.edit,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      onTap: () {
+                                        final session = data[i];
 
-                                      c.loadSession(session);
+                                        c.loadSession(session);
 
-                                      CustomWidgets().showCustomDialog(
-                                        context: context,
-                                        title: Text('Edit Session'),
-                                        icon: Icons.edit,
-                                        formKey: GlobalKey<FormState>(),
-                                        sections: [
-                                          Column(
-                                            children: [
-                                              /// 🔹 SECTION: DATE & TIME
-                                              _sectionCard(
-                                                icon: Icons.schedule,
-                                                title: "Schedule",
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        CustomWidgets()
-                                                            .labelWithAsterisk(
-                                                                'Session Date',
-                                                                required: true),
-                                                        const SizedBox(
-                                                            height: 10),
-                                                        SizedBox(
-                                                            width: 150,
-                                                            child: CustomWidgets()
-                                                                .dropdownStyledTextField(
-                                                              context: context,
-                                                              hint: 'Date',
-                                                              controller: c
-                                                                  .dateController,
-                                                            )),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 10),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        CustomWidgets()
-                                                            .labelWithAsterisk(
-                                                                'Session Time',
-                                                                required: true),
-                                                        const SizedBox(
-                                                            height: 10),
-                                                        SizedBox(
-                                                            width: 150,
-                                                            child: CustomWidgets()
-                                                                .dropdownStyledTextField(
-                                                                    context:
-                                                                        context,
-                                                                    hint:
-                                                                        'Enter Time',
-                                                                    controller:
-                                                                        c.timeController)),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-
-                                              const SizedBox(height: 14),
-
-                                              /// 🔹 SECTION: SESSION DETAILS
-                                              _sectionCard(
-                                                icon: Icons.school,
-                                                title: "Session Details",
-                                                child: Column(
-                                                  children: [
-                                                    CustomWidgets()
-                                                        .labelWithAsterisk(
-                                                            'Duration',
-                                                            required: true),
-                                                    const SizedBox(height: 10),
-                                                    CustomWidgets()
-                                                        .customDropdownField(
-                                                            context: context,
-                                                            hint:
-                                                                'Select Duration',
-                                                            value: c
-                                                                .selectedDuration
-                                                                .value,
-                                                            items: [],
-                                                            onChanged: (p0) => c
-                                                                .selectedDuration
-                                                                .value = p0),
-                                                    const SizedBox(height: 12),
-                                                    CustomWidgets()
-                                                        .labelWithAsterisk(
-                                                            'Teacher',
-                                                            required: true),
-                                                    const SizedBox(height: 10),
-                                                    CustomWidgets()
-                                                        .customDropdownField(
-                                                            context: context,
-                                                            hint:
-                                                                'Select Teacher',
-                                                            items: [],
-                                                            value: c
-                                                                .selectedTeacher
-                                                                .value,
-                                                            onChanged: (p0) => c
-                                                                .selectedTeacher
-                                                                .value = p0),
-                                                  ],
-                                                ),
-                                              ),
-
-                                              const SizedBox(height: 14),
-
-                                              /// 🔹 SECTION: PAYMENT
-                                              _sectionCard(
-                                                icon: Icons.payments_outlined,
-                                                title: "Payment",
-                                                child: Column(
-                                                  children: [
-                                                    CustomWidgets()
-                                                        .labelWithAsterisk(
-                                                      'Teacher Salary (per hour - optional)',
-                                                    ),
-                                                    const SizedBox(height: 10),
-                                                    CustomWidgets()
-                                                        .dropdownStyledTextField(
-                                                            isNumber: true,
-                                                            context: context,
-                                                            hint:
-                                                                'Enter Teacher Salary',
-                                                            controller: c
-                                                                .salaryController),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                        onSubmit: () {},
-                                      );
-                                    }),
-                                CustomWidgets().iconBtn(
-                                  icon: Icons.delete,
-                                  color: Theme.of(context).colorScheme.error,
-                                  onTap: () => CustomWidgets().showDeleteDialog(
-                                    onConfirm: () =>c.delete(data[i].id),
+                                        editSession(context);
+                                      }),
+                                if ((data[i].status != 'completed') &&
+                                    (data[i].status != 'meet_done'))
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.delete,
+                                    color: Theme.of(context).colorScheme.error,
+                                    onTap: () =>
+                                        CustomWidgets().showDeleteDialog(
+                                      onConfirm: () => c.delete(data[i].id),
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           );
@@ -264,6 +127,112 @@ class SessionPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void editSession(BuildContext context) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text('Edit Session'),
+      icon: Icons.edit,
+      formKey: GlobalKey<FormState>(),
+      sections: [
+        Column(
+          children: [
+            /// 🔹 SECTION: DATE & TIME
+            _sectionCard(
+              icon: Icons.schedule,
+              title: "Schedule",
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomWidgets()
+                          .labelWithAsterisk('Session Date', required: true),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                          width: 150,
+                          child: CustomWidgets().dropdownStyledTextField(
+                            context: context,
+                            hint: 'Date',
+                            controller: c.dateController,
+                          )),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomWidgets()
+                          .labelWithAsterisk('Session Time', required: true),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                          width: 150,
+                          child: CustomWidgets().dropdownStyledTextField(
+                              context: context,
+                              hint: 'Enter Time',
+                              controller: c.timeController)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            /// 🔹 SECTION: SESSION DETAILS
+            _sectionCard(
+              icon: Icons.school,
+              title: "Session Details",
+              child: Column(
+                children: [
+                  CustomWidgets().labelWithAsterisk('Duration', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Duration',
+                      value: c.selectedDuration.value,
+                      items: [],
+                      onChanged: (p0) => c.selectedDuration.value = p0),
+                  const SizedBox(height: 12),
+                  CustomWidgets().labelWithAsterisk('Teacher', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Teacher',
+                      items: [],
+                      value: c.selectedTeacher.value,
+                      onChanged: (p0) => c.selectedTeacher.value = p0),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            /// 🔹 SECTION: PAYMENT
+            _sectionCard(
+              icon: Icons.payments_outlined,
+              title: "Payment",
+              child: Column(
+                children: [
+                  CustomWidgets().labelWithAsterisk(
+                    'Teacher Salary (per hour - optional)',
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      isNumber: true,
+                      context: context,
+                      hint: 'Enter Teacher Salary',
+                      controller: c.salaryController),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+      onSubmit: () {},
     );
   }
 
@@ -319,9 +288,9 @@ class SessionPage extends StatelessWidget {
                           const SizedBox(height: 10),
                           CustomWidgets().customDropdownField(
                             context: context,
-                            hint: 'Select Student',
+                            hint: 'Select Teacher',
                             items: c.studentList,
-                            onChanged: (p0) => c.selectedStudent.value = p0,
+                            onChanged: (p0) => c.selectedTeacher.value = p0,
                           ),
                           const SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk(
@@ -363,12 +332,11 @@ class SessionPage extends StatelessWidget {
                           CustomWidgets().labelWithAsterisk('Select Duration',
                               required: true),
                           const SizedBox(height: 20),
-                          CustomWidgets().customDropdownField(
-                            context: context,
-                            hint: 'Select Duration',
-                            items: [],
-                            onChanged: (p0) {},
-                          ),
+                          CustomWidgets().durationPickerStyledField(
+                              context: context,
+                              hint: 'Select Duration',
+                              controller: c.durationController,
+                              selectedDuration: c.selectedDuration),
                         ],
                       );
                     }

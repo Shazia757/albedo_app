@@ -1,7 +1,7 @@
 import 'package:albedo_app/config/color_schemes.dart';
+import 'package:albedo_app/modules/admin/view/batches_list_page.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:albedo_app/common_views/login_page.dart';
-import 'package:albedo_app/modules/admin/view/session_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -35,6 +35,6 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         themeMode: ThemeMode.system,
-        home: isLoggedIn ? SessionPage() : SessionPage());
+        home: isLoggedIn ? BatchesListPage() : BatchesListPage());
   }
 }

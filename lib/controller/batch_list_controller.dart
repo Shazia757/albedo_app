@@ -4,19 +4,27 @@ import 'package:get/get.dart';
 
 class BatchListController extends GetxController {
   var isLoading = true.obs;
+  var isDeleteButtonLoading = true.obs;
 
   var selectedTab = 0.obs;
   var batches = <Batch>[].obs;
+  RxList<String> batchList = <String>[].obs;
+  var selectedBatch = RxnString();
+
   RxList<Batch> filteredBatches = <Batch>[].obs;
   var searchQuery = ''.obs;
   final teacherList = ["Teacher A", "Teacher B", "Teacher C"];
-  var selectedDuration = RxnInt();
+  var selectedDuration = Rxn<int>();
   var selectedTeacher = RxnString();
+  var selectedDate = Rxn<DateTime>();
+  var selectedTime = Rxn<TimeOfDay>();
+
   final formKey = GlobalKey<FormState>();
 
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
 
   TextEditingController dateController = TextEditingController();
+  TextEditingController durationController = TextEditingController();
   TextEditingController timeController = TextEditingController();
   TextEditingController salaryController = TextEditingController();
 
@@ -127,6 +135,16 @@ class BatchListController extends GetxController {
     }
   }
 
+   void loadBatch(Batch batch) {
+    dateController.text = batch.date.toString();
+    timeController.text = batch.startTime.toString();
+
+    selectedDuration.value = batch.duration;
+    selectedTeacher.value = batch.teacherName;
+
+    salaryController.text = batch.teacherSalary?.toString() ?? '';
+  }
+
   void initEdit(Batch data) {
     // Ensure teacher list is ready
     final uniqueTeachers = batches.map((e) => e.teacherName).toSet().toList();
@@ -152,6 +170,23 @@ class BatchListController extends GetxController {
 
     salaryController =
         TextEditingController(text: data.teacherSalary.toString());
+  }
+    delete(String id) {
+    isDeleteButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
   }
 
   void applyFilters() {

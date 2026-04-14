@@ -29,7 +29,6 @@ class SessionController extends GetxController {
   var selectedTeacherEdit = RxnString();
   final formKey = GlobalKey<FormState>();
   var selectedDuration = Rxn<int>();
-  var selectedStudent = RxnString();
   var selectedPackage = RxnString();
   var selectedDate = Rxn<DateTime>();
   var selectedTime = Rxn<TimeOfDay>();
@@ -41,6 +40,7 @@ class SessionController extends GetxController {
 
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
+  TextEditingController durationController = TextEditingController();
   TextEditingController salaryController = TextEditingController();
   TextEditingController teacherController = TextEditingController();
   TextEditingController meetTitleController = TextEditingController();
