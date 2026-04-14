@@ -11,12 +11,12 @@ class SessionController extends GetxController {
   var selectedTab = 0.obs;
   var selectedStatus = 0.obs;
   var searchQuery = ''.obs;
-  var selectAllMentors=false.obs;
-  var selectAllTeachers=false.obs;
-  var selectAllStudents=false.obs;
-  var selectAllCoordinators=false.obs;
-  var selectAllAdvisors=false.obs;
-  var selectAllOtherUsers=false.obs;
+  var selectAllMentors = false.obs;
+  var selectAllTeachers = false.obs;
+  var selectAllStudents = false.obs;
+  var selectAllCoordinators = false.obs;
+  var selectAllAdvisors = false.obs;
+  var selectAllOtherUsers = false.obs;
   var sortType = SortType.newest.obs;
   var sessions = <Session>[].obs;
   var selectedTeacher = RxnString();
@@ -34,11 +34,10 @@ class SessionController extends GetxController {
   var selectedDate = Rxn<DateTime>();
   var selectedTime = Rxn<TimeOfDay>();
   RxString selectedType = "session".obs;
-RxList<String> mentorsList = <String>[].obs;
-RxList<String> coordinatorsList = <String>[].obs;
-RxList<String> advisorsList = <String>[].obs;
-RxList<String> otherUsersList = <String>[].obs;
-
+  RxList<String> mentorsList = <String>[].obs;
+  RxList<String> coordinatorsList = <String>[].obs;
+  RxList<String> advisorsList = <String>[].obs;
+  RxList<String> otherUsersList = <String>[].obs;
 
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
@@ -297,7 +296,7 @@ RxList<String> otherUsersList = <String>[].obs;
         TextEditingController(text: data.teacherSalary.toString());
   }
 
-  delete(int id) {
+  delete(String id) {
     isDeleteButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {

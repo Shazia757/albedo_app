@@ -488,16 +488,16 @@ class CustomWidgets {
     final cs = Theme.of(context).colorScheme;
 
     final LayerLink layerLink = LayerLink();
-
     OverlayEntry? overlayEntry;
+
     final textController = TextEditingController(
       text: value?.toString() ?? "",
     );
 
+    List<T> filteredItems = List.from(items);
+
     return StatefulBuilder(
       builder: (context, setState) {
-        bool isOpen = overlayEntry != null;
-
         void closeDropdown() {
           overlayEntry?.remove();
           overlayEntry = null;
@@ -525,46 +525,53 @@ class CustomWidgets {
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
                             constraints: BoxConstraints(
-                              maxHeight:
-                                  items.length > 5 ? 240 : items.length * 48.0,
+                              maxHeight: filteredItems.isEmpty
+                                  ? 60
+                                  : (filteredItems.length * 48.0).clamp(0, 240),
                             ),
                             decoration: BoxDecoration(
                               color: cs.outline.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: ListView.builder(
-                              padding: EdgeInsets.zero,
-                              shrinkWrap: true,
-                              itemCount: items.length,
-                              itemBuilder: (_, index) {
-                                final item = items[index];
-
-                                return InkWell(
-                                  onTap: () {
-                                    onChanged(item);
-
-                                    textController.text = item.toString();
-
-                                    closeDropdown();
-                                  },
-                                  child: Container(
-                                    color: cs.outline.withOpacity(0.1),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 12,
-                                    ),
-                                    alignment: Alignment.centerLeft,
+                            child: filteredItems.isEmpty
+                                ? Padding(
+                                    padding: const EdgeInsets.all(16),
                                     child: Text(
-                                      item.toString(),
+                                      "No results found",
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: cs.onSurface,
+                                        color: cs.onSurface.withOpacity(0.6),
                                       ),
                                     ),
+                                  )
+                                : ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    itemCount: filteredItems.length,
+                                    itemBuilder: (_, index) {
+                                      final item = filteredItems[index];
+
+                                      return InkWell(
+                                        onTap: () {
+                                          onChanged(item);
+                                          textController.text = item.toString();
+                                          closeDropdown();
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 12,
+                                          ),
+                                          child: Text(
+                                            item.toString(),
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: cs.onSurface,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                            ),
                           ),
                         ),
                       ),
@@ -579,61 +586,53 @@ class CustomWidgets {
           setState(() {});
         }
 
+        void filterItems(String query) {
+          filteredItems = items
+              .where((item) =>
+                  item.toString().toLowerCase().contains(query.toLowerCase()))
+              .toList();
+
+          overlayEntry?.markNeedsBuild();
+        }
+
         return Builder(
           builder: (fieldContext) {
             return CompositedTransformTarget(
               link: layerLink,
-              child: GestureDetector(
+              child: TextFormField(
+                controller: textController,
+                readOnly: false,
+                style: TextStyle(fontSize: 13, color: cs.onSurface),
                 onTap: () {
                   if (overlayEntry == null) {
+                    filteredItems = List.from(items); // reset
                     openDropdown(fieldContext);
-                  } else {
-                    closeDropdown();
                   }
                 },
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    controller: textController,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: cs.onSurface,
-                    ),
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      hintText: hint,
-                      hintStyle: TextStyle(
-                        fontSize: 12,
-                        color: cs.onSurface,
-                      ),
-                      // isDense: true,
-                      filled: true,
-                      fillColor: cs.outline.withOpacity(0.1),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 11,
-                      ),
-                      suffixIcon: Icon(
-                        isOpen
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                        size: 20,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.transparent),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.transparent),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.transparent,
-                          width: 1.5,
-                        ),
-                      ),
-                    ),
+                onChanged: (value) {
+                  if (overlayEntry == null) {
+                    openDropdown(fieldContext);
+                  }
+                  filterItems(value);
+                },
+                decoration: InputDecoration(
+                  hintText: hint,
+                  hintStyle: TextStyle(fontSize: 12),
+                  filled: true,
+                  fillColor: cs.outline.withOpacity(0.1),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 11,
+                  ),
+                  suffixIcon: Icon(
+                    overlayEntry != null
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    size: 20,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
@@ -1011,55 +1010,6 @@ class CustomWidgets {
     );
   }
 
-  static searchableDropDown<T>({
-    required TextEditingController controller,
-    required StringValueOf<T> stringValueOf,
-    required void Function(T) onSelected,
-    void Function(String)? onChanged,
-    required List<T> selectionList,
-    TextInputType? keyboardType,
-    required String label,
-    bool show = true,
-    EdgeInsets margin = const EdgeInsets.symmetric(vertical: 5),
-    double elevation = 2,
-    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 10),
-  }) {
-    return Visibility(
-      visible: show,
-      child: TypeAheadField<T>(
-        hideKeyboardOnDrag: true,
-        debounceDuration: const Duration(milliseconds: 500),
-        builder: (context, controller, focusNode) {
-          return CustomWidgets()
-              .dropdownStyledTextField(context: context, hint: label);
-          // return TextField(
-          //   keyboardType: keyboardType,
-          //   controller: controller,
-          //   focusNode: focusNode,
-          //   onChanged: (value) {
-          //     if (onChanged != null) {
-          //       onChanged(value);
-          //     }
-          //   },
-          //   decoration: InputDecoration(
-          //     labelText: label,
-          //     border: InputBorder.none,
-          //   ),
-          // );
-        },
-        suggestionsCallback: (search) => selectionList
-            .where((element) => stringValueOf(element).toLowerCase().contains(
-                  search.trim().toLowerCase(),
-                ))
-            .toList(),
-        itemBuilder: (context, itemData) =>
-            ListTile(title: Text(stringValueOf(itemData))),
-        controller: controller,
-        onSelected: (value) => onSelected(value),
-      ),
-    );
-  }
-
   Widget dropdownStyledTextField({
     required BuildContext context,
     required String hint,
@@ -1067,6 +1017,7 @@ class CustomWidgets {
     TextEditingController? controller,
     int? minlines,
     bool isMultiline = false,
+    bool isNumber = false,
     bool readOnly = false,
     VoidCallback? onTap,
   }) {
@@ -1075,11 +1026,18 @@ class CustomWidgets {
     return TextFormField(
       controller: controller,
       style: TextStyle(fontSize: 12),
+      inputFormatters: isNumber
+          ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))]
+          : null,
       readOnly: readOnly,
       onTap: onTap,
       minLines: isMultiline ? 3 : 1,
       maxLines: isMultiline ? null : 1,
-      keyboardType: isMultiline ? TextInputType.multiline : TextInputType.text,
+      keyboardType: isMultiline
+          ? TextInputType.multiline
+          : isNumber
+              ? TextInputType.number
+              : TextInputType.text,
       textInputAction:
           isMultiline ? TextInputAction.newline : TextInputAction.done,
       decoration: InputDecoration(
