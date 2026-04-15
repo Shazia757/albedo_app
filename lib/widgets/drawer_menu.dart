@@ -1,4 +1,3 @@
-import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/modules/admin/view/batch_page.dart';
 import 'package:albedo_app/modules/admin/view/batches_list_page.dart';
@@ -7,7 +6,6 @@ import 'package:albedo_app/modules/admin/view/payment_page.dart';
 import 'package:albedo_app/modules/admin/view/report_page.dart';
 import 'package:albedo_app/modules/admin/view/session_page.dart';
 import 'package:albedo_app/modules/admin/view/students_page.dart';
-import 'package:albedo_app/modules/admin/view/students_trs_page.dart';
 import 'package:albedo_app/modules/admin/view/support_page.dart';
 import 'package:albedo_app/modules/admin/view/teachers_page.dart';
 import 'package:flutter/material.dart';

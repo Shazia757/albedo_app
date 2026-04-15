@@ -277,6 +277,9 @@ class StudentsPage extends StatelessWidget {
                       icon: Icons.block,
                       color: cs.error,
                       onTap: () => CustomWidgets().showDeactivateDialog(
+                        context: context,
+                        text:
+                            'Are you sure you want to deactivate this student?',
                         onConfirm: () {},
                       ),
                     ),
@@ -285,6 +288,8 @@ class StudentsPage extends StatelessWidget {
                       icon: Icons.delete,
                       color: cs.error,
                       onTap: () => CustomWidgets().showDeleteDialog(
+                         text: 'Are you sure you want to delete this student permanently?',
+                        context: context,
                         onConfirm: () => c.delete(s!.studentId!),
                       ),
                     ),

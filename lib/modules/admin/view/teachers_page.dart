@@ -24,6 +24,7 @@ class TeachersPage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       drawer: isDesktop ? null : const DrawerMenu(),
+      floatingActionButton: addTeacher(context),
       body: Column(
         children: [
           /// 🔍 Search + Sort
@@ -261,356 +262,12 @@ class TeachersPage extends StatelessWidget {
                     CustomWidgets().iconBtn(
                       icon: Icons.edit,
                       color: cs.secondary,
-                      onTap: () => CustomWidgets().showCustomDialog(
-                        context: context,
-                        title:Text( 'Edit Teacher'),
-                        icon: Icons.edit,
-                        formKey: GlobalKey<FormState>(),
-                        sections: [
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.5,
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    Text('Profile Photo (Max: 50 MB)'),
-                                    const SizedBox(height: 10),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: CircleAvatar(
-                                        radius: 35,
-                                        child: ClipOval(
-                                          child: SizedBox(
-                                            width: 60,
-                                            height: 60,
-                                            child: Image.asset(
-                                              'assets/images/logo.png',
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk('Name',
-                                        required: true),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.nameController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk('Email',
-                                        required: true),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.emailController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk(
-                                        'Teacher ID',
-                                        required: true),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.teacherIdController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk(
-                                        'Phone Number',
-                                        required: true),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.phoneController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('WhatsApp Number'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.whatsappController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Date of Birth'),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.dobController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Qualification'),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.qualificationController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk('Gender'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.genderController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk('Place'),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.placeController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Pincode'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.pincodeController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Address'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.addressController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets()
-                                        .labelWithAsterisk('Time Zone'),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.timezoneController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk(
-                                        'Preferred Language',
-                                        required: true),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.prefLangController),
-                                    const SizedBox(height: 10),
-                                    CustomWidgets().labelWithAsterisk(
-                                        'Tuition Mode',
-                                        required: true),
-                                    CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: '',
-                                        controller: c.tutionModeController),
-                                    const SizedBox(height: 10),
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        'Experience',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Obx(() => Column(
-                                          children: [
-                                            Column(
-                                              children: List.generate(
-                                                c.experiences.length,
-                                                (index) {
-                                                  final exp =
-                                                      c.experiences[index];
-
-                                                  return Card(
-                                                    margin: const EdgeInsets
-                                                        .symmetric(vertical: 8),
-                                                    elevation: 2,
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              12),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          // Title
-                                                          Text(
-                                                            "Experience ${index + 1}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
-
-                                                          const SizedBox(
-                                                              height: 10),
-
-                                                          // Company
-                                                          CustomWidgets()
-                                                              .labelWithAsterisk(
-                                                                  'Company Name'),
-                                                          const SizedBox(
-                                                              height: 8),
-                                                          CustomWidgets()
-                                                              .dropdownStyledTextField(
-                                                            context: context,
-                                                            hint:
-                                                                'Enter company name',
-                                                            controller: exp
-                                                                .companyController,
-                                                          ),
-
-                                                          const SizedBox(
-                                                              height: 10),
-
-                                                          // Years
-                                                          CustomWidgets()
-                                                              .labelWithAsterisk(
-                                                                  'Years'),
-                                                          const SizedBox(
-                                                              height: 8),
-                                                          CustomWidgets()
-                                                              .dropdownStyledTextField(
-                                                            context: context,
-                                                            hint: 'Years',
-                                                            controller: exp
-                                                                .yearController,
-                                                          ),
-
-                                                          const SizedBox(
-                                                              height: 10),
-
-                                                          // Months
-                                                          CustomWidgets()
-                                                              .labelWithAsterisk(
-                                                                  'Months'),
-                                                          const SizedBox(
-                                                              height: 8),
-                                                          CustomWidgets()
-                                                              .dropdownStyledTextField(
-                                                            context: context,
-                                                            hint: 'Months',
-                                                            controller: exp
-                                                                .monthController,
-                                                          ),
-
-                                                          const SizedBox(
-                                                              height: 10),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-
-                                            const SizedBox(height: 16),
-
-                                            // ➕ Add Button at Bottom
-                                            SizedBox(
-                                              width: double.infinity,
-                                              child: ElevatedButton.icon(
-                                                onPressed: c.addExperience,
-                                                // c.addExperience,
-                                                icon: Icon(Icons.add),
-                                                label: Text("Add Experience"),
-                                              ),
-                                            ),
-
-                                            const SizedBox(height: 10),
-                                            CustomWidgets().labelWithAsterisk(
-                                                'Account Number'),
-                                            const SizedBox(height: 10),
-
-                                            CustomWidgets()
-                                                .dropdownStyledTextField(
-                                                    context: context,
-                                                    hint: '',
-                                                    controller: c
-                                                        .accountNumberController),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets().labelWithAsterisk(
-                                                'Account Holder Name'),
-                                            const SizedBox(height: 10),
-
-                                            CustomWidgets().dropdownStyledTextField(
-                                                context: context,
-                                                hint: '',
-                                                controller: c
-                                                    .accountHolderNameController),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets()
-                                                .labelWithAsterisk('UPI ID'),
-                                            const SizedBox(height: 10),
-
-                                            CustomWidgets()
-                                                .dropdownStyledTextField(
-                                                    context: context,
-                                                    hint: '',
-                                                    controller:
-                                                        c.upiIdController),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets().labelWithAsterisk(
-                                                'Account Type'),
-                                            const SizedBox(height: 10),
-
-                                            CustomWidgets().customDropdownField(
-                                              context: context,
-                                              hint: '',
-                                              items: ['Savings', 'Current'],
-                                              onChanged: (p0) {},
-                                            ),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets()
-                                                .labelWithAsterisk('Bank Name'),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets().customDropdownField(
-                                              context: context,
-                                              hint: 'Select bank',
-                                              items: [],
-                                              onChanged: (p0) {},
-                                            ),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets().labelWithAsterisk(
-                                                'Branch Name'),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets().customDropdownField(
-                                              context: context,
-                                              hint: 'Select branch',
-                                              items: [],
-                                              onChanged: (p0) {},
-                                            ),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets()
-                                                .labelWithAsterisk('IFSC Code'),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets()
-                                                .dropdownStyledTextField(
-                                                    context: context,
-                                                    hint: 'Auto-filled'),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets()
-                                                .labelWithAsterisk('Resume'),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets()
-                                                .dropdownStyledTextField(
-                                                    context: context,
-                                                    hint: 'Enter Resume URL'),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets().labelWithAsterisk(
-                                                'Demo Video (Optional)'),
-                                            const SizedBox(height: 10),
-                                            CustomWidgets()
-                                                .dropdownStyledTextField(
-                                                    context: context,
-                                                    hint: 'Enter Demo URL'),
-                                            const SizedBox(height: 20),
-                                          ],
-                                        )),
-                                  ],
-                                ),
-                              ))
-                        ],
-                        onSubmit: () {},
-                      ),
+                      onTap: () {
+                        if (t != null) {
+                          c.loadTeachers(t);
+                          editTeacher(context);
+                        }
+                      },
                     ),
                     const SizedBox(width: 8),
                     CustomWidgets().iconBtn(
@@ -621,6 +278,11 @@ class TeachersPage extends StatelessWidget {
                     CustomWidgets().iconBtn(
                       icon: Icons.delete,
                       color: cs.error,
+                      onTap: () => CustomWidgets().showDeleteDialog(
+                        text: 'Are you sure you want to delete this teacher permanently?',
+                        context: context,
+                        onConfirm: () => c.delete(t!.id),
+                      ),
                     ),
                   ],
                 )
@@ -628,6 +290,653 @@ class TeachersPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void editTeacher(BuildContext context) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text('Edit Teacher'),
+      icon: Icons.edit,
+      formKey: GlobalKey<FormState>(),
+      sections: [
+        SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text('Profile Photo (Max: 50 MB)'),
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: () {},
+                    child: CircleAvatar(
+                      radius: 35,
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Name', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context, hint: '', controller: c.nameController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Email', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.emailController),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Teacher ID', required: true),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.teacherIdController),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Phone Number', required: true),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.phoneController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('WhatsApp Number'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Enter WhatsApp Number',
+                      controller: c.whatsappController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Date of Birth'),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Select Date',
+                      controller: c.dobController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Qualification'),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Qualification',
+                      controller: c.qualificationController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Gender'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Select gender',
+                      controller: c.genderController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Place'),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Place',
+                      controller: c.placeController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Pincode'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Enter pincode/postal code',
+                      controller: c.pincodeController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Address'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Address',
+                      controller: c.addressController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Time Zone'),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Select Time Zone',
+                      controller: c.timezoneController),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Preferred Language', required: true),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Select languages',
+                      controller: c.prefLangController),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Tuition Mode', required: true),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Tution Mode',
+                      controller: c.tutionModeController),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Experience',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Obx(() => Column(
+                        children: [
+                          Column(
+                            children: List.generate(
+                              c.experiences.length,
+                              (index) {
+                                final exp = c.experiences[index];
+
+                                return Card(
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  elevation: 2,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Title
+                                        Text(
+                                          "Experience ${index + 1}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+
+                                        const SizedBox(height: 10),
+
+                                        // Company
+                                        CustomWidgets()
+                                            .labelWithAsterisk('Company Name'),
+                                        const SizedBox(height: 8),
+                                        CustomWidgets().dropdownStyledTextField(
+                                          context: context,
+                                          hint: 'Enter company name',
+                                          controller: exp.companyController,
+                                        ),
+
+                                        const SizedBox(height: 10),
+
+                                        // Years
+                                        CustomWidgets()
+                                            .labelWithAsterisk('Years'),
+                                        const SizedBox(height: 8),
+                                        CustomWidgets().dropdownStyledTextField(
+                                          context: context,
+                                          hint: 'Years',
+                                          controller: exp.yearController,
+                                        ),
+
+                                        const SizedBox(height: 10),
+
+                                        // Months
+                                        CustomWidgets()
+                                            .labelWithAsterisk('Months'),
+                                        const SizedBox(height: 8),
+                                        CustomWidgets().dropdownStyledTextField(
+                                          context: context,
+                                          hint: 'Months',
+                                          controller: exp.monthController,
+                                        ),
+
+                                        const SizedBox(height: 10),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // ➕ Add Button at Bottom
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: c.addExperience,
+                              // c.addExperience,
+                              icon: Icon(Icons.add),
+                              label: Text("Add Experience"),
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+                          CustomWidgets().labelWithAsterisk('Account Number'),
+                          const SizedBox(height: 10),
+
+                          CustomWidgets().dropdownStyledTextField(
+                              context: context,
+                              hint: 'Enter account number',
+                              controller: c.accountNumberController),
+                          const SizedBox(height: 10),
+                          CustomWidgets()
+                              .labelWithAsterisk('Account Holder Name'),
+                          const SizedBox(height: 10),
+
+                          CustomWidgets().dropdownStyledTextField(
+                              context: context,
+                              hint: 'Enter account holder name',
+                              controller: c.accountHolderNameController),
+                          const SizedBox(height: 10),
+                          CustomWidgets().labelWithAsterisk('UPI ID'),
+                          const SizedBox(height: 10),
+
+                          CustomWidgets().dropdownStyledTextField(
+                              context: context,
+                              hint: 'Enter UPI ID',
+                              controller: c.upiIdController),
+                          const SizedBox(height: 10),
+                          CustomWidgets().labelWithAsterisk('Account Type'),
+                          const SizedBox(height: 10),
+
+                          CustomWidgets().customDropdownField(
+                            context: context,
+                            hint: 'Select Account Type',
+                            items: ['Savings', 'Current'],
+                            onChanged: (p0) {},
+                          ),
+                          const SizedBox(height: 10),
+                          CustomWidgets().labelWithAsterisk('Bank Name'),
+                          const SizedBox(height: 10),
+                          CustomWidgets().customDropdownField(
+                            context: context,
+                            hint: 'Select bank',
+                            items: [],
+                            onChanged: (p0) {},
+                          ),
+                          const SizedBox(height: 10),
+                          CustomWidgets().labelWithAsterisk('Branch Name'),
+                          const SizedBox(height: 10),
+                          CustomWidgets().customDropdownField(
+                            context: context,
+                            hint: 'Select branch',
+                            items: [],
+                            onChanged: (p0) {},
+                          ),
+                          const SizedBox(height: 10),
+                          CustomWidgets().labelWithAsterisk('IFSC Code'),
+                          const SizedBox(height: 10),
+                          CustomWidgets().dropdownStyledTextField(
+                              context: context, hint: 'Auto-filled'),
+                          const SizedBox(height: 10),
+                          CustomWidgets().labelWithAsterisk('Resume'),
+                          const SizedBox(height: 10),
+                          CustomWidgets().dropdownStyledTextField(
+                              context: context, hint: 'Enter Resume URL'),
+                          const SizedBox(height: 10),
+                          CustomWidgets()
+                              .labelWithAsterisk('Demo Video (Optional)'),
+                          const SizedBox(height: 10),
+                          CustomWidgets().dropdownStyledTextField(
+                              context: context, hint: 'Enter Demo URL'),
+                          const SizedBox(height: 20),
+                        ],
+                      )),
+                ],
+              ),
+            ))
+      ],
+      onSubmit: () {},
+    );
+  }
+
+  FloatingActionButton addTeacher(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () => CustomWidgets().showCustomDialog(
+        context: context,
+        title: Text('Add Teacher'),
+        formKey: GlobalKey<FormState>(),
+        sections: [
+          SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Text('Profile Photo (Max: 50 MB)'),
+                    const SizedBox(height: 10),
+                    InkWell(
+                      onTap: () {},
+                      child: CircleAvatar(
+                        radius: 35,
+                        child: ClipOval(
+                          child: SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Name', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter teacher name',
+                        controller: c.nameController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Email', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter email address',
+                        controller: c.emailController),
+                    const SizedBox(height: 10),
+                    CustomWidgets()
+                        .labelWithAsterisk('Phone Number', required: true),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '+1234567890',
+                        controller: c.phoneController,
+                        isNumber: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('WhatsApp Number'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '+1234567890',
+                        controller: c.whatsappController,
+                        isNumber: true),
+                    const SizedBox(height: 10),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Gender'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Gender',
+                      items: ['Male', 'Female'],
+                      onChanged: (p0) {},
+                    ),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Place'),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter place',
+                        controller: c.placeController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Pincode'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter pincode/postal code',
+                        controller: c.pincodeController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Address'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter address',
+                        controller: c.addressController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Time Zone'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().customDropdownField(
+                      context: context,
+                      hint: 'Select Time Zone',
+                      items: [],
+                      onChanged: (p0) {},
+                    ),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('WhatsApp Number'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.whatsappController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Date of Birth'),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.dobController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Qualification'),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.qualificationController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Gender'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.genderController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Place'),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.placeController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Pincode'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.pincodeController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Address'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.addressController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Time Zone'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.timezoneController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Preferred Language',
+                        required: true),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.prefLangController),
+                    const SizedBox(height: 10),
+                    CustomWidgets()
+                        .labelWithAsterisk('Tuition Mode', required: true),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: '',
+                        controller: c.tutionModeController),
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Experience',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Obx(() => Column(
+                          children: [
+                            Column(
+                              children: List.generate(
+                                c.experiences.length,
+                                (index) {
+                                  final exp = c.experiences[index];
+
+                                  return Card(
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    elevation: 2,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Title
+                                          Text(
+                                            "Experience ${index + 1}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+
+                                          const SizedBox(height: 10),
+
+                                          // Company
+                                          CustomWidgets().labelWithAsterisk(
+                                              'Company Name'),
+                                          const SizedBox(height: 8),
+                                          CustomWidgets()
+                                              .dropdownStyledTextField(
+                                            context: context,
+                                            hint: 'Enter company name',
+                                            controller: exp.companyController,
+                                          ),
+
+                                          const SizedBox(height: 10),
+
+                                          // Years
+                                          CustomWidgets()
+                                              .labelWithAsterisk('Years'),
+                                          const SizedBox(height: 8),
+                                          CustomWidgets()
+                                              .dropdownStyledTextField(
+                                            context: context,
+                                            hint: 'Years',
+                                            controller: exp.yearController,
+                                          ),
+
+                                          const SizedBox(height: 10),
+
+                                          // Months
+                                          CustomWidgets()
+                                              .labelWithAsterisk('Months'),
+                                          const SizedBox(height: 8),
+                                          CustomWidgets()
+                                              .dropdownStyledTextField(
+                                            context: context,
+                                            hint: 'Months',
+                                            controller: exp.monthController,
+                                          ),
+
+                                          const SizedBox(height: 10),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // ➕ Add Button at Bottom
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: c.addExperience,
+                                // c.addExperience,
+                                icon: Icon(Icons.add),
+                                label: Text("Add Experience"),
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
+                            CustomWidgets().labelWithAsterisk('Account Number'),
+                            const SizedBox(height: 10),
+
+                            CustomWidgets().dropdownStyledTextField(
+                                context: context,
+                                hint: '',
+                                controller: c.accountNumberController),
+                            const SizedBox(height: 10),
+                            CustomWidgets()
+                                .labelWithAsterisk('Account Holder Name'),
+                            const SizedBox(height: 10),
+
+                            CustomWidgets().dropdownStyledTextField(
+                                context: context,
+                                hint: '',
+                                controller: c.accountHolderNameController),
+                            const SizedBox(height: 10),
+                            CustomWidgets().labelWithAsterisk('UPI ID'),
+                            const SizedBox(height: 10),
+
+                            CustomWidgets().dropdownStyledTextField(
+                                context: context,
+                                hint: '',
+                                controller: c.upiIdController),
+                            const SizedBox(height: 10),
+                            CustomWidgets().labelWithAsterisk('Account Type'),
+                            const SizedBox(height: 10),
+
+                            CustomWidgets().customDropdownField(
+                              context: context,
+                              hint: '',
+                              items: ['Savings', 'Current'],
+                              onChanged: (p0) {},
+                            ),
+                            const SizedBox(height: 10),
+                            CustomWidgets().labelWithAsterisk('Bank Name'),
+                            const SizedBox(height: 10),
+                            CustomWidgets().customDropdownField(
+                              context: context,
+                              hint: 'Select bank',
+                              items: [],
+                              onChanged: (p0) {},
+                            ),
+                            const SizedBox(height: 10),
+                            CustomWidgets().labelWithAsterisk('Branch Name'),
+                            const SizedBox(height: 10),
+                            CustomWidgets().customDropdownField(
+                              context: context,
+                              hint: 'Select branch',
+                              items: [],
+                              onChanged: (p0) {},
+                            ),
+                            const SizedBox(height: 10),
+                            CustomWidgets().labelWithAsterisk('IFSC Code'),
+                            const SizedBox(height: 10),
+                            CustomWidgets().dropdownStyledTextField(
+                                context: context, hint: 'Auto-filled'),
+                            const SizedBox(height: 10),
+                            CustomWidgets().labelWithAsterisk('Resume'),
+                            const SizedBox(height: 10),
+                            CustomWidgets().dropdownStyledTextField(
+                                context: context, hint: 'Enter Resume URL'),
+                            const SizedBox(height: 10),
+                            CustomWidgets()
+                                .labelWithAsterisk('Demo Video (Optional)'),
+                            const SizedBox(height: 10),
+                            CustomWidgets().dropdownStyledTextField(
+                                context: context, hint: 'Enter Demo URL'),
+                            const SizedBox(height: 20),
+                          ],
+                        )),
+                  ],
+                ),
+              ))
+        ],
+        onSubmit: () {},
+      ),
+      mini: true,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: Icon(
+        Icons.add,
+        color: context.theme.colorScheme.onPrimary,
       ),
     );
   }

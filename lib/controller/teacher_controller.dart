@@ -11,6 +11,7 @@ class TeacherController extends GetxController {
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
   var isLoading = true.obs;
+  var isDeleteButtonLoading = true.obs;
 
   // --------------------------
   // Counts for tabs
@@ -48,6 +49,10 @@ class TeacherController extends GetxController {
   TextEditingController accountNumberController = TextEditingController();
   TextEditingController accountHolderNameController = TextEditingController();
   TextEditingController upiIdController = TextEditingController();
+  TextEditingController accountTypeController = TextEditingController();
+  TextEditingController bankNameController = TextEditingController();
+  TextEditingController branchNameController = TextEditingController();
+  TextEditingController bankBranchController = TextEditingController();
 
   var experiences = <ExperienceModel>[].obs;
 
@@ -65,23 +70,23 @@ class TeacherController extends GetxController {
 
       teachers.assignAll([
         Teacher(
-          id: "TEA1001",
-          name: "John",
-          email: "john@email.com",
-          status: "Active",
-          type: "Batch",
-          phone: "123456",
-          joinedAt: DateTime.now(),
-        ),
+            id: "TEA1001",
+            name: "John",
+            email: "john@email.com",
+            status: "Active",
+            type: "Batch",
+            phone: "123456",
+            joinedAt: DateTime.now(),
+            gender: 'Male'),
         Teacher(
-          id: "TEA1002",
-          name: "Ms. Smith",
-          email: "smith@email.com",
-          status: "Inactive",
-          type: "Batch",
-          phone: "+9876543210",
-          joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-        ),
+            id: "TEA1002",
+            name: "Ms. Smith",
+            email: "smith@email.com",
+            status: "Inactive",
+            type: "Batch",
+            phone: "+9876543210",
+            joinedAt: DateTime.parse('2024-12-01 09:00:00'),
+            gender: 'Female'),
       ]);
 
       applyFilters();
@@ -116,12 +121,49 @@ class TeacherController extends GetxController {
   }
 
   void addExperience() {
-  experiences.add(
-    ExperienceModel(
-      companyController: TextEditingController(),
-      yearController: TextEditingController(),
-      monthController: TextEditingController(),
-    ),
-  );
-}
+    experiences.add(
+      ExperienceModel(
+        companyController: TextEditingController(),
+        yearController: TextEditingController(),
+        monthController: TextEditingController(),
+      ),
+    );
+  }
+
+  void loadTeachers(Teacher teacher) {
+    nameController.text = teacher.name.toString();
+    emailController.text = teacher.email.toString();
+    phoneController.text = teacher.phone.toString();
+    whatsappController.text = teacher.whatsapp.toString();
+    genderController.text = teacher.gender.toString();
+    placeController.text = teacher.place.toString();
+    pincodeController.text = teacher.pincode.toString();
+    addressController.text = teacher.address.toString();
+    timezoneController.text = teacher.timezone.toString();
+    tutionModeController.text = teacher.tuitionMode.toString();
+    accountNumberController.text = teacher.accountNumber.toString();
+    accountHolderNameController.text = teacher.accountHolder.toString();
+    upiIdController.text = teacher.upiId.toString();
+    accountTypeController.text = teacher.accountType.toString();
+    bankNameController.text = teacher.bankName.toString();
+    bankBranchController.text = teacher.bankBranch.toString();
+  }
+
+  delete(String id) {
+    isDeleteButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
+  }
 }

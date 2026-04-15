@@ -343,11 +343,12 @@ class CustomWidgets {
   }
 
   void showDeleteDialog({
+    required BuildContext context,
+    required String text,
     required VoidCallback onConfirm,
   }) {
     Get.dialog(
       Dialog(
-        backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 40),
         child: Stack(
           children: [
@@ -355,7 +356,6 @@ class CustomWidgets {
             Container(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
               decoration: BoxDecoration(
-                color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
               ),
               child: Column(
@@ -370,20 +370,20 @@ class CustomWidgets {
                   // const SizedBox(height: 16),
 
                   /// 🔹 TITLE
-                  const Text(
+                  Text(
                     "Are you sure?",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1F2937),
+                      color: context.theme.colorScheme.inverseSurface,
                     ),
                   ),
 
                   const SizedBox(height: 10),
 
                   /// 🔹 MESSAGE
-                  const Text(
-                    "Are you sure you want to delete this session permanently?",
+                  Text(
+                    text,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -402,16 +402,15 @@ class CustomWidgets {
                         child: Container(
                           height: 48,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE5E7EB),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: TextButton(
                             onPressed: () => Get.back(),
-                            child: const Text(
+                            child: Text(
                               "No",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Color(0xFF111827),
+                                color: context.theme.colorScheme.inverseSurface,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -434,11 +433,11 @@ class CustomWidgets {
                               onConfirm();
                               Get.back();
                             },
-                            child: const Text(
+                            child: Text(
                               "Yes",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Colors.white,
+                                color: context.theme.colorScheme.inverseSurface,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -461,13 +460,12 @@ class CustomWidgets {
                   height: 36,
                   width: 36,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE5E7EB),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
                     size: 20,
-                    color: Color(0xFF374151),
+                    color: context.theme.colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -479,11 +477,12 @@ class CustomWidgets {
   }
 
   void showDeactivateDialog({
+    required BuildContext context,
     required VoidCallback onConfirm,
+    required String text,
   }) {
     Get.dialog(
       Dialog(
-        backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 40),
         child: Stack(
           children: [
@@ -491,7 +490,6 @@ class CustomWidgets {
             Container(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
               decoration: BoxDecoration(
-                color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
               ),
               child: Column(
@@ -506,20 +504,20 @@ class CustomWidgets {
                   // const SizedBox(height: 16),
 
                   /// 🔹 TITLE
-                  const Text(
+                  Text(
                     "Are you sure?",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1F2937),
+                      color: context.theme.colorScheme.inverseSurface,
                     ),
                   ),
 
                   const SizedBox(height: 10),
 
                   /// 🔹 MESSAGE
-                  const Text(
-                    "Are you sure you want to deactivate this student?",
+                  Text(
+                    text,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -538,16 +536,15 @@ class CustomWidgets {
                         child: Container(
                           height: 48,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE5E7EB),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: TextButton(
                             onPressed: () => Get.back(),
-                            child: const Text(
+                            child: Text(
                               "No",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Color(0xFF111827),
+                                color: context.theme.colorScheme.onSurface,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -562,7 +559,7 @@ class CustomWidgets {
                         child: Container(
                           height: 48,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444),
+                            color: context.theme.colorScheme.secondary,
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: TextButton(
@@ -570,11 +567,11 @@ class CustomWidgets {
                               onConfirm();
                               Get.back();
                             },
-                            child: const Text(
+                            child: Text(
                               "Yes",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Colors.white,
+                                color: context.theme.colorScheme.inverseSurface,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -597,13 +594,12 @@ class CustomWidgets {
                   height: 36,
                   width: 36,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE5E7EB),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
                     size: 20,
-                    color: Color(0xFF374151),
+                    color: context.theme.colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -1030,7 +1026,7 @@ class CustomWidgets {
                     IconButton(
                       onPressed: () => Get.back(),
                       icon: Icon(Icons.close,
-                          color: context.theme.colorScheme.onPrimary),
+                          color: context.theme.colorScheme.inverseSurface),
                     )
                   ],
                 ),

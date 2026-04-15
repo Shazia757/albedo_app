@@ -99,6 +99,9 @@ class BatchesListPage extends StatelessWidget {
                                     color: Theme.of(context).colorScheme.error,
                                     onTap: () =>
                                         CustomWidgets().showDeleteDialog(
+                                      text:
+                                          'Are you sure you want to delete this batch permanently?',
+                                      context: context,
                                       onConfirm: () =>
                                           c.delete(data[i].id ?? ''),
                                     ),
