@@ -1,4 +1,3 @@
-import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/student_model.dart';
@@ -8,6 +7,7 @@ import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 
 class StudentsPage extends StatelessWidget {
   StudentsPage({super.key});
@@ -47,7 +47,7 @@ class StudentsPage extends StatelessWidget {
                       /// Sort
                       InkWell(
                         borderRadius: BorderRadius.circular(8),
-                        onTap: () => CustomWidgets().showSortSheet(
+                        onTap: () => CustomWidgets().showSortSheet<SortType>(
                           title: "Sort Students",
                           options: [
                             SortOption(
@@ -60,7 +60,7 @@ class StudentsPage extends StatelessWidget {
                                 icon: Icons.history),
                             SortOption(
                                 label: "Name A-Z",
-                                value: SortType.student,
+                                value: SortType.name,
                                 icon: Icons.sort_by_alpha),
                           ],
                           selectedValue: c.sortType.value,

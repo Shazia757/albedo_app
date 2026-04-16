@@ -112,6 +112,8 @@ class CoordinatorController extends GetxController {
       temp.sort((a, b) => b.joinedAt.compareTo(a.joinedAt));
     } else if (sortType.value == SortType.oldest) {
       temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
+    } else if (sortType.value == SortType.name) {
+      temp.sort((a, b) => a.name.compareTo(b.name));
     }
 
     filteredCoordinators.assignAll(temp);

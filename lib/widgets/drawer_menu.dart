@@ -92,7 +92,7 @@ class DrawerMenu extends StatelessWidget {
                         ),
                         DrawerSubItem(title: "Mentors", index: 2, onTap: () {}),
                         DrawerSubItem(
-                            title: "Coordinator",
+                            title: "Coordinators",
                             index: 3,
                             onTap: () => Get.offAll(CoordinatorPage())),
                         DrawerSubItem(title: "Advisor", index: 4, onTap: () {}),

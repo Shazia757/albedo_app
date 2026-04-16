@@ -1,7 +1,9 @@
-import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/teacher_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+enum SortType { newest, oldest, name }
+
 
 class TeacherController extends GetxController {
   var teachers = <Teacher>[].obs;
@@ -122,6 +124,8 @@ class TeacherController extends GetxController {
       temp.sort((a, b) => b.joinedAt.compareTo(a.joinedAt));
     } else if (sortType.value == SortType.oldest) {
       temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
+    } else if (sortType.value == SortType.name) {
+      temp.sort((a, b) => a.name.compareTo(b.name));
     }
 
     filteredTeachers.assignAll(temp);

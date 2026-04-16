@@ -26,7 +26,7 @@ class Student {
   String? syllabus;
   String? advisor;
   String? status;
-  String? name;
+  String name;
   String? category;
   String? email;
   DateTime? admissionDate;
@@ -35,7 +35,7 @@ class Student {
   int? totalSession;
 
   Student({
-    this.name,
+    required this.name,
     this.email,
     this.admissionDate,
     this.parentName,

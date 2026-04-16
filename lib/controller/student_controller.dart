@@ -1,7 +1,9 @@
-import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/student_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+enum SortType { newest, oldest, name }
+
 
 class StudentController extends GetxController {
   var students = <Student>[].obs;
@@ -127,7 +129,7 @@ class StudentController extends GetxController {
     if (searchQuery.value.isNotEmpty) {
       temp = temp
           .where((s) =>
-              s.name!.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+              s.name.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
               s.email!
                   .toLowerCase()
                   .contains(searchQuery.value.toLowerCase()) ||
@@ -142,6 +144,8 @@ class StudentController extends GetxController {
       temp.sort((a, b) => b.joinedAt.compareTo(a.joinedAt));
     } else if (sortType.value == SortType.oldest) {
       temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
+    }else if (sortType.value == SortType.name) {
+      temp.sort((a, b) => a.name.compareTo(b.name));
     }
 
     filteredStudents.assignAll(temp);
