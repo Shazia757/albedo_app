@@ -8,7 +8,6 @@ import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 
 class SessionPage extends StatelessWidget {
   final c = Get.put(SessionController());
