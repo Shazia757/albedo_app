@@ -1,51 +1,47 @@
-import 'package:albedo_app/controller/session_controller.dart';
+import 'package:albedo_app/model/coordinator_model.dart';
 import 'package:albedo_app/model/teacher_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class TeacherController extends GetxController {
-  var teachers = <Teacher>[].obs;
-  var filteredTeachers = <Teacher>[].obs;
-  final tabs = ["All", "Active", "Batch", "Inactive"];
-  var selectedTab = 0.obs;
+enum SortType { newest, oldest, name }
+
+class CoordinatorController extends GetxController {
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
+  var coordinators = <Coordinator>[].obs;
+  var selectedTab = 0.obs;
+  var filteredCoordinators = <Coordinator>[].obs;
+  final tabs = ["Active", "Expired"];
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
+
+  var experiences = <ExperienceModel>[].obs;
 
   // --------------------------
   // Counts for tabs
   // --------------------------
-  int get allCount => teachers.length;
 
-  int get activeCount => teachers.where((e) => e.status == "Active").length;
+  int get activeCount => coordinators.where((e) => e.status == "Active").length;
 
-  int get batchCount => teachers.where((e) => e.type == "Batch").length;
-
-  int get inactiveCount => teachers.where((e) => e.status == "Inactive").length;
+  int get expiredCount =>
+      coordinators.where((e) => e.status == "Expired").length;
 
   List<Map<String, dynamic>> get tabData => [
-        {"label": "All", "count": allCount},
         {"label": "Active", "count": activeCount},
-        {"label": "Batch", "count": batchCount},
-        {"label": "Inactive", "count": inactiveCount},
+        {"label": "Expired", "count": expiredCount},
       ];
 
-  // 🎯 Teacher-specific fields
   TextEditingController nameController = TextEditingController();
+  TextEditingController empIdController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  TextEditingController teacherIdController = TextEditingController();
+  TextEditingController dobController = TextEditingController();
   TextEditingController whatsappController = TextEditingController();
-  TextEditingController genderController = TextEditingController();
+  TextEditingController qualificationController = TextEditingController();
   TextEditingController placeController = TextEditingController();
   TextEditingController pincodeController = TextEditingController();
   TextEditingController addressController = TextEditingController();
-  TextEditingController timezoneController = TextEditingController();
-  TextEditingController dobController = TextEditingController();
-  TextEditingController qualificationController = TextEditingController();
   TextEditingController prefLangController = TextEditingController();
-  TextEditingController tutionModeController = TextEditingController();
   TextEditingController accountNumberController = TextEditingController();
   TextEditingController accountHolderNameController = TextEditingController();
   TextEditingController upiIdController = TextEditingController();
@@ -54,39 +50,35 @@ class TeacherController extends GetxController {
   TextEditingController branchNameController = TextEditingController();
   TextEditingController bankBranchController = TextEditingController();
 
-  var experiences = <ExperienceModel>[].obs;
-
   @override
   void onInit() {
     super.onInit();
-    fetchTeachers();
+    fetchCoordinators();
   }
 
-  void fetchTeachers() async {
+  void fetchCoordinators() async {
     try {
       isLoading.value = true;
 
       await Future.delayed(const Duration(seconds: 2));
 
-      teachers.assignAll([
-        Teacher(
-            id: "TEA1001",
-            name: "John",
-            email: "john@email.com",
-            status: "Active",
-            type: "Batch",
-            phone: "123456",
-            joinedAt: DateTime.now(),
-            gender: 'Male'),
-        Teacher(
-            id: "TEA1002",
-            name: "Ms. Smith",
-            email: "smith@email.com",
-            status: "Inactive",
-            type: "Batch",
-            phone: "+9876543210",
-            joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-            gender: 'Female'),
+      coordinators.assignAll([
+        Coordinator(
+          id: "COO1001",
+          name: "Maria",
+          email: "maria@email.com",
+          status: "Active",
+          phone: "123456",
+          joinedAt: DateTime.now(),
+        ),
+        Coordinator(
+          id: "COO1002",
+          name: "Nick",
+          email: "nick@email.com",
+          status: "Expired",
+          phone: "+9876543210",
+          joinedAt: DateTime.parse('2024-12-01 09:00:00'),
+        ),
       ]);
 
       applyFilters();
@@ -96,17 +88,15 @@ class TeacherController extends GetxController {
   }
 
   void applyFilters() {
-    List<Teacher> temp = teachers;
+    List<Coordinator> temp = coordinators;
 
     switch (selectedTab.value) {
-      case 1:
+      case 0:
         temp = temp.where((t) => t.status == "Active").toList();
         break;
-      case 2:
-        temp = temp.where((t) => t.type == "Batch").toList();
-        break;
-      case 3:
-        temp = temp.where((t) => t.status == "Inactive").toList();
+
+      case 1:
+        temp = temp.where((t) => t.status == "Expired").toList();
         break;
     }
 
@@ -124,7 +114,27 @@ class TeacherController extends GetxController {
       temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
     }
 
-    filteredTeachers.assignAll(temp);
+    filteredCoordinators.assignAll(temp);
+  }
+
+  void loadCoordinators(Coordinator c) {
+    nameController.text = c.name.toString();
+    empIdController.text = c.id.toString();
+    emailController.text = c.email.toString();
+    phoneController.text = c.phone.toString();
+    whatsappController.text = c.whatsapp.toString();
+    dobController.text = c.dob.toString();
+    qualificationController.text = c.qualification.toString();
+    placeController.text = c.place.toString();
+    pincodeController.text = c.pincode.toString();
+    addressController.text = c.address.toString();
+    prefLangController.text = c.prefLanguage.toString();
+    accountNumberController.text = c.accountNumber.toString();
+    accountHolderNameController.text = c.accountHolder.toString();
+    upiIdController.text = c.upiId.toString();
+    accountTypeController.text = c.accountType.toString();
+    bankNameController.text = c.bankName.toString();
+    bankBranchController.text = c.bankBranch.toString();
   }
 
   void addExperience() {
@@ -137,26 +147,7 @@ class TeacherController extends GetxController {
     );
   }
 
-  void loadTeachers(Teacher teacher) {
-    nameController.text = teacher.name.toString();
-    emailController.text = teacher.email.toString();
-    phoneController.text = teacher.phone.toString();
-    whatsappController.text = teacher.whatsapp.toString();
-    genderController.text = teacher.gender.toString();
-    placeController.text = teacher.place.toString();
-    pincodeController.text = teacher.pincode.toString();
-    addressController.text = teacher.address.toString();
-    timezoneController.text = teacher.timezone.toString();
-    tutionModeController.text = teacher.tuitionMode.toString();
-    accountNumberController.text = teacher.accountNumber.toString();
-    accountHolderNameController.text = teacher.accountHolder.toString();
-    upiIdController.text = teacher.upiId.toString();
-    accountTypeController.text = teacher.accountType.toString();
-    bankNameController.text = teacher.bankName.toString();
-    bankBranchController.text = teacher.bankBranch.toString();
-  }
-
-  delete(String id) {
+  delete(id) {
     isDeleteButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {

@@ -1,5 +1,6 @@
 import 'package:albedo_app/common_views/login_page.dart';
 import 'package:albedo_app/modules/admin/view/profile_page.dart';
+import 'package:albedo_app/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,11 +16,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Get.isDarkMode;
+    final isDesktop = Responsive.isDesktop(context);
 
     return AppBar(
       backgroundColor: cs.surface,
       elevation: 0,
       scrolledUnderElevation: 2,
+      automaticallyImplyLeading: !isDesktop,
       iconTheme: IconThemeData(color: cs.onSurface),
       // ✅ TITLE OR LOGO
       title: title != null

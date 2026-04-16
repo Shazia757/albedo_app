@@ -164,13 +164,13 @@ class CustomWidgets {
     );
   }
 
-  void showSortSheet({
-    required List<SortOption> options,
-    required SortType selectedValue,
-    required Function(SortType) onSelected,
+  void showSortSheet<T>({
+    required List<SortOption<T>> options,
+    required T selectedValue,
+    required Function(T) onSelected,
     String title = "Sort",
   }) {
-    SortType tempSelected = selectedValue;
+    T tempSelected = selectedValue;
 
     Get.bottomSheet(
       Builder(

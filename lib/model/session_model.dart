@@ -31,9 +31,9 @@ class Session {
   });
 }
 
-class SortOption {
+class SortOption<T> {
   final String label;
-  final SortType value;
+  final T value;
   final IconData icon;
 
   SortOption({

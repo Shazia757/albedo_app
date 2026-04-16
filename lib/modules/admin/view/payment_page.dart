@@ -27,7 +27,8 @@ class PaymentPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
-      appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
+         appBar: const CustomAppBar(),
+
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Column(
         children: [

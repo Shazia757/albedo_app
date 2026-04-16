@@ -1,6 +1,7 @@
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/modules/admin/view/batch_page.dart';
 import 'package:albedo_app/modules/admin/view/batches_list_page.dart';
+import 'package:albedo_app/modules/admin/view/coordinator_page.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:albedo_app/modules/admin/view/payment_page.dart';
 import 'package:albedo_app/modules/admin/view/report_page.dart';
@@ -91,7 +92,9 @@ class DrawerMenu extends StatelessWidget {
                         ),
                         DrawerSubItem(title: "Mentors", index: 2, onTap: () {}),
                         DrawerSubItem(
-                            title: "Coordinator", index: 3, onTap: () {}),
+                            title: "Coordinator",
+                            index: 3,
+                            onTap: () => Get.offAll(CoordinatorPage())),
                         DrawerSubItem(title: "Advisor", index: 4, onTap: () {}),
                         DrawerSubItem(title: "Others", index: 5, onTap: () {}),
                       ]),

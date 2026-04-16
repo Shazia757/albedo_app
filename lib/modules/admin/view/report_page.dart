@@ -29,20 +29,27 @@ class ReportsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
+      appBar: const CustomAppBar(),
       drawer: isDesktop ? null : const DrawerMenu(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _tabs(context),
-            const SizedBox(height: 16),
-            _filters(context),
-            const SizedBox(height: 16),
-            Expanded(child: Obx(() => _tabView(context))),
-          ],
-        ),
+      body: Row(
+        children: [
+          if (isDesktop) const DrawerMenu(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _tabs(context),
+                  const SizedBox(height: 16),
+                  _filters(context),
+                  const SizedBox(height: 16),
+                  Expanded(child: Obx(() => _tabView(context))),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

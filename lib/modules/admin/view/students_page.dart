@@ -21,118 +21,126 @@ class StudentsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
-      appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
+      appBar: const CustomAppBar(),
       floatingActionButton: addStudent(context),
       drawer: isDesktop ? null : const DrawerMenu(),
-      body: Column(
+      body: Row(
         children: [
-          /// 🔍 Search + Sort
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
+          if (isDesktop) DrawerMenu(),
+          Expanded(
+            child: Column(
               children: [
-                Expanded(
-                    child: CustomWidgets().premiumSearch(context,
-                        hint: "Search students...", onChanged: (value) {
-                  c.searchQuery.value = value;
-                  c.applyFilters();
-                })),
+                /// 🔍 Search + Sort
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: CustomWidgets().premiumSearch(context,
+                              hint: "Search students...", onChanged: (value) {
+                        c.searchQuery.value = value;
+                        c.applyFilters();
+                      })),
 
-                const SizedBox(width: 10),
+                      const SizedBox(width: 10),
 
-                /// Sort
-                InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => CustomWidgets().showSortSheet(
-                    title: "Sort Students",
-                    options: [
-                      SortOption(
-                          label: "Newest",
-                          value: SortType.newest,
-                          icon: Icons.schedule),
-                      SortOption(
-                          label: "Oldest",
-                          value: SortType.oldest,
-                          icon: Icons.history),
-                      SortOption(
-                          label: "Name A-Z",
-                          value: SortType.student,
-                          icon: Icons.sort_by_alpha),
+                      /// Sort
+                      InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => CustomWidgets().showSortSheet(
+                          title: "Sort Students",
+                          options: [
+                            SortOption(
+                                label: "Newest",
+                                value: SortType.newest,
+                                icon: Icons.schedule),
+                            SortOption(
+                                label: "Oldest",
+                                value: SortType.oldest,
+                                icon: Icons.history),
+                            SortOption(
+                                label: "Name A-Z",
+                                value: SortType.student,
+                                icon: Icons.sort_by_alpha),
+                          ],
+                          selectedValue: c.sortType.value,
+                          onSelected: (val) {
+                            c.sortType.value = val;
+                            c.applyFilters();
+                          },
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Icon(Icons.sort, size: 20),
+                        ),
+                      )
                     ],
-                    selectedValue: c.sortType.value,
-                    onSelected: (val) {
-                      c.sortType.value = val;
+                  ),
+                ),
+
+                /// 🧭 Tabs
+                Obx(
+                  () => CustomWidgets().customTabs(
+                    context,
+                    tabs: tabs,
+                    selectedIndex: c.selectedTab.value,
+                    onTap: (index) {
+                      c.selectedTab.value = index;
                       c.applyFilters();
                     },
+                    getCount: (index) {
+                      switch (index) {
+                        case 0:
+                          return c.allCount;
+                        case 1:
+                          return c.activeCount;
+                        case 2:
+                          return c.batchCount;
+                        case 3:
+                          return c.tbaCount;
+                        case 4:
+                          return c.inactiveCount;
+                        default:
+                          return 0;
+                      }
+                    },
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Icon(Icons.sort, size: 20),
-                  ),
-                )
+                ),
+
+                const SizedBox(height: 10),
+
+                /// 📋 List
+                Expanded(
+                  child: Obx(() {
+                    if (c.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (c.filteredStudents.isEmpty) {
+                      return const Center(child: Text("No students found"));
+                    }
+
+                    return ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        itemCount: c.filteredStudents.length,
+                        itemBuilder: (context, index) {
+                          final student = c.filteredStudents[index];
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 700),
+                                child: _card(context, student),
+                              ),
+                            ),
+                          );
+                        });
+                  }),
+                ),
               ],
             ),
-          ),
-
-          /// 🧭 Tabs
-          Obx(
-            () => CustomWidgets().customTabs(
-              context,
-              tabs: tabs,
-              selectedIndex: c.selectedTab.value,
-              onTap: (index) {
-                c.selectedTab.value = index;
-                c.applyFilters();
-              },
-              getCount: (index) {
-                switch (index) {
-                  case 0:
-                    return c.allCount;
-                  case 1:
-                    return c.activeCount;
-                  case 2:
-                    return c.batchCount;
-                  case 3:
-                    return c.tbaCount;
-                  case 4:
-                    return c.inactiveCount;
-                  default:
-                    return 0;
-                }
-              },
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          /// 📋 List
-          Expanded(
-            child: Obx(() {
-              if (c.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (c.filteredStudents.isEmpty) {
-                return const Center(child: Text("No students found"));
-              }
-
-              return ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  itemCount: c.filteredStudents.length,
-                  itemBuilder: (context, index) {
-                    final student = c.filteredStudents[index];
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 700),
-                          child: _card(context, student),
-                        ),
-                      ),
-                    );
-                  });
-            }),
           ),
         ],
       ),
@@ -288,7 +296,8 @@ class StudentsPage extends StatelessWidget {
                       icon: Icons.delete,
                       color: cs.error,
                       onTap: () => CustomWidgets().showDeleteDialog(
-                         text: 'Are you sure you want to delete this student permanently?',
+                        text:
+                            'Are you sure you want to delete this student permanently?',
                         context: context,
                         onConfirm: () => c.delete(s!.studentId!),
                       ),

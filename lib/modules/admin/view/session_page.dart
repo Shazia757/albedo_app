@@ -20,7 +20,7 @@ class SessionPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
 
     return Scaffold(
-      appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
+      appBar: const CustomAppBar(),
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       drawer: isDesktop ? null : const DrawerMenu(),
       floatingActionButton: addSessionBtn(context),
@@ -111,8 +111,9 @@ class SessionPage extends StatelessWidget {
                                     color: Theme.of(context).colorScheme.error,
                                     onTap: () =>
                                         CustomWidgets().showDeleteDialog(
-                                           text: 'Are you sure you want to delete this session permanently?',
-                                          context: context,
+                                      text:
+                                          'Are you sure you want to delete this session permanently?',
+                                      context: context,
                                       onConfirm: () => c.delete(data[i].id),
                                     ),
                                   ),

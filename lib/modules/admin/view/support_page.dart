@@ -18,7 +18,8 @@ class SupportsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
+      appBar: const CustomAppBar(),
+
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Column(
         children: [

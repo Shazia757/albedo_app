@@ -18,7 +18,7 @@ class BatchesListPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
 
     return Scaffold(
-      appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
+      appBar: const CustomAppBar(),
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       floatingActionButton: addSessionBtn(context),
       drawer: isDesktop ? null : const DrawerMenu(),

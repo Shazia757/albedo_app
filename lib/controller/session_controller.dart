@@ -1,4 +1,3 @@
-import 'package:albedo_app/model/mentor_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
