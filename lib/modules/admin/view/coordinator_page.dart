@@ -17,122 +17,127 @@ class CoordinatorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
 
-    return Scaffold(
-      appBar: const CustomAppBar(),
-      drawer: isDesktop ? null : const DrawerMenu(),
-      floatingActionButton: addCoordinator(context),
-      body: Row(
-        children: [
-          if (isDesktop) DrawerMenu(),
-          Expanded(
-            child: Column(
-              children: [
-                /// 🔍 Search + Sort
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: CustomWidgets().premiumSearch(context,
-                            hint: "Search Coordinators...",
-                            onChanged: (value) => c.searchQuery.value = value),
-                      ),
-
-                      const SizedBox(width: 10),
-
-                      /// Sort
-                      InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () => CustomWidgets().showSortSheet<SortType>(
-                          title: "Sort Coordinators",
-                          options: [
-                            SortOption(
-                                label: "Newest",
-                                value: SortType.newest,
-                                icon: Icons.schedule),
-                            SortOption(
-                                label: "Oldest",
-                                value: SortType.oldest,
-                                icon: Icons.history),
-                            SortOption(
-                                label: "Name A-Z",
-                                value: SortType.name,
-                                icon: Icons.sort_by_alpha),
-                          ],
-                          selectedValue: c.sortType.value,
-                          onSelected: (val) {
-                            c.sortType.value = val;
-                            c.applyFilters();
-                          },
+    return SafeArea(
+      child: Scaffold(
+        appBar: const CustomAppBar(),
+        drawer: isDesktop ? null : const DrawerMenu(),
+        floatingActionButton: addCoordinator(context),
+        body: Row(
+          children: [
+            if (isDesktop) DrawerMenu(),
+            Expanded(
+              child: Column(
+                children: [
+                  /// 🔍 Search + Sort
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: CustomWidgets().premiumSearch(context,
+                              hint: "Search Coordinators...",
+                              onChanged: (value) =>
+                                  c.searchQuery.value = value),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Icon(Icons.sort, size: 20),
-                        ),
-                      )
-                    ],
+
+                        const SizedBox(width: 10),
+
+                        /// Sort
+                        InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () => CustomWidgets().showSortSheet<SortType>(
+                            title: "Sort Coordinators",
+                            options: [
+                              SortOption(
+                                  label: "Newest",
+                                  value: SortType.newest,
+                                  icon: Icons.schedule),
+                              SortOption(
+                                  label: "Oldest",
+                                  value: SortType.oldest,
+                                  icon: Icons.history),
+                              SortOption(
+                                  label: "Name A-Z",
+                                  value: SortType.name,
+                                  icon: Icons.sort_by_alpha),
+                            ],
+                            selectedValue: c.sortType.value,
+                            onSelected: (val) {
+                              c.sortType.value = val;
+                              c.applyFilters();
+                            },
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(Icons.sort, size: 20),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
 
-                /// 🧭 Tabs
-                Obx(
-                  () => CustomWidgets().customTabs(
-                    context,
-                    tabs: c.tabs,
-                    selectedIndex: c.selectedTab.value,
-                    onTap: (index) {
-                      c.selectedTab.value = index;
-                      c.applyFilters();
-                    },
-                    getCount: (index) {
-                      switch (index) {
-                        case 0:
-                          return c.activeCount;
-                        case 1:
-                          return c.expiredCount;
-                        default:
-                          return 0;
+                  /// 🧭 Tabs
+                  Obx(
+                    () => CustomWidgets().customTabs(
+                      context,
+                      tabs: c.tabs,
+                      selectedIndex: c.selectedTab.value,
+                      onTap: (index) {
+                        c.selectedTab.value = index;
+                        c.applyFilters();
+                      },
+                      getCount: (index) {
+                        switch (index) {
+                          case 0:
+                            return c.activeCount;
+                          case 1:
+                            return c.expiredCount;
+                          default:
+                            return 0;
+                        }
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// 📋 List
+                  Expanded(
+                    child: Obx(() {
+                      if (c.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
                       }
-                    },
-                  ),
-                ),
+                      if (c.filteredCoordinators.isEmpty) {
+                        return const Center(
+                            child: Text("No coordinators found"));
+                      }
 
-                const SizedBox(height: 10),
+                      return ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          itemCount: c.filteredCoordinators.length,
+                          itemBuilder: (context, index) {
+                            final teacher = c.filteredCoordinators[index];
 
-                /// 📋 List
-                Expanded(
-                  child: Obx(() {
-                    if (c.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (c.filteredCoordinators.isEmpty) {
-                      return const Center(child: Text("No coordinators found"));
-                    }
-
-                    return ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        itemCount: c.filteredCoordinators.length,
-                        itemBuilder: (context, index) {
-                          final teacher = c.filteredCoordinators[index];
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 700),
-                                child: _card(context, teacher),
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 700),
+                                  child: _card(context, teacher),
+                                ),
                               ),
-                            ),
-                          );
-                        });
-                  }),
-                ),
-              ],
+                            );
+                          });
+                    }),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

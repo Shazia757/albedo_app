@@ -4,6 +4,7 @@ import 'package:albedo_app/modules/admin/view/batch_page.dart';
 import 'package:albedo_app/modules/admin/view/batches_list_page.dart';
 import 'package:albedo_app/modules/admin/view/coordinator_page.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
+import 'package:albedo_app/modules/admin/view/mentors_page.dart';
 import 'package:albedo_app/modules/admin/view/payment_page.dart';
 import 'package:albedo_app/modules/admin/view/report_page.dart';
 import 'package:albedo_app/modules/admin/view/session_page.dart';
@@ -23,7 +24,7 @@ class DrawerMenu extends StatelessWidget {
     final isDesktop = MediaQuery.of(context).size.width > 800;
 
     final sidebar = Container(
-      width: 240, // 👈 reduced width (premium feel)
+      width: 240,
       color: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
@@ -41,66 +42,60 @@ class DrawerMenu extends StatelessWidget {
                     active: c.selectedIndex.value == 0,
                     onPressed: () {
                       c.setIndex(0);
+                      c.selectedParentIndex.value = -1; // 🔥 reset parent
+                      c.selectedSubIndex.value = -1;
                       Get.back(); // close drawer if open
                       Get.to(() => HomeView());
                     },
                   ),
                   DrawerExpansionMenu(
                       title: 'Sessions',
-                      leadingIcon: Icons.video_collection,
+                      icon: Icons.video_collection,
                       parentIndex: 1,
-                      selectedParentIndex: c.selectedIndex,
+                      selectedParentIndex: c.selectedParentIndex,
                       selectedSubIndex: c.selectedSubIndex,
                       children: [
                         DrawerSubItem(
                           title: 'Sessions',
-                          index: 0,
+                          index: 10,
                           onTap: () => Get.offAll(SessionPage()),
                         ),
                         DrawerSubItem(
                           title: 'Batches',
-                          index: 1,
+                          index: 11,
                           onTap: () => Get.offAll(BatchesListPage()),
                         ),
                       ]),
-                  // _menuItem(
-                  //   context,
-                  //   Icons.video_collection,
-                  //   "Sessions",
-                  //   active: c.selectedIndex.value == 1,
-                  //   onPressed: () {
-                  //     c.setIndex(1);
-                  //     Get.back(); // close drawer if open
-                  //     Get.to(() => SessionPage());
-                  //   },
-                  // ),
                   DrawerExpansionMenu(
                       title: 'Users',
-                      leadingIcon: Icons.people,
+                      icon: Icons.people,
                       parentIndex: 7,
-                      selectedParentIndex: c.selectedIndex,
+                      selectedParentIndex: c.selectedParentIndex,
                       selectedSubIndex: c.selectedSubIndex,
                       children: [
                         DrawerSubItem(
                           title: "Students",
-                          index: 0,
+                          index: 20,
                           onTap: () => Get.offAll(StudentsPage()),
                         ),
                         DrawerSubItem(
                           title: "Teachers",
-                          index: 1,
+                          index: 21,
                           onTap: () => Get.offAll(TeachersPage()),
                         ),
-                        DrawerSubItem(title: "Mentors", index: 2, onTap: () {}),
+                        DrawerSubItem(
+                            title: "Mentors",
+                            index: 22,
+                            onTap: () => Get.offAll(MentorsPage())),
                         DrawerSubItem(
                             title: "Coordinators",
-                            index: 3,
+                            index: 23,
                             onTap: () => Get.offAll(CoordinatorPage())),
                         DrawerSubItem(
                             title: "Advisors",
-                            index: 4,
+                            index: 24,
                             onTap: () => Get.offAll(AdvisorsPage())),
-                        DrawerSubItem(title: "Others", index: 5, onTap: () {}),
+                        DrawerSubItem(title: "Others", index: 25, onTap: () {}),
                       ]),
                   _menuItem(
                     context,
@@ -109,25 +104,27 @@ class DrawerMenu extends StatelessWidget {
                     active: c.selectedIndex.value == 2,
                     onPressed: () {
                       c.setIndex(2);
+                      c.selectedParentIndex.value = -1; // 🔥 reset parent
+                      c.selectedSubIndex.value = -1;
                       Get.back(); // close drawer if open
                       Get.to(() => BatchesPage());
                     },
                   ),
                   DrawerExpansionMenu(
                       title: 'Payments',
-                      leadingIcon: Icons.payment,
+                      icon: Icons.payment,
                       parentIndex: 8,
-                      selectedParentIndex: c.selectedIndex,
+                      selectedParentIndex: c.selectedParentIndex,
                       selectedSubIndex: c.selectedSubIndex,
                       children: [
                         DrawerSubItem(
                             title: "Student",
-                            index: 0,
+                            index: 30,
                             onTap: () => Get.offAll(() =>
                                 PaymentPage(type: PaymentUserType.student))),
                         DrawerSubItem(
                             title: "Teacher",
-                            index: 1,
+                            index: 31,
                             onTap: () => Get.offAll(() =>
                                 PaymentPage(type: PaymentUserType.teacher))),
                       ]),
@@ -138,6 +135,8 @@ class DrawerMenu extends StatelessWidget {
                     active: c.selectedIndex.value == 4,
                     onPressed: () {
                       c.setIndex(4);
+                      c.selectedParentIndex.value = -1; // 🔥 reset parent
+                      c.selectedSubIndex.value = -1;
                       Get.back(); // close drawer if open
                       Get.to(() => ReportsPage());
                     },
@@ -149,6 +148,8 @@ class DrawerMenu extends StatelessWidget {
                     active: c.selectedIndex.value == 5,
                     onPressed: () {
                       c.setIndex(5);
+                      c.selectedParentIndex.value = -1; // 🔥 reset parent
+                      c.selectedSubIndex.value = -1;
                       Get.back();
                       Get.to(() => SupportsPage());
                     },
@@ -160,6 +161,8 @@ class DrawerMenu extends StatelessWidget {
                     active: c.selectedIndex.value == 6,
                     onPressed: () {
                       c.setIndex(6);
+                      c.selectedParentIndex.value = -1; // 🔥 reset parent
+                      c.selectedSubIndex.value = -1;
                       Get.back();
                       Get.to(() => HomeView());
                     },
@@ -312,7 +315,7 @@ class DrawerMenu extends StatelessWidget {
 
 class DrawerExpansionMenu extends StatelessWidget {
   final String title;
-  final IconData leadingIcon;
+  final IconData icon;
   final int parentIndex;
   final RxInt selectedParentIndex;
   final RxInt selectedSubIndex;
@@ -321,7 +324,7 @@ class DrawerExpansionMenu extends StatelessWidget {
   const DrawerExpansionMenu({
     super.key,
     required this.title,
-    required this.leadingIcon,
+    required this.icon,
     required this.parentIndex,
     required this.selectedParentIndex,
     required this.selectedSubIndex,
@@ -330,42 +333,176 @@ class DrawerExpansionMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Theme(
-          data: Theme.of(context).copyWith(
-            dividerColor: Colors.transparent,
-          ),
-          child: ExpansionTile(
-            tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-            childrenPadding: const EdgeInsets.only(left: 12),
-            leading: Icon(
-              leadingIcon,
-              size: 20,
-              color: selectedParentIndex.value == parentIndex
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-            ),
-            title: Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                color: selectedParentIndex.value == parentIndex
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurface,
-                fontWeight: selectedParentIndex.value == parentIndex
-                    ? FontWeight.w600
-                    : FontWeight.w400,
+    final cs = Theme.of(context).colorScheme;
+
+    return Obx(() {
+      /// 🔹 UI state (only for expand/collapse)
+      final isOpen = selectedParentIndex.value == parentIndex;
+
+      /// 🔹 Navigation state (only for highlight)
+      final isActive = selectedParentIndex.value == parentIndex &&
+          selectedSubIndex.value != -1;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 🔹 Parent Tile
+          InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () {
+              /// 🔥 ONLY toggle open/close
+              selectedParentIndex.value = isOpen ? -1 : parentIndex;
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: isActive
+                    ? cs.primaryContainer.withOpacity(0.4)
+                    : Colors.transparent,
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    icon,
+                    size: 20,
+                    color:
+                        isActive ? cs.primary : cs.onSurface.withOpacity(0.6),
+                  ),
+                  const SizedBox(width: 10),
+
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight:
+                            isActive ? FontWeight.w600 : FontWeight.w400,
+                        color: isActive ? cs.primary : cs.onSurface,
+                      ),
+                    ),
+                  ),
+
+                  /// 🔥 Arrow animation
+                  AnimatedRotation(
+                    duration: const Duration(milliseconds: 200),
+                    turns: isOpen ? 0.5 : 0,
+                    child: Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 18,
+                      color: cs.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                ],
               ),
             ),
-            children: children
-                .map((item) => DrawerSubItemWidget(
-                      item: item,
-                      parentIndex: parentIndex,
-                      selectedParentIndex: selectedParentIndex,
-                      selectedSubIndex: selectedSubIndex,
-                    ))
-                .toList(),
           ),
-        ));
+
+          /// 🔹 Children (Animated)
+          AnimatedCrossFade(
+            firstChild: const SizedBox(),
+            secondChild: Column(
+              children: children.map((item) {
+                return _ProSubItem(
+                  item: item,
+                  parentIndex: parentIndex,
+                  selectedParentIndex: selectedParentIndex,
+                  selectedSubIndex: selectedSubIndex,
+                );
+              }).toList(),
+            ),
+            crossFadeState:
+                isOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 200),
+          ),
+        ],
+      );
+    });
+  }
+}
+
+class _ProSubItem extends StatefulWidget {
+  final DrawerSubItem item;
+  final int parentIndex;
+  final RxInt selectedParentIndex;
+  final RxInt selectedSubIndex;
+
+  const _ProSubItem({
+    required this.item,
+    required this.parentIndex,
+    required this.selectedParentIndex,
+    required this.selectedSubIndex,
+  });
+
+  @override
+  State<_ProSubItem> createState() => _ProSubItemState();
+}
+
+class _ProSubItemState extends State<_ProSubItem> {
+  bool isHover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Obx(() {
+      final isActive = widget.selectedParentIndex.value == widget.parentIndex &&
+          widget.selectedSubIndex.value == widget.item.index;
+
+      return MouseRegion(
+        onEnter: (_) => setState(() => isHover = true),
+        onExit: (_) => setState(() => isHover = false),
+        child: InkWell(
+          onTap: () {
+            final c = Get.find<HomeController>(); // 🔥 get controller
+
+            c.selectedIndex.value = -1;
+            widget.selectedParentIndex.value = widget.parentIndex;
+            widget.selectedSubIndex.value = widget.item.index;
+
+            Get.back();
+            widget.item.onTap();
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: isActive
+                  ? cs.primaryContainer.withOpacity(0.5)
+                  : isHover
+                      ? cs.primaryContainer.withOpacity(0.2)
+                      : Colors.transparent,
+            ),
+            child: Row(
+              children: [
+                /// 🔥 Left indicator
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 3,
+                  height: 16,
+                  margin: const EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                    color: isActive ? cs.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+
+                Text(
+                  widget.item.title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                    color: isActive ? cs.primary : cs.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 

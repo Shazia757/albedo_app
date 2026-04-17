@@ -106,7 +106,7 @@ class AdvisorsPage extends StatelessWidget {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (c.filteredAdvisors.isEmpty) {
-                      return const Center(child: Text("No coordinators found"));
+                      return const Center(child: Text("No advisors found"));
                     }
 
                     return ListView.builder(

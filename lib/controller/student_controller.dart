@@ -81,7 +81,7 @@ class StudentController extends GetxController {
           studentId: "STU1001",
           name: "Riya Shah",
           email: "riya@email.com",
-          status: "Active",
+          status: "Active", //TODO: status to be active if number of sessions more than 5 in a month
           type: "Batch",
           joinedAt: DateTime.now(),
         ),

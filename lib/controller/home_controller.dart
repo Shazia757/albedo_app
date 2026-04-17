@@ -16,7 +16,8 @@ class HomeController extends GetxController {
   var isLoading = true.obs;
   var isUsersExpanded = false.obs;
   var selectedIndex = 0.obs;
-  var selectedSubIndex = 0.obs;
+  var selectedParentIndex = (-1).obs;
+  var selectedSubIndex = (-1).obs;
   var totalPackage = 0.0.obs;
 
   var packageData = <Map<String, dynamic>>[].obs;
