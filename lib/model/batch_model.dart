@@ -1,8 +1,9 @@
 class Batch {
-  final String? id;
-  final String? batchID;
-  final String? batchName;
-  final String? teacherId;
+   String? id;
+   String? batchID;
+   String? batchName;
+   String? mode;
+   String? teacherId;
   String teacherName;
   int? teacherSalary;
   final int? duration;
@@ -20,6 +21,7 @@ class Batch {
     this.batchID,
     this.batchName,
     this.teacherId,
+    this.mode,
     required this.teacherName,
     this.teacherSalary,
     this.mentorId,

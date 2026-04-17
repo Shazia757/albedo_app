@@ -1,4 +1,4 @@
-import 'package:albedo_app/model/coordinator_model.dart';
+
 import 'package:albedo_app/model/mentor_model.dart';
 import 'package:albedo_app/model/teacher_model.dart';
 import 'package:flutter/material.dart';
@@ -54,10 +54,10 @@ class MentorController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchCoordinators();
+    fetchMentors();
   }
 
-  void fetchCoordinators() async {
+  void fetchMentors() async {
     try {
       isLoading.value = true;
 

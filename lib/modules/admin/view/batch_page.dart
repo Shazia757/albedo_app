@@ -1,15 +1,15 @@
 import 'package:albedo_app/controller/batch_controller.dart';
-import 'package:albedo_app/widgets/widgets.dart';
+import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
-import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class BatchesPage extends StatelessWidget {
-  final BatchesController c = Get.put(BatchesController());
+  final BatchController c = Get.put(BatchController());
 
   @override
   Widget build(BuildContext context) {
@@ -18,112 +18,117 @@ class BatchesPage extends StatelessWidget {
     return Scaffold(
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       drawer: isDesktop ? null : const DrawerMenu(),
+      floatingActionButton: addBatch(context),
       body: Row(
         children: [
-          if (isDesktop) const DrawerMenu(),
+          if (isDesktop) DrawerMenu(),
           Expanded(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
+            child: Column(
+              children: [
+                /// 🔍 Search + Sort
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
                     children: [
-                      CustomWidgets().premiumSearch(context,
-                          hint: "Search batches...", onChanged: (value) {
+                      Expanded(
+                          child: CustomWidgets().premiumSearch(context,
+                              hint: "Search batches...", onChanged: (value) {
                         c.searchQuery.value = value;
-                      }),
-                      const SizedBox(height: 12),
-                      _tabs(),
-                      const SizedBox(height: 12),
-                      Expanded(child: Obx(() {
-                        final batches = c.filteredBatches;
-                        if (c.isLoading.value) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        if (batches.isEmpty) {
-                          return Center(child: Text("No batches found"));
-                        }
-                        int crossAxisCount = 1;
-
-                        if (Responsive.isTablet(context)) {
-                          crossAxisCount = 2;
-                        } else if (Responsive.isDesktop(context)) {
-                          crossAxisCount = 3;
-                        }
-                        return Expanded(
-                          child: Obx(() {
-                            final batches = c.filteredBatches;
-
-                            if (c.isLoading.value) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-
-                            if (batches.isEmpty) {
-                              return const Center(
-                                  child: Text("No batches found"));
-                            }
-
-                            return LayoutBuilder(
-                              builder: (context, constraints) {
-                                int crossAxisCount = 1;
-
-                                if (constraints.maxWidth > 1200) {
-                                  crossAxisCount = 3;
-                                } else if (constraints.maxWidth > 700) {
-                                  crossAxisCount = 2;
-                                }
-
-                                return MasonryGridView.count(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 6),
-                                  crossAxisCount: crossAxisCount,
-                                  mainAxisSpacing: 12,
-                                  crossAxisSpacing: 12,
-                                  itemCount: batches.length,
-                                  itemBuilder: (_, i) {
-                                    final batch = batches[i];
-
-                                    return InfoCard(
-                                      id: batch.id ?? '',
-                                      status: batch.status ?? '',
-                                      statusColor: getStatusColor(
-                                          context, batch.status ?? ''),
-
-                                      /// 🔥 Use rows instead of fixed columns
-                                      infoRows: [
-                                        _buildBatchSimpleInfo(context, batch),
-                                      ],
-
-                                      actions: [
-                                        CustomWidgets().iconBtn(
-                                          icon: Icons.edit,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          onTap: () {},
-                                        ),
-                                        CustomWidgets().iconBtn(
-                                          icon: Icons.delete,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .error,
-                                          onTap: () {},
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          }),
-                        );
+                        c.applyFilters();
                       })),
+
+                      const SizedBox(width: 10),
+
+                      /// Sort
+                      InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => CustomWidgets().showSortSheet<SortType>(
+                          title: "Sort Batches",
+                          options: [
+                            SortOption(
+                                label: "Newest",
+                                value: SortType.newest,
+                                icon: Icons.schedule),
+                            SortOption(
+                                label: "Oldest",
+                                value: SortType.oldest,
+                                icon: Icons.history),
+                            SortOption(
+                                label: "Name A-Z",
+                                value: SortType.name,
+                                icon: Icons.sort_by_alpha),
+                          ],
+                          selectedValue: c.sortType.value,
+                          onSelected: (val) {
+                            c.sortType.value = val;
+                            c.applyFilters();
+                          },
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Icon(Icons.sort, size: 20),
+                        ),
+                      )
                     ],
                   ),
                 ),
-              ),
+
+                /// 🧭 Tabs
+                Obx(
+                  () => CustomWidgets().customTabs(
+                    context,
+                    tabs: c.tabs,
+                    selectedIndex: c.selectedTab.value,
+                    onTap: (index) {
+                      c.selectedTab.value = index;
+                      c.applyFilters();
+                    },
+                    getCount: (index) {
+                      switch (index) {
+                        case 0:
+                          return c.activeCount;
+                        case 2:
+                          return c.inactiveCount;
+                        default:
+                          return 0;
+                      }
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                /// 📋 List
+                Expanded(
+                  child: Obx(() {
+                    if (c.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (c.filteredBatches.isEmpty) {
+                      return const Center(child: Text("No batches found"));
+                    }
+
+                    return ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        itemCount: c.filteredBatches.length,
+                        itemBuilder: (context, index) {
+                          final batch = c.filteredBatches[index];
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 700),
+                                child: _card(context, batch),
+                              ),
+                            ),
+                          );
+                        });
+                  }),
+                ),
+              ],
             ),
           ),
         ],
@@ -131,158 +136,260 @@ class BatchesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBatchSimpleInfo(BuildContext context, batch) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isSmall = constraints.maxWidth < 300;
-
-        return isSmall
-
-            /// 🔥 MOBILE → STACK
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _miniInfo(
-                    context: context,
-                    label: "Batch Name",
-                    value: batch.batchName ?? '',
-                  ),
-                  const SizedBox(height: 6),
-                  _miniInfo(
-                    context: context,
-                    label: "Batch Code",
-                    value: batch.batchID ?? '',
-                  ),
-                ],
-              )
-
-            /// 🔥 TABLET/DESKTOP → ROW
-            : Row(
-                children: [
-                  Expanded(
-                    child: _miniInfo(
-                      context: context,
-                      label: "Batch Name",
-                      value: batch.batchName ?? '',
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _miniInfo(
-                      context: context,
-                      label: "Batch Code",
-                      value: batch.batchID ?? '',
-                    ),
-                  ),
-                ],
-              );
-      },
-    );
-  }
-
-  Widget _miniInfo({
-    required BuildContext context,
-    String? label,
-    required String value,
-  }) {
+  Widget _card(BuildContext context, Batch? b) {
     final cs = Theme.of(context).colorScheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (label != null)
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: cs.onSurface.withOpacity(0.6),
-              fontWeight: FontWeight.w500,
+    final isActive = b?.status == "Active";
+
+    final statusColor = isActive ? cs.primary : cs.error;
+    final data = c.filteredBatches;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: cs.surface,
+        boxShadow: [
+          BoxShadow(
+            color: cs.shadow.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 🔥 Left Accent Bar
+          Container(
+            width: 4,
+            height: 70,
+            decoration: BoxDecoration(
+              color: statusColor,
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
-        if (label != null) const SizedBox(height: 2),
-        Text(
-          value.isEmpty ? "-" : value,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: cs.onSurface,
-          ),
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
-  }
 
-  Widget _tabs() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: Theme.of(Get.context!).colorScheme.onPrimary,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color:
-                  Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.05),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            )
-          ],
-        ),
-        child: Row(
-          children: [
-            _tabItem("Pending", 0),
-            _tabItem("Approved", 1),
-          ],
-        ),
+          const SizedBox(width: 10),
+
+          /// Content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Top Row
+                Row(
+                  children: [
+                    Text(
+                      b?.batchID ?? 'NULL',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: cs.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                    const Spacer(),
+
+                    /// Status Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        b?.status ?? 'NULL',
+                        style: TextStyle(
+                          color: statusColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 6),
+
+                /// Name
+                Text(
+                  b?.batchName ?? 'NULL',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: cs.onSurface,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                /// 🔘 Actions
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (b?.status != 'Inactive')
+                      CustomWidgets().iconBtn(
+                        icon: Icons.edit,
+                        color: cs.secondary,
+                        onTap: () {
+                          if (b != null) {
+                            c.loadBatches(b);
+                            editBatch(context);
+                          }
+                        },
+                      ),
+                    const SizedBox(width: 8),
+                    CustomWidgets().iconBtn(
+                      icon: Icons.delete,
+                      color: cs.error,
+                      onTap: () => CustomWidgets().showDeleteDialog(
+                        text:
+                            'Are you sure you want to delete this batch permanently?',
+                        context: context,
+                        onConfirm: () => c.delete(b!.batchID!),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _tabItem(String title, int index) {
-    return Expanded(
-      child: Obx(() {
-        final isSelected = c.selectedTab.value == index;
-
-        return GestureDetector(
-          onTap: () => c.selectedTab.value = index,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              gradient: isSelected
-                  ? const LinearGradient(
-                      colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
-                    )
-                  : null,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: isSelected
-                      ? Theme.of(Get.context!).colorScheme.onPrimary
-                      : Theme.of(Get.context!).colorScheme.outline,
-                  fontWeight: FontWeight.w600,
-                ),
+  void editBatch(BuildContext context) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text('Edit Batch'),
+      icon: Icons.edit,
+      formKey: GlobalKey<FormState>(),
+      sections: [
+        SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text('Profile Photo (Max: 50 MB)'),
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: () {},
+                    child: CircleAvatar(
+                      radius: 35,
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Batch Name', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.batchNameController),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Batch Code', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: '',
+                      controller: c.batchCodeController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Mode', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Select modes',
+                      controller: c.batchModeController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Course', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Select Course',
+                      controller: c.courseController),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Mentor', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Select Mentor',
+                      controller: c.mentorController),
+                  const SizedBox(height: 10),
+                ],
               ),
-            ),
-          ),
-        );
-      }),
+            ))
+      ],
+      onSubmit: () {},
     );
   }
 
-  Color getStatusColor(BuildContext context, String status) {
-    switch (status.toLowerCase()) {
-      case "active":
-        return Theme.of(context).colorScheme.onInverseSurface;
-      case "inactive":
-        return Theme.of(context).colorScheme.onTertiary;
-      default:
-        return Theme.of(context).colorScheme.shadow;
-    }
+  FloatingActionButton addBatch(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () => CustomWidgets().showCustomDialog(
+        context: context,
+        title: Text('Add New Batch'),
+        formKey: GlobalKey<FormState>(),
+        sections: [
+          SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    CustomWidgets()
+                        .labelWithAsterisk('Batch Name', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter batch name',
+                        controller: c.batchNameController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Mode', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select modes',
+                        controller: c.batchModeController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Course', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select Course',
+                        controller: c.courseController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Mentor', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select Mentor',
+                        controller: c.mentorController),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ))
+        ],
+        onSubmit: () {},
+      ),
+      mini: true,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: Icon(
+        Icons.add,
+        color: context.theme.colorScheme.onPrimary,
+      ),
+    );
   }
 }
