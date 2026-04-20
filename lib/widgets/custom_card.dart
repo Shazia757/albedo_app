@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 class InfoCard extends StatelessWidget {
   final String id;
-  final String status;
-  final Color statusColor;
+  final String? status;
+  final Color? statusColor;
 
   final List<Widget>? infoRows;
   final List<Map<String, String>>? infoColumns;
@@ -13,8 +13,8 @@ class InfoCard extends StatelessWidget {
   const InfoCard({
     super.key,
     required this.id,
-    required this.status,
-    required this.statusColor,
+    this.status,
+    this.statusColor,
     this.infoRows,
     this.infoColumns,
     this.actions,
@@ -57,6 +57,7 @@ class InfoCard extends StatelessWidget {
               LayoutBuilder(
                 builder: (context, constraints) {
                   final isTight = constraints.maxWidth < 260;
+                  final statusWidget = _buildStatus(context);
 
                   return isTight
                       ? Wrap(
@@ -64,14 +65,14 @@ class InfoCard extends StatelessWidget {
                           runSpacing: 6,
                           children: [
                             _buildIdChip(context),
-                            _buildStatus(context),
+                            if (statusWidget != null) _buildStatus(context),
                           ],
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _buildIdChip(context),
-                            _buildStatus(context),
+                            if (statusWidget != null) _buildStatus(context),
                           ],
                         );
                 },
@@ -156,9 +157,10 @@ class InfoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatus(BuildContext context) {
+  _buildStatus(BuildContext context) {
+    if (status != null || status != '') return null;
     return Text(
-      status.toUpperCase(),
+      status!.toUpperCase(),
       style: TextStyle(
         fontSize: Responsive.isMobile(context) ? 11 : 12,
         fontWeight: FontWeight.bold,

@@ -1,5 +1,15 @@
+import 'package:albedo_app/model/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+enum VisibleTo {
+  all,
+  student,
+  teacher,
+  mentor,
+  assistantAdmin,
+  other,
+}
 
 class SettingsController extends GetxController {
   RxBool isLoading = true.obs;
@@ -14,6 +24,11 @@ class SettingsController extends GetxController {
   var referralSource = [].obs;
   var assessmentAttentionQn = [].obs;
   var users = [].obs;
+  var notifications = <Notifications>[].obs;
+
+  RxBool isDeleteButtonLoading = false.obs;
+
+RxList<VisibleTo> selected = <VisibleTo>[].obs;
 
   TextEditingController regFeeController = TextEditingController();
   TextEditingController factorValueController = TextEditingController();
@@ -32,6 +47,9 @@ class SettingsController extends GetxController {
   TextEditingController mentorPrivacyController = TextEditingController();
   TextEditingController coordinatorPrivacyController = TextEditingController();
   TextEditingController otherPrivacyController = TextEditingController();
+
+  TextEditingController titleController = TextEditingController();
+  TextEditingController messageController = TextEditingController();
 
   List<String> tabs = [
     "General",
@@ -53,6 +71,7 @@ class SettingsController extends GetxController {
   void onInit() {
     super.onInit();
     fetchData();
+    fetchNotifications();
   }
 
   Future<void> fetchData() async {
@@ -70,7 +89,7 @@ class SettingsController extends GetxController {
       referralSource.assignAll(['Marketing Team']);
       assessmentAttentionQn
           .assignAll(['Consistency', 'Participation in Discussions']);
-          users.assignAll(['Student','Teacher','Mentor','Coordinator','Other']);
+      users.assignAll(['Student', 'Teacher', 'Mentor', 'Coordinator', 'Other']);
     } catch (e) {
       print("Error: $e");
     } finally {
@@ -92,5 +111,71 @@ class SettingsController extends GetxController {
 
   void deleteSyllabus(int id) {
     syllabus.removeWhere((e) => e.id == id);
+  }
+
+  void fetchNotifications() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      notifications.assignAll([
+        Notifications(
+            id: '#001',
+            title: 'Attendance policy update',
+            message: 'Please make sure to ....',
+            isImportant: true,
+            visibleTo: [VisibleTo.teacher, VisibleTo.mentor]),
+        Notifications(
+            id: '#002',
+            title: 'Teachers Doc',
+            message: 'Dear trs, Please make sure to ....',
+            isImportant: true,
+            visibleTo: [VisibleTo.teacher]),
+      ]);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadNotifications(Notifications msg) {
+    titleController.text = msg.title.toString();
+    messageController.text = msg.message.toString();
+    selected.assignAll(msg.visibleTo);
+  }
+
+  delete(id) {
+    isDeleteButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
+  }
+
+  String getLabel(VisibleTo v) {
+    switch (v) {
+      case VisibleTo.all:
+        return "All";
+      case VisibleTo.student:
+        return "Student";
+      case VisibleTo.teacher:
+        return "Teacher";
+      case VisibleTo.mentor:
+        return "Mentor";
+      case VisibleTo.assistantAdmin:
+        return "Assistant Admin";
+      case VisibleTo.other:
+        return "Other";
+    }
   }
 }
