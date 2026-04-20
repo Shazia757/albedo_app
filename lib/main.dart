@@ -1,5 +1,5 @@
 import 'package:albedo_app/config/color_schemes.dart';
-import 'package:albedo_app/modules/admin/view/coordinator_page.dart';
+import 'package:albedo_app/modules/admin/view/settings/settings_page.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:albedo_app/common_views/login_page.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +35,6 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         themeMode: ThemeMode.system,
-        home: isLoggedIn ? CoordinatorPage() : CoordinatorPage());
+        home: isLoggedIn ? SettingsPage() : SettingsPage());
   }
 }

@@ -1,17 +1,18 @@
 import 'package:albedo_app/model/payment_model.dart';
-import 'package:albedo_app/modules/admin/view/advisors_page.dart';
+import 'package:albedo_app/modules/admin/view/users/advisors_page.dart';
 import 'package:albedo_app/modules/admin/view/batch_page.dart';
 import 'package:albedo_app/modules/admin/view/batches_list_page.dart';
-import 'package:albedo_app/modules/admin/view/coordinator_page.dart';
+import 'package:albedo_app/modules/admin/view/users/coordinator_page.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
-import 'package:albedo_app/modules/admin/view/mentors_page.dart';
+import 'package:albedo_app/modules/admin/view/users/mentors_page.dart';
 import 'package:albedo_app/modules/admin/view/others_page.dart';
 import 'package:albedo_app/modules/admin/view/payment_page.dart';
 import 'package:albedo_app/modules/admin/view/report_page.dart';
 import 'package:albedo_app/modules/admin/view/session_page.dart';
-import 'package:albedo_app/modules/admin/view/students_page.dart';
+import 'package:albedo_app/modules/admin/view/settings/settings_page.dart';
+import 'package:albedo_app/modules/admin/view/users/students_page.dart';
 import 'package:albedo_app/modules/admin/view/support_page.dart';
-import 'package:albedo_app/modules/admin/view/teachers_page.dart';
+import 'package:albedo_app/modules/admin/view/users/teachers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/home_controller.dart';
@@ -168,7 +169,7 @@ class DrawerMenu extends StatelessWidget {
                       c.selectedParentIndex.value = -1; // 🔥 reset parent
                       c.selectedSubIndex.value = -1;
                       Get.back();
-                      Get.to(() => HomeView());
+                      Get.to(() => SettingsPage());
                     },
                   ),
                 ],

@@ -1,15 +1,23 @@
-class SupportModel {
+class Ticket {
   final String id;
   final String title;
   final String description;
-  final String by;
+  String? category;
+  String? priority;
+  String? userType;
+  String? studentName;
+  String? teacherName;
   final String status; // open / closed
 
-  SupportModel({
+  Ticket({
     required this.id,
     required this.title,
     required this.description,
-    required this.by,
+    this.category,
+    this.priority,
+    this.studentName,
+    this.teacherName,
+this.userType,
     required this.status,
   });
 }

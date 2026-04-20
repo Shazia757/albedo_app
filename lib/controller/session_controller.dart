@@ -119,7 +119,6 @@ class SessionController extends GetxController {
     try {
       isLoading.value = true;
 
-      // 🔥 Replace with your API call
       await Future.delayed(const Duration(seconds: 2));
 
       sessions.assignAll([

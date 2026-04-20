@@ -15,7 +15,7 @@ class HomeController extends GetxController {
   var mentorData = <double>[].obs;
   var isLoading = true.obs;
   var isUsersExpanded = false.obs;
-  var selectedIndex = 0.obs;
+  var selectedIndex = 6.obs;
   var selectedParentIndex = (-1).obs;
   var selectedSubIndex = (-1).obs;
   var totalPackage = 0.0.obs;
