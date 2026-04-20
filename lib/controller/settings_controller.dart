@@ -1,3 +1,4 @@
+import 'package:albedo_app/model/banners_model.dart';
 import 'package:albedo_app/model/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,10 +26,11 @@ class SettingsController extends GetxController {
   var assessmentAttentionQn = [].obs;
   var users = [].obs;
   var notifications = <Notifications>[].obs;
+  var banners = <Banners>[].obs;
 
   RxBool isDeleteButtonLoading = false.obs;
 
-RxList<VisibleTo> selected = <VisibleTo>[].obs;
+  RxList<VisibleTo> selected = <VisibleTo>[].obs;
 
   TextEditingController regFeeController = TextEditingController();
   TextEditingController factorValueController = TextEditingController();
@@ -51,6 +53,13 @@ RxList<VisibleTo> selected = <VisibleTo>[].obs;
   TextEditingController titleController = TextEditingController();
   TextEditingController messageController = TextEditingController();
 
+  TextEditingController urlController = TextEditingController();
+  TextEditingController startDateController = TextEditingController();
+  TextEditingController endDateController = TextEditingController();
+
+Rx<BannerType> selectedType = BannerType.defaultBanner.obs;
+
+
   List<String> tabs = [
     "General",
     "Notifications",
@@ -72,6 +81,7 @@ RxList<VisibleTo> selected = <VisibleTo>[].obs;
     super.onInit();
     fetchData();
     fetchNotifications();
+    fetchBanners();
   }
 
   Future<void> fetchData() async {
@@ -177,5 +187,27 @@ RxList<VisibleTo> selected = <VisibleTo>[].obs;
       case VisibleTo.other:
         return "Other";
     }
+  }
+
+  void fetchBanners() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      banners.assignAll([
+        Banners(id: '1', visibleTo: [VisibleTo.assistantAdmin])
+      ]);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadBanners(Banners banner) {
+    urlController.text = banner.url.toString();
+    startDateController.text = banner.startDate.toString();
+    endDateController.text = banner.endDate.toString();
+
+    selected.assignAll(banner.visibleTo);
   }
 }

@@ -1,8 +1,8 @@
 import 'package:albedo_app/controller/settings_controller.dart';
+import 'package:albedo_app/modules/admin/view/settings/banner_ads_page.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
-import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -63,8 +63,10 @@ class NotificationsPage extends StatelessWidget {
                       itemBuilder: (_, i) {
                         final item = data[i];
 
-                        return NotificationCard(
+                        return CustomCard(
+                          c: c,
                           title: item.title ?? '',
+                          visibleTo: item.visibleTo,
                           description: item.message ?? '',
                           isImportant: item.isImportant,
                           actions: [
@@ -168,97 +170,6 @@ class NotificationsPage extends StatelessWidget {
       child: Icon(
         Icons.add,
         color: context.theme.colorScheme.onPrimary,
-      ),
-    );
-  }
-}
-
-class NotificationCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final bool isImportant;
-  final List<Widget>? actions;
-
-  const NotificationCard({
-    super.key,
-    required this.title,
-    required this.description,
-    this.isImportant = false,
-    this.actions,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: cs.outlineVariant),
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// 🔥 Header
-          Row(
-            children: [
-              if (isImportant)
-                Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: cs.errorContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(Icons.priority_high,
-                      size: 16, color: cs.onErrorContainer),
-                ),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 8),
-
-          /// 🔥 Description
-          Text(
-            description,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.onSurface.withOpacity(0.7),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          /// 🔥 Actions
-          if (actions != null && actions!.isNotEmpty)
-            Align(
-              alignment: Alignment.centerRight,
-              child: Wrap(
-                spacing: 6,
-                children: actions!,
-              ),
-            ),
-        ],
       ),
     );
   }
