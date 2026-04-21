@@ -2,7 +2,9 @@ import 'package:albedo_app/model/banners_model.dart';
 import 'package:albedo_app/model/coupons_model.dart';
 import 'package:albedo_app/model/hiring_ad_model.dart';
 import 'package:albedo_app/model/notification_model.dart';
+import 'package:albedo_app/model/rating_value_model.dart';
 import 'package:albedo_app/model/recommendations_model.dart';
+import 'package:albedo_app/model/support_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -34,6 +36,8 @@ class SettingsController extends GetxController {
   var coupons = <Coupons>[].obs;
   var recommendations = <Recommendations>[].obs;
   var hiringAd = <HiringAd>[].obs;
+  var ratingValues = <RatingValue>[].obs;
+  var supports = <Macro>[].obs;
 
   RxBool isDeleteButtonLoading = false.obs;
 
@@ -76,6 +80,8 @@ class SettingsController extends GetxController {
 
   TextEditingController timeController = TextEditingController();
 
+  var textControllers = <TextEditingController>[].obs;
+
   List<String> tabs = [
     "General",
     "Notifications",
@@ -101,6 +107,8 @@ class SettingsController extends GetxController {
     fetchCoupons();
     fetchRecommendations();
     fetchHiringAds();
+    fetchRatingValues();
+    fetchSupports();
   }
 
   Future<void> fetchData() async {
@@ -306,5 +314,89 @@ class SettingsController extends GetxController {
     startDateController.text = ad.startDate.toString();
     endDateController.text = ad.endDate.toString();
     selectedDays.assignAll(ad.days ?? []);
+  }
+
+  void fetchRatingValues() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      final data = [
+        RatingValue(label: 'MV1', value: 0.5),
+        RatingValue(label: 'MV2', value: 0.6),
+        RatingValue(label: 'MV3', value: 1),
+      ];
+
+      ratingValues.assignAll(data);
+
+      // 🔥 IMPORTANT: Sync controllers
+      textControllers.clear();
+
+      for (var item in data) {
+        textControllers.add(
+          TextEditingController(text: item.value.toString()),
+        );
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void addField({String defaultValue = "0"}) {
+    textControllers.add(TextEditingController(text: defaultValue));
+    ratingValues.add(RatingValue(
+        label: "MV${ratingValues.length + 1}",
+        value: double.tryParse(defaultValue) ?? 0));
+  }
+
+  void loadRatingValues(HiringAd ad) {}
+
+  void removeField(int index) {
+    if (ratingValues.length > 5) {
+      textControllers.removeAt(index);
+      ratingValues.removeAt(index);
+    } else {
+      Get.snackbar("Error", "Minimum 5 values required",
+          snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  void saveSettings() {
+    // Collect data from controllers
+    for (int i = 0; i < textControllers.length; i++) {
+      print("Saving MV${i + 1}: ${textControllers[i].text}");
+    }
+    Get.snackbar("Success", "Settings saved successfully",
+        backgroundColor: Colors.green, colorText: Colors.white);
+  }
+
+  void fetchSupports() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      final data = [
+        Macro(
+            id: '1',
+            title: 'App issue',
+            description: 'Thank you for reporting'),
+        Macro(
+            id: '1',
+            title: 'Network Issue',
+            description:
+                'We are sorry to hear you experienced network issues.'),
+      ];
+
+      supports.assignAll(data);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadSupports(Macro macro) {
+    titleController.text = macro.title ?? '';
+    messageController.text = macro.description ?? '';
   }
 }

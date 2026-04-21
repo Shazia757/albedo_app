@@ -29,7 +29,7 @@ class SettingsPage extends StatelessWidget {
     _SettingsItem("Coupons", Icons.confirmation_number, CouponsPage()),
     _SettingsItem("Recommendation", Icons.thumb_up, RecommendationPage()),
     _SettingsItem("Hiring", Icons.work, HiringPage()),
-    _SettingsItem("Star of Month", Icons.star, StarPage()),
+    _SettingsItem("Star of Month", Icons.star, StarOfMonthPage()),
     _SettingsItem("Automation", Icons.auto_mode, MacroPage()),
     _SettingsItem("Assessments", Icons.assignment, AssessmentsPage()),
     _SettingsItem("Materials", Icons.menu_book, MaterialsPage()),

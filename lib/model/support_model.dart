@@ -17,7 +17,19 @@ class Ticket {
     this.priority,
     this.studentName,
     this.teacherName,
-this.userType,
+    this.userType,
     required this.status,
+  });
+}
+
+class Macro {
+  final String id;
+  final String title;
+  final String description;
+
+  Macro({
+    required this.id,
+    required this.title,
+    required this.description,
   });
 }
