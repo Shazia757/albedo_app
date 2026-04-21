@@ -1,5 +1,6 @@
 import 'package:albedo_app/model/banners_model.dart';
 import 'package:albedo_app/model/coupons_model.dart';
+import 'package:albedo_app/model/hiring_ad_model.dart';
 import 'package:albedo_app/model/notification_model.dart';
 import 'package:albedo_app/model/recommendations_model.dart';
 import 'package:flutter/material.dart';
@@ -32,11 +33,13 @@ class SettingsController extends GetxController {
   var banners = <Banners>[].obs;
   var coupons = <Coupons>[].obs;
   var recommendations = <Recommendations>[].obs;
+  var hiringAd = <HiringAd>[].obs;
 
   RxBool isDeleteButtonLoading = false.obs;
 
   RxList<VisibleTo> selected = <VisibleTo>[].obs;
   RxList selectedSyllabus = [].obs;
+  RxList<Days> selectedDays = <Days>[].obs;
 
   TextEditingController regFeeController = TextEditingController();
   TextEditingController factorValueController = TextEditingController();
@@ -71,6 +74,8 @@ class SettingsController extends GetxController {
   Rx<String> selectedDiscountType = 'percentage'.obs;
   Rx<String> selectedRecommendationType = 'package'.obs;
 
+  TextEditingController timeController = TextEditingController();
+
   List<String> tabs = [
     "General",
     "Notifications",
@@ -95,6 +100,7 @@ class SettingsController extends GetxController {
     fetchBanners();
     fetchCoupons();
     fetchRecommendations();
+    fetchHiringAds();
   }
 
   Future<void> fetchData() async {
@@ -270,5 +276,35 @@ class SettingsController extends GetxController {
         : (rec.package ?? '');
     startDateController.text = rec.startDate.toString();
     endDateController.text = rec.endDate.toString();
+  }
+
+  void fetchHiringAds() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      hiringAd.assignAll([
+        HiringAd(
+            package: 'Biology',
+            time: '12:00 PM',
+            startDate: '18 Sep 2025',
+            endDate: '03 Oct 2025',
+            days: [Days.monday, Days.tuesday])
+      ]);
+      // if (hiringAd.isNotEmpty) {
+      //   selectedSyllabus.assignAll(recommendations.first.visibleTo);
+      // }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadHiringAds(HiringAd ad) {
+    nameController.text = ad.package ?? '';
+    timeController.text = ad.time ?? '';
+    startDateController.text = ad.startDate.toString();
+    endDateController.text = ad.endDate.toString();
+    selectedDays.assignAll(ad.days ?? []);
   }
 }
