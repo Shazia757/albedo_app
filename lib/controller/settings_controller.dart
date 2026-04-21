@@ -1,6 +1,7 @@
 import 'package:albedo_app/model/banners_model.dart';
 import 'package:albedo_app/model/coupons_model.dart';
 import 'package:albedo_app/model/notification_model.dart';
+import 'package:albedo_app/model/recommendations_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,6 +18,7 @@ class SettingsController extends GetxController {
   RxBool isLoading = true.obs;
   var selectedTab = 0.obs;
 
+  var syllabusList = <String>[].obs;
   var syllabus = [].obs;
   var course = [].obs;
   var package = [].obs;
@@ -29,10 +31,12 @@ class SettingsController extends GetxController {
   var notifications = <Notifications>[].obs;
   var banners = <Banners>[].obs;
   var coupons = <Coupons>[].obs;
+  var recommendations = <Recommendations>[].obs;
 
   RxBool isDeleteButtonLoading = false.obs;
 
   RxList<VisibleTo> selected = <VisibleTo>[].obs;
+  RxList selectedSyllabus = [].obs;
 
   TextEditingController regFeeController = TextEditingController();
   TextEditingController factorValueController = TextEditingController();
@@ -65,6 +69,7 @@ class SettingsController extends GetxController {
 
   Rx<BannerType> selectedType = BannerType.defaultBanner.obs;
   Rx<String> selectedDiscountType = 'percentage'.obs;
+  Rx<String> selectedRecommendationType = 'package'.obs;
 
   List<String> tabs = [
     "General",
@@ -89,6 +94,7 @@ class SettingsController extends GetxController {
     fetchNotifications();
     fetchBanners();
     fetchCoupons();
+    fetchRecommendations();
   }
 
   Future<void> fetchData() async {
@@ -234,5 +240,35 @@ class SettingsController extends GetxController {
   void loadCoupons(Coupons cpn) {
     nameController.text = cpn.name.toString();
     codeController.text = cpn.code.toString();
+  }
+
+  void fetchRecommendations() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      recommendations.assignAll([
+        Recommendations(
+            id: '#001',
+            batch: 'B001',
+            startDate: '01 Aug 2025',
+            endDate: '31 Dec 2025',
+            visibleTo: ['Albedo School', 'British'])
+      ]);
+      if (recommendations.isNotEmpty) {
+        selectedSyllabus.assignAll(recommendations.first.visibleTo);
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadRecommendations(Recommendations rec) {
+    nameController.text = (selectedRecommendationType == 'batch')
+        ? (rec.batch ?? '')
+        : (rec.package ?? '');
+    startDateController.text = rec.startDate.toString();
+    endDateController.text = rec.endDate.toString();
   }
 }

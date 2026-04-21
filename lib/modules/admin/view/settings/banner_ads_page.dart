@@ -125,8 +125,9 @@ class BannerAdsPage extends StatelessWidget {
         const SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Visible To:'),
         const SizedBox(height: 10),
-        VisibleToSelector(
-          c: c,
+        MultiSelector<VisibleTo>(
+          items: VisibleTo.values.where((e) => e != VisibleTo.all).toList(),
+          labelBuilder: (v) => c.getLabel(v),
           initial: List<VisibleTo>.from(c.selected),
           onChanged: (val) {
             c.selected.assignAll(val);
@@ -212,8 +213,12 @@ class BannerAdsPage extends StatelessWidget {
                           const SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Visible To:'),
                           const SizedBox(height: 10),
-                          VisibleToSelector(
-                            c: c,
+                          MultiSelector<VisibleTo>(
+                            items: VisibleTo.values
+                                .where((e) => e != VisibleTo.all)
+                                .toList(),
+                            allValue: VisibleTo.all,
+                            labelBuilder: (v) => c.getLabel(v),
                             initial: List<VisibleTo>.from(c.selected),
                             onChanged: (val) {
                               c.selected.assignAll(val);
@@ -236,8 +241,12 @@ class BannerAdsPage extends StatelessWidget {
                           const SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Visible To:'),
                           const SizedBox(height: 10),
-                          VisibleToSelector(
-                            c: c,
+                          MultiSelector<VisibleTo>(
+                            items: VisibleTo.values
+                                .where((e) => e != VisibleTo.all)
+                                .toList(),
+                            allValue: VisibleTo.all,
+                            labelBuilder: (v) => c.getLabel(v),
                             initial: List<VisibleTo>.from(c.selected),
                             onChanged: (val) {
                               c.selected.assignAll(val);
@@ -388,109 +397,117 @@ class CustomCard extends StatelessWidget {
   }
 }
 
-class VisibleToSelector extends StatefulWidget {
-  final SettingsController c;
-  final List<VisibleTo> initial;
-  final Function(List<VisibleTo>) onChanged;
+class MultiSelector<T> extends StatefulWidget {
+  final List<T> items;
+  final List<T> initial;
+  final Function(List<T>) onChanged;
 
-  const VisibleToSelector({
+  /// Optional "All" item (can be enum OR string OR model)
+  final T? allValue;
+
+  /// Label builder (important for enums / objects)
+  final String Function(T) labelBuilder;
+
+  const MultiSelector({
     super.key,
-    required this.c,
+    required this.items,
     required this.initial,
     required this.onChanged,
+    required this.labelBuilder,
+    this.allValue,
   });
 
   @override
-  State<VisibleToSelector> createState() => _VisibleToSelectorState();
+  State<MultiSelector<T>> createState() => _MultiSelectorState<T>();
 }
 
-class _VisibleToSelectorState extends State<VisibleToSelector> {
-  late List<VisibleTo> selected;
+class _MultiSelectorState<T> extends State<MultiSelector<T>> {
+  late List<T> selected;
 
   @override
   void initState() {
     super.initState();
-    selected = List<VisibleTo>.from(widget.initial);
+    selected = List<T>.from(widget.initial);
   }
 
-  void toggle(VisibleTo value) {
+  void toggle(T value) {
     setState(() {
-      final allExceptAll =
-          VisibleTo.values.where((e) => e != VisibleTo.all).toList();
+      final hasAll = widget.allValue != null;
 
-      if (value == VisibleTo.all) {
-        if (selected.contains(VisibleTo.all)) {
-          selected.clear();
+      final allExceptAll = hasAll
+          ? widget.items.where((e) => e != widget.allValue).toList()
+          : widget.items;
+
+      if (hasAll && value == widget.allValue) {
+        final isAllSelected = selected.toSet().containsAll(allExceptAll);
+
+        if (isAllSelected) {
+          selected.clear(); // unselect all
         } else {
-          selected = List<VisibleTo>.from(VisibleTo.values);
+          selected = List<T>.from(allExceptAll); // ✅ select everything
         }
       } else {
-        selected.remove(VisibleTo.all);
-
         if (selected.contains(value)) {
           selected.remove(value);
         } else {
           selected.add(value);
         }
 
-        // auto select ALL if everything selected
-        if (selected.toSet().containsAll(allExceptAll)) {
-          selected = [VisibleTo.all];
+        // if all items selected manually → keep them all (NOT collapse to "All")
+        if (hasAll && selected.toSet().containsAll(allExceptAll)) {
+          selected = List<T>.from(allExceptAll);
         }
       }
     });
 
-    widget.onChanged(List<VisibleTo>.from(selected));
+    widget.onChanged(List<T>.from(selected));
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          spacing: 10,
-          runSpacing: 6,
-          children: VisibleTo.values.map((v) {
-            final isSelected = selected.contains(v);
+    final displayList = widget.allValue != null
+        ? [widget.allValue as T, ...widget.items]
+        : widget.items;
 
-            return InkWell(
+    return Wrap(
+      spacing: 10,
+      runSpacing: 6,
+      children: displayList.map((v) {
+        final isSelected = widget.allValue != null && v == widget.allValue
+            ? selected.toSet().containsAll(widget.items)
+            : selected.contains(v);
+        return InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () => toggle(v),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: isSelected ? cs.primaryContainer : cs.surfaceVariant,
               borderRadius: BorderRadius.circular(10),
-              onTap: () => toggle(v),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isSelected ? cs.primaryContainer : cs.surfaceVariant,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected ? cs.primary : cs.outlineVariant,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      isSelected
-                          ? Icons.check_box
-                          : Icons.check_box_outline_blank,
-                      size: 18,
-                      color: isSelected ? cs.primary : cs.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      widget.c.getLabel(v),
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ],
-                ),
+              border: Border.all(
+                color: isSelected ? cs.primary : cs.outlineVariant,
               ),
-            );
-          }).toList(),
-        ),
-      ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                  size: 18,
+                  color: isSelected ? cs.primary : cs.onSurfaceVariant,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  widget.labelBuilder(v),
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
