@@ -1,4 +1,5 @@
 import 'package:albedo_app/model/banners_model.dart';
+import 'package:albedo_app/model/coupons_model.dart';
 import 'package:albedo_app/model/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,6 +28,7 @@ class SettingsController extends GetxController {
   var users = [].obs;
   var notifications = <Notifications>[].obs;
   var banners = <Banners>[].obs;
+  var coupons = <Coupons>[].obs;
 
   RxBool isDeleteButtonLoading = false.obs;
 
@@ -57,8 +59,12 @@ class SettingsController extends GetxController {
   TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
 
-Rx<BannerType> selectedType = BannerType.defaultBanner.obs;
+  TextEditingController nameController = TextEditingController();
+  TextEditingController codeController = TextEditingController();
+  TextEditingController discountController = TextEditingController();
 
+  Rx<BannerType> selectedType = BannerType.defaultBanner.obs;
+  Rx<String> selectedDiscountType = 'percentage'.obs;
 
   List<String> tabs = [
     "General",
@@ -82,6 +88,7 @@ Rx<BannerType> selectedType = BannerType.defaultBanner.obs;
     fetchData();
     fetchNotifications();
     fetchBanners();
+    fetchCoupons();
   }
 
   Future<void> fetchData() async {
@@ -209,5 +216,23 @@ Rx<BannerType> selectedType = BannerType.defaultBanner.obs;
     endDateController.text = banner.endDate.toString();
 
     selected.assignAll(banner.visibleTo);
+  }
+
+  void fetchCoupons() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      coupons
+          .assignAll([Coupons(code: 'AW375X', name: 'Wallet Offer', id: '1')]);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadCoupons(Coupons cpn) {
+    nameController.text = cpn.name.toString();
+    codeController.text = cpn.code.toString();
   }
 }

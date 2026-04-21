@@ -67,7 +67,18 @@ class NotificationsPage extends StatelessWidget {
                           c: c,
                           title: item.title ?? '',
                           visibleTo: item.visibleTo,
-                          description: item.message ?? '',
+                          content: Text(
+                            item.message ?? '',
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.7),
+                            ),
+                          ),
                           isImportant: item.isImportant,
                           actions: [
                             CustomWidgets().iconBtn(

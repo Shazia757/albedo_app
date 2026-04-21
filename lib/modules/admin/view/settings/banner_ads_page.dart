@@ -266,20 +266,20 @@ class BannerAdsPage extends StatelessWidget {
 
 class CustomCard extends StatelessWidget {
   final String? title;
-  final String? description;
+  final Widget? content;
   final bool isImportant;
   final List<Widget>? actions;
-  final List<VisibleTo> visibleTo;
+  final List<VisibleTo>? visibleTo;
   final SettingsController c;
 
   const CustomCard({
     super.key,
     this.title,
-    this.description,
+    this.content,
     required this.c,
     this.isImportant = false,
     this.actions,
-    required this.visibleTo,
+    this.visibleTo,
   });
 
   @override
@@ -330,27 +330,22 @@ class CustomCard extends StatelessWidget {
           ),
 
           const SizedBox(height: 8),
+          if (content != null) ...[
+            content!,
+            const SizedBox(height: 10),
+          ],
 
-          Text(
-            description ?? '',
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.onSurface.withOpacity(0.7),
-            ),
-          ),
           const SizedBox(height: 10),
-          Text(
-            'Shown in:',
-            style: TextStyle(
-              fontSize: 11,
-              color: cs.onSurface.withOpacity(0.9),
-            ),
-          ),
 
           /// 🔥 Visible To Chips
           if ((visibleTo ?? []).isNotEmpty) ...[
+            Text(
+              'Shown in:',
+              style: TextStyle(
+                fontSize: 11,
+                color: cs.onSurface.withOpacity(0.9),
+              ),
+            ),
             const SizedBox(height: 10),
             Wrap(
               spacing: 6,
