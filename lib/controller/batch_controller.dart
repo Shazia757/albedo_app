@@ -1,5 +1,5 @@
 import 'package:albedo_app/model/batch_model.dart';
-import 'package:albedo_app/model/student_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

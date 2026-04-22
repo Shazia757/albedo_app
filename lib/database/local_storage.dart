@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:albedo_app/model/user_model.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:get_storage/get_storage.dart';
 
 class LocalStorage {

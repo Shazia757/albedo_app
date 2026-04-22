@@ -30,28 +30,43 @@ const lightColorScheme = ColorScheme(
   tertiaryContainer: Color(0xFFFFE0B2),
 );
 
-/// 🌙 DARK THEME
+/// 🌙 DARK THEME (BLACK-BASED)
 const darkColorScheme = ColorScheme(
   brightness: Brightness.dark,
-  primary: primaryBlue,
-  onPrimary: Color(0xFF00344C),
-  primaryContainer: Color(0xFF004C6D),
-  onPrimaryContainer: Color(0xFFC8E6FF),
-  secondary: secondaryPurple,
-  onSecondary: Color(0xFF3A0F3A),
-  secondaryContainer: Color(0xFF5A1F5A),
-  onSecondaryContainer: Color(0xFFF1D8F1),
-  surface: Color(0xFF0B1E2D),
-  onSurface: Color(0xFFEAF6FF),
-  error: Color(0xFFFFB4AB),
-  onError: Color(0xFF690005),
-  outline: Color(0xFF8A8A8A),
+
+  // 🔵 Keep brand color but slightly toned for dark UI
+  primary: Color(0xFF3EA6FF),
+  onPrimary: Colors.black,
+  primaryContainer: Color(0xFF1E3A5F),
+  onPrimaryContainer: Color(0xFFD6E9FF),
+
+  // 🟣 Secondary (subtle, not glowing)
+  secondary: Color(0xFFB39DDB),
+  onSecondary: Colors.black,
+  secondaryContainer: Color(0xFF2A2238),
+  onSecondaryContainer: Color(0xFFE6DFFF),
+
+  // ⚫ TRUE DARK SURFACE (KEY CHANGE)
+  surface: Color(0xFF121212), // standard dark mode base
+  onSurface: Color(0xFFEDEDED),
+
+  // ❌ Error
+  error: Color(0xFFCF6679),
+  onError: Colors.black,
+
+  // 🔘 Borders / dividers
+  outline: Color(0xFF2C2C2C),
+
   shadow: Colors.black,
   scrim: Colors.black,
-  inverseSurface: Color(0xFFEAF6FF),
-  onInverseSurface: Colors.green,
-  inversePrimary: primaryBlue,
-  tertiary: Colors.orange,
+
+  // 🔁 Inverse
+  inverseSurface: Color(0xFFEDEDED),
+  onInverseSurface: Color(0xFF121212),
+  inversePrimary: Color(0xFF90CAF9),
+
+  // 🟠 Accent
+  tertiary: Color(0xFFFFB74D),
   onTertiary: Colors.black,
-  tertiaryContainer: Color(0xFF4E342E),
+  tertiaryContainer: Color(0xFF3E2E1F),
 );

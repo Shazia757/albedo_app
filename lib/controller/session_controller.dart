@@ -1,4 +1,8 @@
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,12 +21,13 @@ class SessionController extends GetxController {
   var sortType = SortType.newest.obs;
   var sessions = <Session>[].obs;
   var selectedTeacher = RxnString();
-  RxList<String> selectedStudents = <String>[].obs;
-  RxList<String> selectedTeachers = <String>[].obs;
-  RxList<String> selectedMentors = <String>[].obs;
+  RxList<Student> selectedStudents = <Student>[].obs;
+  RxList<Teacher> selectedTeachers = <Teacher>[].obs;
+  RxList<Mentor> selectedMentors = <Mentor>[].obs;
   RxList<String> selectedCoordinators = <String>[].obs;
   RxList<String> selectedAdvisors = <String>[].obs;
   RxList<String> selectedOtherUsers = <String>[].obs;
+  final RxBool showStudentMenu = false.obs;
   var selectedTeacherEdit = RxnString();
   final formKey = GlobalKey<FormState>();
   var selectedDuration = Rxn<int>();
@@ -30,7 +35,9 @@ class SessionController extends GetxController {
   var selectedDate = Rxn<DateTime>();
   var selectedTime = Rxn<TimeOfDay>();
   RxString selectedType = "session".obs;
-  RxList<String> mentorsList = <String>[].obs;
+  RxList<Student> studentsList = <Student>[].obs;
+  RxList<Teacher> teacherList = <Teacher>[].obs;
+  RxList<Mentor> mentorsList = <Mentor>[].obs;
   RxList<String> coordinatorsList = <String>[].obs;
   RxList<String> advisorsList = <String>[].obs;
   RxList<String> otherUsersList = <String>[].obs;
@@ -44,9 +51,8 @@ class SessionController extends GetxController {
   TextEditingController descriptionController = TextEditingController();
 
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
-  final studentList = ['Student A', 'Student B', 'Student C'];
+
   final packageOptions = ['Package A', 'Package B', 'Package C'];
-  final teacherList = ["Teacher A", "Teacher B", "Teacher C"];
 
   RxBool isLoading = true.obs;
   RxBool isDeleteButtonLoading = false.obs;
@@ -113,6 +119,9 @@ class SessionController extends GetxController {
   void onInit() {
     super.onInit();
     fetchData();
+    fetchStudentDetail();
+    fetchTeacherDetail();
+    fetchMentorDetail();
   }
 
   Future<void> fetchData() async {
@@ -125,11 +134,14 @@ class SessionController extends GetxController {
         Session(
           id: "S001",
           studentName: "Aisha",
-          studentId: "ST01",
-          subject: "Math",
+          studentId: "STU001",
+          syllabus: 'CBSE',
+          mentorId: 'MTR001',
+          mentorName: 'Saeeda',
+          package: "Math",
           className: "10A",
-          teacherName: "John",
-          teacherId: "T01",
+          teacherName: "Ameen Rahman",
+          teacherId: "T001",
           date: DateTime.now().subtract(const Duration(days: 1)),
           time: DateTime.now(),
           status: "started",
@@ -138,10 +150,13 @@ class SessionController extends GetxController {
           id: "S002",
           studentName: "Rahul",
           studentId: "ST02",
-          subject: "Science",
+          syllabus: 'SCERT',
+          mentorId: 'MTR002',
+          mentorName: 'David',
+          package: "Science",
           className: "9B",
           teacherName: "David",
-          teacherId: "T02",
+          teacherId: "T002",
           date: DateTime.now().add(const Duration(days: 1)),
           time: DateTime.now(),
           status: "upcoming",
@@ -150,10 +165,13 @@ class SessionController extends GetxController {
           id: "S003",
           studentName: "Fatima",
           studentId: "ST03",
-          subject: "English",
+          package: "English",
+          syllabus: 'CBSE',
           className: "8C",
+          mentorId: 'MTR001',
+          mentorName: 'Saeeda',
           teacherName: "John",
-          teacherId: "T01",
+          teacherId: "T001",
           date: DateTime.now(),
           time: DateTime.now(),
           status: "pending",
@@ -162,7 +180,10 @@ class SessionController extends GetxController {
           id: "S004",
           studentName: "Arjun",
           studentId: "ST04",
-          subject: "Physics",
+          package: "Physics",
+          syllabus: 'SCERT',
+          mentorId: 'MTR002',
+          mentorName: 'David',
           className: "11A",
           teacherName: "Meera",
           teacherId: "T03",
@@ -174,10 +195,13 @@ class SessionController extends GetxController {
           id: "S005",
           studentName: "Nisha",
           studentId: "ST05",
-          subject: "Chemistry",
+          package: "Chemistry",
+          syllabus: "CBSE",
           className: "12B",
+          mentorId: 'MTR001',
+          mentorName: 'Saeeda',
           teacherName: "David",
-          teacherId: "T02",
+          teacherId: "T002",
           date: DateTime.now(),
           time: DateTime.now(),
           status: "no_balance",
@@ -186,7 +210,10 @@ class SessionController extends GetxController {
           id: "S006",
           studentName: "Ali",
           studentId: "ST06",
-          subject: "Biology",
+          package: "Biology",
+          syllabus: 'SCERT',
+          mentorId: 'MTR002',
+          mentorName: 'David',
           className: "10A",
           teacherName: "Meera",
           teacherId: "T03",
@@ -198,11 +225,14 @@ class SessionController extends GetxController {
           id: "S007",
           studentName: "Sneha",
           studentId: "ST07",
-          subject: "Math",
+          package: "Math",
+          syllabus: 'CBSE',
+          mentorId: 'MTR001',
+          mentorName: 'Saeeda',
           className: "9A",
           time: DateTime.now(),
           teacherName: "John",
-          teacherId: "T01",
+          teacherId: "T001",
           date: DateTime.now().add(const Duration(hours: 3)),
           status: "started",
         ),
@@ -213,6 +243,206 @@ class SessionController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> fetchStudentDetail() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      studentsList.assignAll([
+        Student(
+            studentId: "STU001",
+            name: "Aisha",
+            email: "aisha@mail.com",
+            joinedAt: DateTime.now()),
+        Student(
+            studentId: "STU002",
+            name: "Rahul",
+            email: "rahul@mail.com",
+            joinedAt: DateTime.now())
+      ]);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchTeacherDetail() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      teacherList.assignAll([
+        Teacher(
+          id: "T001",
+          name: "Ameen Rahman",
+          email: "ameen@gmail.com",
+          status: "Active",
+          gender: "Male",
+          type: "Batch",
+          joinedAt: DateTime(2023, 5, 10),
+          phone: "9876543210",
+          whatsapp: "9876543210",
+          qualification: "MSc Mathematics",
+          place: "Malappuram",
+          pincode: "676505",
+          totalStudents: 45,
+          totalPackages: 6,
+          totalSessions: 120,
+          totalHours: 180,
+          salary: 40000,
+          paid: 30000,
+          balance: 10000,
+          bankName: "SBI",
+          accountNumber: "1234567890",
+          accountHolder: "Ameen Rahman",
+          accountType: "Savings",
+          upiId: "ameen@upi",
+        ),
+        Teacher(
+          id: "T002",
+          name: "Fathima Noor",
+          email: "fathima@gmail.com",
+          status: "Active",
+          gender: "Female",
+          type: "TBA",
+          joinedAt: DateTime(2024, 1, 15),
+          phone: "9123456780",
+          qualification: "BEd English",
+          place: "Kozhikode",
+          totalStudents: 30,
+          totalPackages: 4,
+          totalSessions: 90,
+          totalHours: 140,
+          salary: 35000,
+          paid: 20000,
+          balance: 15000,
+        ),
+      ]);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchMentorDetail() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      mentorsList.assignAll([
+        Mentor(
+          id: "MTR001",
+          name: "Saeeda KP",
+          email: "saeeda@gmail.com",
+          status: "Active",
+          gender: "Female",
+          joinedAt: DateTime(2023, 3, 12),
+          phone: "9876543211",
+          whatsapp: "9876543211",
+          qualification: "MA English",
+          place: "Malappuram",
+          pincode: "676505",
+          address: "Kottakkal, Malappuram",
+          timezone: "IST",
+          prefLanguage: "English",
+          salary: 30000,
+          bankName: "SBI",
+          accountNumber: "111122223333",
+          accountHolder: "Saeeda KP",
+          accountType: "Savings",
+          upiId: "saeeda@upi",
+        ),
+        Mentor(
+          id: "MTR002",
+          name: "David Mathew",
+          email: "david@gmail.com",
+          status: "Active",
+          gender: "Male",
+          joinedAt: DateTime(2022, 11, 5),
+          phone: "9123456789",
+          qualification: "MSc Physics",
+          place: "Kozhikode",
+          address: "Koyilandy, Kozhikode",
+          prefLanguage: "English",
+          salary: 32000,
+          bankName: "HDFC",
+          accountNumber: "444455556666",
+          accountHolder: "David Mathew",
+          accountType: "Savings",
+          upiId: "david@upi",
+        ),
+      ]);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // void setStudents(List<Student> list) {
+  //   studentsList.assignAll(list);
+
+  //   _studentMap.clear();
+  //   for (var s in list) {
+  //     _studentMap[s.studentId!] = s;
+  //   }
+  // }
+
+  Student? getStudentById(String id) {
+    try {
+      return studentsList.firstWhere((e) => e.studentId == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Users studentToUser(Student s) {
+    return Users(
+      id: s.studentId!,
+      name: s.name,
+      role: "student",
+    );
+  }
+
+  Teacher? getTeacherById(String id) {
+    print("Clicked ID: $id");
+    try {
+      return teacherList.firstWhere((e) => e.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Users teacherToUser(Teacher t) {
+    return Users(
+      id: t.id,
+      name: t.name,
+      role: "teacher",
+    );
+  }
+
+  Mentor? getMentorById(String id) {
+    print("Clicked ID: $id");
+    try {
+      return mentorsList.firstWhere((e) => e.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Users mentorToUser(Mentor m) {
+    return Users(
+      id: m.id,
+      name: m.name,
+      role: "mentor",
+    );
   }
 
   void applyFilters() {
@@ -267,10 +497,10 @@ class SessionController extends GetxController {
 
   void initEdit(Session data) {
     // Ensure teacher list is ready
-    final uniqueTeachers = sessions.map((e) => e.teacherName).toSet().toList();
+    final uniqueTeachers = sessions.map((e) => e).toSet().toList();
 
     teacherList.clear();
-    teacherList.addAll(uniqueTeachers);
+    // teacherList.addAll(uniqueTeachers);
 
     // ✅ Set initial values safely
     selectedDuration.value =

@@ -1,6 +1,6 @@
 class Users {
   String? name;
-  String? employeeId;
+  String? id;
   String? role;
   String? email;
   String? contact;
@@ -8,7 +8,7 @@ class Users {
 
   Users({
     this.name,
-    this.employeeId,
+    this.id,
     this.role,
     this.email,
     this.contact,
@@ -19,7 +19,7 @@ class Users {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'employeeId': employeeId,
+      'id': id,
       'role': role,
       'email': email,
       'contact': contact,
@@ -31,7 +31,7 @@ class Users {
   factory Users.fromJson(Map<String, dynamic> json) {
     return Users(
       name: json['name'] ?? '',
-      employeeId: json['employeeId'] ?? '',
+      id: json['id'] ?? '',
       role: json['role'] ?? '',
       email: json['email'],
       contact: json['contact'],

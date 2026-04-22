@@ -1,14 +1,21 @@
-import 'package:albedo_app/controller/session_controller.dart';
 import 'package:flutter/material.dart';
 
 class Session {
   final String id;
   final String studentName;
   final String studentId;
-  final String subject;
+  final String package;
+  final String syllabus;
   final String className;
   final String teacherName;
   final String teacherId;
+  final String mentorName;
+  final String mentorId;
+  final String? coordinatorName;
+  final String? coordinatorId;
+  final String? advisorName;
+  final String? advisorId;
+
   final DateTime date;
   final DateTime time;
   final String status;
@@ -19,13 +26,20 @@ class Session {
     required this.id,
     required this.studentName,
     required this.studentId,
-    required this.subject,
+    required this.package,
+    required this.syllabus,
     required this.className,
     required this.teacherName,
     required this.teacherId,
     required this.date,
     required this.time,
     required this.status,
+    this.advisorId,
+    this.advisorName,
+    this.coordinatorId,
+    this.coordinatorName,
+    required this.mentorId,
+    required this.mentorName,
     this.duration,
     this.teacherSalary,
   });

@@ -1,4 +1,4 @@
-import 'package:albedo_app/model/student_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -165,7 +165,7 @@ class StudentController extends GetxController {
     addressController.text = student.address.toString();
     timezoneController.text = student.timezone.toString();
     mentorController.text = student.mentor.toString();
-    advisorController.text = student.advisor.toString();
+    advisorController.text = student.advisorName.toString();
     referredByController.text = student.referredBy.toString();
   }
 

@@ -973,6 +973,7 @@ class CustomWidgets {
     required GlobalKey<FormState> formKey,
     required List<Widget> sections,
     required VoidCallback onSubmit,
+    bool isViewOnly = false,
     String submitText = "Save",
   }) {
     Get.dialog(
@@ -1039,47 +1040,49 @@ class CustomWidgets {
               ),
 
               /// 🔷 ACTIONS
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-                decoration: BoxDecoration(
-                  color: context.theme.colorScheme.outline.withOpacity(0.03),
-                  borderRadius: const BorderRadius.vertical(
-                    bottom: Radius.circular(28),
+              if (isViewOnly = false)
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+                  decoration: BoxDecoration(
+                    color: context.theme.colorScheme.outline.withOpacity(0.03),
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(28),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Get.back(),
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(
+                                color: context.theme.colorScheme.onSurface),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  context.theme.colorScheme.secondary),
+                          onPressed: () {
+                            if (!formKey.currentState!.validate()) return;
+                            onSubmit();
+                            Get.back();
+                          },
+                          child: Text(
+                            submitText,
+                            style: TextStyle(
+                                color:
+                                    context.theme.colorScheme.inverseSurface),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Get.back(),
-                        child: Text(
-                          "Cancel",
-                          style: TextStyle(
-                              color: context.theme.colorScheme.onSurface),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                context.theme.colorScheme.secondary),
-                        onPressed: () {
-                          if (!formKey.currentState!.validate()) return;
-                          onSubmit();
-                          Get.back();
-                        },
-                        child: Text(
-                          submitText,
-                          style: TextStyle(
-                              color: context.theme.colorScheme.inverseSurface),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),

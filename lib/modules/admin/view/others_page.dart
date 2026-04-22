@@ -1,5 +1,5 @@
 import 'package:albedo_app/controller/other_users_controller.dart';
-import 'package:albedo_app/model/other_users_model.dart';
+import 'package:albedo_app/model/users/other_users_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';

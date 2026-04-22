@@ -1,4 +1,7 @@
 import 'package:albedo_app/config/color_schemes.dart';
+import 'package:albedo_app/config/text_theme.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/modules/admin/view/session_page.dart';
 import 'package:albedo_app/modules/admin/view/settings/settings_page.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:albedo_app/common_views/login_page.dart';
@@ -10,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  Get.put(AuthController(), permanent: true);
   runApp(MyApp());
 }
 
@@ -26,15 +30,15 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: lightColorScheme,
           useMaterial3: true,
-          textTheme: GoogleFonts.poppinsTextTheme(),
+          textTheme: AppTextTheme.lightTextTheme,
         ),
         // Dark Theme
         darkTheme: ThemeData(
-          textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
+          textTheme: AppTextTheme.darkTextTheme,
           colorScheme: darkColorScheme,
           useMaterial3: true,
         ),
         themeMode: ThemeMode.system,
-        home: isLoggedIn ? SettingsPage() : SettingsPage());
+        home: isLoggedIn ? SessionPage() : SessionPage());
   }
 }

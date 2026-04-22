@@ -1,4 +1,6 @@
-import 'package:albedo_app/model/user_model.dart';
+import 'package:albedo_app/config/root.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,6 @@ class AccountController extends GetxController {
   var isLoading = false.obs;
   final box = GetStorage();
   @override
-  
   onInit() {
     if (kDebugMode) {
       emailController.text = 'test@gmail.com';
@@ -35,17 +36,27 @@ class AccountController extends GetxController {
     try {
       // TODO: API CALL HERE
       await Future.delayed(const Duration(seconds: 2));
+      final user = Users(
+        name: 'Test',
+        id: 'EMP001',
+        role: 'admin',
+      );
 
       if (rememberMe.value) {
         box.write('isLoggedIn', true);
         box.write('user', {
-          'name': 'Test',
-          'employeeId': 'EMP001',
+          'name': user.name,
+          'id': user.id,
+          'role': user.role,
         });
       }
 
+      final AuthController auth = Get.find<AuthController>();
+
+      auth.currentUser.value = user;
+
       Get.snackbar("Success", "Login Successful");
-      Get.offAll(() => HomeView());
+      Get.offAll(() => const Root());
     } catch (e) {
       Get.snackbar("Error", "Login Failed");
     } finally {
@@ -57,7 +68,7 @@ class AccountController extends GetxController {
 
   var user = Users(
     name: "Shazia",
-    employeeId: "EMP123",
+    id: "EMP123",
     role: "Software Developer",
     email: "shazia@email.com",
     contact: "9876543210",

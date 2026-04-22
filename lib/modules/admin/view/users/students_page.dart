@@ -1,6 +1,6 @@
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/model/student_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';

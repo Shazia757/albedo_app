@@ -4,6 +4,8 @@ class Teacher {
   final String id;
   final String name;
   String? email;
+  String? imageUrl;
+
   final String status;
   final String gender;
   String? type; // Batch / TBA
@@ -37,6 +39,7 @@ class Teacher {
       required this.name,
       this.email,
       required this.status,
+      this.imageUrl,
       this.type,
       required this.joinedAt,
       this.phone,

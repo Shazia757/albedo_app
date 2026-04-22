@@ -1,5 +1,5 @@
 import 'package:albedo_app/controller/advisor_controller.dart';
-import 'package:albedo_app/model/advisor_model.dart';
+import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';

@@ -1,5 +1,5 @@
 import 'package:albedo_app/controller/settings_controller.dart';
-import 'package:albedo_app/model/banners_model.dart';
+import 'package:albedo_app/model/settings/banners_model.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';

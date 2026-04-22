@@ -1,9 +1,11 @@
-import 'package:albedo_app/model/banners_model.dart';
-import 'package:albedo_app/model/coupons_model.dart';
-import 'package:albedo_app/model/hiring_ad_model.dart';
-import 'package:albedo_app/model/notification_model.dart';
-import 'package:albedo_app/model/rating_value_model.dart';
-import 'package:albedo_app/model/recommendations_model.dart';
+import 'package:albedo_app/model/settings/assessment_model.dart';
+import 'package:albedo_app/model/settings/banners_model.dart';
+import 'package:albedo_app/model/settings/coupons_model.dart';
+import 'package:albedo_app/model/settings/hiring_ad_model.dart';
+import 'package:albedo_app/model/settings/material_model.dart';
+import 'package:albedo_app/model/settings/notification_model.dart';
+import 'package:albedo_app/model/settings/rating_value_model.dart';
+import 'package:albedo_app/model/settings/recommendations_model.dart';
 import 'package:albedo_app/model/support_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,7 +31,7 @@ class SettingsController extends GetxController {
   var supportCategory = [].obs;
   var standard = [].obs;
   var referralSource = [].obs;
-  var assessmentAttentionQn = [].obs;
+  var assessmentAttentionQn = <String>[].obs;
   var users = [].obs;
   var notifications = <Notifications>[].obs;
   var banners = <Banners>[].obs;
@@ -38,12 +40,17 @@ class SettingsController extends GetxController {
   var hiringAd = <HiringAd>[].obs;
   var ratingValues = <RatingValue>[].obs;
   var supports = <Macro>[].obs;
+  var assessments = <Assessment>[].obs;
+  var materials = <Materials>[].obs;
+  var testTypes = <String>[].obs;
 
   RxBool isDeleteButtonLoading = false.obs;
 
   RxList<VisibleTo> selected = <VisibleTo>[].obs;
   RxList selectedSyllabus = [].obs;
   RxList<Days> selectedDays = <Days>[].obs;
+  RxList<String> selectedTestType = <String>[].obs;
+  RxList selectedAttentionQns = [].obs;
 
   TextEditingController regFeeController = TextEditingController();
   TextEditingController factorValueController = TextEditingController();
@@ -74,13 +81,24 @@ class SettingsController extends GetxController {
   TextEditingController codeController = TextEditingController();
   TextEditingController discountController = TextEditingController();
 
+  TextEditingController batchController = TextEditingController();
+  TextEditingController packageController = TextEditingController();
+  TextEditingController categoryController = TextEditingController();
+  TextEditingController courseController = TextEditingController();
+  TextEditingController syllabusController = TextEditingController();
+  TextEditingController standardController = TextEditingController();
+
   Rx<BannerType> selectedType = BannerType.defaultBanner.obs;
   Rx<String> selectedDiscountType = 'percentage'.obs;
   Rx<String> selectedRecommendationType = 'package'.obs;
+  Rx<String> selectedMaterialType = 'drive'.obs;
+  Rx<String> selectedUser = 'batch'.obs;
 
   TextEditingController timeController = TextEditingController();
 
   var textControllers = <TextEditingController>[].obs;
+
+  TextEditingController dateController = TextEditingController();
 
   List<String> tabs = [
     "General",
@@ -109,6 +127,8 @@ class SettingsController extends GetxController {
     fetchHiringAds();
     fetchRatingValues();
     fetchSupports();
+    fetchAssessments();
+    fetchMaterials();
   }
 
   Future<void> fetchData() async {
@@ -124,6 +144,7 @@ class SettingsController extends GetxController {
       category.assignAll(['High School', 'Higher secondary school']);
       standard.assignAll(['1', '2', '3', '4']);
       referralSource.assignAll(['Marketing Team']);
+      testTypes.assignAll(['Academic', 'Keypoints', 'Language']);
       assessmentAttentionQn
           .assignAll(['Consistency', 'Participation in Discussions']);
       users.assignAll(['Student', 'Teacher', 'Mentor', 'Coordinator', 'Other']);
@@ -398,5 +419,80 @@ class SettingsController extends GetxController {
   void loadSupports(Macro macro) {
     titleController.text = macro.title ?? '';
     messageController.text = macro.description ?? '';
+  }
+
+  void fetchAssessments() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      final data = [
+        Assessment(
+            id: '1',
+            title: 'Academic & Basics',
+            testType: ['Academic', 'Maths'],
+            attentionQuestions: ['Consistency', 'Participation']),
+        Assessment(
+            id: '1',
+            title: 'Maths',
+            testType: ['Academic', 'Language'],
+            attentionQuestions: ['Consistency', 'Participation']),
+      ];
+
+      assessments.assignAll(data);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadAssessments(Assessment assessment) {
+    titleController.text = assessment.title ?? '';
+    dateController.text = assessment.date ?? '';
+    selectedTestType.assignAll(assessment.testType);
+    selectedAttentionQns.assignAll(assessment.attentionQuestions ?? []);
+  }
+
+  void fetchMaterials() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      final data = [
+        Materials(
+            id: '1',
+            title: 'Test',
+            type: 'Individual',
+            category: 'Categ hjj',
+            course: 'maths',
+            link: 'http/wwwwwwwwww.'),
+      ];
+
+      materials.assignAll(data);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadMaterials(Materials material) {
+    selectedUser.value = material.type!.toLowerCase();
+    titleController.text = material.title ?? '';
+    packageController.text = material.package ?? '';
+    categoryController.text = material.category ?? '';
+    courseController.text = material.course ?? '';
+    batchController.text = material.batch ?? '';
+    messageController.text = material.description ?? '';
+    urlController.text = material.link ?? '';
+  }
+
+  void clearController() {
+    titleController.clear();
+    packageController.clear();
+    categoryController.clear();
+    courseController.clear();
+    batchController.clear();
+    messageController.clear();
+    urlController.clear();
   }
 }

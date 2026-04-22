@@ -14,7 +14,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MediaQuery.of(context).size.width > 800 ? null : DrawerMenu(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: CustomAppBar(),
       body: Row(
         children: [
@@ -31,7 +31,7 @@ class HomeView extends StatelessWidget {
                 child: Column(
                   children: [
                     _expenseChartCard(context),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     _chartCard(
                       context,
                       title: "Students Count",
@@ -46,7 +46,7 @@ class HomeView extends StatelessWidget {
                         c.updateStudentData(range: value);
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     _chartCard(
                       context,
                       title: "Teachers Count",
@@ -64,9 +64,9 @@ class HomeView extends StatelessWidget {
                         c.updateTeacherData(range: value);
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     _summaryCard(context),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     _chartCard(
                       context,
                       icon: Icons.people_outline,
@@ -86,7 +86,7 @@ class HomeView extends StatelessWidget {
                         c.updateMentorData(range: p0);
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     _chartCard(
                       context,
                       title: "Coordinators Count",
@@ -184,25 +184,22 @@ class HomeView extends StatelessWidget {
                     children: [
                       Text(
                         count,
-                        style: const TextStyle(
-                          fontSize: 20,
+                        style: context.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         title,
-                        style: TextStyle(
+                        style: context.textTheme.bodyMedium?.copyWith(
                           color: context.theme.colorScheme.outline,
-                          fontSize: 13,
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
-
-              // ✅ Popup stays right
               Obx(() => PopupMenuButton(
                     padding: EdgeInsets.zero,
                     offset: const Offset(0, 45),
@@ -226,13 +223,12 @@ class HomeView extends StatelessWidget {
                           horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
                         color: context.theme.cardColor,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
                         children: [
                           Text(selectedRange.value,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w500)),
+                              style: context.textTheme.labelLarge),
                           const SizedBox(width: 6),
                           const Icon(Icons.keyboard_arrow_down_rounded,
                               size: 20)
@@ -248,10 +244,7 @@ class HomeView extends StatelessWidget {
             child: LineChart(
               LineChartData(
                 minX: 0,
-
-                // ✅ FIXED: dynamic maxX
                 maxX: (labels.length - 1).toDouble(),
-
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
@@ -261,7 +254,6 @@ class HomeView extends StatelessWidget {
                     strokeWidth: 1,
                   ),
                 ),
-
                 titlesData: FlTitlesData(
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
@@ -271,8 +263,7 @@ class HomeView extends StatelessWidget {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           value.toInt().toString(),
-                          style: TextStyle(
-                            fontSize: 10,
+                          style: context.textTheme.labelSmall?.copyWith(
                             color: context.theme.colorScheme.outline,
                           ),
                         );
@@ -294,8 +285,7 @@ class HomeView extends StatelessWidget {
 
                         return Text(
                           labels[index],
-                          style: TextStyle(
-                            fontSize: 10,
+                          style: context.textTheme.labelSmall?.copyWith(
                             color: context.theme.colorScheme.outline,
                           ),
                         );
@@ -308,23 +298,22 @@ class HomeView extends StatelessWidget {
                   topTitles:
                       AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
-
                 borderData: FlBorderData(show: false),
-
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
                     tooltipRoundedRadius: 8,
                     getTooltipItems: (spots) {
                       return spots.map((spot) {
                         return LineTooltipItem(
-                          "${spot.y}",
-                          TextStyle(color: context.theme.colorScheme.onPrimary),
-                        );
+                            "${spot.y}",
+                            TextStyle(
+                              color: context.theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w600,
+                            ));
                       }).toList();
                     },
                   ),
                 ),
-
                 lineBarsData: [
                   LineChartBarData(
                     isCurved: true,
@@ -338,7 +327,7 @@ class HomeView extends StatelessWidget {
                         .map((e) => FlSpot(e.key.toDouble(), e.value))
                         .toList(),
 
-                    barWidth: 3,
+                    barWidth: 2.4,
                     color: color,
                     dotData: FlDotData(show: false),
                     belowBarData: BarAreaData(
@@ -373,9 +362,9 @@ class HomeView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   "Summary",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: context.textTheme.titleMedium,
                 ),
 
                 // 🔹 RANGE SELECTOR
@@ -414,11 +403,8 @@ class HomeView extends StatelessWidget {
                         ),
                         child: Row(
                           children: [
-                            Text(
-                              c.summaryRange.value,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w500),
-                            ),
+                            Text(c.summaryRange.value,
+                                style: context.textTheme.labelLarge),
                             const SizedBox(width: 6),
                             const Icon(Icons.keyboard_arrow_down_rounded,
                                 size: 20)
@@ -428,10 +414,10 @@ class HomeView extends StatelessWidget {
                     )),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             _donutChart(context),
-            const SizedBox(height: 16),
-            _packageList(),
+            const SizedBox(height: 14),
+            _packageList(context),
           ],
         ),
       );
@@ -440,7 +426,7 @@ class HomeView extends StatelessWidget {
 
   Widget _donutChart(BuildContext context) {
     return SizedBox(
-      height: 220,
+      height: 200,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -465,17 +451,15 @@ class HomeView extends StatelessWidget {
             children: [
               Text(
                 "Total Package",
-                style: TextStyle(
+                style: context.textTheme.bodySmall?.copyWith(
                   color: context.theme.colorScheme.outline,
-                  fontSize: 12,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 formatCurrency(c.totalPackage.value),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                style: context.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -485,7 +469,7 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _packageList() {
+  Widget _packageList(BuildContext context) {
     return Column(
       children: c.packageData.map((item) {
         final percent = item['value'] / c.totalPackage.value;
@@ -519,11 +503,14 @@ class HomeView extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(item['name']),
                         Text(
-                          formatCurrency(item['value']),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          item['name'],
+                          style: context.textTheme.bodyMedium,
                         ),
+                        Text(formatCurrency(item['value']),
+                            style: context.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            )),
                       ],
                     ),
 
@@ -583,6 +570,7 @@ class HomeView extends StatelessWidget {
   }
 
   Widget _expenseChartCard(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Obx(() {
       return Container(
         height: 260,
@@ -601,17 +589,15 @@ class HomeView extends StatelessWidget {
                   children: [
                     Text(
                       "${c.expenseRatio.value.toStringAsFixed(2)}%",
-                      style: const TextStyle(
-                        fontSize: 20,
+                      style: context.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       "Expense Ratio",
-                      style: TextStyle(
+                      style: context.textTheme.bodySmall?.copyWith(
                         color: context.theme.colorScheme.outline,
-                        fontSize: 13,
                       ),
                     ),
                   ],
@@ -643,21 +629,11 @@ class HomeView extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: context.theme.cardColor,
                           borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: context.theme.colorScheme.shadow
-                                  .withOpacity(0.08),
-                              blurRadius: 10,
-                            )
-                          ],
                         ),
                         child: Row(
                           children: [
-                            Text(
-                              c.expenseRange.value,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w500),
-                            ),
+                            Text(c.expenseRange.value,
+                                style: context.textTheme.labelLarge),
                             const SizedBox(width: 6),
                             const Icon(Icons.keyboard_arrow_down_rounded,
                                 size: 20),
@@ -671,8 +647,7 @@ class HomeView extends StatelessWidget {
 
             Text(
               "${c.totalExpense.value.toStringAsFixed(0)} / ${c.totalIncome.value.toStringAsFixed(0)}",
-              style: TextStyle(
-                fontSize: 11,
+              style: context.textTheme.labelSmall?.copyWith(
                 color: context.theme.colorScheme.outline,
               ),
             ),
@@ -682,11 +657,11 @@ class HomeView extends StatelessWidget {
             // 🔹 LEGEND (compact like chart style)
             Row(
               children: [
-                _legendDot(context, Colors.blue, "Hours"),
+                _legendDot(context, cs.primary, "Hours"),
                 const SizedBox(width: 12),
-                _legendDot(context, Colors.green, "Amount"),
+                _legendDot(context, cs.secondary, "Amount"),
                 const SizedBox(width: 12),
-                _legendDot(context, Colors.purple, "Salary"),
+                _legendDot(context, cs.tertiary, "Salary"),
               ],
             ),
 
@@ -717,8 +692,7 @@ class HomeView extends StatelessWidget {
                         getTitlesWidget: (value, meta) {
                           return Text(
                             c.years[value.toInt()],
-                            style: TextStyle(
-                              fontSize: 10,
+                            style: context.textTheme.labelSmall?.copyWith(
                               color: context.theme.colorScheme.outline,
                             ),
                           );
@@ -732,8 +706,7 @@ class HomeView extends StatelessWidget {
                         getTitlesWidget: (value, meta) {
                           return Text(
                             _formatCompact(value),
-                            style: TextStyle(
-                              fontSize: 10,
+                            style: context.textTheme.labelSmall?.copyWith(
                               color: context.theme.colorScheme.outline,
                             ),
                           );
@@ -752,19 +725,19 @@ class HomeView extends StatelessWidget {
                       getTooltipItems: (spots) {
                         return spots.map((spot) {
                           return LineTooltipItem(
-                            _formatCompact(spot.y),
-                            TextStyle(
-                              color: context.theme.colorScheme.onPrimary,
-                            ),
-                          );
+                              _formatCompact(spot.y),
+                              TextStyle(
+                                color: context.theme.colorScheme.onSurface,
+                                fontWeight: FontWeight.w600,
+                              ));
                         }).toList();
                       },
                     ),
                   ),
                   lineBarsData: [
-                    _line(c.totalHours, Colors.blue),
-                    _line(c.classAmount, Colors.green),
-                    _line(c.totalSalary, Colors.purple),
+                    _line(c.totalHours, cs.primary),
+                    _line(c.classAmount, cs.secondary),
+                    _line(c.totalSalary, cs.tertiary),
                   ],
                 ),
               ),
@@ -785,7 +758,7 @@ class HomeView extends StatelessWidget {
           .entries
           .map((e) => FlSpot(e.key.toDouble(), e.value))
           .toList(),
-      barWidth: 3,
+      barWidth: 2.4,
       color: color,
       dotData: FlDotData(show: false),
       belowBarData: BarAreaData(
@@ -816,8 +789,7 @@ class HomeView extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           text,
-          style: TextStyle(
-            fontSize: 11,
+          style: context.textTheme.labelSmall?.copyWith(
             color: context.theme.colorScheme.outline,
           ),
         ),
@@ -903,15 +875,21 @@ class HomeView extends StatelessWidget {
   // ================= COMMON =================
 
   BoxDecoration _cardDecoration(BuildContext context) {
+    final cs = context.theme.colorScheme;
+
     return BoxDecoration(
-      color: context.theme.cardColor,
-      borderRadius: BorderRadius.circular(20),
+      color: cs.surface,
+      borderRadius: BorderRadius.circular(14), // 🔥 reduced
+      border: Border.all(
+        color: cs.outline.withOpacity(0.12),
+      ),
       boxShadow: [
         BoxShadow(
-          blurRadius: 12,
-          color: context.theme.colorScheme.shadow.withOpacity(0.1),
-          offset: const Offset(0, 4),
-        )
+          blurRadius: 16,
+          spreadRadius: -6,
+          offset: const Offset(0, 6),
+          color: Colors.black.withOpacity(Get.isDarkMode ? 0.35 : 0.06),
+        ),
       ],
     );
   }

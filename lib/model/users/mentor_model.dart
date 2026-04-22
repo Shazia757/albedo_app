@@ -2,6 +2,7 @@ class Mentor {
     final String id;
   final String name;
   String? email;
+  String? imageUrl;
   String? status;
   String? gender;
   final DateTime joinedAt;
@@ -30,6 +31,7 @@ class Mentor {
       this.gender,
       this.status,
       this.phone,
+      this.imageUrl,
       this.whatsapp,
       this.timezone,
       this.salary,

@@ -1,5 +1,10 @@
+import 'package:albedo_app/config/root.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
@@ -8,6 +13,10 @@ import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+
+extension TextThemeExt on BuildContext {
+  TextTheme get tt => Theme.of(this).textTheme;
+}
 
 class SessionPage extends StatelessWidget {
   final c = Get.put(SessionController());
@@ -55,7 +64,11 @@ class SessionPage extends StatelessWidget {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (data.isEmpty) {
-                        return const Center(child: Text("No sessions found"));
+                        return Center(
+                            child: Text(
+                          "No sessions found",
+                          style: context.tt.bodyMedium,
+                        ));
                       }
 
                       if (Responsive.isTablet(context)) {
@@ -80,43 +93,49 @@ class SessionPage extends StatelessWidget {
                             mainAxisSpacing: 12,
                             crossAxisSpacing: 12,
                             itemCount: data.length,
-                            itemBuilder: (_, i) => InfoCard(
-                              id: data[i].id,
-                              status: data[i].status,
-                              statusColor:
-                                  getStatusColor(context, data[i].status),
-                              infoRows: [
-                                _buildPersonSection(context, data[i]),
-                                _buildDetailsSection(context, data[i]),
-                              ],
-                              actions: [
-                                if (data[i].status != 'completed' &&
-                                    data[i].status != 'meet_done')
-                                  CustomWidgets().iconBtn(
-                                      icon: Icons.edit,
+                            itemBuilder: (_, i) => InkWell(
+                              onTap: () =>
+                                  _openSessionDetails(context, data[i]),
+                              child: InfoCard(
+                                id: data[i].id,
+                                status: data[i].status,
+                                statusColor:
+                                    getStatusColor(context, data[i].status),
+                                infoRows: [
+                                  _buildPersonSection(context, data[i]),
+                                  _buildDetailsSection(context, data[i]),
+                                ],
+                                actions: [
+                                  if (data[i].status != 'completed' &&
+                                      data[i].status != 'meet_done')
+                                    CustomWidgets().iconBtn(
+                                        icon: Icons.edit,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        onTap: () {
+                                          final session = data[i];
+
+                                          c.loadSession(session);
+
+                                          editSession(context);
+                                        }),
+                                  if ((data[i].status != 'completed') &&
+                                      (data[i].status != 'meet_done'))
+                                    CustomWidgets().iconBtn(
+                                      icon: Icons.delete,
                                       color:
-                                          Theme.of(context).colorScheme.primary,
-                                      onTap: () {
-                                        final session = data[i];
-
-                                        c.loadSession(session);
-
-                                        editSession(context);
-                                      }),
-                                if ((data[i].status != 'completed') &&
-                                    (data[i].status != 'meet_done'))
-                                  CustomWidgets().iconBtn(
-                                    icon: Icons.delete,
-                                    color: Theme.of(context).colorScheme.error,
-                                    onTap: () =>
-                                        CustomWidgets().showDeleteDialog(
-                                      text:
-                                          'Are you sure you want to delete this session permanently?',
-                                      context: context,
-                                      onConfirm: () => c.delete(data[i].id),
+                                          Theme.of(context).colorScheme.error,
+                                      onTap: () =>
+                                          CustomWidgets().showDeleteDialog(
+                                        text:
+                                            'Are you sure you want to delete this session permanently?',
+                                        context: context,
+                                        onConfirm: () => c.delete(data[i].id),
+                                      ),
                                     ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
                           );
                         },
@@ -129,6 +148,783 @@ class SessionPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _openSessionDetails(BuildContext context, Session data) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: const Text("Session Details"),
+      icon: Icons.visibility,
+      formKey: GlobalKey<FormState>(),
+      submitText: "Close",
+      onSubmit: () {},
+      sections: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.5,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _detailCard(
+                  context,
+                  title: "Student",
+                  name: data.studentName,
+                  id: data.studentId,
+                  onTap: () => _onUserTap(context, "student", data.studentId),
+                ),
+                _detailCard(
+                  context,
+                  title: "Teacher",
+                  name: data.teacherName,
+                  id: data.teacherId,
+                  onTap: () => _onUserTap(context, "teacher", data.teacherId),
+                ),
+                _detailCard(
+                  context,
+                  title: "Mentor",
+                  name: data.mentorName ?? "-",
+                  id: data.mentorId ?? "-",
+                  onTap: () => _onUserTap(context, "mentor", data.mentorId),
+                ),
+                _detailCard(
+                  context,
+                  title: "Coordinator",
+                  name: data.coordinatorName ?? "-",
+                  id: data.coordinatorId ?? "-",
+                  onTap: () =>
+                      _onUserTap(context, "coordinator", data.coordinatorId),
+                ),
+                _detailCard(
+                  context,
+                  title: "Advisor",
+                  name: data.advisorName ?? "-",
+                  id: data.advisorId ?? "-",
+                  onTap: () => _onUserTap(context, "advisor", data.advisorId),
+                ),
+                const SizedBox(height: 10),
+                _infoCard(
+                  context,
+                  type: "schedule",
+                  icon: Icons.schedule,
+                  title: "Schedule",
+                  children: [
+                    _infoRow("Date", _formatDate(data.date)),
+                    _infoRow("Time", _formatTime(data.time)),
+                    _infoRow("Duration", data.duration?.toString() ?? "-"),
+                  ],
+                ),
+                _infoCard(
+                  context,
+                  type: "session",
+                  icon: Icons.menu_book,
+                  title: "Session Info",
+                  children: [
+                    _infoRow("Subject", data.package ?? "-"),
+                    _infoRow("Syllabus", data.syllabus ?? "-"),
+                  ],
+                ),
+                _infoCard(
+                  context,
+                  type: "status",
+                  icon: Icons.flag,
+                  title: "Status",
+                  children: [
+                    _infoRow("Current Status", data.status),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _detailCard(
+    BuildContext context, {
+    required String title,
+    required String name,
+    required String id,
+    required VoidCallback onTap,
+    String? Function()? getImageUrl,
+  }) {
+    final color = _getRoleColor(context, title.toLowerCase());
+    final imageUrl = getImageUrl?.call();
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withOpacity(0.2)),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+                radius: 18,
+                // backgroundColor: color.withOpacity(0.15),
+                child: imageUrl == null
+                    ? Image.asset('assets/images/logo.png')
+                    : null),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: context.tt.labelSmall?.copyWith(color: color),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    name,
+                    style: context.tt.titleMedium,
+                  ),
+                  Text(
+                    id,
+                    style: context.tt.labelSmall?.copyWith(color: color),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, size: 14, color: color),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _infoCard(
+    BuildContext context, {
+    required String type, // 🔥 NEW
+    required IconData icon,
+    required String title,
+    required List<Widget> children,
+  }) {
+    final color = _getRoleColor(context, type);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: color),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: context.tt.titleSmall?.copyWith(
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Color _getRoleColor(BuildContext context, String role) {
+    final cs = Theme.of(context).colorScheme;
+
+    switch (role) {
+      case "student":
+        return cs.primary;
+      case "teacher":
+        return cs.secondary;
+      case "mentor":
+        return Colors.indigo;
+      case "coordinator":
+        return Colors.orange;
+      case "advisor":
+        return Colors.teal;
+      case "schedule":
+        return Colors.blue;
+      case "session":
+        return Colors.deepPurple;
+      case "status":
+        return Colors.green;
+      default:
+        return cs.primary;
+    }
+  }
+
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 12)),
+          Text(value,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w500, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  void _onUserTap(BuildContext context, String role, String? id) {
+    if (id == null || id == "-") return;
+
+    if (role == "student") {
+      final student = c.getStudentById(id);
+
+      if (student == null) {
+        Get.snackbar("Error", "Student not found");
+        return;
+      }
+
+      _openStudentProfile(context, student);
+    } else if (role == 'teacher') {
+      final teacher = c.getTeacherById(id);
+      print("Searching for teacherId: $id");
+      print("Available IDs: ${c.teacherList.map((e) => e.id).toList()}");
+
+      if (teacher == null) {
+        Get.snackbar("Error", "Teacher not found");
+        return;
+      }
+
+      _openTeacherProfile(context, teacher);
+    } else if (role == 'mentor') {
+      final mentor = c.getMentorById(id);
+      print("Searching for teacherId: $id");
+      print("Available IDs: ${c.teacherList.map((e) => e.id).toList()}");
+
+      if (mentor == null) {
+        Get.snackbar("Error", "Teacher not found");
+        return;
+      }
+
+      _openMentorProfile(context, mentor);
+    }
+  }
+
+  void _openStudentProfile(BuildContext context, Student data) {
+    final color = _getRoleColor(context, "student");
+
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text("Student Profile", style: context.tt.titleMedium),
+      icon: Icons.person,
+      formKey: GlobalKey<FormState>(),
+      submitText: "Close",
+      onSubmit: () {},
+      sections: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                /// 🔥 PROFILE HEADER
+                profileHeader(
+                  context: context,
+                  data: data,
+                  color: color,
+                  getName: (s) => s.name,
+                  getEmail: (s) => s.email,
+                  getId: (s) => s.studentId,
+                  getImageUrl: (s) => s.imageUrl,
+                  onDashboardTap: () {
+                    final auth = Get.find<AuthController>();
+                    final user = c.studentToUser(data);
+
+                    auth.startImpersonation(user);
+                    Get.offAll(() => const Root());
+                  },
+                ),
+                const SizedBox(height: 10),
+                _idCardCTA(context, data, color),
+                const SizedBox(height: 10),
+
+                /// 🔹 CONTACT (ONLY WHERE LABELS NEEDED)
+                _profileCard(
+                  context,
+                  color: color,
+                  title: "Contact",
+                  children: [
+                    _infoRow("Phone", data.phone ?? "-"),
+                    _infoRow("WhatsApp", data.whatsapp ?? "-"),
+                  ],
+                ),
+
+                /// 🔹 FAMILY (NO LABELS)
+                _profileCard(
+                  context,
+                  color: Colors.orange,
+                  title: "Parent Details",
+                  children: [
+                    _simpleText(data.parentName ?? "-"),
+                    _simpleText(data.parentOccupation ?? "-"),
+                  ],
+                ),
+
+                /// 🔹 ACADEMIC (LABELS REQUIRED)
+                _profileCard(
+                  context,
+                  color: Colors.deepPurple,
+                  title: "Academic",
+                  children: [
+                    _infoRow("Syllabus", data.syllabus ?? "-"),
+                    _infoRow("Category", data.category ?? "-"),
+                    _infoRow("Standard", data.standard?.toString() ?? "-"),
+                  ],
+                ),
+
+                /// 🔹 COORDINATOR (NO LABELS)
+                if (data.coordinatorName != null)
+                  _profileCard(
+                    context,
+                    color: Colors.teal,
+                    title: "Coordinator",
+                    children: [
+                      _simpleText(data.coordinatorName!),
+                      _simpleText(data.coordinatorId ?? "-"),
+                    ],
+                  ),
+
+                /// 🔹 MENTOR (NO LABELS)
+                if (data.mentorName != null)
+                  _profileCard(
+                    context,
+                    color: Colors.indigo,
+                    title: "Mentor",
+                    children: [
+                      _simpleText(data.mentorName!),
+                      _simpleText(data.mentorId ?? "-"),
+                    ],
+                  ),
+
+                /// 🔹 ADVISOR (NO LABELS)
+                if (data.advisorName != null)
+                  _profileCard(
+                    context,
+                    color: Colors.green,
+                    title: "Advisor",
+                    children: [
+                      _simpleText(data.advisorName!),
+                      _simpleText(data.advisorId ?? "-"),
+                    ],
+                  ),
+
+                /// 🔹 REFERRAL (NO LABELS)
+                if (data.referralName != null)
+                  _profileCard(
+                    context,
+                    color: Colors.lightGreen,
+                    title: "Referral",
+                    children: [
+                      _simpleText(data.referralName!),
+                      _simpleText(data.referralRole ?? "-"),
+                    ],
+                  ),
+
+                /// 🔹 ADDRESS
+                _profileCard(
+                  context,
+                  color: Colors.blueGrey,
+                  title: "Address",
+                  children: [
+                    _simpleText(data.address ?? "-"),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _idCardCTA(BuildContext context, Student data, Color color) {
+    return InkWell(
+      onTap: () {
+        print("Open ID Card");
+        // 👉 Navigate / open ID card
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: color, // 🔥 SOLID COLOR
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            /// 🪪 ICON
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.badge_outlined,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            /// 🔹 TEXT
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Student ID Card",
+                    style: context.tt.titleSmall?.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "Tap to view or download",
+                    style: context.tt.bodySmall?.copyWith(
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            /// 👉 ARROW
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white,
+              size: 14,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget profileHeader<T>({
+    required BuildContext context,
+    required T data,
+    required Color color,
+
+    /// 🔹 field resolvers (make it dynamic safely)
+    required String Function(T) getName,
+    required String? Function(T) getEmail,
+    required String? Function(T) getId,
+    String? Function(T)? getImageUrl,
+
+    /// 🔹 optional action
+    VoidCallback? onDashboardTap,
+  }) {
+    final imageUrl = getImageUrl?.call(data);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          /// 🔥 PROFILE IMAGE
+          CircleAvatar(
+            radius: 28,
+            backgroundColor: color.withOpacity(0.2),
+            backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
+            child:
+                imageUrl == null ? Image.asset("assets/images/logo.png") : null,
+          ),
+
+          const SizedBox(width: 12),
+
+          /// 🔹 INFO
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(getName(data), style: context.tt.titleMedium),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  getEmail(data) ?? "-",
+                  style: context.tt.bodySmall,
+                ),
+
+                const SizedBox(height: 4),
+
+                /// 🪪 ID CHIP
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    getId(data) ?? "-",
+                    style: context.tt.labelSmall?.copyWith(color: color),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          /// 🔥 ACTION BUTTON
+          if (onDashboardTap != null)
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: color,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: onDashboardTap,
+              child: Text(
+                "Dashboard",
+                style: context.tt.labelMedium?.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _simpleText(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _profileCard(
+    BuildContext context, {
+    required Color color,
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      constraints: const BoxConstraints(minHeight: 100), // 🔥 ADD THIS
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: context.tt.titleSmall?.copyWith(color: color),
+          ),
+          const SizedBox(height: 10),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  void _openTeacherProfile(BuildContext context, Teacher data) {
+    final color = _getRoleColor(context, "teacher");
+
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text("Teacher Profile", style: context.tt.titleMedium),
+      icon: Icons.school,
+      formKey: GlobalKey<FormState>(),
+      isViewOnly: true,
+      submitText: "Close",
+      onSubmit: () {},
+      sections: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                /// 🔥 PROFILE HEADER (reuse same)
+                profileHeader(
+                  context: context, data: data, color: color,
+                  getName: (t) => t.name,
+                  getEmail: (t) => t.email,
+                  getId: (t) => t.id,
+                  getImageUrl: (t) => t.imageUrl,
+
+                  // no image
+                  onDashboardTap: () {
+                    final auth = Get.find<AuthController>();
+                    final user = c.teacherToUser(data);
+
+                    auth.startImpersonation(user);
+                    Get.offAll(() => const Root());
+                  },
+                ),
+
+                const SizedBox(height: 10),
+
+                /// 🔹 BASIC INFO (like student first card feel)
+                _profileCard(
+                  context,
+                  color: color,
+                  title: "Details",
+                  children: [
+                    _infoRow("Qualification", data.qualification ?? "-"),
+                    _infoRow("Gender", data.gender ?? "-"),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                /// 🔹 CONTACT (same as student)
+                _profileCard(
+                  context,
+                  color: color,
+                  title: "Contact",
+                  children: [
+                    _infoRow("Phone", data.phone ?? "-"),
+                    _infoRow("WhatsApp", data.whatsapp ?? "-"),
+                  ],
+                ),
+
+                /// 🔹 ADDRESS (same pattern)
+                _profileCard(
+                  context,
+                  color: Colors.blueGrey,
+                  title: "Address",
+                  children: [
+                    _simpleText(data.address ?? "-"),
+                    _simpleText(data.place ?? "-"),
+                    _simpleText(data.pincode ?? "-"),
+                  ],
+                ),
+
+                /// 🔹 BANK DETAILS (NEW SECTION)
+                _profileCard(
+                  context,
+                  color: Colors.green,
+                  title: "Bank Details",
+                  children: [
+                    _infoRow("UPI ID", data.upiId ?? "-"),
+                    _infoRow("Account No", data.accountNumber ?? "-"),
+                    _infoRow("IFSC Code",
+                        data.bankBranch ?? "-"), // if IFSC stored here
+                    _infoRow("Bank", data.bankName ?? "-"),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  void _openMentorProfile(BuildContext context, Mentor data) {
+    final color = _getRoleColor(context, "teacher");
+
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text("Mentor Profile", style: context.tt.titleMedium),
+      icon: Icons.school,
+      formKey: GlobalKey<FormState>(),
+      isViewOnly: true,
+      submitText: "Close",
+      onSubmit: () {},
+      sections: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                /// 🔥 PROFILE HEADER (reuse same)
+                profileHeader(
+                  context: context, data: data, color: color,
+                  getName: (m) => m.name,
+                  getEmail: (m) => m.email,
+                  getId: (m) => m.id,
+                  getImageUrl: (m) => m.imageUrl,
+
+                  // no image
+                  onDashboardTap: () {
+                    final auth = Get.find<AuthController>();
+                    final user = c.mentorToUser(data);
+
+                    auth.startImpersonation(user);
+                    Get.offAll(() => const Root());
+                  },
+                ),
+
+                const SizedBox(height: 10),
+
+                _profileCard(
+                  context,
+                  color: color,
+                  title: "Contact",
+                  children: [
+                    _infoRow("Phone", data.phone ?? "-"),
+                    _infoRow("WhatsApp", data.whatsapp ?? "-"),
+                  ],
+                ),
+
+                /// 🔹 ADDRESS (same pattern)
+                _profileCard(
+                  context,
+                  color: Colors.blueGrey,
+                  title: "Address",
+                  children: [
+                    _simpleText(data.address ?? "-"),
+                    _simpleText(data.place ?? "-"),
+                    _simpleText(data.pincode ?? "-"),
+                  ],
+                ),
+
+                /// 🔹 BANK DETAILS (NEW SECTION)
+                _profileCard(
+                  context,
+                  color: Colors.green,
+                  title: "Bank Details",
+                  children: [
+                    _infoRow("UPI ID", data.upiId ?? "-"),
+                    _infoRow("Account No", data.accountNumber ?? "-"),
+                    _infoRow("IFSC Code",
+                        data.bankBranch ?? "-"), // if IFSC stored here
+                    _infoRow("Bank", data.bankName ?? "-"),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
     );
   }
 
@@ -271,6 +1067,7 @@ class SessionPage extends StatelessWidget {
                         ),
                         Expanded(
                           child: RadioListTile(
+                            dense: true,
                             title: Text('Meet'),
                             value: "meet",
                             groupValue: c.selectedType.value,
@@ -291,8 +1088,9 @@ class SessionPage extends StatelessWidget {
                           CustomWidgets().customDropdownField(
                             context: context,
                             hint: 'Select Teacher',
-                            items: c.studentList,
-                            onChanged: (p0) => c.selectedTeacher.value = p0,
+                            items: c.teacherList,
+                            onChanged: (p0) =>
+                                c.selectedTeacher.value = p0.name,
                           ),
                           const SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk(
@@ -304,7 +1102,8 @@ class SessionPage extends StatelessWidget {
                             context: context,
                             hint: 'Select Teacher',
                             items: c.teacherList,
-                            onChanged: (p0) => c.selectedTeacher.value = p0,
+                            onChanged: (p0) =>
+                                c.selectedTeacher.value = p0.name,
                           ),
                           const SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Teacher Salary'),
@@ -434,7 +1233,7 @@ class SessionPage extends StatelessWidget {
                                     if (value == true) {
                                       // select all
                                       c.selectedStudents
-                                          .assignAll(c.studentList);
+                                          .assignAll(c.studentsList);
                                     } else {
                                       // clear all
                                       c.selectedStudents.clear();
@@ -449,8 +1248,8 @@ class SessionPage extends StatelessWidget {
                           CustomWidgets().customMultiDropdownField(
                               context: context,
                               hint:
-                                  'Select Students (${c.studentList.length} available)',
-                              items: c.studentList,
+                                  'Select Students (${c.studentsList.length} available)',
+                              items: c.studentsList,
                               selectedItems: c.selectedStudents),
                           const SizedBox(height: 10),
                           Row(
@@ -634,7 +1433,7 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailsSection(BuildContext context, data) {
+  Widget _buildDetailsSection(BuildContext context, Session data) {
     final cs = Theme.of(context).colorScheme;
 
     return LayoutBuilder(
@@ -656,7 +1455,7 @@ class SessionPage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _miniInfo(context, "Subject", data.subject),
+                        _miniInfo(context, "Subject", data.package),
                         SizedBox(height: 10),
                         _miniInfo(context, "Class", data.className),
                       ],
@@ -680,7 +1479,7 @@ class SessionPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _miniInfo(context, "Subject", data.subject),
+                          _miniInfo(context, "Subject", data.package),
                           const SizedBox(height: 6),
                           _miniInfo(context, "Class", data.className),
                         ],
@@ -770,7 +1569,7 @@ class SessionPage extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(fontSize: 13),
+            style: context.tt.labelMedium,
           ),
         ],
       ),
@@ -826,14 +1625,14 @@ class SessionPage extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-              fontSize: 10, color: Theme.of(context).colorScheme.outline),
+          style: context.tt.labelSmall?.copyWith(
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 12,
+          style: context.tt.bodySmall?.copyWith(
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -848,22 +1647,23 @@ class SessionPage extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
-              fontSize: 10, color: Theme.of(context).colorScheme.outline),
+          style: context.tt.labelSmall?.copyWith(
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
           name,
-          style: const TextStyle(
-            fontSize: 13,
+          style: context.tt.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
-          overflow: TextOverflow.ellipsis,
         ),
+        const SizedBox(height: 2),
         Text(
           id,
-          style: TextStyle(
-              fontSize: 11, color: Theme.of(context).colorScheme.outline),
+          style: context.tt.labelSmall?.copyWith(
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
       ],
     );

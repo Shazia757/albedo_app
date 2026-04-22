@@ -89,7 +89,7 @@ class ProfilePage extends StatelessWidget {
                     _infoTile(
                       context,
                       title: "Employee ID",
-                      value: user.employeeId ?? 'NA',
+                      value: user.id ?? 'NA',
                       icon: Icons.badge_outlined,
                     ),
                     _editableTile(

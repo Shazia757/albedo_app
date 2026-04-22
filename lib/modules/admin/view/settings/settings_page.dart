@@ -33,7 +33,7 @@ class SettingsPage extends StatelessWidget {
     _SettingsItem("Automation", Icons.auto_mode, MacroPage()),
     _SettingsItem("Assessments", Icons.assignment, AssessmentsPage()),
     _SettingsItem("Materials", Icons.menu_book, MaterialsPage()),
-    _SettingsItem("Data Import", Icons.upload_file, BulkUploadPage()),
+    _SettingsItem("Bulk Upload", Icons.upload_file, BulkUploadPage()),
     _SettingsItem("Backup", Icons.backup, BackupPage()),
   ];
 

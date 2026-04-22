@@ -1,5 +1,5 @@
 import 'package:albedo_app/controller/settings_controller.dart';
-import 'package:albedo_app/model/hiring_ad_model.dart';
+import 'package:albedo_app/model/settings/hiring_ad_model.dart';
 import 'package:albedo_app/modules/admin/view/settings/banner_ads_page.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
