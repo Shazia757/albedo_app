@@ -2,6 +2,8 @@ import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/advisor_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
@@ -95,7 +97,7 @@ class SessionPage extends StatelessWidget {
                             itemCount: data.length,
                             itemBuilder: (_, i) => InkWell(
                               onTap: () =>
-                                  _openSessionDetails(context, data[i]),
+                                  _openSessionDetails(context, data, i),
                               child: InfoCard(
                                 id: data[i].id,
                                 status: data[i].status,
@@ -104,36 +106,6 @@ class SessionPage extends StatelessWidget {
                                 infoRows: [
                                   _buildPersonSection(context, data[i]),
                                   _buildDetailsSection(context, data[i]),
-                                ],
-                                actions: [
-                                  if (data[i].status != 'completed' &&
-                                      data[i].status != 'meet_done')
-                                    CustomWidgets().iconBtn(
-                                        icon: Icons.edit,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        onTap: () {
-                                          final session = data[i];
-
-                                          c.loadSession(session);
-
-                                          editSession(context);
-                                        }),
-                                  if ((data[i].status != 'completed') &&
-                                      (data[i].status != 'meet_done'))
-                                    CustomWidgets().iconBtn(
-                                      icon: Icons.delete,
-                                      color:
-                                          Theme.of(context).colorScheme.error,
-                                      onTap: () =>
-                                          CustomWidgets().showDeleteDialog(
-                                        text:
-                                            'Are you sure you want to delete this session permanently?',
-                                        context: context,
-                                        onConfirm: () => c.delete(data[i].id),
-                                      ),
-                                    ),
                                 ],
                               ),
                             ),
@@ -151,7 +123,65 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  void _openSessionDetails(BuildContext context, Session data) {
+  void _openProfileDialog({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required Color color,
+    required Widget content,
+  }) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text(title, style: context.tt.titleMedium),
+      icon: icon,
+      formKey: GlobalKey<FormState>(),
+      submitText: "Close",
+      onSubmit: () {},
+      sections: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: SingleChildScrollView(child: content),
+        )
+      ],
+    );
+  }
+
+  Widget buildProfileContent<T>({
+    required BuildContext context,
+    required T data,
+    required Color color,
+    required String role,
+    required String Function(T) getName,
+    required String? Function(T) getEmail,
+    required String? Function(T) getId,
+    String? Function(T)? getImageUrl,
+    required VoidCallback onDashboardTap,
+    required List<Widget> sections,
+  }) {
+    return Column(
+      children: [
+        profileHeader(
+          context: context,
+          data: data,
+          color: color,
+          getName: getName,
+          getEmail: getEmail,
+          getId: getId,
+          getImageUrl: getImageUrl,
+          onDashboardTap: onDashboardTap,
+        ),
+        const SizedBox(height: 10),
+        ...sections,
+      ],
+    );
+  }
+
+  void _openSessionDetails(
+    BuildContext context,
+    List<Session> sessions,
+    int currentIndex,
+  ) {
+    int index = currentIndex;
     CustomWidgets().showCustomDialog(
       context: context,
       title: const Text("Session Details"),
@@ -160,81 +190,176 @@ class SessionPage extends StatelessWidget {
       submitText: "Close",
       onSubmit: () {},
       sections: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.5,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _detailCard(
-                  context,
-                  title: "Student",
-                  name: data.studentName,
-                  id: data.studentId,
-                  onTap: () => _onUserTap(context, "student", data.studentId),
-                ),
-                _detailCard(
-                  context,
-                  title: "Teacher",
-                  name: data.teacherName,
-                  id: data.teacherId,
-                  onTap: () => _onUserTap(context, "teacher", data.teacherId),
-                ),
-                _detailCard(
-                  context,
-                  title: "Mentor",
-                  name: data.mentorName ?? "-",
-                  id: data.mentorId ?? "-",
-                  onTap: () => _onUserTap(context, "mentor", data.mentorId),
-                ),
-                _detailCard(
-                  context,
-                  title: "Coordinator",
-                  name: data.coordinatorName ?? "-",
-                  id: data.coordinatorId ?? "-",
-                  onTap: () =>
-                      _onUserTap(context, "coordinator", data.coordinatorId),
-                ),
-                _detailCard(
-                  context,
-                  title: "Advisor",
-                  name: data.advisorName ?? "-",
-                  id: data.advisorId ?? "-",
-                  onTap: () => _onUserTap(context, "advisor", data.advisorId),
-                ),
-                const SizedBox(height: 10),
-                _infoCard(
-                  context,
-                  type: "schedule",
-                  icon: Icons.schedule,
-                  title: "Schedule",
-                  children: [
-                    _infoRow("Date", _formatDate(data.date)),
-                    _infoRow("Time", _formatTime(data.time)),
-                    _infoRow("Duration", data.duration?.toString() ?? "-"),
-                  ],
-                ),
-                _infoCard(
-                  context,
-                  type: "session",
-                  icon: Icons.menu_book,
-                  title: "Session Info",
-                  children: [
-                    _infoRow("Subject", data.package ?? "-"),
-                    _infoRow("Syllabus", data.syllabus ?? "-"),
-                  ],
-                ),
-                _infoCard(
-                  context,
-                  type: "status",
-                  icon: Icons.flag,
-                  title: "Status",
-                  children: [
-                    _infoRow("Current Status", data.status),
-                  ],
-                ),
-              ],
-            ),
-          ),
+        StatefulBuilder(
+          builder: (context, setState) {
+            final data = sessions[index];
+
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: Column(
+                children: [
+                  /// 🔥 NAVIGATION BAR
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed:
+                            index > 0 ? () => setState(() => index--) : null,
+                        icon: const Icon(Icons.arrow_back_ios),
+                      ),
+                      Text(
+                        "Session ${index + 1}/${sessions.length}",
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      IconButton(
+                        onPressed: index < sessions.length - 1
+                            ? () => setState(() => index++)
+                            : null,
+                        icon: const Icon(Icons.arrow_forward_ios),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  /// 🔥 CONTENT
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          _detailCard(
+                            context,
+                            title: "Student",
+                            name: data.studentName,
+                            id: data.studentId,
+                            onTap: () =>
+                                _onUserTap(context, "student", data.studentId),
+                          ),
+                          _detailCard(
+                            context,
+                            title: "Teacher",
+                            name: data.teacherName,
+                            id: data.teacherId,
+                            onTap: () =>
+                                _onUserTap(context, "teacher", data.teacherId),
+                          ),
+                          _detailCard(
+                            context,
+                            title: "Mentor",
+                            name: data.mentorName ?? "-",
+                            id: data.mentorId ?? "-",
+                            onTap: () =>
+                                _onUserTap(context, "mentor", data.mentorId),
+                          ),
+                          _detailCard(
+                            context,
+                            title: "Coordinator",
+                            name: data.coordinatorName ?? "-",
+                            id: data.coordinatorId ?? "-",
+                            onTap: () => _onUserTap(
+                                context, "coordinator", data.coordinatorId),
+                          ),
+                          _detailCard(
+                            context,
+                            title: "Advisor",
+                            name: data.advisorName ?? "-",
+                            id: data.advisorId ?? "-",
+                            onTap: () =>
+                                _onUserTap(context, "advisor", data.advisorId),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          EditableInfoCard(
+                            type: "schedule",
+                            icon: Icons.schedule,
+                            title: "Schedule",
+                            date: _formatDate(data.date),
+                            time: _formatTime(data.time),
+                            duration: data.duration?.toString() ?? "-",
+                            onSave: (date, time) {
+                              // update
+                            },
+                          ),
+
+                          _infoCard(
+                            context,
+                            type: "session",
+                            icon: Icons.menu_book,
+                            title: "Session Info",
+                            children: [
+                              _infoRow("Subject", data.package ?? "-"),
+                              _infoRow("Syllabus", data.syllabus ?? "-"),
+                            ],
+                          ),
+
+                          _infoCard(
+                            context,
+                            type: "status",
+                            icon: Icons.flag,
+                            title: "Status",
+                            children: [
+                              _infoRow("Current Status", data.status),
+                            ],
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          /// 🔥 ACTION BUTTONS
+                          if (data.status != 'completed' &&
+                              data.status != 'meet_done')
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 110,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () => editSession(context),
+                                    icon: const Icon(Icons.edit,
+                                        size: 16, color: Colors.white),
+                                    label: const Text("Edit",
+                                        style: TextStyle(color: Colors.white)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 110,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      CustomWidgets().showDeleteDialog(
+                                        text:
+                                            'Are you sure you want to delete this session permanently?',
+                                        context: context,
+                                        onConfirm: () =>
+                                            c.delete(data.id), // ✅ correct
+                                      );
+                                    },
+                                    icon: const Icon(Icons.delete,
+                                        size: 16, color: Colors.white),
+                                    label: const Text("Delete",
+                                        style: TextStyle(color: Colors.white)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .errorContainer,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ],
     );
@@ -300,10 +425,11 @@ class SessionPage extends StatelessWidget {
 
   Widget _infoCard(
     BuildContext context, {
-    required String type, // 🔥 NEW
+    required String type,
     required IconData icon,
     required String title,
     required List<Widget> children,
+    VoidCallback? onEdit,
   }) {
     final color = _getRoleColor(context, type);
 
@@ -328,6 +454,16 @@ class SessionPage extends StatelessWidget {
                   color: color,
                 ),
               ),
+              const Spacer(),
+              if (onEdit != null) // 👈 show only if editable
+                InkWell(
+                  onTap: onEdit,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(Icons.edit, size: 16, color: color),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 10),
@@ -380,172 +516,121 @@ class SessionPage extends StatelessWidget {
   void _onUserTap(BuildContext context, String role, String? id) {
     if (id == null || id == "-") return;
 
-    if (role == "student") {
-      final student = c.getStudentById(id);
+    final handlers = {
+      "student": () {
+        final s = c.getStudentById(id);
+        if (s != null) _openStudentProfile(context, s);
+      },
+      "teacher": () {
+        final t = c.getTeacherById(id);
+        if (t != null) _openTeacherProfile(context, t);
+      },
+      "mentor": () {
+        final m = c.getMentorById(id);
+        if (m != null) _openMentorProfile(context, m);
+      },
+      "coordinator": () {
+        final c1 = c.getCoordinatorById(id);
+        if (c1 != null) _openCoordinatorProfile(context, c1);
+      },
+      "advisor": () {
+        final a = c.getAdvisorById(id);
+        if (a != null) _openAdvisorProfile(context, a);
+      },
+    };
 
-      if (student == null) {
-        Get.snackbar("Error", "Student not found");
-        return;
-      }
-
-      _openStudentProfile(context, student);
-    } else if (role == 'teacher') {
-      final teacher = c.getTeacherById(id);
-      print("Searching for teacherId: $id");
-      print("Available IDs: ${c.teacherList.map((e) => e.id).toList()}");
-
-      if (teacher == null) {
-        Get.snackbar("Error", "Teacher not found");
-        return;
-      }
-
-      _openTeacherProfile(context, teacher);
-    } else if (role == 'mentor') {
-      final mentor = c.getMentorById(id);
-      print("Searching for teacherId: $id");
-      print("Available IDs: ${c.teacherList.map((e) => e.id).toList()}");
-
-      if (mentor == null) {
-        Get.snackbar("Error", "Teacher not found");
-        return;
-      }
-
-      _openMentorProfile(context, mentor);
+    if (handlers.containsKey(role)) {
+      handlers[role]!();
+    } else {
+      Get.snackbar("Error", "$role not found");
     }
+  }
+
+  void _openGenericProfile<T>({
+    required BuildContext context,
+    required String title,
+    required String role,
+    required IconData icon,
+    required T data,
+    required String Function(T) getName,
+    required String? Function(T) getEmail,
+    required String? Function(T) getId,
+    String? Function(T)? getImageUrl,
+    required dynamic Function(T) toUser,
+    required List<Widget> sections,
+  }) {
+    final color = _getRoleColor(context, role);
+
+    _openProfileDialog(
+      context: context,
+      title: title,
+      icon: icon,
+      color: color,
+      content: buildProfileContent<T>(
+        context: context,
+        data: data,
+        color: color,
+        role: role,
+        getName: getName,
+        getEmail: getEmail,
+        getId: getId,
+        getImageUrl: getImageUrl,
+        onDashboardTap: () {
+          final auth = Get.find<AuthController>();
+          final user = toUser(data);
+
+          auth.startImpersonation(user);
+          Get.offAll(() => const Root());
+        },
+        sections: sections,
+      ),
+    );
   }
 
   void _openStudentProfile(BuildContext context, Student data) {
     final color = _getRoleColor(context, "student");
 
-    CustomWidgets().showCustomDialog(
+    _openGenericProfile(
       context: context,
-      title: Text("Student Profile", style: context.tt.titleMedium),
+      title: "Student Profile",
+      role: "student",
       icon: Icons.person,
-      formKey: GlobalKey<FormState>(),
-      submitText: "Close",
-      onSubmit: () {},
+      data: data,
+      getName: (s) => s.name,
+      getEmail: (s) => s.email,
+      getId: (s) => s.studentId,
+      getImageUrl: (s) => s.imageUrl,
+      toUser: c.studentToUser,
       sections: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                /// 🔥 PROFILE HEADER
-                profileHeader(
-                  context: context,
-                  data: data,
-                  color: color,
-                  getName: (s) => s.name,
-                  getEmail: (s) => s.email,
-                  getId: (s) => s.studentId,
-                  getImageUrl: (s) => s.imageUrl,
-                  onDashboardTap: () {
-                    final auth = Get.find<AuthController>();
-                    final user = c.studentToUser(data);
-
-                    auth.startImpersonation(user);
-                    Get.offAll(() => const Root());
-                  },
-                ),
-                const SizedBox(height: 10),
-                _idCardCTA(context, data, color),
-                const SizedBox(height: 10),
-
-                /// 🔹 CONTACT (ONLY WHERE LABELS NEEDED)
-                _profileCard(
-                  context,
-                  color: color,
-                  title: "Contact",
-                  children: [
-                    _infoRow("Phone", data.phone ?? "-"),
-                    _infoRow("WhatsApp", data.whatsapp ?? "-"),
-                  ],
-                ),
-
-                /// 🔹 FAMILY (NO LABELS)
-                _profileCard(
-                  context,
-                  color: Colors.orange,
-                  title: "Parent Details",
-                  children: [
-                    _simpleText(data.parentName ?? "-"),
-                    _simpleText(data.parentOccupation ?? "-"),
-                  ],
-                ),
-
-                /// 🔹 ACADEMIC (LABELS REQUIRED)
-                _profileCard(
-                  context,
-                  color: Colors.deepPurple,
-                  title: "Academic",
-                  children: [
-                    _infoRow("Syllabus", data.syllabus ?? "-"),
-                    _infoRow("Category", data.category ?? "-"),
-                    _infoRow("Standard", data.standard?.toString() ?? "-"),
-                  ],
-                ),
-
-                /// 🔹 COORDINATOR (NO LABELS)
-                if (data.coordinatorName != null)
-                  _profileCard(
-                    context,
-                    color: Colors.teal,
-                    title: "Coordinator",
-                    children: [
-                      _simpleText(data.coordinatorName!),
-                      _simpleText(data.coordinatorId ?? "-"),
-                    ],
-                  ),
-
-                /// 🔹 MENTOR (NO LABELS)
-                if (data.mentorName != null)
-                  _profileCard(
-                    context,
-                    color: Colors.indigo,
-                    title: "Mentor",
-                    children: [
-                      _simpleText(data.mentorName!),
-                      _simpleText(data.mentorId ?? "-"),
-                    ],
-                  ),
-
-                /// 🔹 ADVISOR (NO LABELS)
-                if (data.advisorName != null)
-                  _profileCard(
-                    context,
-                    color: Colors.green,
-                    title: "Advisor",
-                    children: [
-                      _simpleText(data.advisorName!),
-                      _simpleText(data.advisorId ?? "-"),
-                    ],
-                  ),
-
-                /// 🔹 REFERRAL (NO LABELS)
-                if (data.referralName != null)
-                  _profileCard(
-                    context,
-                    color: Colors.lightGreen,
-                    title: "Referral",
-                    children: [
-                      _simpleText(data.referralName!),
-                      _simpleText(data.referralRole ?? "-"),
-                    ],
-                  ),
-
-                /// 🔹 ADDRESS
-                _profileCard(
-                  context,
-                  color: Colors.blueGrey,
-                  title: "Address",
-                  children: [
-                    _simpleText(data.address ?? "-"),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        )
+        _idCardCTA(context, data, color),
+        _profileCard(
+          context,
+          color: color,
+          title: "Contact",
+          children: [
+            _infoRow("Phone", data.phone ?? "-"),
+            _infoRow("WhatsApp", data.whatsapp ?? "-"),
+          ],
+        ),
+        _profileCard(
+          context,
+          color: Colors.orange,
+          title: "Parent Details",
+          children: [
+            _simpleText(data.parentName ?? "-"),
+            _simpleText(data.parentOccupation ?? "-"),
+          ],
+        ),
+        _profileCard(
+          context,
+          color: Colors.deepPurple,
+          title: "Academic",
+          children: [
+            _infoRow("Syllabus", data.syllabus ?? "-"),
+            _infoRow("Category", data.category ?? "-"),
+            _infoRow("Standard", data.standard?.toString() ?? "-"),
+          ],
+        ),
       ],
     );
   }
@@ -646,8 +731,8 @@ class SessionPage extends StatelessWidget {
           /// 🔥 PROFILE IMAGE
           CircleAvatar(
             radius: 28,
-            backgroundColor: color.withOpacity(0.2),
-            backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
+            // backgroundColor: color.withOpacity(0.2),
+            // backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
             child:
                 imageUrl == null ? Image.asset("assets/images/logo.png") : null,
           ),
@@ -757,173 +842,164 @@ class SessionPage extends StatelessWidget {
   void _openTeacherProfile(BuildContext context, Teacher data) {
     final color = _getRoleColor(context, "teacher");
 
-    CustomWidgets().showCustomDialog(
+    _openGenericProfile(
       context: context,
-      title: Text("Teacher Profile", style: context.tt.titleMedium),
+      title: "Teacher Profile",
+      role: "teacher",
       icon: Icons.school,
-      formKey: GlobalKey<FormState>(),
-      isViewOnly: true,
-      submitText: "Close",
-      onSubmit: () {},
+      data: data,
+      getName: (t) => t.name,
+      getEmail: (t) => t.email,
+      getId: (t) => t.id,
+      getImageUrl: (t) => t.imageUrl,
+      toUser: c.teacherToUser,
       sections: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                /// 🔥 PROFILE HEADER (reuse same)
-                profileHeader(
-                  context: context, data: data, color: color,
-                  getName: (t) => t.name,
-                  getEmail: (t) => t.email,
-                  getId: (t) => t.id,
-                  getImageUrl: (t) => t.imageUrl,
-
-                  // no image
-                  onDashboardTap: () {
-                    final auth = Get.find<AuthController>();
-                    final user = c.teacherToUser(data);
-
-                    auth.startImpersonation(user);
-                    Get.offAll(() => const Root());
-                  },
-                ),
-
-                const SizedBox(height: 10),
-
-                /// 🔹 BASIC INFO (like student first card feel)
-                _profileCard(
-                  context,
-                  color: color,
-                  title: "Details",
-                  children: [
-                    _infoRow("Qualification", data.qualification ?? "-"),
-                    _infoRow("Gender", data.gender ?? "-"),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                /// 🔹 CONTACT (same as student)
-                _profileCard(
-                  context,
-                  color: color,
-                  title: "Contact",
-                  children: [
-                    _infoRow("Phone", data.phone ?? "-"),
-                    _infoRow("WhatsApp", data.whatsapp ?? "-"),
-                  ],
-                ),
-
-                /// 🔹 ADDRESS (same pattern)
-                _profileCard(
-                  context,
-                  color: Colors.blueGrey,
-                  title: "Address",
-                  children: [
-                    _simpleText(data.address ?? "-"),
-                    _simpleText(data.place ?? "-"),
-                    _simpleText(data.pincode ?? "-"),
-                  ],
-                ),
-
-                /// 🔹 BANK DETAILS (NEW SECTION)
-                _profileCard(
-                  context,
-                  color: Colors.green,
-                  title: "Bank Details",
-                  children: [
-                    _infoRow("UPI ID", data.upiId ?? "-"),
-                    _infoRow("Account No", data.accountNumber ?? "-"),
-                    _infoRow("IFSC Code",
-                        data.bankBranch ?? "-"), // if IFSC stored here
-                    _infoRow("Bank", data.bankName ?? "-"),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        )
+        _profileCard(
+          context,
+          color: color,
+          title: "Details",
+          children: [
+            _infoRow("Qualification", data.qualification ?? "-"),
+            _infoRow("Gender", data.gender ?? "-"),
+          ],
+        ),
+        _profileCard(
+          context,
+          color: color,
+          title: "Contact",
+          children: [
+            _infoRow("Phone", data.phone ?? "-"),
+            _infoRow("WhatsApp", data.whatsapp ?? "-"),
+          ],
+        ),
+        _profileCard(
+          context,
+          color: Colors.blueGrey,
+          title: "Address",
+          children: [
+            _simpleText(data.address ?? "-"),
+            _simpleText(data.place ?? "-"),
+            _simpleText(data.pincode ?? "-"),
+          ],
+        ),
+        _profileCard(
+          context,
+          color: Colors.green,
+          title: "Bank Details",
+          children: [
+            _infoRow("UPI ID", data.upiId ?? "-"),
+            _infoRow("Account No", data.accountNumber ?? "-"),
+            _infoRow("IFSC Code", data.bankBranch ?? "-"),
+            _infoRow("Bank", data.bankName ?? "-"),
+          ],
+        ),
       ],
     );
   }
 
+  List<Widget> _staffSections(BuildContext context, dynamic data, Color color) {
+    return [
+      _profileCard(
+        context,
+        color: color,
+        title: "Contact",
+        children: [
+          _infoRow("Phone", data.phone ?? "-"),
+          _infoRow("WhatsApp", data.whatsapp ?? "-"),
+        ],
+      ),
+      _profileCard(
+        context,
+        color: Colors.blueGrey,
+        title: "Address",
+        children: [
+          _simpleText(data.address ?? "-"),
+          _simpleText(data.place ?? "-"),
+          _simpleText(data.pincode ?? "-"),
+        ],
+      ),
+      _profileCard(
+        context,
+        color: Colors.green,
+        title: "Bank Details",
+        children: [
+          _infoRow("UPI ID", data.upiId ?? "-"),
+          _infoRow("Account No", data.accountNumber ?? "-"),
+          _infoRow("IFSC Code", data.bankBranch ?? "-"),
+          _infoRow("Bank", data.bankName ?? "-"),
+        ],
+      ),
+    ];
+  }
+
   void _openMentorProfile(BuildContext context, Mentor data) {
-    final color = _getRoleColor(context, "teacher");
+    final color = _getRoleColor(context, "mentor");
 
-    CustomWidgets().showCustomDialog(
+    _openGenericProfile(
       context: context,
-      title: Text("Mentor Profile", style: context.tt.titleMedium),
+      title: "Mentor Profile",
+      role: "mentor",
       icon: Icons.school,
-      formKey: GlobalKey<FormState>(),
-      isViewOnly: true,
-      submitText: "Close",
-      onSubmit: () {},
+      data: data,
+      getName: (m) => m.name,
+      getEmail: (m) => m.email,
+      getId: (m) => m.id,
+      getImageUrl: (m) => m.imageUrl,
+      toUser: c.mentorToUser,
+      sections: _staffSections(context, data, color),
+    );
+  }
+
+  void _openCoordinatorProfile(BuildContext context, Coordinator data) {
+    final color = _getRoleColor(context, "coordinator");
+
+    _openGenericProfile(
+      context: context,
+      title: "Coordinator Profile",
+      role: "coordinator",
+      icon: Icons.school,
+      data: data,
+      getName: (m) => m.name,
+      getEmail: (m) => m.email,
+      getId: (m) => m.id,
+      getImageUrl: (m) => m.imageUrl,
+      toUser: c.coordinatorToUser,
+      sections: _staffSections(context, data, color),
+    );
+  }
+
+  void _openAdvisorProfile(BuildContext context, Advisor data) {
+    final color = _getRoleColor(context, "advisor");
+
+    _openGenericProfile(
+      context: context,
+      title: "Advisor Profile",
+      role: "advisor",
+      icon: Icons.school,
+      data: data,
+      getName: (m) => m.name,
+      getEmail: (m) => m.email,
+      getId: (m) => m.id,
+      getImageUrl: (m) => m.imageUrl,
+      toUser: c.advisorToUser,
       sections: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                /// 🔥 PROFILE HEADER (reuse same)
-                profileHeader(
-                  context: context, data: data, color: color,
-                  getName: (m) => m.name,
-                  getEmail: (m) => m.email,
-                  getId: (m) => m.id,
-                  getImageUrl: (m) => m.imageUrl,
-
-                  // no image
-                  onDashboardTap: () {
-                    final auth = Get.find<AuthController>();
-                    final user = c.mentorToUser(data);
-
-                    auth.startImpersonation(user);
-                    Get.offAll(() => const Root());
-                  },
-                ),
-
-                const SizedBox(height: 10),
-
-                _profileCard(
-                  context,
-                  color: color,
-                  title: "Contact",
-                  children: [
-                    _infoRow("Phone", data.phone ?? "-"),
-                    _infoRow("WhatsApp", data.whatsapp ?? "-"),
-                  ],
-                ),
-
-                /// 🔹 ADDRESS (same pattern)
-                _profileCard(
-                  context,
-                  color: Colors.blueGrey,
-                  title: "Address",
-                  children: [
-                    _simpleText(data.address ?? "-"),
-                    _simpleText(data.place ?? "-"),
-                    _simpleText(data.pincode ?? "-"),
-                  ],
-                ),
-
-                /// 🔹 BANK DETAILS (NEW SECTION)
-                _profileCard(
-                  context,
-                  color: Colors.green,
-                  title: "Bank Details",
-                  children: [
-                    _infoRow("UPI ID", data.upiId ?? "-"),
-                    _infoRow("Account No", data.accountNumber ?? "-"),
-                    _infoRow("IFSC Code",
-                        data.bankBranch ?? "-"), // if IFSC stored here
-                    _infoRow("Bank", data.bankName ?? "-"),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        )
+        _profileCard(
+          context,
+          color: color,
+          title: "Contact",
+          children: [
+            _infoRow("Phone", data.phone ?? "-"),
+            _infoRow("WhatsApp", data.whatsapp ?? "-"),
+          ],
+        ),
+        _profileCard(
+          context,
+          color: Colors.green,
+          title: "Converted Students",
+          children: [
+            _simpleText(data.convertedStudents?.toString() ?? "-"),
+          ],
+        ),
       ],
     );
   }
@@ -1515,41 +1591,91 @@ class SessionPage extends StatelessWidget {
   Widget _topBar(BuildContext context, SessionController c) {
     final isMobile = Responsive.isMobile(context);
 
-    if (isMobile) {
-      return Column(
+    return Obx(() {
+      final searching = c.isSearching.value;
+
+      if (isMobile) {
+        return Column(
+          children: [
+            Row(
+              children: [
+                const SizedBox(width: 10),
+                if (!searching)
+                  Expanded(
+                    child: Text(
+                      "Sessions",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: CustomWidgets().premiumSearch(
+                      context,
+                      hint: "Search sessions...",
+                      onChanged: (val) => c.searchQuery.value = val,
+                    ),
+                  ),
+                IconButton(
+                  icon: Icon(searching ? Icons.close : Icons.search),
+                  onPressed: () {
+                    c.isSearching.value = !searching;
+                    if (!searching == false) {
+                      c.searchQuery.value = "";
+                    }
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            if (!searching)
+              Row(
+                children: [
+                  Expanded(child: _filterButton(context, c)),
+                  const SizedBox(width: 10),
+                  Expanded(child: _sortButton(context, c)),
+                ],
+              ),
+          ],
+        );
+      }
+
+      return Row(
         children: [
-          CustomWidgets().premiumSearch(
-            context,
-            hint: "Search sessions...",
-            onChanged: (val) => c.searchQuery.value = val,
+          if (!searching)
+            Expanded(
+              flex: 2,
+              child: Text(
+                "Sessions",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            )
+          else
+            Expanded(
+              flex: 3,
+              child: CustomWidgets().premiumSearch(
+                context,
+                hint: "Search sessions...",
+                onChanged: (val) => c.searchQuery.value = val,
+              ),
+            ),
+          IconButton(
+            icon: Icon(searching ? Icons.close : Icons.search),
+            onPressed: () {
+              c.isSearching.value = !searching;
+              if (!searching == false) {
+                c.searchQuery.value = "";
+              }
+            },
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(child: _filterButton(context)),
-              const SizedBox(width: 10),
-              Expanded(child: _sortButton(context, c)),
-            ],
-          )
+          if (!searching) ...[
+            const SizedBox(width: 12),
+            _filterButton(context, c),
+            const SizedBox(width: 8),
+            _sortButton(context, c),
+          ],
         ],
       );
-    }
-
-    return Row(
-      children: [
-        Expanded(
-            flex: 3,
-            child: CustomWidgets().premiumSearch(
-              context,
-              hint: "Search sessions...",
-              onChanged: (val) => c.searchQuery.value = val,
-            )),
-        const SizedBox(width: 12),
-        _filterButton(context),
-        const SizedBox(width: 8),
-        _sortButton(context, c),
-      ],
-    );
+    });
   }
 
   Widget _actionButton(BuildContext context, IconData icon, String label) {
@@ -1587,29 +1713,15 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  Widget _filterButton(BuildContext context) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+  Widget _filterButton(BuildContext context, SessionController c) {
+    return GestureDetector(
+      onTap: () => CustomWidgets().showFilterSheet(
+        title: "Filter Sessions",
+        options: _filterOptions,
+        selectedValue: c.filterType.value,
+        onSelected: (val) => c.filterType.value = val,
       ),
-      child: InkWell(
-        onTap: () {
-          // TODO: open filter bottom sheet
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.filter_list, size: 18),
-            SizedBox(width: 6),
-            Text("Filter", style: TextStyle(fontSize: 13)),
-          ],
-        ),
-      ),
+      child: _actionButton(context, Icons.filter_list, "Filter"),
     );
   }
 
@@ -1731,3 +1843,195 @@ final List<SortOption> _sortOptions = [
   SortOption(
       label: "Teacher Name", value: SortType.teacher, icon: Icons.school),
 ];
+
+final List<FilterOption> _filterOptions = [
+  FilterOption(label: "All", value: FilterType.all, icon: Icons.schedule),
+  FilterOption(
+      label: "Class Session",
+      value: FilterType.classSession,
+      icon: Icons.class_),
+  FilterOption(
+      label: "Meet Session",
+      value: FilterType.meetSession,
+      icon: Icons.handshake),
+];
+
+class EditableInfoCard extends StatefulWidget {
+  final String type;
+  final IconData icon;
+  final String title;
+
+  final String date;
+  final String time;
+  final String duration;
+
+  final Function(String date, String time)? onSave;
+
+  const EditableInfoCard({
+    super.key,
+    required this.type,
+    required this.icon,
+    required this.title,
+    required this.date,
+    required this.time,
+    required this.duration,
+    this.onSave,
+  });
+
+  @override
+  State<EditableInfoCard> createState() => _EditableInfoCardState();
+}
+
+class _EditableInfoCardState extends State<EditableInfoCard> {
+  bool isEditing = false;
+
+  late TextEditingController dateController;
+  late TextEditingController timeController;
+
+  @override
+  void initState() {
+    super.initState();
+    dateController = TextEditingController(text: widget.date);
+    timeController = TextEditingController(text: widget.time);
+  }
+
+  @override
+  void dispose() {
+    dateController.dispose();
+    timeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getRoleColor(context, widget.type);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Header
+          Row(
+            children: [
+              Icon(widget.icon, size: 16, color: color),
+              const SizedBox(width: 6),
+              Text(
+                widget.title,
+                style: context.tt.titleSmall?.copyWith(color: color),
+              ),
+              const Spacer(),
+              InkWell(
+                onTap: () {
+                  setState(() => isEditing = !isEditing);
+                },
+                child: Icon(
+                  isEditing ? Icons.close : Icons.edit,
+                  size: 16,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          /// Content
+          if (!isEditing) ...[
+            _infoRow("Date", widget.date),
+            _infoRow("Time", widget.time),
+            _infoRow("Duration", widget.duration),
+          ] else ...[
+            CustomWidgets().labelWithAsterisk('Session Date', required: true),
+            const SizedBox(height: 6),
+
+            CustomWidgets().dropdownStyledTextField(
+              controller: dateController,
+              hint: 'Date',
+              context: context,
+            ),
+            const SizedBox(height: 6),
+            CustomWidgets().labelWithAsterisk('Session Time', required: true),
+            const SizedBox(height: 6),
+
+            CustomWidgets().dropdownStyledTextField(
+              controller: timeController,
+              hint: 'Time',
+              context: context,
+            ),
+            const SizedBox(height: 10),
+
+            /// Actions
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      isEditing = false;
+                      dateController.text = widget.date;
+                      timeController.text = widget.time;
+                    });
+                  },
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    widget.onSave?.call(
+                      dateController.text,
+                      timeController.text,
+                    );
+
+                    setState(() => isEditing = false);
+                  },
+                  child: const Text("Save"),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getRoleColor(BuildContext context, String type) {
+    switch (type) {
+      case "student":
+        return Colors.blue;
+      case "mentor":
+        return Colors.green;
+      case "schedule":
+        return Colors.orange;
+      default:
+        return Theme.of(context).colorScheme.primary;
+    }
+  }
+}

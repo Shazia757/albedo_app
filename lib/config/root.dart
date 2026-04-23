@@ -17,6 +17,7 @@ class Root extends GetView<AuthController> {
   Widget build(BuildContext context) {
     return Obx(() {
       final user = controller.activeUser;
+      print("ROOT sees user: $user");
 
       if (user == null) {
         return LoginView();
@@ -51,7 +52,7 @@ class Root extends GetView<AuthController> {
       return Scaffold(
         body: Column(
           children: [
-            const ImpersonationBanner(), // 🔥 added here
+            const ImpersonationBanner(),
             Expanded(child: page),
           ],
         ),

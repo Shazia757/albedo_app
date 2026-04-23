@@ -2,6 +2,7 @@ class Coordinator {
   final String id;
   final String name;
   String? email;
+  String? imageUrl;
   String? status;
   String? gender;
   final DateTime joinedAt;
@@ -28,6 +29,7 @@ class Coordinator {
       this.email,
       this.gender,
       this.status,
+      this.imageUrl,
       this.phone,
       this.whatsapp,
       this.salary,

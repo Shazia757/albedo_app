@@ -56,3 +56,14 @@ class SortOption<T> {
     required this.icon,
   });
 }
+class FilterOption<T> {
+  final String label;
+  final T value;
+  final IconData icon;
+
+  FilterOption({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+}

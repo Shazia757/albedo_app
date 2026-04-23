@@ -1,4 +1,6 @@
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/advisor_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
@@ -8,10 +10,13 @@ import 'package:get/get.dart';
 
 enum SortType { newest, oldest, student, teacher }
 
+enum FilterType { all, classSession, meetSession }
+
 class SessionController extends GetxController {
   var selectedTab = 0.obs;
   var selectedStatus = 0.obs;
   var searchQuery = ''.obs;
+  RxBool isSearching = false.obs;
   var selectAllMentors = false.obs;
   var selectAllTeachers = false.obs;
   var selectAllStudents = false.obs;
@@ -19,13 +24,14 @@ class SessionController extends GetxController {
   var selectAllAdvisors = false.obs;
   var selectAllOtherUsers = false.obs;
   var sortType = SortType.newest.obs;
+  var filterType = SortType.newest.obs;
   var sessions = <Session>[].obs;
   var selectedTeacher = RxnString();
   RxList<Student> selectedStudents = <Student>[].obs;
   RxList<Teacher> selectedTeachers = <Teacher>[].obs;
   RxList<Mentor> selectedMentors = <Mentor>[].obs;
-  RxList<String> selectedCoordinators = <String>[].obs;
-  RxList<String> selectedAdvisors = <String>[].obs;
+  RxList<Coordinator> selectedCoordinators = <Coordinator>[].obs;
+  RxList<Advisor> selectedAdvisors = <Advisor>[].obs;
   RxList<String> selectedOtherUsers = <String>[].obs;
   final RxBool showStudentMenu = false.obs;
   var selectedTeacherEdit = RxnString();
@@ -38,8 +44,8 @@ class SessionController extends GetxController {
   RxList<Student> studentsList = <Student>[].obs;
   RxList<Teacher> teacherList = <Teacher>[].obs;
   RxList<Mentor> mentorsList = <Mentor>[].obs;
-  RxList<String> coordinatorsList = <String>[].obs;
-  RxList<String> advisorsList = <String>[].obs;
+  RxList<Coordinator> coordinatorsList = <Coordinator>[].obs;
+  RxList<Advisor> advisorsList = <Advisor>[].obs;
   RxList<String> otherUsersList = <String>[].obs;
 
   TextEditingController dateController = TextEditingController();
@@ -85,7 +91,15 @@ class SessionController extends GetxController {
       final matchesSearch = s.studentName
               .toLowerCase()
               .contains(searchQuery.value.toLowerCase()) ||
-          s.teacherName.toLowerCase().contains(searchQuery.value.toLowerCase());
+          s.studentId.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          s.teacherId.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          s.teacherName
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase()) ||
+          s.id.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          s.package.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          s.className.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          s.date.toString().contains(searchQuery.value.toLowerCase());
 
       return matchesStatus && matchesSearch;
     }).toList();
@@ -122,6 +136,8 @@ class SessionController extends GetxController {
     fetchStudentDetail();
     fetchTeacherDetail();
     fetchMentorDetail();
+    fetchCoordinatorDetail();
+    fetchAdvisorDetail();
   }
 
   Future<void> fetchData() async {
@@ -135,16 +151,26 @@ class SessionController extends GetxController {
           id: "S001",
           studentName: "Aisha",
           studentId: "STU001",
-          syllabus: 'CBSE',
-          mentorId: 'MTR001',
-          mentorName: 'Saeeda',
-          package: "Math",
-          className: "10A",
+          package: "Premium Package",
+          syllabus: "CBSE Mathematics",
+          className: "Class 10",
           teacherName: "Ameen Rahman",
           teacherId: "T001",
-          date: DateTime.now().subtract(const Duration(days: 1)),
-          time: DateTime.now(),
+          mentorName: "Saeeda",
+          mentorId: "MTR001",
+
+          // Optional fields
+          coordinatorName: "Najeeb",
+          coordinatorId: "COO001",
+          advisorName: "Fathima",
+          advisorId: "ADV001",
+
+          date: DateTime(2026, 4, 23),
+          time: DateTime(2026, 4, 23, 10, 30), // 10:30 AM
           status: "started",
+
+          duration: 60, // in minutes
+          teacherSalary: 500.0,
         ),
         Session(
           id: "S002",
@@ -386,6 +412,77 @@ class SessionController extends GetxController {
     }
   }
 
+  Future<void> fetchCoordinatorDetail() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      coordinatorsList.assignAll([
+        Coordinator(
+          id: "COO001",
+          name: "Najeeb Rahman",
+          joinedAt: DateTime(2025, 1, 15),
+          email: "najeeb.rahman@example.com",
+          imageUrl: "https://example.com/profile/najeeb.jpg",
+          status: "Active",
+          gender: "Male",
+          phone: "+919876543210",
+          whatsapp: "+919876543210",
+          dob: "1995-06-12",
+          qualification: "MBA",
+          place: "Malappuram",
+          pincode: "679322",
+          address: "Green Villa, Perintalmanna, Kerala",
+          prefLanguage: "English",
+          accountNumber: "123456789012",
+          accountHolder: "Najeeb Rahman",
+          upiId: "najeeb@upi",
+          accountType: "Savings",
+          bankName: "State Bank of India",
+          bankBranch: "Perintalmanna Branch",
+          salary: 25000,
+        ),
+      ]);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchAdvisorDetail() async {
+    try {
+      isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      advisorsList.assignAll([
+        Advisor(
+          id: "ADV001",
+          name: "Fathima Noor",
+          joinedAt: DateTime(2025, 3, 10),
+          email: "fathima.noor@example.com",
+          status: "Active",
+          gender: "Female",
+          phone: "+919812345678",
+          whatsapp: "+919812345678",
+          convertedStudents: 45,
+          imageUrl: "https://example.com/profile/fathima.jpg",
+          dob: "1998-09-21",
+          qualification: "BBA",
+          place: "Kozhikode",
+          pincode: "673001",
+          address: "Noor Manzil, Kozhikode, Kerala",
+        ),
+      ]);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   // void setStudents(List<Student> list) {
   //   studentsList.assignAll(list);
 
@@ -442,6 +539,40 @@ class SessionController extends GetxController {
       id: m.id,
       name: m.name,
       role: "mentor",
+    );
+  }
+
+  Coordinator? getCoordinatorById(String id) {
+    print("Clicked ID: $id");
+    try {
+      return coordinatorsList.firstWhere((e) => e.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Users coordinatorToUser(Coordinator c) {
+    return Users(
+      id: c.id,
+      name: c.name,
+      role: "coordinator",
+    );
+  }
+
+  Advisor? getAdvisorById(String id) {
+    print("Clicked ID: $id");
+    try {
+      return advisorsList.firstWhere((e) => e.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Users advisorToUser(Advisor a) {
+    return Users(
+      id: a.id,
+      name: a.name,
+      role: "advisor",
     );
   }
 

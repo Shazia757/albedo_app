@@ -41,7 +41,7 @@ const darkColorScheme = ColorScheme(
   onPrimaryContainer: Color(0xFFD6E9FF),
 
   // 🟣 Secondary (subtle, not glowing)
-  secondary: Color(0xFFB39DDB),
+  secondary: secondaryPurple,
   onSecondary: Colors.black,
   secondaryContainer: Color(0xFF2A2238),
   onSecondaryContainer: Color(0xFFE6DFFF),
@@ -51,7 +51,7 @@ const darkColorScheme = ColorScheme(
   onSurface: Color(0xFFEDEDED),
 
   // ❌ Error
-  error: Color(0xFFCF6679),
+  error: Color(0xFFB3261E),
   onError: Colors.black,
 
   // 🔘 Borders / dividers

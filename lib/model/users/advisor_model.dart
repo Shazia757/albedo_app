@@ -7,6 +7,8 @@ class Advisor {
   final DateTime joinedAt;
   String? phone;
   String? whatsapp;
+  int? convertedStudents;
+  String? imageUrl;
   String? dob;
   String? qualification;
   String? place;
@@ -28,6 +30,8 @@ class Advisor {
       this.email,
       this.gender,
       this.status,
+      this.convertedStudents,
+      this.imageUrl,
       this.phone,
       this.whatsapp,
       // this.salary,

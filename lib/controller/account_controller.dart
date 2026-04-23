@@ -1,5 +1,6 @@
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/database/local_storage.dart';
 import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:flutter/foundation.dart';
@@ -13,10 +14,10 @@ class AccountController extends GetxController {
   final contactController = TextEditingController();
   final passwordController = TextEditingController();
 
-  var rememberMe = false.obs;
+  var rememberMe = true.obs;
   var obscurePassword = true.obs;
   var isLoading = false.obs;
-  final box = GetStorage();
+
   @override
   onInit() {
     if (kDebugMode) {
@@ -42,21 +43,14 @@ class AccountController extends GetxController {
         role: 'admin',
       );
 
-      if (rememberMe.value) {
-        box.write('isLoggedIn', true);
-        box.write('user', {
-          'name': user.name,
-          'id': user.id,
-          'role': user.role,
-        });
-      }
+      LocalStorage().writeUser(user);
 
       final AuthController auth = Get.find<AuthController>();
 
       auth.currentUser.value = user;
 
       Get.snackbar("Success", "Login Successful");
-      Get.offAll(() => const Root());
+      Get.offAll(() => HomeView());
     } catch (e) {
       Get.snackbar("Error", "Login Failed");
     } finally {
@@ -102,7 +96,7 @@ class AccountController extends GetxController {
   }
 
   void logout() {
-    box.erase(); // clears saved login
+    LocalStorage().clearAll(); // clears saved login
   }
 
   void forgotPassword() async {
