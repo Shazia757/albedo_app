@@ -14,6 +14,8 @@ class CoordinatorController extends GetxController {
   final tabs = ["Active", "Expired"];
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
+  var isDeactivateButtonLoading = true.obs;
+  var isSearching = false.obs;
 
   var experiences = <ExperienceModel>[].obs;
 
@@ -166,4 +168,23 @@ class CoordinatorController extends GetxController {
     //   },
     // );
   }
+
+    deactivate(String id) {
+    isDeactivateButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
+  }
+
 }

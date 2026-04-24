@@ -1,11 +1,13 @@
 import 'package:albedo_app/controller/other_users_controller.dart';
-import 'package:albedo_app/model/users/other_users_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
+import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class OthersPage extends StatelessWidget {
@@ -44,25 +46,86 @@ class OthersPage extends StatelessWidget {
                         return const Center(child: Text("No users found"));
                       }
 
-                      return ListView.builder(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          itemCount: data.length,
-                          itemBuilder: (context, index) {
-                            final otherUsers = data[index];
+                      return LayoutBuilder(builder: (context, constraints) {
+                        int crossAxisCount = 1;
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: Align(
-                                alignment: Alignment.center,
+                        if (constraints.maxWidth > 1200) {
+                          crossAxisCount = 3;
+                        } else if (constraints.maxWidth > 700) {
+                          crossAxisCount = 2;
+                        }
+
+                        return MasonryGridView.count(
+                            crossAxisCount: crossAxisCount,
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            itemCount: data.length,
+                            itemBuilder: (context, index) {
+                              final otherUsers = data[index];
+                              final cs = Theme.of(context).colorScheme;
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
                                 child: ConstrainedBox(
                                   constraints:
                                       const BoxConstraints(maxWidth: 700),
-                                  child: _card(context, otherUsers),
+                                  child: PremiumInfoCard(
+                                    id: otherUsers.id ?? "",
+                                    title: otherUsers?.name ?? "",
+                                    subtitle: otherUsers?.email ?? "",
+                                    status: otherUsers?.status,
+                                    statusColor:
+                                        getStatusColor(otherUsers?.status),
+                                    footerText:
+                                        "Joined • ${otherUsers?.joinedAt.toString().substring(0, 16)}",
+                                    extraInfo: otherUsers?.phone != null
+                                        ? "Contact • ${otherUsers!.phone}"
+                                        : null,
+                                    onTap: () {
+                                      if (otherUsers != null) {
+                                        {
+                                          openOtherUserProfile(
+                                              context, otherUsers,
+                                              role: otherUsers.role,
+                                              toUser: (p0) =>
+                                                  otherUserToUser(otherUsers));
+                                        }
+                                      }
+                                    },
+                                    actions: [
+                                      InfoAction(
+                                        icon: Icons.dashboard,
+                                        color: cs.primary,
+                                        onTap: () {},
+                                      ),
+                                      InfoAction(
+                                        icon: Icons.edit,
+                                        color: cs.secondary,
+                                        onTap: () {
+                                          if (otherUsers != null) {
+                                            c.loadOtherUsers(otherUsers);
+                                            editUser(context);
+                                          }
+                                        },
+                                      ),
+                                      InfoAction(
+                                        icon: Icons.delete,
+                                        color: cs.error,
+                                        onTap: () =>
+                                            CustomWidgets().showDeleteDialog(
+                                          text:
+                                              'Are you sure you want to delete this otherUsers permanently?',
+                                          context: context,
+                                          onConfirm: () =>
+                                              c.delete(otherUsers!.id),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          });
+                              );
+                            });
+                      });
                     }),
                   )
                 ],
@@ -78,34 +141,83 @@ class OthersPage extends StatelessWidget {
     final isMobile = Responsive.isMobile(context);
 
     if (isMobile) {
-      return Column(
-        children: [
-          CustomWidgets().premiumSearch(
-            context,
-            hint: "Search users...",
-            onChanged: (val) => c.searchQuery.value = val,
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(child: _filterButton(context)),
-              const SizedBox(width: 10),
-              Expanded(child: _sortButton(context, c)),
-            ],
-          )
-        ],
-      );
+      return Obx(() {
+        final searching = c.isSearching.value;
+
+        return Column(
+          children: [
+            /// 🔹 TITLE / SEARCH ROW
+            Row(
+              children: [
+                const SizedBox(width: 10),
+
+                if (!searching)
+                  Expanded(
+                    child: Text(
+                      "Users",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: CustomWidgets().premiumSearch(
+                      context,
+                      hint: "Search users...",
+                      onChanged: (val) {
+                        c.searchQuery.value = val;
+                        c.applyFilters();
+                      },
+                    ),
+                  ),
+
+                /// 🔍 TOGGLE BUTTON
+                IconButton(
+                  icon: Icon(searching ? Icons.close : Icons.search),
+                  onPressed: () {
+                    c.isSearching.value = !searching;
+
+                    if (searching) {
+                      c.searchQuery.value = "";
+                      c.applyFilters();
+                    }
+                  },
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            /// 🔽 FILTER + SORT (UNCHANGED)
+            Row(
+              children: [
+                Expanded(child: _filterButton(context)),
+                const SizedBox(width: 10),
+                Expanded(child: _sortButton(context, c)),
+              ],
+            )
+          ],
+        );
+      });
     }
 
+    /// 💻 DESKTOP (optional: you can keep or add title here too)
     return Row(
       children: [
         Expanded(
-            flex: 3,
-            child: CustomWidgets().premiumSearch(
-              context,
-              hint: "Search Users...",
-              onChanged: (val) => c.searchQuery.value = val,
-            )),
+          flex: 2,
+          child: Text(
+            "Users",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: CustomWidgets().premiumSearch(
+            context,
+            hint: "Search Users...",
+            onChanged: (val) => c.searchQuery.value = val,
+          ),
+        ),
         const SizedBox(width: 12),
         _filterButton(context),
         const SizedBox(width: 8),
@@ -177,156 +289,6 @@ class OthersPage extends StatelessWidget {
             Text("Filter", style: TextStyle(fontSize: 13)),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _card(BuildContext context, OtherUsers user) {
-    final cs = Theme.of(context).colorScheme;
-
-    final isActive = user.status == "Active";
-
-    final statusColor = isActive ? cs.primary : cs.error;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: cs.surface,
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// 🔥 Left Accent Bar
-          Container(
-            width: 4,
-            height: 70,
-            decoration: BoxDecoration(
-              color: statusColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          /// Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Top Row
-                Row(
-                  children: [
-                    Text(
-                      user.id ?? 'NULL',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                    const Spacer(),
-
-                    /// Status Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        user.status ?? '',
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Name
-                Text(
-                  user.name ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-
-                /// Email
-                Text(
-                  user.email ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: cs.onSurface.withOpacity(0.6),
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Extra Info
-                Text(
-                  "Contact • ${user.phone ?? "N/A"}",
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.5),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                /// 🔘 Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomWidgets().iconBtn(
-                      title: "Dashboard",
-                      icon: Icons.dashboard,
-                      color: cs.primary,
-                      onTap: () {},
-                    ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.edit,
-                      color: cs.secondary,
-                      onTap: () {
-                        c.loadOtherUsers(user);
-                        editUser(context);
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.delete,
-                      color: cs.error,
-                      onTap: () => CustomWidgets().showDeleteDialog(
-                        text:
-                            'Are you sure you want to delete this coordinator permanently?',
-                        context: context,
-                        onConfirm: () => c.delete(user.id),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -2,10 +2,13 @@ import 'package:albedo_app/controller/coordinator_controller.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
+import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class CoordinatorPage extends StatelessWidget {
@@ -30,50 +33,82 @@ class CoordinatorPage extends StatelessWidget {
                 children: [
                   /// 🔍 Search + Sort
                   Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CustomWidgets().premiumSearch(context,
-                              hint: "Search Coordinators...",
-                              onChanged: (value) =>
-                                  c.searchQuery.value = value),
-                        ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
+                    child: Obx(() {
+                      final searching = c.isSearching.value;
 
-                        const SizedBox(width: 10),
+                      return Row(
+                        children: [
+                          const SizedBox(width: 10),
 
-                        /// Sort
-                        InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: () => CustomWidgets().showSortSheet<SortType>(
-                            title: "Sort Coordinators",
-                            options: [
-                              SortOption(
-                                  label: "Newest",
-                                  value: SortType.newest,
-                                  icon: Icons.schedule),
-                              SortOption(
-                                  label: "Oldest",
-                                  value: SortType.oldest,
-                                  icon: Icons.history),
-                              SortOption(
-                                  label: "Name A-Z",
-                                  value: SortType.name,
-                                  icon: Icons.sort_by_alpha),
-                            ],
-                            selectedValue: c.sortType.value,
-                            onSelected: (val) {
-                              c.sortType.value = val;
-                              c.applyFilters();
+                          /// 🔹 TITLE / SEARCH
+                          if (!searching)
+                            Expanded(
+                              child: Text(
+                                "Coordinators",
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            )
+                          else
+                            Expanded(
+                              child: CustomWidgets().premiumSearch(
+                                context,
+                                hint: "Search coordinators...",
+                                onChanged: (value) {
+                                  c.searchQuery.value = value;
+                                  c.applyFilters();
+                                },
+                              ),
+                            ),
+
+                          /// 🔹 SEARCH TOGGLE
+                          IconButton(
+                            icon: Icon(searching ? Icons.close : Icons.search),
+                            onPressed: () {
+                              c.isSearching.value = !searching;
+
+                              if (searching) {
+                                c.searchQuery.value = "";
+                                c.applyFilters();
+                              }
                             },
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(Icons.sort, size: 20),
+
+                          /// 🔹 SORT (unchanged)
+                          InkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: () =>
+                                CustomWidgets().showSortSheet<SortType>(
+                              title: "Sort Coordinators",
+                              options: [
+                                SortOption(
+                                    label: "Newest",
+                                    value: SortType.newest,
+                                    icon: Icons.schedule),
+                                SortOption(
+                                    label: "Oldest",
+                                    value: SortType.oldest,
+                                    icon: Icons.history),
+                                SortOption(
+                                    label: "Name A-Z",
+                                    value: SortType.name,
+                                    icon: Icons.sort_by_alpha),
+                              ],
+                              selectedValue: c.sortType.value,
+                              onSelected: (val) {
+                                c.sortType.value = val;
+                                c.applyFilters();
+                              },
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Icon(Icons.sort, size: 20),
+                            ),
                           ),
-                        )
-                      ],
-                    ),
+                        ],
+                      );
+                    }),
                   ),
 
                   /// 🧭 Tabs
@@ -111,26 +146,109 @@ class CoordinatorPage extends StatelessWidget {
                         return const Center(
                             child: Text("No coordinators found"));
                       }
+                      int crossAxisCount = 1;
 
-                      return ListView.builder(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          itemCount: c.filteredCoordinators.length,
-                          itemBuilder: (context, index) {
-                            final teacher = c.filteredCoordinators[index];
+                      if (Responsive.isTablet(context)) {
+                        crossAxisCount = 2;
+                      } else if (Responsive.isDesktop(context)) {
+                        crossAxisCount = 3;
+                      }
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: ConstrainedBox(
-                                  constraints:
-                                      const BoxConstraints(maxWidth: 700),
-                                  child: _card(context, teacher),
+                      return LayoutBuilder(builder: (context, constraints) {
+                        int crossAxisCount = 1;
+
+                        if (constraints.maxWidth > 1200) {
+                          crossAxisCount = 3;
+                        } else if (constraints.maxWidth > 700) {
+                          crossAxisCount = 2;
+                        }
+
+                        return MasonryGridView.count(
+                            crossAxisCount: crossAxisCount,
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            itemCount: c.filteredCoordinators.length,
+                            itemBuilder: (context, index) {
+                              final coordinator = c.filteredCoordinators[index];
+                              final cs = Theme.of(context).colorScheme;
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 700),
+                                    child: PremiumInfoCard(
+                                      id: coordinator.id ?? "",
+                                      title: coordinator?.name ?? "",
+                                      subtitle: coordinator?.email ?? "",
+                                      status: coordinator?.status,
+                                      statusColor:
+                                          getStatusColor(coordinator?.status),
+                                      footerText:
+                                          "Joined • ${coordinator?.joinedAt.toString().substring(0, 16)}",
+                                      extraInfo: coordinator?.phone != null
+                                          ? "Contact • ${coordinator!.phone}"
+                                          : null,
+                                      onTap: () {
+                                        if (coordinator != null) {
+                                          {
+                                            openCoordinatorProfile(
+                                              context,
+                                              coordinator,
+                                              (p0) => coordinatorToUser(
+                                                  coordinator),
+                                            );
+                                          }
+                                        }
+                                      },
+                                      actions: [
+                                        InfoAction(
+                                          icon: Icons.dashboard,
+                                          color: cs.primary,
+                                          onTap: () {},
+                                        ),
+                                        InfoAction(
+                                          icon: Icons.edit,
+                                          color: cs.secondary,
+                                          onTap: () {
+                                            if (coordinator != null) {
+                                              c.loadCoordinators(coordinator);
+                                              editCoordinator(context);
+                                            }
+                                          },
+                                        ),
+                                        InfoAction(
+                                            icon: Icons.block,
+                                            color: cs.error,
+                                            onTap: () => CustomWidgets()
+                                                    .showDeactivateDialog(
+                                                  text:
+                                                      'Are you sure you want to deactivate this coordinator permanently?',
+                                                  context: context,
+                                                  onConfirm: () => c.deactivate(
+                                                      coordinator.id!),
+                                                )),
+                                        InfoAction(
+                                          icon: Icons.delete,
+                                          color: cs.error,
+                                          onTap: () =>
+                                              CustomWidgets().showDeleteDialog(
+                                            text:
+                                                'Are you sure you want to delete this coordinator permanently?',
+                                            context: context,
+                                            onConfirm: () =>
+                                                c.delete(coordinator!.id),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            );
-                          });
+                              );
+                            });
+                      });
                     }),
                   ),
                 ],
@@ -138,162 +256,6 @@ class CoordinatorPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _card(BuildContext context, Coordinator ctr) {
-    final cs = Theme.of(context).colorScheme;
-
-    final isActive = ctr.status == "Active";
-
-    final statusColor = isActive ? cs.primary : cs.error;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: cs.surface,
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// 🔥 Left Accent Bar
-          Container(
-            width: 4,
-            height: 70,
-            decoration: BoxDecoration(
-              color: statusColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          /// Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Top Row
-                Row(
-                  children: [
-                    Text(
-                      ctr.id ?? 'NULL',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                    const Spacer(),
-
-                    /// Status Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        ctr.status ?? 'NULL',
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Name
-                Text(
-                  ctr.name ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-
-                /// Email
-                Text(
-                  ctr.email ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: cs.onSurface.withOpacity(0.6),
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Extra Info
-                Text(
-                  "Contact • ${ctr.phone ?? "N/A"}",
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.5),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                /// 🔘 Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomWidgets().iconBtn(
-                      title: "Dashboard",
-                      icon: Icons.dashboard,
-                      color: cs.primary,
-                      onTap: () {},
-                    ),
-                    const SizedBox(width: 8),
-                    if (ctr.status == 'Active')
-                      CustomWidgets().iconBtn(
-                        icon: Icons.edit,
-                        color: cs.secondary,
-                        onTap: () {
-                          c.loadCoordinators(ctr);
-                          editCoordinator(context);
-                        },
-                      ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.block,
-                      color: cs.error,
-                    ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.delete,
-                      color: cs.error,
-                      onTap: () => CustomWidgets().showDeleteDialog(
-                        text:
-                            'Are you sure you want to delete this coordinator permanently?',
-                        context: context,
-                        onConfirm: () => c.delete(ctr.id),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

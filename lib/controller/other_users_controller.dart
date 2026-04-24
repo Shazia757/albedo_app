@@ -12,6 +12,7 @@ class OtherUsersController extends GetxController {
   var selectedTab = 0.obs;
   var filteredOtherUsers = <OtherUsers>[].obs;
   final tabs = ["Active", "Inactive"];
+  var isSearching = false.obs;
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
 

@@ -1,5 +1,7 @@
 import 'package:albedo_app/controller/batch_list_controller.dart';
+import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/widgets/responsive.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
@@ -36,7 +38,7 @@ class BatchesListPage extends StatelessWidget {
                     () => CustomWidgets().customTabs(context,
                         tabs: c.tabs,
                         selectedIndex: c.selectedTab.value,
-                        getCount: (index) => c.batches
+                        getCount: (index) => c.batchList
                             .where((e) => e.status == c.statusMap[index])
                             .length,
                         onTap: (index) {
@@ -72,41 +74,19 @@ class BatchesListPage extends StatelessWidget {
                             mainAxisSpacing: 12,
                             crossAxisSpacing: 12,
                             itemCount: data.length,
-                            itemBuilder: (_, i) => InfoCard(
-                              id: data[i].id ?? '',
-                              status: data[i].status ?? '',
-                              statusColor:
-                                  getStatusColor(context, data[i].status ?? ''),
-                              infoRows: [
-                                _buildBatchPersonSection(context, data[i]),
-                                _buildBatchDetailsSection(context, data[i]),
-                              ],
-                              actions: [
-                                if (data[i].status != 'completed')
-                                  CustomWidgets().iconBtn(
-                                    icon: Icons.edit,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    onTap: () {
-                                      final batch = data[i];
-                                      c.loadBatch(batch);
-                                      editSession(context);
-                                    },
-                                  ),
-                                if (data[i].status != 'completed')
-                                  CustomWidgets().iconBtn(
-                                    icon: Icons.delete,
-                                    color: Theme.of(context).colorScheme.error,
-                                    onTap: () =>
-                                        CustomWidgets().showDeleteDialog(
-                                      text:
-                                          'Are you sure you want to delete this batch permanently?',
-                                      context: context,
-                                      onConfirm: () =>
-                                          c.delete(data[i].id ?? ''),
-                                    ),
-                                  ),
-                              ],
+                            itemBuilder: (_, i) => InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () => _openBatchDetails(context, data, i),
+                              child: InfoCard(
+                                id: data[i].id ?? '',
+                                status: data[i].status ?? '',
+                                statusColor: getStatusColor(
+                                    context, data[i].status ?? ''),
+                                infoRows: [
+                                  _buildBatchPersonSection(context, data[i]),
+                                  _buildBatchDetailsSection(context, data[i]),
+                                ],
+                              ),
                             ),
                           );
                         },
@@ -120,6 +100,301 @@ class BatchesListPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _openBatchDetails(
+    BuildContext context,
+    List<Batch> batches,
+    int currentIndex,
+  ) {
+    int index = currentIndex;
+
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: const Text(
+        "Batch Details",
+        style: TextStyle(color: Colors.white),
+      ),
+      icon: Icons.groups,
+      formKey: GlobalKey<FormState>(),
+      submitText: "Close",
+      onSubmit: () {},
+      isViewOnly: true,
+      sections: [
+        StatefulBuilder(
+          builder: (context, setState) {
+            final data = batches[index];
+
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.55,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed:
+                            index > 0 ? () => setState(() => index--) : null,
+                        icon: const Icon(Icons.arrow_back_ios),
+                      ),
+                      Text(
+                        "Batch ${index + 1}/${batches.length}",
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      IconButton(
+                        onPressed: index < batches.length - 1
+                            ? () => setState(() => index++)
+                            : null,
+                        icon: const Icon(Icons.arrow_forward_ios),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          detailCard(
+                            context,
+                            title: "Batch",
+                            name: data.batchName ?? "-",
+                            id: data.batchID ?? "-",
+                            onTap: () =>
+                                _onUserTap(context, "batch", data.batchID),
+                          ),
+
+                          detailCard(
+                            context,
+                            title: "Teacher",
+                            name: data.teacher?.name ?? "-",
+                            id: data.teacher?.id ?? "-",
+                            onTap: () => _onUserTap(
+                                context, "teacher", data.teacher?.id),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          /// 📅 SCHEDULE
+                          EditableInfoCard(
+                            type: "schedule",
+                            icon: Icons.schedule,
+                            title: "Schedule",
+                            date: formatDate(data.date ?? DateTime.now()),
+                            time: data.startTime ?? '',
+                            duration: data.duration?.toString() ?? "-",
+                            onSave: (date, time) {
+                              // update
+                            },
+                          ),
+
+                          /// 📘 DETAILS
+                          infoCard(
+                            context,
+                            type: "batch",
+                            icon: Icons.menu_book,
+                            title: "Batch Info",
+                            children: [
+                              // infoRow("Package", data.package ?? "-"),
+                              if (data.syllabus != null &&
+                                  data.syllabus!.isNotEmpty)
+                                infoRow("Syllabus", data.syllabus!),
+                            ],
+                          ),
+
+                          /// 🚦 STATUS
+                          infoCard(
+                            context,
+                            type: "status",
+                            icon: Icons.flag,
+                            title: "Status",
+                            children: [
+                              infoRow("Current Status", data.status ?? "-"),
+                            ],
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          if (data.status != 'completed')
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 110,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                                    onPressed: () {
+                                      c.loadBatch(data);
+                                      editSession(context);
+                                    },
+                                    icon: const Icon(Icons.edit,
+                                        size: 16, color: Colors.white),
+                                    label: const Text(
+                                      "Edit",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 110,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      CustomWidgets().showDeleteDialog(
+                                        context: context,
+                                        text: "Delete this batch permanently?",
+                                        onConfirm: () =>
+                                            c.delete(data.id ?? ''),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.delete,
+                                        size: 16, color: Colors.white),
+                                    label: const Text("Delete",
+                                        style: TextStyle(color: Colors.white)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .errorContainer,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  void _onUserTap(BuildContext context, String role, String? id) {
+    if (id == null || id == "-") return;
+
+    final handlers = {
+      "teacher": () {
+        final t = c.getTeacherById(id);
+        if (t != null) {
+          openTeacherProfile(
+            context,
+            t,
+            toUser: (p0) => c.teacherToUser(t),
+          );
+        }
+      },
+      "batch": () {
+        final b = c.getBatchById(id);
+        if (b != null) openBatchProfile(context, b);
+      },
+    };
+
+    if (handlers.containsKey(role)) {
+      handlers[role]!();
+    } else {
+      Get.snackbar("Error", "$role not found");
+    }
+  }
+
+  void openBatchProfile(BuildContext context, Batch data) {
+    final primary = Theme.of(context).colorScheme.primary;
+    openProfileDialog(
+        context: context,
+        title: 'Batch profile',
+        icon: Icons.people,
+        color: Theme.of(context).colorScheme.primary,
+        content: SingleChildScrollView(
+          child: Column(children: [
+            profileHeader<Batch>(
+              context: context,
+              data: data,
+              color: primary,
+              getName: (b) => b.batchName ?? "-",
+              getEmail: (_) => null,
+              getId: (b) => b.batchID,
+              getImageUrl: (b) => b.imageUrl,
+            ),
+            const SizedBox(height: 10),
+            infoCard(
+              context,
+              type: "schedule",
+              icon: Icons.calendar_today,
+              title: "Duration",
+              children: [
+                infoRow("Start Date", formatDate(data.date ?? DateTime.now())),
+                infoRow(
+                  "Duration",
+                  "${data.duration ?? 0} days",
+                ),
+              ],
+            ),
+            infoCard(
+              context,
+              type: "batch",
+              icon: Icons.bar_chart,
+              title: "Batch Statistics",
+              children: [
+                infoRow("Students", data.students.toString()),
+                infoRow("Packages", data.package!.length.toString()),
+              ],
+            ),
+            infoCard(
+              context,
+              type: "status",
+              icon: Icons.account_balance_wallet,
+              title: "Payment Summary",
+              children: [
+                infoRow("Total Fee", "₹50,000"),
+                infoRow("Total Paid", "₹35,000"),
+                infoRow("Balance", "₹15,000"),
+                infoRow("Expense Ratio", "70%"),
+              ],
+            ),
+            profileCard(
+              context,
+              color: Colors.indigo,
+              title: "Assigned Personnel",
+              children: [
+                if (data.mentorName != null)
+                  detailCard(
+                    context,
+                    title: "Mentor",
+                    name: data.mentorName ?? "-",
+                    id: data.mentorId ?? "-",
+                    onTap: () {
+                      // 🔁 connect your mentor profile
+                    },
+                  ),
+
+                if (data.mentorName == null) simpleText("No mentor assigned"),
+
+                const SizedBox(height: 6),
+
+                /// 🔥 EDITABLE COORDINATOR
+                infoCard(
+                  context,
+                  type: "coordinator",
+                  icon: Icons.person,
+                  title: "Coordinator",
+                  onEdit: () {
+                    // 🔁 open edit dialog
+                  },
+                  children: [
+                    infoRow("Name", data.mentorName ?? "-"),
+                    infoRow("ID", data.mentorId ?? "-"),
+                  ],
+                ),
+              ],
+            ),
+          ]),
+        ));
   }
 
   FloatingActionButton addSessionBtn(BuildContext context) {
@@ -141,7 +416,7 @@ class BatchesListPage extends StatelessWidget {
                   CustomWidgets().customDropdownField(
                     context: context,
                     hint: 'Select Batch',
-                    items: c.batchList,
+                    items: c.batches,
                     onChanged: (p0) => c.selectedBatch.value = p0,
                   ),
                   const SizedBox(height: 10),
@@ -151,7 +426,7 @@ class BatchesListPage extends StatelessWidget {
                   CustomWidgets().customDropdownField(
                     context: context,
                     hint: 'Select Teacher',
-                    items: c.teacherList,
+                    items: c.teachersList,
                     onChanged: (p0) => c.selectedTeacher.value = p0,
                   ),
                   const SizedBox(height: 10),
@@ -205,7 +480,7 @@ class BatchesListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBatchPersonSection(BuildContext context, data) {
+  Widget _buildBatchPersonSection(BuildContext context, Batch data) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isSmall = constraints.maxWidth < 320;
@@ -226,8 +501,8 @@ class BatchesListPage extends StatelessWidget {
                       _personCompact(
                         context,
                         "Teacher",
-                        data.teacherName ?? '',
-                        data.teacherId ?? '',
+                        data.teacher?.name ?? '',
+                        data.teacher?.id ?? '',
                       ),
                     ],
                   ),
@@ -248,8 +523,8 @@ class BatchesListPage extends StatelessWidget {
                     child: _personCompact(
                       context,
                       "Teacher",
-                      data.teacherName ?? '',
-                      data.teacherId ?? '',
+                      data.teacher?.name ?? '',
+                      data.teacher?.id ?? '',
                     ),
                   ),
                 ],
@@ -258,7 +533,7 @@ class BatchesListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBatchDetailsSection(BuildContext context, data) {
+  Widget _buildBatchDetailsSection(BuildContext context, Batch data) {
     final cs = Theme.of(context).colorScheme;
 
     return LayoutBuilder(
@@ -272,22 +547,21 @@ class BatchesListPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: isSmall
-
-              /// 🔥 MOBILE → STACK
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _miniInfo(
-                            context: context,
-                            label: "Subject",
-                            value: data.subject ?? ''),
-                        _miniInfo(
-                            context: context,
-                            // label: "Syllabus",
-                            value: data.syllabus ?? ''),
+                        // _miniInfo(
+                        //     context: context,
+                        //     label: "package",
+                        //     value: data.package ?? ''),
+                        if (data.syllabus != null && data.syllabus != '')
+                          _miniInfo(
+                              context: context,
+                              label: "Syllabus",
+                              value: data.syllabus ?? ''),
                       ],
                     ),
                     Column(
@@ -315,15 +589,16 @@ class BatchesListPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _miniInfo(
-                              context: context,
-                              label: "Subject",
-                              value: data.subject ?? ''),
+                          // _miniInfo(
+                          //     context: context,
+                          //     label: "Package",
+                          //     value: data.package ?? ''),
                           const SizedBox(height: 6),
-                          _miniInfo(
-                              context: context,
-                              label: "Syllabus",
-                              value: data.syllabus ?? ''),
+                          if (data.syllabus != null && data.syllabus != '')
+                            _miniInfo(
+                                context: context,
+                                label: "Syllabus",
+                                value: data.syllabus ?? ''),
                         ],
                       ),
                     ),
@@ -497,31 +772,91 @@ class BatchesListPage extends StatelessWidget {
   Widget _topBar(BuildContext context, BatchListController c) {
     final isMobile = Responsive.isMobile(context);
 
-    if (isMobile) {
-      CustomWidgets().premiumSearch(
-        context,
-        hint: "Search batches...",
-        onChanged: (val) {
-          c.searchQuery.value = val;
-          c.applyFilters();
-        },
-      );
-    }
+    return Obx(() {
+      final searching = c.isSearching.value;
 
-    return Row(
-      children: [
-        Expanded(
-            flex: 3,
-            child: CustomWidgets().premiumSearch(
-              context,
-              hint: "Search batches...",
-              onChanged: (val) {
-                c.searchQuery.value = val;
-                c.applyFilters();
+      /// =========================
+      /// MOBILE
+      /// =========================
+      if (isMobile) {
+        return Row(
+          children: [
+            const SizedBox(width: 10),
+            if (!searching)
+              Expanded(
+                child: Text(
+                  "Batches",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              )
+            else
+              Expanded(
+                child: CustomWidgets().premiumSearch(
+                  context,
+                  hint: "Search batches...",
+                  onChanged: (val) {
+                    c.searchQuery.value = val;
+                    c.applyFilters();
+                  },
+                ),
+              ),
+            IconButton(
+              icon: Icon(searching ? Icons.close : Icons.search),
+              onPressed: () {
+                c.isSearching.value = !searching;
+
+                if (searching) {
+                  c.searchQuery.value = "";
+                  c.applyFilters();
+                }
               },
-            )),
-      ],
-    );
+            ),
+          ],
+        );
+      }
+
+      /// =========================
+      /// DESKTOP
+      /// =========================
+      return Row(
+        children: [
+          /// TITLE / SEARCH (LEFT)
+          if (!searching)
+            Expanded(
+              flex: 2,
+              child: Text(
+                "Batches",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            )
+          else
+            Expanded(
+              flex: 3,
+              child: CustomWidgets().premiumSearch(
+                context,
+                hint: "Search batches...",
+                onChanged: (val) {
+                  c.searchQuery.value = val;
+                  c.applyFilters();
+                },
+              ),
+            ),
+
+          /// SEARCH TOGGLE ICON
+          IconButton(
+            icon: Icon(searching ? Icons.close : Icons.search),
+            onPressed: () {
+              c.isSearching.value = !searching;
+
+              if (searching) {
+                c.searchQuery.value = "";
+                c.applyFilters();
+              }
+            },
+          ),
+        ],
+      );
+    });
   }
 
   Widget _miniInfo(

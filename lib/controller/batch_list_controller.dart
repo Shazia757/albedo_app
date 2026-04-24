@@ -1,19 +1,28 @@
 import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BatchListController extends GetxController {
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
+  RxBool isSearching = false.obs;
 
   var selectedTab = 0.obs;
-  var batches = <Batch>[].obs;
-  RxList<String> batchList = <String>[].obs;
+  var batches = <String>[].obs;
+  RxList<Batch> batchList = <Batch>[].obs;
+  RxList<Teacher> teacherList = <Teacher>[].obs;
+  RxList<Mentor> mentorsList = <Mentor>[].obs;
+  RxList<Coordinator> coordinatorsList = <Coordinator>[].obs;
+
   var selectedBatch = RxnString();
 
-  RxList<Batch> filteredBatches = <Batch>[].obs;
+  // RxList<Batch> filteredBatches = <Batch>[].obs;
   var searchQuery = ''.obs;
-  final teacherList = ["Teacher A", "Teacher B", "Teacher C"];
+  final teachersList = ["Teacher A", "Teacher B", "Teacher C"];
   var selectedDuration = Rxn<int>();
   var selectedTeacher = RxnString();
   var selectedDate = Rxn<DateTime>();
@@ -52,27 +61,37 @@ class BatchListController extends GetxController {
     try {
       isLoading.value = true;
 
-      // 🔥 Replace with your API call
       await Future.delayed(const Duration(seconds: 2));
 
-      batches.assignAll([
+      batchList.assignAll([
         Batch(
           id: "S001",
           batchName: "10A",
           batchID: "BT01",
-          subject: "Math",
-          teacherName: "John",
-          teacherId: "T01",
+          package: ["Math"],
+          students: 5,
+          teacher: Teacher(
+            id: "T001",
+            name: "Ameen Rahman",
+            status: "active",
+            joinedAt: DateTime(2023, 1, 1),
+            gender: "male",
+          ),
           date: DateTime.now().subtract(const Duration(days: 1)),
           status: "started",
         ),
         Batch(
           id: "S002",
-          batchName: "Rahul",
+          batchName: "ATTC",
           batchID: "BT02",
-          subject: "Science",
-          teacherName: "David",
-          teacherId: "T02",
+          package: ["Science"],
+          teacher: Teacher(
+            id: "T02",
+            name: "David",
+            status: "active",
+            joinedAt: DateTime(2023, 2, 1),
+            gender: "male",
+          ),
           date: DateTime.now().add(const Duration(days: 1)),
           status: "upcoming",
         ),
@@ -80,54 +99,79 @@ class BatchListController extends GetxController {
           id: "S003",
           batchName: "9B",
           batchID: "ST03",
-          subject: "English",
-          teacherName: "John",
-          teacherId: "T01",
+          package: ["English"],
+          teacher: Teacher(
+            id: "T001",
+            name: "John",
+            status: "active",
+            joinedAt: DateTime(2023, 1, 1),
+            gender: "male",
+          ),
           date: DateTime.now(),
           status: "pending",
         ),
         Batch(
           id: "S004",
-          batchID: "ST04",
-          subject: "Physics",
           batchName: "11A",
-          teacherName: "Meera",
-          teacherId: "T03",
+          batchID: "ST04",
+          package: ["Physics"],
+          teacher: Teacher(
+            id: "T003",
+            name: "Meera",
+            status: "active",
+            joinedAt: DateTime(2023, 3, 1),
+            gender: "female",
+          ),
           date: DateTime.now().subtract(const Duration(days: 3)),
           status: "completed",
         ),
         Batch(
           id: "S005",
-          batchID: "ST05",
-          subject: "Chemistry",
           batchName: "12B",
-          teacherName: "David",
-          teacherId: "T02",
+          batchID: "ST05",
+          package: ["Chemistry"],
+          teacher: Teacher(
+            id: "T02",
+            name: "David",
+            status: "active",
+            joinedAt: DateTime(2023, 2, 1),
+            gender: "male",
+          ),
           date: DateTime.now(),
           status: "no_balance",
         ),
         Batch(
           id: "S006",
-          batchID: "ST06",
-          subject: "Biology",
           batchName: "10A",
-          teacherName: "Meera",
-          teacherId: "T03",
+          batchID: "ST06",
+          package: ["Biology"],
+          teacher: Teacher(
+            id: "T003",
+            name: "Meera",
+            status: "active",
+            joinedAt: DateTime(2023, 3, 1),
+            gender: "female",
+          ),
           date: DateTime.now().subtract(const Duration(hours: 5)),
           status: "meet_done",
         ),
         Batch(
           id: "S007",
-          batchID: "ST07",
-          subject: "Math",
           batchName: "9A",
-          teacherName: "John",
-          teacherId: "T01",
+          batchID: "ST07",
+          package: ["Math"],
+          teacher: Teacher(
+            id: "T01",
+            name: "John",
+            status: "active",
+            joinedAt: DateTime(2023, 1, 1),
+            gender: "male",
+          ),
           date: DateTime.now().add(const Duration(hours: 3)),
           status: "started",
         ),
       ]);
-      filteredBatches.assignAll(batches);
+      filteredBatches.assignAll(batchList);
     } catch (e) {
       print("Error: $e");
     } finally {
@@ -135,29 +179,46 @@ class BatchListController extends GetxController {
     }
   }
 
-   void loadBatch(Batch batch) {
+
+
+  void loadBatch(Batch batch) {
     dateController.text = batch.date.toString();
     timeController.text = batch.startTime.toString();
 
     selectedDuration.value = batch.duration;
-    selectedTeacher.value = batch.teacherName;
+    selectedTeacher.value = batch.teacher?.name;
 
-    salaryController.text = batch.teacherSalary?.toString() ?? '';
+    salaryController.text = batch.teacher?.salary?.toString() ?? '';
+  }
+
+  Teacher? getTeacherById(String id) {
+    try {
+      return teacherList.firstWhere((e) => e.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Users teacherToUser(Teacher t) {
+    return Users(
+      id: t.id,
+      name: t.name,
+      role: "teacher",
+    );
   }
 
   void initEdit(Batch data) {
-    // Ensure teacher list is ready
-    final uniqueTeachers = batches.map((e) => e.teacherName).toSet().toList();
+    final uniqueTeachers =
+        batchList.map((e) => e.teacher?.name).toSet().toList();
 
     teacherList.clear();
-    teacherList.addAll(uniqueTeachers);
+    // teacherList.addAll(uniqueTeachers);
 
-    // ✅ Set initial values safely
     selectedDuration.value =
         durationOptions.contains(data.duration) ? data.duration : null;
 
     selectedTeacher.value =
-        teacherList.contains(data.teacherName) ? data.teacherName : null;
+        teacherList.contains(data.teacher?.name) ? data.teacher?.name : null;
 
     // Controllers
     dateController = TextEditingController(
@@ -169,9 +230,10 @@ class BatchListController extends GetxController {
     );
 
     salaryController =
-        TextEditingController(text: data.teacherSalary.toString());
+        TextEditingController(text: data.teacher?.salary.toString());
   }
-    delete(String id) {
+
+  delete(String id) {
     isDeleteButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {
@@ -189,10 +251,40 @@ class BatchListController extends GetxController {
     // );
   }
 
-  void applyFilters() {
-    List<Batch> temp = batches;
+  List<Batch> get filteredBatches {
+    final status = statusMap[selectedTab.value];
 
-    /// 🎯 Tab filter (ALWAYS apply)
+    // ✅ Step 1: Filter first
+    List<Batch> filtered = batchList.where((s) {
+      final matchesStatus = s.status == status;
+
+      final matchesSearch = s.batchName!
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase()) ||
+          s.batchID!.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          s.teacher!.id
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase()) ||
+          s.teacher!.name
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase()) ||
+          s.id!.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          s.date.toString().contains(searchQuery.value.toLowerCase());
+
+      return matchesStatus && matchesSearch;
+    }).toList();
+    if (selectedTeacher.value != null && selectedTeacher.value!.isNotEmpty) {
+      filtered = filtered
+          .where((s) => s.teacher?.name == selectedTeacher.value)
+          .toList();
+    }
+
+    return filtered;
+  }
+
+  void applyFilters() {
+    List<Batch> temp = batchList;
+
     final status = statusMap[selectedTab.value];
 
     temp = temp.where((s) {
@@ -205,10 +297,18 @@ class BatchListController extends GetxController {
 
       temp = temp.where((s) {
         return (s.batchName?.toLowerCase().contains(query) ?? false) ||
-            (s.teacherName.toLowerCase().contains(query));
+            (s.teacher!.name.toLowerCase().contains(query));
       }).toList();
     }
 
     filteredBatches.assignAll(temp);
+  }
+
+  Batch? getBatchById(String id) {
+    try {
+      return batchList.firstWhere((e) => e.batchID == id);
+    } catch (e) {
+      return null;
+    }
   }
 }

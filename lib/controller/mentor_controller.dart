@@ -1,4 +1,3 @@
-
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +12,10 @@ class MentorController extends GetxController {
   var selectedTab = 0.obs;
   var filteredMentors = <Mentor>[].obs;
   final tabs = ["Active", "Inactive"];
+  var isSearching = false.obs;
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
+  var isDeactivateButtonLoading = true.obs;
 
   var experiences = <ExperienceModel>[].obs;
 
@@ -153,6 +154,24 @@ class MentorController extends GetxController {
 
   delete(id) {
     isDeleteButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
+  }
+
+  deactivate(String id) {
+    isDeactivateButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {
     //     if (value?.status == true) {

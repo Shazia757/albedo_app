@@ -13,7 +13,9 @@ class AdvisorController extends GetxController {
   var filteredAdvisors = <Advisor>[].obs;
   final tabs = ["Active", "Expired"];
   var isLoading = true.obs;
+  var isSearching = false.obs;
   var isDeleteButtonLoading = true.obs;
+  var isDeactivateButtonLoading = true.obs;
 
   var experiences = <ExperienceModel>[].obs;
 
@@ -158,4 +160,23 @@ class AdvisorController extends GetxController {
     //   },
     // );
   }
+
+     deactivate(String id) {
+    isDeactivateButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
+  }
+
 }

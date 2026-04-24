@@ -3,6 +3,8 @@ class OtherUsers {
   final String name;
   String? email;
   String? status;
+  String? imageUrl;
+  String? role;
   String? gender;
   final DateTime joinedAt;
   String? phone;
@@ -27,7 +29,9 @@ class OtherUsers {
     required this.id,
     required this.joinedAt,
     this.email,
+    this.imageUrl,
     this.gender,
+    this.role,
     this.status,
     this.phone,
     this.whatsapp,

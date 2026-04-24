@@ -88,12 +88,16 @@ class SessionController extends GetxController {
     List<Session> filtered = sessions.where((s) {
       final matchesStatus = s.status == status;
 
-      final matchesSearch = s.studentName
+      final matchesSearch = s.student!.name
               .toLowerCase()
               .contains(searchQuery.value.toLowerCase()) ||
-          s.studentId.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          s.teacherId.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          s.teacherName
+          s.student!.studentId!
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase()) ||
+          s.teacher!.id
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase()) ||
+          s.teacher!.name
               .toLowerCase()
               .contains(searchQuery.value.toLowerCase()) ||
           s.id.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
@@ -105,7 +109,7 @@ class SessionController extends GetxController {
     }).toList();
     if (selectedTeacher.value != null && selectedTeacher.value!.isNotEmpty) {
       filtered = filtered
-          .where((s) => s.teacherName == selectedTeacher.value)
+          .where((s) => s.teacher?.name == selectedTeacher.value)
           .toList();
     }
 
@@ -118,10 +122,10 @@ class SessionController extends GetxController {
         filtered.sort((a, b) => a.date.compareTo(b.date));
         break;
       case SortType.student:
-        filtered.sort((a, b) => a.studentName.compareTo(b.studentName));
+        filtered.sort((a, b) => a.student!.name.compareTo(b.student!.name));
         break;
       case SortType.teacher:
-        filtered.sort((a, b) => a.teacherName.compareTo(b.teacherName));
+        filtered.sort((a, b) => a.teacher!.name.compareTo(b.teacher!.name));
         break;
     }
 
@@ -133,11 +137,6 @@ class SessionController extends GetxController {
   void onInit() {
     super.onInit();
     fetchData();
-    fetchStudentDetail();
-    fetchTeacherDetail();
-    fetchMentorDetail();
-    fetchCoordinatorDetail();
-    fetchAdvisorDetail();
   }
 
   Future<void> fetchData() async {
@@ -149,117 +148,194 @@ class SessionController extends GetxController {
       sessions.assignAll([
         Session(
           id: "S001",
-          studentName: "Aisha",
-          studentId: "STU001",
+          student: Student(
+            studentId: "STU001",
+            name: "Aisha",
+            joinedAt: DateTime.now(),
+          ),
           package: "Premium Package",
           syllabus: "CBSE Mathematics",
           className: "Class 10",
-          teacherName: "Ameen Rahman",
-          teacherId: "T001",
-          mentorName: "Saeeda",
-          mentorId: "MTR001",
-
-          // Optional fields
-          coordinatorName: "Najeeb",
-          coordinatorId: "COO001",
-          advisorName: "Fathima",
-          advisorId: "ADV001",
-
+          teacher: Teacher(
+            id: "T001",
+            name: "Ameen Rahman",
+            status: "Active",
+            gender: "Male",
+            joinedAt: DateTime.now(),
+          ),
+          mentor: Mentor(
+            id: "MTR001",
+            name: "Saeeda",
+            joinedAt: DateTime.now(),
+          ),
+          coordinator: Coordinator(
+            id: "COO001",
+            name: "Najeeb",
+            joinedAt: DateTime.now(),
+          ),
+          advisor: Advisor(
+            id: "ADV001",
+            name: "Fathima",
+            joinedAt: DateTime.now(),
+          ),
           date: DateTime(2026, 4, 23),
-          time: DateTime(2026, 4, 23, 10, 30), // 10:30 AM
+          time: DateTime(2026, 4, 23, 10, 30),
           status: "started",
-
-          duration: 60, // in minutes
-          teacherSalary: 500.0,
         ),
         Session(
           id: "S002",
-          studentName: "Rahul",
-          studentId: "ST02",
-          syllabus: 'SCERT',
-          mentorId: 'MTR002',
-          mentorName: 'David',
+          student: Student(
+            studentId: "STU002",
+            name: "Rahul",
+            joinedAt: DateTime.now(),
+          ),
           package: "Science",
+          syllabus: "SCERT",
           className: "9B",
-          teacherName: "David",
-          teacherId: "T002",
+          teacher: Teacher(
+            id: "T002",
+            name: "David",
+            status: "Active",
+            gender: "Male",
+            joinedAt: DateTime.now(),
+          ),
+          mentor: Mentor(
+            id: "MTR002",
+            name: "David",
+            joinedAt: DateTime.now(),
+          ),
           date: DateTime.now().add(const Duration(days: 1)),
           time: DateTime.now(),
           status: "upcoming",
         ),
         Session(
           id: "S003",
-          studentName: "Fatima",
-          studentId: "ST03",
+          student: Student(
+            studentId: "STU003",
+            name: "Fatima",
+            joinedAt: DateTime.now(),
+          ),
           package: "English",
-          syllabus: 'CBSE',
+          syllabus: "CBSE",
           className: "8C",
-          mentorId: 'MTR001',
-          mentorName: 'Saeeda',
-          teacherName: "John",
-          teacherId: "T001",
+          teacher: Teacher(
+            id: "T001",
+            name: "John",
+            status: "Active",
+            gender: "Male",
+            joinedAt: DateTime.now(),
+          ),
+          mentor: Mentor(
+            id: "MTR001",
+            name: "Saeeda",
+            joinedAt: DateTime.now(),
+          ),
           date: DateTime.now(),
           time: DateTime.now(),
           status: "pending",
         ),
         Session(
           id: "S004",
-          studentName: "Arjun",
-          studentId: "ST04",
+          student: Student(
+            studentId: "ST04",
+            name: "Arjun",
+            joinedAt: DateTime.now(),
+          ),
           package: "Physics",
-          syllabus: 'SCERT',
-          mentorId: 'MTR002',
-          mentorName: 'David',
+          syllabus: "SCERT",
           className: "11A",
-          teacherName: "Meera",
-          teacherId: "T03",
+          teacher: Teacher(
+            id: "T003",
+            name: "Meera",
+            status: "Active",
+            gender: "Male",
+            joinedAt: DateTime.now(),
+          ),
+          mentor: Mentor(
+            id: "MTR002",
+            name: "David",
+            joinedAt: DateTime.now(),
+          ),
           date: DateTime.now().subtract(const Duration(days: 3)),
           time: DateTime.now(),
           status: "completed",
         ),
         Session(
           id: "S005",
-          studentName: "Nisha",
-          studentId: "ST05",
+          student: Student(
+            studentId: "ST05",
+            name: "Nisha",
+            joinedAt: DateTime.now(),
+          ),
           package: "Chemistry",
           syllabus: "CBSE",
           className: "12B",
-          mentorId: 'MTR001',
-          mentorName: 'Saeeda',
-          teacherName: "David",
-          teacherId: "T002",
+          teacher: Teacher(
+            id: "T002",
+            name: "David",
+            status: "Active",
+            gender: "Male",
+            joinedAt: DateTime.now(),
+          ),
+          mentor: Mentor(
+            id: "MTR001",
+            name: "Saeeda",
+            joinedAt: DateTime.now(),
+          ),
           date: DateTime.now(),
           time: DateTime.now(),
           status: "no_balance",
         ),
         Session(
           id: "S006",
-          studentName: "Ali",
-          studentId: "ST06",
+          student: Student(
+            studentId: "ST06",
+            name: "Ali",
+            joinedAt: DateTime.now(),
+          ),
           package: "Biology",
-          syllabus: 'SCERT',
-          mentorId: 'MTR002',
-          mentorName: 'David',
+          syllabus: "SCERT",
           className: "10A",
-          teacherName: "Meera",
-          teacherId: "T03",
-          time: DateTime.now(),
+          teacher: Teacher(
+            id: "T003",
+            name: "Meera",
+            status: "Active",
+            gender: "Male",
+            joinedAt: DateTime.now(),
+          ),
+          mentor: Mentor(
+            id: "MTR002",
+            name: "David",
+            joinedAt: DateTime.now(),
+          ),
           date: DateTime.now().subtract(const Duration(hours: 5)),
+          time: DateTime.now(),
           status: "meet_done",
         ),
         Session(
           id: "S007",
-          studentName: "Sneha",
-          studentId: "ST07",
+          student: Student(
+            studentId: "ST07",
+            name: "Sneha",
+            joinedAt: DateTime.now(),
+          ),
           package: "Math",
-          syllabus: 'CBSE',
-          mentorId: 'MTR001',
-          mentorName: 'Saeeda',
+          syllabus: "CBSE",
           className: "9A",
-          time: DateTime.now(),
-          teacherName: "John",
-          teacherId: "T001",
+          teacher: Teacher(
+            id: "T001",
+            name: "Ameen Rahman",
+            status: "Active",
+            gender: "Male",
+            joinedAt: DateTime.now(),
+          ),
+          mentor: Mentor(
+            id: "MTR001",
+            name: "Saeeda",
+            joinedAt: DateTime.now(),
+          ),
           date: DateTime.now().add(const Duration(hours: 3)),
+          time: DateTime.now(),
           status: "started",
         ),
       ]);
@@ -451,37 +527,6 @@ class SessionController extends GetxController {
     }
   }
 
-  Future<void> fetchAdvisorDetail() async {
-    try {
-      isLoading.value = true;
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      advisorsList.assignAll([
-        Advisor(
-          id: "ADV001",
-          name: "Fathima Noor",
-          joinedAt: DateTime(2025, 3, 10),
-          email: "fathima.noor@example.com",
-          status: "Active",
-          gender: "Female",
-          phone: "+919812345678",
-          whatsapp: "+919812345678",
-          convertedStudents: 45,
-          imageUrl: "https://example.com/profile/fathima.jpg",
-          dob: "1998-09-21",
-          qualification: "BBA",
-          place: "Kozhikode",
-          pincode: "673001",
-          address: "Noor Manzil, Kozhikode, Kerala",
-        ),
-      ]);
-    } catch (e) {
-      print("Error: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
 
   // void setStudents(List<Student> list) {
   //   studentsList.assignAll(list);
@@ -509,7 +554,6 @@ class SessionController extends GetxController {
   }
 
   Teacher? getTeacherById(String id) {
-    print("Clicked ID: $id");
     try {
       return teacherList.firstWhere((e) => e.id == id);
     } catch (e) {
@@ -551,13 +595,7 @@ class SessionController extends GetxController {
     }
   }
 
-  Users coordinatorToUser(Coordinator c) {
-    return Users(
-      id: c.id,
-      name: c.name,
-      role: "coordinator",
-    );
-  }
+
 
   Advisor? getAdvisorById(String id) {
     print("Clicked ID: $id");
@@ -568,13 +606,6 @@ class SessionController extends GetxController {
     }
   }
 
-  Users advisorToUser(Advisor a) {
-    return Users(
-      id: a.id,
-      name: a.name,
-      role: "advisor",
-    );
-  }
 
   void applyFilters() {
     List<Session> temp = sessions;
@@ -588,8 +619,8 @@ class SessionController extends GetxController {
       final query = searchQuery.value.toLowerCase();
 
       temp = temp.where((s) {
-        return s.studentName.toLowerCase().contains(query) ||
-            s.teacherName.toLowerCase().contains(query);
+        return s.student!.name.toLowerCase().contains(query) ||
+            s.teacher!.name.toLowerCase().contains(query);
       }).toList();
     }
 
@@ -599,7 +630,7 @@ class SessionController extends GetxController {
     } else if (sortType.value == "old") {
       temp.sort((a, b) => a.date.compareTo(b.date));
     } else if (sortType.value == "name") {
-      temp.sort((a, b) => a.studentName.compareTo(b.studentName));
+      temp.sort((a, b) => a.student!.name.compareTo(b.student!.name));
     }
 
     /// ✅ Final update
@@ -638,7 +669,7 @@ class SessionController extends GetxController {
         durationOptions.contains(data.duration) ? data.duration : null;
 
     selectedTeacher.value =
-        teacherList.contains(data.teacherName) ? data.teacherName : null;
+        teacherList.contains(data.teacher?.name) ? data.teacher?.name : null;
 
     // Controllers
     dateController = TextEditingController(
@@ -676,7 +707,7 @@ class SessionController extends GetxController {
     timeController.text = session.time.toString();
 
     selectedDuration.value = session.duration;
-    selectedTeacher.value = session.teacherName;
+    selectedTeacher.value = session.teacher?.name;
 
     salaryController.text = session.teacherSalary?.toString() ?? '';
   }

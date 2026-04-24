@@ -8,7 +8,7 @@ class Teacher {
 
   final String status;
   final String gender;
-  String? type; // Batch / TBA
+  String? type; 
   final DateTime joinedAt;
   String? phone;
   String? whatsapp;

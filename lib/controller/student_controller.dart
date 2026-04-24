@@ -12,8 +12,10 @@ class StudentController extends GetxController {
   var selectedTab = 0.obs;
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
+  var isSearching = false.obs;
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
+  var isDeactivateButtonLoading = true.obs;
 
   // --------------------------
   // Counts for tabs
@@ -186,4 +188,22 @@ class StudentController extends GetxController {
     //   },
     // );
   }
+  deactivate(String id) {
+    isDeactivateButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
+  }
+
 }

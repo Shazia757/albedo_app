@@ -1,13 +1,14 @@
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
+import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-
 
 class StudentsPage extends StatelessWidget {
   StudentsPage({super.key});
@@ -33,49 +34,75 @@ class StudentsPage extends StatelessWidget {
                 /// 🔍 Search + Sort
                 Padding(
                   padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: CustomWidgets().premiumSearch(context,
-                              hint: "Search students...", onChanged: (value) {
-                        c.searchQuery.value = value;
-                        c.applyFilters();
-                      })),
+                  child: Obx(() {
+                    final searching = c.isSearching.value;
 
-                      const SizedBox(width: 10),
+                    return Row(
+                      children: [
+                        const SizedBox(width: 10),
 
-                      /// Sort
-                      InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () => CustomWidgets().showSortSheet<SortType>(
-                          title: "Sort Students",
-                          options: [
-                            SortOption(
-                                label: "Newest",
-                                value: SortType.newest,
-                                icon: Icons.schedule),
-                            SortOption(
-                                label: "Oldest",
-                                value: SortType.oldest,
-                                icon: Icons.history),
-                            SortOption(
-                                label: "Name A-Z",
-                                value: SortType.name,
-                                icon: Icons.sort_by_alpha),
-                          ],
-                          selectedValue: c.sortType.value,
-                          onSelected: (val) {
-                            c.sortType.value = val;
-                            c.applyFilters();
+                        if (!searching)
+                          Expanded(
+                            child: Text(
+                              "Students",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          )
+                        else
+                          Expanded(
+                            child: CustomWidgets().premiumSearch(
+                              context,
+                              hint: "Search students...",
+                              onChanged: (value) {
+                                c.searchQuery.value = value;
+                                c.applyFilters();
+                              },
+                            ),
+                          ),
+
+                        /// 🔍 SEARCH TOGGLE
+                        IconButton(
+                          icon: Icon(searching ? Icons.close : Icons.search),
+                          onPressed: () {
+                            c.isSearching.value = !searching;
+
+                            if (searching) {
+                              c.searchQuery.value = "";
+                              c.applyFilters();
+                            }
                           },
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Icon(Icons.sort, size: 20),
+
+                        /// 🔽 SORT
+                        IconButton(
+                          icon: const Icon(Icons.sort),
+                          onPressed: () =>
+                              CustomWidgets().showSortSheet<SortType>(
+                            title: "Sort Students",
+                            options: [
+                              SortOption(
+                                  label: "Newest",
+                                  value: SortType.newest,
+                                  icon: Icons.schedule),
+                              SortOption(
+                                  label: "Oldest",
+                                  value: SortType.oldest,
+                                  icon: Icons.history),
+                              SortOption(
+                                  label: "Name A-Z",
+                                  value: SortType.name,
+                                  icon: Icons.sort_by_alpha),
+                            ],
+                            selectedValue: c.sortType.value,
+                            onSelected: (val) {
+                              c.sortType.value = val;
+                              c.applyFilters();
+                            },
+                          ),
                         ),
-                      )
-                    ],
-                  ),
+                      ],
+                    );
+                  }),
                 ),
 
                 /// 🧭 Tabs
@@ -119,191 +146,86 @@ class StudentsPage extends StatelessWidget {
                       return const Center(child: Text("No students found"));
                     }
 
-                    return ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        itemCount: c.filteredStudents.length,
-                        itemBuilder: (context, index) {
-                          final student = c.filteredStudents[index];
+                    return LayoutBuilder(builder: (context, constraints) {
+                      int crossAxisCount = 1;
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 700),
-                                child: _card(context, student),
+                      if (constraints.maxWidth > 1200) {
+                        crossAxisCount = 3;
+                      } else if (constraints.maxWidth > 700) {
+                        crossAxisCount = 2;
+                      }
+
+                      return MasonryGridView.count(
+                          crossAxisCount: crossAxisCount,
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          itemCount: c.filteredStudents.length,
+                          itemBuilder: (context, index) {
+                            final student = c.filteredStudents[index];
+                            final isActive = student?.status == "Active";
+                            final cs = Theme.of(context).colorScheme;
+
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              child: InkWell(
+                                onTap: () =>
+                                    openStudentProfile(context, student),
+                                child: PremiumInfoCard(
+                                  extraInfo: '',
+                                  id: student.studentId ?? "NULL",
+                                  title: student.name ?? "NULL",
+                                  subtitle: student.email ?? "NULL",
+                                  status: student.status,
+                                  statusColor: isActive ? cs.primary : cs.error,
+                                  footerText:
+                                      "Joined • ${student.joinedAt.toString().substring(0, 16)}",
+                                  actions: [
+                                    InfoAction(
+                                      icon: Icons.dashboard,
+                                      color: cs.primary,
+                                      onTap: () {},
+                                    ),
+                                    if (student?.status != 'Inactive')
+                                      InfoAction(
+                                        icon: Icons.edit,
+                                        color: cs.secondary,
+                                        onTap: () {
+                                          c.loadStudents(student!);
+                                          editStudent(context);
+                                        },
+                                      ),
+                                    InfoAction(
+                                      icon: Icons.block,
+                                      color: cs.error,
+                                      onTap: () =>
+                                          CustomWidgets().showDeactivateDialog(
+                                        text:
+                                            'Are you sure you want to deactivate this student permanently?',
+                                        context: context,
+                                        onConfirm: () =>
+                                            c.deactivate(student.studentId!),
+                                      ),
+                                    ),
+                                    InfoAction(
+                                      icon: Icons.delete,
+                                      color: cs.error,
+                                      onTap: () =>
+                                          CustomWidgets().showDeleteDialog(
+                                        text:
+                                            'Are you sure you want to delete this student permanently?',
+                                        context: context,
+                                        onConfirm: () =>
+                                            c.delete(student.studentId!),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        });
+                            );
+                          });
+                    });
                   }),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _card(BuildContext context, Student? s) {
-    final cs = Theme.of(context).colorScheme;
-
-    final isActive = s?.status == "Active";
-
-    final statusColor = isActive ? cs.primary : cs.error;
-    final data = c.filteredStudents;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: cs.surface,
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// 🔥 Left Accent Bar
-          Container(
-            width: 4,
-            height: 70,
-            decoration: BoxDecoration(
-              color: statusColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          /// Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Top Row
-                Row(
-                  children: [
-                    Text(
-                      s?.studentId ?? 'NULL',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                    const Spacer(),
-
-                    /// Status Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        s?.status ?? 'NULL',
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Name
-                Text(
-                  s?.name ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-
-                /// Email
-                Text(
-                  s?.email ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: cs.onSurface.withOpacity(0.6),
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Extra Info
-                Text(
-                  "Joined • ${s?.joinedAt.toString().substring(0, 16) ?? 'NULL'}",
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.5),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                /// 🔘 Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomWidgets().iconBtn(
-                      title: "Dashboard",
-                      icon: Icons.dashboard,
-                      color: cs.primary,
-                      onTap: () {},
-                    ),
-                    const SizedBox(width: 8),
-                    if (s?.status != 'Inactive')
-                      CustomWidgets().iconBtn(
-                        icon: Icons.edit,
-                        color: cs.secondary,
-                        onTap: () {
-                          if (s != null) {
-                            c.loadStudents(s);
-                            editStudent(context);
-                          }
-                        },
-                      ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.block,
-                      color: cs.error,
-                      onTap: () => CustomWidgets().showDeactivateDialog(
-                        context: context,
-                        text:
-                            'Are you sure you want to deactivate this student?',
-                        onConfirm: () {},
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.delete,
-                      color: cs.error,
-                      onTap: () => CustomWidgets().showDeleteDialog(
-                        text:
-                            'Are you sure you want to delete this student permanently?',
-                        context: context,
-                        onConfirm: () => c.delete(s!.studentId!),
-                      ),
-                    ),
-                  ],
-                )
               ],
             ),
           ),

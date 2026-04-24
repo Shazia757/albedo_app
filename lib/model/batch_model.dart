@@ -1,15 +1,24 @@
+import 'package:albedo_app/model/users/teacher_model.dart';
+
 class Batch {
-   String? id;
-   String? batchID;
-   String? batchName;
-   String? mode;
-   String? teacherId;
-  String teacherName;
-  int? teacherSalary;
+  String? id;
+  String? batchID;
+  String? batchName;
+  String? mode;
+  String? course;
+  String? imageUrl;
+  Teacher? teacher;
+  int? students;
+  int? totalFee;
+  int? totalPaid;
+  int? balance;
+  int? expenseRatio;
   final int? duration;
   String? mentorName;
-  final String? mentorId;
-  final String? subject;
+ String? mentorId;
+  String? coordinatorName;
+  final String? coordinatorId;
+  final List<String>? package;
   final String? syllabus;
   final DateTime? date;
   final String? startTime;
@@ -20,14 +29,21 @@ class Batch {
     this.id,
     this.batchID,
     this.batchName,
-    this.teacherId,
+    this.teacher,
     this.mode,
-    required this.teacherName,
-    this.teacherSalary,
+    this.totalFee,
+    this.totalPaid,
+    this.balance,
+    this.expenseRatio,
+    this.students,
+    this.coordinatorId,
+    this.coordinatorName,
+    this.imageUrl,
     this.mentorId,
     this.mentorName,
+    this.course,
     this.duration,
-    this.subject,
+    this.package,
     this.syllabus,
     this.date,
     this.startTime,
@@ -41,11 +57,8 @@ class Batch {
       id: json['id'],
       batchID: json['batchID'],
       batchName: json['batchName'],
-      teacherId: json['teacherID'],
-      teacherName: json['teacherName'],
-      teacherSalary: json['teacherSalary'],
       duration: json['duration'],
-      subject: json['subject'],
+      package: json['package'],
       syllabus: json['syllabus'],
       date: json['date'] != null ? DateTime.tryParse(json['date']) : null,
       startTime: json['startTime'],
@@ -60,10 +73,8 @@ class Batch {
       'id': id,
       'batchID': batchID,
       'batchName': batchName,
-      'teacherID': teacherId,
-      'teacherName': teacherName,
       'duration': duration,
-      'subject': subject,
+      'package': package,
       'syllabus': syllabus,
       'date': date?.toIso8601String(),
       'startTime': startTime,

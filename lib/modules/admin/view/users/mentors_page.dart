@@ -2,10 +2,13 @@ import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
+import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class MentorsPage extends StatelessWidget {
@@ -57,34 +60,123 @@ class MentorsPage extends StatelessWidget {
                   Expanded(
                     child: Obx(() {
                       final data = c.filteredMentors;
+                      final cs = Theme.of(context).colorScheme;
                       int crossAxisCount = 1;
 
                       if (c.isLoading.value) {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (data.isEmpty) {
-                        return const Center(child: Text("No mentors found"));
+                        return Center(
+                            child: Text(
+                          "No mentors found",
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ));
                       }
 
-                      return ListView.builder(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          itemCount: c.filteredMentors.length,
-                          itemBuilder: (context, index) {
-                            final mentor = c.filteredMentors[index];
+                      if (Responsive.isTablet(context)) {
+                        crossAxisCount = 2;
+                      } else if (Responsive.isDesktop(context)) {
+                        crossAxisCount = 3;
+                      }
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: ConstrainedBox(
-                                  constraints:
-                                      const BoxConstraints(maxWidth: 700),
-                                  child: _card(context, mentor),
+                      return LayoutBuilder(builder: (context, constraints) {
+                        int crossAxisCount = 1;
+
+                        if (constraints.maxWidth > 1200) {
+                          crossAxisCount = 3;
+                        } else if (constraints.maxWidth > 700) {
+                          crossAxisCount = 2;
+                        }
+
+                        return MasonryGridView.count(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            crossAxisCount: crossAxisCount,
+                            itemCount: c.filteredMentors.length,
+                            itemBuilder: (context, index) {
+                              final mentor = c.filteredMentors[index];
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                child: InkWell(
+                                  onTap: () => openMentorProfile(
+                                    context,
+                                    mentor,
+                                    (p0) => mentorToUser(mentor),
+                                  ),
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 700),
+                                    child: PremiumInfoCard(
+                                      id: mentor.id ?? "",
+                                      title: mentor?.name ?? "",
+                                      subtitle: mentor?.email ?? "",
+                                      status: mentor?.status,
+                                      statusColor:
+                                          getStatusColor(mentor?.status),
+                                      footerText:
+                                          "Joined • ${mentor?.joinedAt.toString().substring(0, 16)}",
+                                      extraInfo: mentor?.phone != null
+                                          ? "Contact • ${mentor!.phone}"
+                                          : null,
+                                      onTap: () {
+                                        if (mentor != null) {
+                                          {
+                                            openMentorProfile(
+                                              context,
+                                              mentor,
+                                              (p0) => mentorToUser(mentor),
+                                            );
+                                          }
+                                        }
+                                      },
+                                      actions: [
+                                        InfoAction(
+                                          icon: Icons.dashboard,
+                                          color: cs.primary,
+                                          onTap: () {},
+                                        ),
+                                        InfoAction(
+                                          icon: Icons.edit,
+                                          color: cs.secondary,
+                                          onTap: () {
+                                            if (mentor != null) {
+                                              c.loadMentors(mentor);
+                                              editMentor(context);
+                                            }
+                                          },
+                                        ),
+                                        InfoAction(
+                                            icon: Icons.block,
+                                            color: cs.error,
+                                            onTap: () => CustomWidgets()
+                                                    .showDeactivateDialog(
+                                                  text:
+                                                      'Are you sure you want to deactivate this mentor permanently?',
+                                                  context: context,
+                                                  onConfirm: () =>
+                                                      c.deactivate(mentor.id!),
+                                                )),
+                                        InfoAction(
+                                          icon: Icons.delete,
+                                          color: cs.error,
+                                          onTap: () =>
+                                              CustomWidgets().showDeleteDialog(
+                                            text:
+                                                'Are you sure you want to delete this mentor permanently?',
+                                            context: context,
+                                            onConfirm: () =>
+                                                c.delete(mentor!.id),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            );
-                          });
+                              );
+                            });
+                      });
                     }),
                   )
                 ],
@@ -100,25 +192,71 @@ class MentorsPage extends StatelessWidget {
     final isMobile = Responsive.isMobile(context);
 
     if (isMobile) {
-      return Column(
-        children: [
-          CustomWidgets().premiumSearch(
-            context,
-            hint: "Search mentors...",
-            onChanged: (val) => c.searchQuery.value = val,
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(child: _filterButton(context)),
-              const SizedBox(width: 10),
-              Expanded(child: _sortButton(context, c)),
-            ],
-          )
-        ],
-      );
+      return Obx(() {
+        final searching = c.isSearching.value;
+
+        return Column(
+          children: [
+            /// 🔹 TITLE + SEARCH TOGGLE (same row)
+            Row(
+              children: [
+                if (!searching)
+                  Expanded(
+                    child: Text(
+                      "Mentors",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: CustomWidgets().premiumSearch(
+                      context,
+                      hint: "Search mentors...",
+                      onChanged: (val) {
+                        c.searchQuery.value = val;
+                        c.applyFilters();
+                      },
+                    ),
+                  ),
+
+                /// 🔍 SEARCH ICON
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () {
+                    c.isSearching.value = !searching;
+
+                    if (searching) {
+                      c.searchQuery.value = "";
+                      c.applyFilters();
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      searching ? Icons.close : Icons.search,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            /// ✅ KEEP THIS ROW UNCHANGED
+            Row(
+              children: [
+                Expanded(child: _filterButton(context)),
+                const SizedBox(width: 10),
+                Expanded(child: _sortButton(context, c)),
+              ],
+            )
+          ],
+        );
+      });
     }
 
+    /// DESKTOP (unchanged)
     return Row(
       children: [
         Expanded(
@@ -199,162 +337,6 @@ class MentorsPage extends StatelessWidget {
             Text("Filter", style: TextStyle(fontSize: 13)),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _card(BuildContext context, Mentor mtr) {
-    final cs = Theme.of(context).colorScheme;
-
-    final isActive = mtr.status == "Active";
-
-    final statusColor = isActive ? cs.primary : cs.error;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: cs.surface,
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// 🔥 Left Accent Bar
-          Container(
-            width: 4,
-            height: 70,
-            decoration: BoxDecoration(
-              color: statusColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          /// Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Top Row
-                Row(
-                  children: [
-                    Text(
-                      mtr.id ?? 'NULL',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                    const Spacer(),
-
-                    /// Status Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        mtr.status ?? 'NULL',
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Name
-                Text(
-                  mtr.name ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-
-                /// Email
-                Text(
-                  mtr.email ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: cs.onSurface.withOpacity(0.6),
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Extra Info
-                Text(
-                  "Contact • ${mtr.phone ?? "N/A"}",
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.5),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                /// 🔘 Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomWidgets().iconBtn(
-                      title: "Dashboard",
-                      icon: Icons.dashboard,
-                      color: cs.primary,
-                      onTap: () {},
-                    ),
-                    const SizedBox(width: 8),
-                    if (mtr.status == 'Active')
-                      CustomWidgets().iconBtn(
-                        icon: Icons.edit,
-                        color: cs.secondary,
-                        onTap: () {
-                          c.loadMentors(mtr);
-                          editMentor(context);
-                        },
-                      ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.block,
-                      color: cs.error,
-                    ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.delete,
-                      color: cs.error,
-                      onTap: () => CustomWidgets().showDeleteDialog(
-                        text:
-                            'Are you sure you want to delete this coordinator permanently?',
-                        context: context,
-                        onConfirm: () => c.delete(mtr.id),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

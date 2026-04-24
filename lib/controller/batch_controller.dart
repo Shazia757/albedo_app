@@ -1,11 +1,14 @@
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum SortType { newest, oldest, name }
 
 class BatchController extends GetxController {
+  RxBool isSearching = false.obs;
+
   var batches = <Batch>[].obs;
   var filteredBatches = <Batch>[].obs;
   final tabs = ["Active", "Inactive"];
@@ -54,13 +57,25 @@ class BatchController extends GetxController {
 
       batches.assignAll([
         Batch(
-          teacherName: '',
+          teacher: Teacher(
+            id: "T01",
+            name: "John",
+            status: "active",
+            joinedAt: DateTime(2023, 1, 1),
+            gender: "male",
+          ),
           batchName: 'ATTC PROGRAME COURSE BATCH 1',
           batchID: 'B-ATTAP2601',
           status: "Active",
         ),
         Batch(
-          teacherName: '',
+          teacher: Teacher(
+            id: "T02",
+            name: "David",
+            status: "active",
+            joinedAt: DateTime(2023, 2, 1),
+            gender: "male",
+          ),
           batchName: '10 TH CBSE BATCH 1 2026-2027',
           batchID: 'B-10 MA2601',
           status: "Active",

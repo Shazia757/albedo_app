@@ -285,6 +285,7 @@ class CustomWidgets {
       ),
     );
   }
+
   void showFilterSheet<T>({
     required List<FilterOption<T>> options,
     required T selectedValue,
@@ -558,7 +559,7 @@ class CustomWidgets {
                               "Yes",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: context.theme.colorScheme.inverseSurface,
+                                color: Colors.white,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -692,7 +693,7 @@ class CustomWidgets {
                               "Yes",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: context.theme.colorScheme.inverseSurface,
+                                color: Colors.white,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -1097,6 +1098,7 @@ class CustomWidgets {
     bool isViewOnly = false,
     String submitText = "Save",
   }) {
+    final cs = Theme.of(context).colorScheme;
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(
@@ -1115,8 +1117,8 @@ class CustomWidgets {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Get.theme.colorScheme.primary,
-                      Get.theme.colorScheme.secondary.withOpacity(0.4),
+                      cs.primary,
+                      cs.secondary.withOpacity(0.4),
                     ],
                   ),
                   borderRadius: const BorderRadius.vertical(
@@ -1131,8 +1133,7 @@ class CustomWidgets {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(icon,
-                            color: context.theme.colorScheme.inverseSurface),
+                        child: Icon(icon, color: Colors.white),
                       ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1140,15 +1141,14 @@ class CustomWidgets {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: context.theme.colorScheme.inverseSurface,
+                          color: Colors.white,
                         ),
                         child: title,
                       ),
                     ),
                     IconButton(
                       onPressed: () => Get.back(),
-                      icon: Icon(Icons.close,
-                          color: context.theme.colorScheme.inverseSurface),
+                      icon: Icon(Icons.close, color: Colors.white),
                     )
                   ],
                 ),
@@ -1161,7 +1161,7 @@ class CustomWidgets {
               ),
 
               /// 🔷 ACTIONS
-              if (isViewOnly = false)
+              if (isViewOnly == false)
                 Container(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
                   decoration: BoxDecoration(
@@ -1195,9 +1195,7 @@ class CustomWidgets {
                           },
                           child: Text(
                             submitText,
-                            style: TextStyle(
-                                color:
-                                    context.theme.colorScheme.inverseSurface),
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ),

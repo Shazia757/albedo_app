@@ -1,9 +1,9 @@
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum SortType { newest, oldest, name }
-
 
 class TeacherController extends GetxController {
   var teachers = <Teacher>[].obs;
@@ -12,8 +12,10 @@ class TeacherController extends GetxController {
   var selectedTab = 0.obs;
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
+  var isSearching = false.obs;
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
+  var isDeactivateButtonLoading = true.obs;
 
   // --------------------------
   // Counts for tabs
@@ -97,6 +99,14 @@ class TeacherController extends GetxController {
     }
   }
 
+  Users teacherToUser(Teacher t) {
+    return Users(
+      id: t.id,
+      name: t.name,
+      role: "teacher",
+    );
+  }
+
   void applyFilters() {
     List<Teacher> temp = teachers;
 
@@ -162,6 +172,24 @@ class TeacherController extends GetxController {
 
   delete(String id) {
     isDeleteButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
+  }
+
+  deactivate(String id) {
+    isDeactivateButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {
     //     if (value?.status == true) {

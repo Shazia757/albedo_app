@@ -2,8 +2,10 @@ import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
+import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,51 +31,89 @@ class TeachersPage extends StatelessWidget {
             child: Column(
               children: [
                 /// 🔍 Search + Sort
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: CustomWidgets().premiumSearch(context,
-                            hint: "Search teachers...",
-                            onChanged: (value) => c.searchQuery.value = value),
-                      ),
+                Obx(() {
+                  final searching = c.isSearching.value;
 
-                      const SizedBox(width: 10),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
 
-                      /// Sort
-                      InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () => CustomWidgets().showSortSheet<SortType>(
-                          title: "Sort Teachers",
-                          options: [
-                            SortOption(
-                                label: "Newest",
-                                value: SortType.newest,
-                                icon: Icons.schedule),
-                            SortOption(
-                                label: "Oldest",
-                                value: SortType.oldest,
-                                icon: Icons.history),
-                            SortOption(
-                                label: "Name A-Z",
-                                value: SortType.name,
-                                icon: Icons.sort_by_alpha),
-                          ],
-                          selectedValue: c.sortType.value,
-                          onSelected: (val) {
-                            c.sortType.value = val;
-                            c.applyFilters();
+                        if (!searching)
+                          Expanded(
+                            child: Text(
+                              "Teachers",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          )
+                        else
+                          Expanded(
+                            child: CustomWidgets().premiumSearch(
+                              context,
+                              hint: "Search teachers...",
+                              onChanged: (value) {
+                                c.searchQuery.value = value;
+                                c.applyFilters();
+                              },
+                            ),
+                          ),
+
+                        /// 🔍 SEARCH TOGGLE
+                        InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () {
+                            c.isSearching.value = !searching;
+
+                            if (searching) {
+                              c.searchQuery.value = "";
+                              c.applyFilters();
+                            }
                           },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Icon(searching ? Icons.close : Icons.search,
+                                size: 20),
+                          ),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Icon(Icons.sort, size: 20),
+
+                        const SizedBox(width: 6),
+
+                        /// 🔃 SORT
+                        InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () => CustomWidgets().showSortSheet<SortType>(
+                            title: "Sort Teachers",
+                            options: [
+                              SortOption(
+                                  label: "Newest",
+                                  value: SortType.newest,
+                                  icon: Icons.schedule),
+                              SortOption(
+                                  label: "Oldest",
+                                  value: SortType.oldest,
+                                  icon: Icons.history),
+                              SortOption(
+                                  label: "Name A-Z",
+                                  value: SortType.name,
+                                  icon: Icons.sort_by_alpha),
+                            ],
+                            selectedValue: c.sortType.value,
+                            onSelected: (val) {
+                              c.sortType.value = val;
+                              c.applyFilters();
+                            },
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(Icons.sort, size: 20),
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                ),
+                      ],
+                    ),
+                  );
+                }),
 
                 /// 🧭 Tabs
                 Obx(
@@ -119,179 +159,78 @@ class TeachersPage extends StatelessWidget {
                         itemCount: c.filteredTeachers.length,
                         itemBuilder: (context, index) {
                           final teacher = c.filteredTeachers[index];
+                          final cs = Theme.of(context).colorScheme;
 
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: ConstrainedBox(
+                            child: ConstrainedBox(
                                 constraints:
                                     const BoxConstraints(maxWidth: 700),
-                                child: _card(context, teacher),
-                              ),
-                            ),
+                                child: PremiumInfoCard(
+                                  id: teacher.id ?? "",
+                                  title: teacher?.name ?? "",
+                                  subtitle: teacher?.email ?? "",
+                                  status: teacher?.status,
+                                  statusColor: getStatusColor(teacher?.status),
+                                  footerText:
+                                      "Joined • ${teacher?.joinedAt.toString().substring(0, 16)}",
+                                  extraInfo: teacher?.phone != null
+                                      ? "Contact • ${teacher!.phone}"
+                                      : null,
+                                  onTap: () {
+                                    if (teacher != null) {
+                                      openTeacherProfile(
+                                        context,
+                                        teacher,
+                                        toUser: (p0) =>
+                                            c.teacherToUser(teacher),
+                                      );
+                                    }
+                                  },
+                                  actions: [
+                                    InfoAction(
+                                      icon: Icons.dashboard,
+                                      color: cs.primary,
+                                      onTap: () {},
+                                    ),
+                                    InfoAction(
+                                      icon: Icons.edit,
+                                      color: cs.secondary,
+                                      onTap: () {
+                                        if (teacher != null) {
+                                          c.loadTeachers(teacher);
+                                          editTeacher(context);
+                                        }
+                                      },
+                                    ),
+                                    InfoAction(
+                                        icon: Icons.block,
+                                        color: cs.error,
+                                        onTap: () => CustomWidgets()
+                                                .showDeactivateDialog(
+                                              text:
+                                                  'Are you sure you want to deactivate this student permanently?',
+                                              context: context,
+                                              onConfirm: () =>
+                                                  c.deactivate(teacher.id!),
+                                            )),
+                                    InfoAction(
+                                      icon: Icons.delete,
+                                      color: cs.error,
+                                      onTap: () =>
+                                          CustomWidgets().showDeleteDialog(
+                                        text:
+                                            'Are you sure you want to delete this teacher permanently?',
+                                        context: context,
+                                        onConfirm: () => c.delete(teacher!.id),
+                                      ),
+                                    ),
+                                  ],
+                                )),
                           );
                         });
                   }),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 💎 Premium Card
-  Widget _card(BuildContext context, Teacher? t) {
-    final cs = Theme.of(context).colorScheme;
-
-    final isActive = t?.status == "Active";
-
-    final statusColor = isActive ? cs.primary : cs.error;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: cs.surface,
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// 🔥 Left Accent Bar
-          Container(
-            width: 4,
-            height: 70,
-            decoration: BoxDecoration(
-              color: statusColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          /// Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Top Row
-                Row(
-                  children: [
-                    Text(
-                      t?.id ?? 'NULL',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                    const Spacer(),
-
-                    /// Status Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        t?.status ?? 'NULL',
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Name
-                Text(
-                  t?.name ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-
-                /// Email
-                Text(
-                  t?.email ?? 'NULL',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: cs.onSurface.withOpacity(0.6),
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                /// Extra Info
-                Text(
-                  "Contact • ${t?.phone ?? "N/A"}",
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.5),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                /// 🔘 Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomWidgets().iconBtn(
-                      title: "Dashboard",
-                      icon: Icons.dashboard,
-                      color: cs.primary,
-                      onTap: () {},
-                    ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.edit,
-                      color: cs.secondary,
-                      onTap: () {
-                        if (t != null) {
-                          c.loadTeachers(t);
-                          editTeacher(context);
-                        }
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.block,
-                      color: cs.error,
-                    ),
-                    const SizedBox(width: 8),
-                    CustomWidgets().iconBtn(
-                      icon: Icons.delete,
-                      color: cs.error,
-                      onTap: () => CustomWidgets().showDeleteDialog(
-                        text:
-                            'Are you sure you want to delete this teacher permanently?',
-                        context: context,
-                        onConfirm: () => c.delete(t!.id),
-                      ),
-                    ),
-                  ],
-                )
               ],
             ),
           ),

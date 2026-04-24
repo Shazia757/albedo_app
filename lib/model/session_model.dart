@@ -1,20 +1,20 @@
+import 'package:albedo_app/model/users/advisor_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:flutter/material.dart';
 
 class Session {
   final String id;
-  final String studentName;
-  final String studentId;
+  Student? student;
   final String package;
   final String syllabus;
   final String className;
-  final String teacherName;
-  final String teacherId;
-  final String mentorName;
-  final String mentorId;
-  final String? coordinatorName;
-  final String? coordinatorId;
-  final String? advisorName;
-  final String? advisorId;
+  Teacher? teacher;
+  Mentor? mentor;
+  Coordinator? coordinator;
+  Advisor? advisor;
 
   final DateTime date;
   final DateTime time;
@@ -24,22 +24,17 @@ class Session {
 
   Session({
     required this.id,
-    required this.studentName,
-    required this.studentId,
+    this.student,
     required this.package,
     required this.syllabus,
     required this.className,
-    required this.teacherName,
-    required this.teacherId,
+    this.teacher,
     required this.date,
     required this.time,
     required this.status,
-    this.advisorId,
-    this.advisorName,
-    this.coordinatorId,
-    this.coordinatorName,
-    required this.mentorId,
-    required this.mentorName,
+    this.advisor,
+    this.coordinator,
+    this.mentor,
     this.duration,
     this.teacherSalary,
   });
@@ -56,6 +51,7 @@ class SortOption<T> {
     required this.icon,
   });
 }
+
 class FilterOption<T> {
   final String label;
   final T value;
