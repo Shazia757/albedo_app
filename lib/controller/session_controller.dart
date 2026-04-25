@@ -545,13 +545,6 @@ class SessionController extends GetxController {
     }
   }
 
-  Users studentToUser(Student s) {
-    return Users(
-      id: s.studentId!,
-      name: s.name,
-      role: "student",
-    );
-  }
 
   Teacher? getTeacherById(String id) {
     try {
@@ -561,13 +554,6 @@ class SessionController extends GetxController {
     }
   }
 
-  Users teacherToUser(Teacher t) {
-    return Users(
-      id: t.id,
-      name: t.name,
-      role: "teacher",
-    );
-  }
 
   Mentor? getMentorById(String id) {
     print("Clicked ID: $id");

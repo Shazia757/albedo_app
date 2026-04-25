@@ -222,8 +222,8 @@ class SessionPage extends StatelessWidget {
                             icon: Icons.menu_book,
                             title: "Session Info",
                             children: [
-                              infoRow("Subject", data.package ?? "-"),
-                              infoRow("Syllabus", data.syllabus ?? "-"),
+                              infoRow(label: "Subject",value: data.package ?? "-"),
+                              infoRow(label: "Syllabus",value: data.syllabus ?? "-"),
                             ],
                           ),
                           infoCard(
@@ -232,7 +232,7 @@ class SessionPage extends StatelessWidget {
                             icon: Icons.flag,
                             title: "Status",
                             children: [
-                              infoRow("Current Status", data.status),
+                              infoRow(label: "Current Status",value:  data.status),
                             ],
                           ),
                           const SizedBox(height: 10),
@@ -311,7 +311,7 @@ class SessionPage extends StatelessWidget {
           openTeacherProfile(
             context,
             t,
-            toUser: (p0) => c.teacherToUser(t),
+            toUser: (p0) => teacherToUser(t),
           );
         } else {
           Get.snackbar("Error", "Teacher not found for ID: $id");

@@ -1,9 +1,12 @@
+import 'package:albedo_app/config/root.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -31,89 +34,38 @@ class TeachersPage extends StatelessWidget {
             child: Column(
               children: [
                 /// 🔍 Search + Sort
-                Obx(() {
-                  final searching = c.isSearching.value;
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 10),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 10),
-
-                        if (!searching)
-                          Expanded(
-                            child: Text(
-                              "Teachers",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                          )
-                        else
-                          Expanded(
-                            child: CustomWidgets().premiumSearch(
-                              context,
-                              hint: "Search teachers...",
-                              onChanged: (value) {
-                                c.searchQuery.value = value;
-                                c.applyFilters();
-                              },
-                            ),
-                          ),
-
-                        /// 🔍 SEARCH TOGGLE
-                        InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: () {
-                            c.isSearching.value = !searching;
-
-                            if (searching) {
-                              c.searchQuery.value = "";
-                              c.applyFilters();
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Icon(searching ? Icons.close : Icons.search,
-                                size: 20),
-                          ),
-                        ),
-
-                        const SizedBox(width: 6),
-
-                        /// 🔃 SORT
-                        InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: () => CustomWidgets().showSortSheet<SortType>(
-                            title: "Sort Teachers",
-                            options: [
-                              SortOption(
-                                  label: "Newest",
-                                  value: SortType.newest,
-                                  icon: Icons.schedule),
-                              SortOption(
-                                  label: "Oldest",
-                                  value: SortType.oldest,
-                                  icon: Icons.history),
-                              SortOption(
-                                  label: "Name A-Z",
-                                  value: SortType.name,
-                                  icon: Icons.sort_by_alpha),
-                            ],
-                            selectedValue: c.sortType.value,
-                            onSelected: (val) {
-                              c.sortType.value = val;
-                              c.applyFilters();
-                            },
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(Icons.sort, size: 20),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                HeaderWithSearch(
+                  title: "Teachers",
+                  hint: "Search teachers...",
+                  isSearching: c.isSearching,
+                  searchQuery: c.searchQuery,
+                  onSearchChanged: () => c.applyFilters(),
+                  onSortTap: () => CustomWidgets().showSortSheet<SortType>(
+                    title: "Sort Teachers",
+                    options: [
+                      SortOption(
+                        label: "Newest",
+                        value: SortType.newest,
+                        icon: Icons.schedule,
+                      ),
+                      SortOption(
+                        label: "Oldest",
+                        value: SortType.oldest,
+                        icon: Icons.history,
+                      ),
+                      SortOption(
+                        label: "Name A-Z",
+                        value: SortType.name,
+                        icon: Icons.sort_by_alpha,
+                      ),
+                    ],
+                    selectedValue: c.sortType.value,
+                    onSelected: (val) {
+                      c.sortType.value = val;
+                      c.applyFilters();
+                    },
+                  ),
+                ),
 
                 /// 🧭 Tabs
                 Obx(
@@ -182,8 +134,7 @@ class TeachersPage extends StatelessWidget {
                                       openTeacherProfile(
                                         context,
                                         teacher,
-                                        toUser: (p0) =>
-                                            c.teacherToUser(teacher),
+                                        toUser: (p0) => teacherToUser(teacher),
                                       );
                                     }
                                   },
@@ -191,7 +142,13 @@ class TeachersPage extends StatelessWidget {
                                     InfoAction(
                                       icon: Icons.dashboard,
                                       color: cs.primary,
-                                      onTap: () {},
+                                      onTap: () {
+                                        final auth = Get.find<AuthController>();
+                                        final user = teacherToUser(teacher);
+
+                                        auth.startImpersonation(user);
+                                        Get.offAll(() => const Root());
+                                      },
                                     ),
                                     InfoAction(
                                       icon: Icons.edit,

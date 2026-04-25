@@ -13,6 +13,7 @@ class SupportController extends GetxController {
   var filteredTickets = <Ticket>[].obs;
   RxString selectedType = "student".obs;
 
+  RxBool isSearching = false.obs;
   RxBool isLoading = true.obs;
   RxBool isDeleteButtonLoading = false.obs;
 

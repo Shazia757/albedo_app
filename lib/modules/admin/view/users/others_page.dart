@@ -1,5 +1,9 @@
+import 'package:albedo_app/config/root.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/other_users_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/other_users_model.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -84,43 +88,148 @@ class OthersPage extends StatelessWidget {
                                     onTap: () {
                                       if (otherUsers != null) {
                                         {
-                                          openOtherUserProfile(
-                                              context, otherUsers,
-                                              role: otherUsers.role,
-                                              toUser: (p0) =>
-                                                  otherUserToUser(otherUsers));
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => Dialog(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(20),
+                                                width: 350,
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    /// 🔹 Profile Image
+                                                    CircleAvatar(
+                                                      radius: 40,
+                                                      // backgroundImage:
+                                                      //     user.imageUrl != null ? NetworkImage(user.imageUrl!) : null,
+                                                      child: otherUsers
+                                                                  .imageUrl ==
+                                                              null
+                                                          ? Image.asset(
+                                                              'assets/images/logo.png')
+                                                          : null,
+                                                    ),
+
+                                                    const SizedBox(height: 12),
+
+                                                    /// 🔹 Name
+                                                    Text(
+                                                      otherUsers.name ?? "-",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium,
+                                                    ),
+
+                                                    const SizedBox(height: 4),
+
+                                                    /// 🔹 Role
+                                                    Text(
+                                                      otherUsers.role ?? "User",
+                                                      style: TextStyle(
+                                                          color:
+                                                              Colors.grey[600]),
+                                                    ),
+
+                                                    const Divider(height: 24),
+
+                                                    /// 🔹 Details
+                                                    infoRow(
+                                                        icon: Icons.badge,
+                                                        label: "Emp ID",
+                                                        value: otherUsers.id),
+                                                    infoRow(
+                                                        icon: Icons.email,
+                                                        label: "Email",
+                                                        value:
+                                                            otherUsers.email),
+                                                    infoRow(
+                                                        icon: Icons.phone,
+                                                        label: "Phone",
+                                                        value:
+                                                            otherUsers.phone),
+
+                                                    const SizedBox(height: 20),
+
+                                                    /// 🔹 Actions
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        InfoActionButton(
+                                                          action: InfoAction(
+                                                            icon:
+                                                                Icons.dashboard,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .primary,
+                                                            onTap: () {
+                                                              final auth = Get.find<
+                                                                  AuthController>();
+                                                              final user =
+                                                                  otherUserToUser(
+                                                                      otherUsers);
+
+                                                              auth.startImpersonation(
+                                                                  user);
+                                                              Get.offAll(() =>
+                                                                  const Root());
+                                                            },
+                                                          ),
+                                                        ),
+                                                        InfoActionButton(
+                                                          action: InfoAction(
+                                                            icon: Icons.edit,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .secondary,
+                                                            onTap: () {
+                                                              if (otherUsers !=
+                                                                  null) {
+                                                                c.loadOtherUsers(
+                                                                    otherUsers);
+                                                                editUser(
+                                                                    context);
+                                                              }
+                                                            },
+                                                          ),
+                                                        ),
+                                                        InfoActionButton(
+                                                          action: InfoAction(
+                                                            icon: Icons.delete,
+                                                            color: cs.error,
+                                                            onTap: () =>
+                                                                CustomWidgets()
+                                                                    .showDeleteDialog(
+                                                              text:
+                                                                  'Are you sure you want to delete this user permanently?',
+                                                              context: context,
+                                                              onConfirm: () =>
+                                                                  c.delete(
+                                                                      otherUsers!
+                                                                          .id),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
                                         }
                                       }
                                     },
-                                    actions: [
-                                      InfoAction(
-                                        icon: Icons.dashboard,
-                                        color: cs.primary,
-                                        onTap: () {},
-                                      ),
-                                      InfoAction(
-                                        icon: Icons.edit,
-                                        color: cs.secondary,
-                                        onTap: () {
-                                          if (otherUsers != null) {
-                                            c.loadOtherUsers(otherUsers);
-                                            editUser(context);
-                                          }
-                                        },
-                                      ),
-                                      InfoAction(
-                                        icon: Icons.delete,
-                                        color: cs.error,
-                                        onTap: () =>
-                                            CustomWidgets().showDeleteDialog(
-                                          text:
-                                              'Are you sure you want to delete this otherUsers permanently?',
-                                          context: context,
-                                          onConfirm: () =>
-                                              c.delete(otherUsers!.id),
-                                        ),
-                                      ),
-                                    ],
+                                    actions: [],
                                   ),
                                 ),
                               );
@@ -477,6 +586,14 @@ class OthersPage extends StatelessWidget {
       onSubmit: () {
         // TODO: update user
       },
+    );
+  }
+
+  Users otherUserToUser(OtherUsers a) {
+    return Users(
+      id: a.id,
+      name: a.name,
+      role: a.role,
     );
   }
 }

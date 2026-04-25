@@ -1,9 +1,12 @@
+import 'package:albedo_app/config/root.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/coordinator_controller.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -32,83 +35,37 @@ class CoordinatorPage extends StatelessWidget {
               child: Column(
                 children: [
                   /// 🔍 Search + Sort
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 10),
-                    child: Obx(() {
-                      final searching = c.isSearching.value;
-
-                      return Row(
-                        children: [
-                          const SizedBox(width: 10),
-
-                          /// 🔹 TITLE / SEARCH
-                          if (!searching)
-                            Expanded(
-                              child: Text(
-                                "Coordinators",
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                            )
-                          else
-                            Expanded(
-                              child: CustomWidgets().premiumSearch(
-                                context,
-                                hint: "Search coordinators...",
-                                onChanged: (value) {
-                                  c.searchQuery.value = value;
-                                  c.applyFilters();
-                                },
-                              ),
-                            ),
-
-                          /// 🔹 SEARCH TOGGLE
-                          IconButton(
-                            icon: Icon(searching ? Icons.close : Icons.search),
-                            onPressed: () {
-                              c.isSearching.value = !searching;
-
-                              if (searching) {
-                                c.searchQuery.value = "";
-                                c.applyFilters();
-                              }
-                            },
-                          ),
-
-                          /// 🔹 SORT (unchanged)
-                          InkWell(
-                            borderRadius: BorderRadius.circular(8),
-                            onTap: () =>
-                                CustomWidgets().showSortSheet<SortType>(
-                              title: "Sort Coordinators",
-                              options: [
-                                SortOption(
-                                    label: "Newest",
-                                    value: SortType.newest,
-                                    icon: Icons.schedule),
-                                SortOption(
-                                    label: "Oldest",
-                                    value: SortType.oldest,
-                                    icon: Icons.history),
-                                SortOption(
-                                    label: "Name A-Z",
-                                    value: SortType.name,
-                                    icon: Icons.sort_by_alpha),
-                              ],
-                              selectedValue: c.sortType.value,
-                              onSelected: (val) {
-                                c.sortType.value = val;
-                                c.applyFilters();
-                              },
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Icon(Icons.sort, size: 20),
-                            ),
-                          ),
-                        ],
-                      );
-                    }),
+                  HeaderWithSearch(
+                    title: "Coordinators",
+                    hint: "Search coordinators...",
+                    isSearching: c.isSearching,
+                    searchQuery: c.searchQuery,
+                    onSearchChanged: () => c.applyFilters(),
+                    onSortTap: () => CustomWidgets().showSortSheet<SortType>(
+                      title: "Sort Coordinators",
+                      options: [
+                        SortOption(
+                          label: "Newest",
+                          value: SortType.newest,
+                          icon: Icons.schedule,
+                        ),
+                        SortOption(
+                          label: "Oldest",
+                          value: SortType.oldest,
+                          icon: Icons.history,
+                        ),
+                        SortOption(
+                          label: "Name A-Z",
+                          value: SortType.name,
+                          icon: Icons.sort_by_alpha,
+                        ),
+                      ],
+                      selectedValue: c.sortType.value,
+                      onSelected: (val) {
+                        c.sortType.value = val;
+                        c.applyFilters();
+                      },
+                    ),
                   ),
 
                   /// 🧭 Tabs
@@ -207,7 +164,15 @@ class CoordinatorPage extends StatelessWidget {
                                         InfoAction(
                                           icon: Icons.dashboard,
                                           color: cs.primary,
-                                          onTap: () {},
+                                          onTap: () {
+                                            final auth =
+                                                Get.find<AuthController>();
+                                            final user =
+                                                coordinatorToUser(coordinator);
+
+                                            auth.startImpersonation(user);
+                                            Get.offAll(() => const Root());
+                                          },
                                         ),
                                         InfoAction(
                                           icon: Icons.edit,

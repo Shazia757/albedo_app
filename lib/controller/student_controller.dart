@@ -1,4 +1,5 @@
 import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -205,5 +206,6 @@ class StudentController extends GetxController {
     //   },
     // );
   }
+
 
 }

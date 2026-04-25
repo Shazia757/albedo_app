@@ -81,11 +81,5 @@ class CommonController extends GetxController {
     }
   }
 
-  Users teacherToUser(Teacher t) {
-    return Users(
-      id: t.id,
-      name: t.name,
-      role: "teacher",
-    );
-  }
+
 }

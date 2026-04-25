@@ -1,5 +1,6 @@
 import 'package:albedo_app/controller/support_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
@@ -166,12 +167,13 @@ class SupportsPage extends StatelessWidget {
     if (isMobile) {
       return Column(
         children: [
-          CustomWidgets().premiumSearch(
-            context,
-            hint: "Search tickets...",
-            onChanged: (val) => c.searchQuery.value = val,
+          HeaderWithSearch(
+            title: 'Supports',
+            hint: 'Search tickets...',
+            isSearching: c.isSearching,
+            searchQuery: c.searchQuery,
+            onSearchChanged: () {},
           ),
-          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(child: _filterButton(context)),

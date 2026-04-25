@@ -83,7 +83,7 @@ class BatchesListPage extends StatelessWidget {
                             itemCount: data.length,
                             itemBuilder: (_, i) => InkWell(
                               borderRadius: BorderRadius.circular(16),
-                              onTap: () => _openBatchDetails(context, data, i),
+                              onTap: () => openBatchDetails(context, data, i),
                               child: InfoCard(
                                 id: data[i].id ?? '',
                                 status: data[i].status ?? '',
@@ -109,7 +109,7 @@ class BatchesListPage extends StatelessWidget {
     );
   }
 
-  void _openBatchDetails(
+  void openBatchDetails(
     BuildContext context,
     List<Batch> batches,
     int currentIndex,
@@ -204,7 +204,8 @@ class BatchesListPage extends StatelessWidget {
                               // infoRow("Package", data.package ?? "-"),
                               if (data.syllabus != null &&
                                   data.syllabus!.isNotEmpty)
-                                infoRow("Syllabus", data.syllabus!),
+                                infoRow(
+                                    label: "Syllabus", value: data.syllabus!),
                             ],
                           ),
 
@@ -215,7 +216,9 @@ class BatchesListPage extends StatelessWidget {
                             icon: Icons.flag,
                             title: "Status",
                             children: [
-                              infoRow("Current Status", data.status ?? "-"),
+                              infoRow(
+                                  label: "Current Status",
+                                  value: data.status ?? "-"),
                             ],
                           ),
 
@@ -289,12 +292,12 @@ class BatchesListPage extends StatelessWidget {
     final handlers = {
       "teacher": () {
         final t = c.getTeacherById(id);
-        if (t != null)
+        if (t != null){
           openTeacherProfile(
             context,
             t,
-            toUser: (p0) => c.teacherToUser(t),
-          );
+            toUser: (p0) => teacherToUser(t),
+          );}
       },
       "batch": () {
         final b = c.getBatchById(id);
@@ -309,94 +312,6 @@ class BatchesListPage extends StatelessWidget {
     }
   }
 
-  void openBatchProfile(BuildContext context, Batch data) {
-    final primary = Theme.of(context).colorScheme.primary;
-    openProfileDialog(
-        context: context,
-        title: 'Batch profile',
-        icon: Icons.people,
-        color: Theme.of(context).colorScheme.primary,
-        content: SingleChildScrollView(
-          child: Column(children: [
-            profileHeader<Batch>(
-              context: context,
-              data: data,
-              color: primary,
-              getName: (b) => b.batchName ?? "-",
-              getEmail: (_) => null,
-              getId: (b) => b.batchID,
-              getImageUrl: (b) => b.imageUrl,
-              getStatus: (p0) => p0.status,
-            ),
-            const SizedBox(height: 10),
-            infoCard(
-              context,
-              type: "schedule",
-              icon: Icons.calendar_today,
-              title: "Course Details",
-              children: [
-                infoRow("Course", data.course ?? ''),
-                infoRow(
-                  "Duration",
-                  "${data.duration ?? 0} days",
-                ),
-              ],
-            ),
-            infoCard(
-              context,
-              type: "batch",
-              icon: Icons.bar_chart,
-              title: "Batch Statistics",
-              children: [
-                infoRow("Students", data.students.toString()),
-                infoRow("Packages", data.package!.length.toString()),
-              ],
-            ),
-            infoCard(
-              context,
-              type: "status",
-              icon: Icons.account_balance_wallet,
-              title: "Payment Summary",
-              children: [
-                infoRow("Total Fee", data.totalFee.toString()),
-                infoRow("Total Paid", data.totalPaid.toString()),
-                infoRow("Balance", data.balance.toString()),
-                infoRow("Expense Ratio", data.expenseRatio.toString()),
-              ],
-            ),
-            profileCard(
-              context,
-              color: Colors.indigo,
-              title: "Assigned Personnel",
-              children: [
-                if (data.coordinatorName != null)
-                  detailCard(
-                    context,
-                    title: "Coordinator",
-                    name: data.coordinatorName ?? "-",
-                    id: data.coordinatorId ?? "-",
-                    onTap: () {},
-                  ),
-                if (data.coordinatorName == null)
-                  simpleText("No coordinator assigned"),
-                const SizedBox(height: 6),
-                EditableDetailCard(
-                  type: "mentor",
-                  title: "Mentor",
-                  name: data.mentorName ?? "",
-                  id: data.mentorId ?? "",
-                  field1Label: "Name",
-                  field2Label: "ID",
-                  onSave: (name, id) {
-                    data.mentorName = name;
-                    data.mentorId = id;
-                  },
-                ),
-              ],
-            ),
-          ]),
-        ));
-  }
 
   FloatingActionButton addSessionBtn(BuildContext context) {
     return FloatingActionButton(

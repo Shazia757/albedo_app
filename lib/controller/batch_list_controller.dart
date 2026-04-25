@@ -199,13 +199,6 @@ class BatchListController extends GetxController {
     }
   }
 
-  Users teacherToUser(Teacher t) {
-    return Users(
-      id: t.id,
-      name: t.name,
-      role: "teacher",
-    );
-  }
 
   void initEdit(Batch data) {
     final uniqueTeachers =

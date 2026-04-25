@@ -5,6 +5,7 @@ class ReportsController extends GetxController {
   var selectedTab = 0.obs;
   var searchQuery = ''.obs;
   var selectedRange = 'This Month'.obs;
+  RxBool isSearching=false.obs;
 
   var packages = <PackageReportModel>[].obs;
   var students = <PackageReportModel>[].obs;

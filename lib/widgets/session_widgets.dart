@@ -2,6 +2,7 @@ import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/batch_list_controller.dart';
 import 'package:albedo_app/controller/session_controller.dart';
+import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
@@ -9,6 +10,7 @@ import 'package:albedo_app/model/users/other_users_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
+import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -104,9 +106,9 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
 
           /// Content
           if (!isEditing) ...[
-            infoRow("Date", widget.date),
-            infoRow("Time", widget.time),
-            infoRow("Duration", widget.duration),
+            infoRow(label: "Date", value: widget.date),
+            infoRow(label: "Time", value: widget.time),
+            infoRow(label: "Duration", value: widget.duration),
           ] else ...[
             CustomWidgets().labelWithAsterisk('Session Date', required: true),
             const SizedBox(height: 6),
@@ -160,27 +162,27 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
     );
   }
 
-  Widget infoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget infoRow(String label, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(bottom: 6),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(
+  //           label,
+  //           style: const TextStyle(fontSize: 12),
+  //         ),
+  //         Text(
+  //           value,
+  //           style: const TextStyle(
+  //             fontWeight: FontWeight.w500,
+  //             fontSize: 12,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Color _getRoleColor(BuildContext context, String type) {
     switch (type) {
@@ -485,15 +487,45 @@ Widget infoCard(
   );
 }
 
-Widget infoRow(String label, String value) {
+Widget infoRow({
+  required String label,
+  String? value,
+  IconData? icon,
+}) {
   return Padding(
-    padding: const EdgeInsets.only(bottom: 6),
+    padding: const EdgeInsets.symmetric(vertical: 6),
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12)),
-        Text(value,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12)),
+        if (icon != null) ...[
+          Icon(icon, size: 16, color: Colors.grey),
+          const SizedBox(width: 8),
+        ],
+
+        /// 🔹 Label
+        SizedBox(
+          width: 80, // keeps alignment clean
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+
+        /// 🔹 Value
+        Expanded(
+          child: Text(
+            value ?? "-",
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
+        ),
       ],
     ),
   );
@@ -525,16 +557,24 @@ void openStudentProfile(BuildContext context, Student data) {
     getEmail: (s) => s.email,
     getId: (s) => s.studentId,
     getImageUrl: (s) => s.imageUrl,
-    toUser: c.studentToUser,
+    toUser: studentToUser,
     sections: [
-      _idCardCTA(context, data, color),
+      idCardCTA(
+        context: context,
+        color: color,
+        title: "Student ID Card",
+        subtitle: "Tap to view or download",
+        onTap: () {
+          print("Open Student ID");
+        },
+      ),
       profileCard(
         context,
         color: color,
         title: "Contact",
         children: [
-          infoRow("Phone", data.phone ?? "-"),
-          infoRow("WhatsApp", data.whatsapp ?? "-"),
+          infoRow(label: "Phone", value: data.phone ?? "-"),
+          infoRow(label: "WhatsApp", value: data.whatsapp ?? "-"),
         ],
       ),
       profileCard(
@@ -551,28 +591,39 @@ void openStudentProfile(BuildContext context, Student data) {
         color: Colors.deepPurple,
         title: "Academic",
         children: [
-          infoRow("Syllabus", data.syllabus ?? "-"),
-          infoRow("Category", data.category ?? "-"),
-          infoRow("Standard", data.standard?.toString() ?? "-"),
+          infoRow(label: "Syllabus", value: data.syllabus ?? "-"),
+          infoRow(label: "Category", value: data.category ?? "-"),
+          infoRow(label: "Standard", value: data.standard?.toString() ?? "-"),
         ],
       ),
     ],
   );
 }
 
-Widget _idCardCTA(BuildContext context, Student data, Color color) {
+Users studentToUser(Student s) {
+  return Users(
+    id: s.studentId!,
+    name: s.name,
+    role: "student",
+  );
+}
+
+Widget idCardCTA({
+  required BuildContext context,
+  required Color color,
+  required String title,
+  required String subtitle,
+  required VoidCallback onTap,
+}) {
   return InkWell(
-    onTap: () {
-      print("Open ID Card");
-      // 👉 Navigate / open ID card
-    },
+    onTap: onTap,
     borderRadius: BorderRadius.circular(14),
     child: Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color, // 🔥 SOLID COLOR
+        color: color,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -599,14 +650,14 @@ Widget _idCardCTA(BuildContext context, Student data, Color color) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Student ID Card",
+                  title,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: Colors.white,
                       ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  "Tap to view or download",
+                  subtitle,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Colors.white70,
                       ),
@@ -652,8 +703,8 @@ void openTeacherProfile(
         color: color,
         title: "Details",
         children: [
-          infoRow("Qualification", data.qualification ?? "-"),
-          infoRow("Gender", data.gender ?? "-"),
+          infoRow(label: "Qualification", value: data.qualification ?? "-"),
+          infoRow(label: "Gender", value: data.gender ?? "-"),
         ],
       ),
       profileCard(
@@ -661,8 +712,8 @@ void openTeacherProfile(
         color: color,
         title: "Contact",
         children: [
-          infoRow("Phone", data.phone ?? "-"),
-          infoRow("WhatsApp", data.whatsapp ?? "-"),
+          infoRow(label: "Phone", value: data.phone ?? "-"),
+          infoRow(label: "WhatsApp", value: data.whatsapp ?? "-"),
         ],
       ),
       profileCard(
@@ -680,13 +731,21 @@ void openTeacherProfile(
         color: Colors.green,
         title: "Bank Details",
         children: [
-          infoRow("UPI ID", data.upiId ?? "-"),
-          infoRow("Account No", data.accountNumber ?? "-"),
-          infoRow("IFSC Code", data.bankBranch ?? "-"),
-          infoRow("Bank", data.bankName ?? "-"),
+          infoRow(label: "UPI ID", value: data.upiId ?? "-"),
+          infoRow(label: "Account No", value: data.accountNumber ?? "-"),
+          infoRow(label: "IFSC Code", value: data.bankBranch ?? "-"),
+          infoRow(label: "Bank", value: data.bankName ?? "-"),
         ],
       ),
     ],
+  );
+}
+
+Users teacherToUser(Teacher t) {
+  return Users(
+    id: t.id,
+    name: t.name,
+    role: "teacher",
   );
 }
 
@@ -712,6 +771,98 @@ void openMentorProfile(
   );
 }
 
+void openBatchProfile(BuildContext context, Batch data) {
+  final primary = Theme.of(context).colorScheme.primary;
+  openProfileDialog(
+      context: context,
+      title: 'Batch profile',
+      icon: Icons.people,
+      color: Theme.of(context).colorScheme.primary,
+      content: SingleChildScrollView(
+        child: Column(children: [
+          profileHeader<Batch>(
+            context: context,
+            data: data,
+            color: primary,
+            getName: (b) => b.batchName ?? "-",
+            getEmail: (_) => null,
+            getId: (b) => b.batchID ?? '',
+            getImageUrl: (b) => b.imageUrl ?? '',
+            getStatus: (p0) => p0.status ?? '',
+          ),
+          const SizedBox(height: 10),
+          infoCard(
+            context,
+            type: "schedule",
+            icon: Icons.calendar_today,
+            title: "Course Details",
+            children: [
+              infoRow(label: "Course", value: data.course ?? ''),
+              infoRow(
+                label: "Duration",
+                value: "${data.duration ?? 0} days",
+              ),
+            ],
+          ),
+          infoCard(
+            context,
+            type: "batch",
+            icon: Icons.bar_chart,
+            title: "Batch Statistics",
+            children: [
+              infoRow(label: "Students", value: data.students.toString()),
+              infoRow(
+                  label: "Packages",
+                  value: data.package?.length.toString() ?? ''),
+            ],
+          ),
+          infoCard(
+            context,
+            type: "status",
+            icon: Icons.account_balance_wallet,
+            title: "Payment Summary",
+            children: [
+              infoRow(label: "Total Fee", value: data.totalFee.toString()),
+              infoRow(label: "Total Paid", value: data.totalPaid.toString()),
+              infoRow(label: "Balance", value: data.balance.toString()),
+              infoRow(
+                  label: "Expense Ratio", value: data.expenseRatio.toString()),
+            ],
+          ),
+          profileCard(
+            context,
+            color: Colors.indigo,
+            title: "Assigned Personnel",
+            children: [
+              if (data.coordinatorName != null)
+                detailCard(
+                  context,
+                  title: "Coordinator",
+                  name: data.coordinatorName ?? "-",
+                  id: data.coordinatorId ?? "-",
+                  onTap: () {},
+                ),
+              if (data.coordinatorName == null)
+                simpleText("No coordinator assigned"),
+              const SizedBox(height: 6),
+              EditableDetailCard(
+                type: "mentor",
+                title: "Mentor",
+                name: data.mentorName ?? "",
+                id: data.mentorId ?? "",
+                field1Label: "Name",
+                field2Label: "ID",
+                onSave: (name, id) {
+                  data.mentorName = name;
+                  data.mentorId = id;
+                },
+              ),
+            ],
+          ),
+        ]),
+      ));
+}
+
 List<Widget> staffSections(BuildContext context, dynamic data, Color color) {
   return [
     profileCard(
@@ -719,8 +870,8 @@ List<Widget> staffSections(BuildContext context, dynamic data, Color color) {
       color: color,
       title: "Contact",
       children: [
-        infoRow("Phone", data.phone ?? "-"),
-        infoRow("WhatsApp", data.whatsapp ?? "-"),
+        infoRow(label: "Phone", value: data.phone ?? "-"),
+        infoRow(label: "WhatsApp", value: data.whatsapp ?? "-"),
       ],
     ),
     profileCard(
@@ -738,10 +889,10 @@ List<Widget> staffSections(BuildContext context, dynamic data, Color color) {
       color: Colors.green,
       title: "Bank Details",
       children: [
-        infoRow("UPI ID", data.upiId ?? "-"),
-        infoRow("Account No", data.accountNumber ?? "-"),
-        infoRow("IFSC Code", data.bankBranch ?? "-"),
-        infoRow("Bank", data.bankName ?? "-"),
+        infoRow(label: "UPI ID", value: data.upiId ?? "-"),
+        infoRow(label: "Account No", value: data.accountNumber ?? "-"),
+        infoRow(label: "IFSC Code", value: data.bankBranch ?? "-"),
+        infoRow(label: "Bank", value: data.bankName ?? "-"),
       ],
     ),
   ];
@@ -804,7 +955,31 @@ void openAdvisorProfile(
     getImageUrl: (m) => m.imageUrl,
     toUser: (p0) => toUser,
     sections: [
-      
+      profileCard(
+        context,
+        color: Colors.blueGrey,
+        title: "Phone Number",
+        children: [
+          simpleText(data.phone ?? "-"),
+        ],
+      ),
+      profileCard(
+        context,
+        color: Colors.teal,
+        title: "Converted Students",
+        children: [
+          simpleText(data.convertedStudents?.toString() ?? "-"),
+        ],
+      ),
+      idCardCTA(
+        context: context,
+        color: color,
+        title: "Advisor ID Card",
+        subtitle: "Tap to view or download",
+        onTap: () {
+          print("Open Advisor ID");
+        },
+      )
     ],
   );
 }
@@ -814,33 +989,6 @@ Users advisorToUser(Advisor a) {
     id: a.id,
     name: a.name,
     role: "advisor",
-  );
-}
-
-void openOtherUserProfile(BuildContext context, OtherUsers data,
-    {Function(OtherUsers)? toUser, String? role}) {
-  final color = getRoleColor(context, "");
-
-  openGenericProfile(
-    context: context,
-    title: "User Profile",
-    role: role ?? '',
-    icon: Icons.school,
-    data: data,
-    getName: (m) => m.name,
-    getEmail: (m) => m.email,
-    getId: (m) => m.id,
-    getImageUrl: (m) => m.imageUrl,
-    toUser: (p0) => toUser,
-    sections: [],
-  );
-}
-
-Users otherUserToUser(OtherUsers a) {
-  return Users(
-    id: a.id,
-    name: a.name,
-    role: a.role,
   );
 }
 

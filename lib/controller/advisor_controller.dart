@@ -1,5 +1,6 @@
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -179,4 +180,11 @@ class AdvisorController extends GetxController {
     // );
   }
 
+Users advisorToUser(Advisor a) {
+  return Users(
+    id: a.id,
+    name: a.name,
+    role: "advisor",
+  );
+}
 }

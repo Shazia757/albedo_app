@@ -2,6 +2,7 @@
 import 'package:albedo_app/controller/report_controller.dart';
 import 'package:albedo_app/modules/admin/view/student_report_page.dart';
 import 'package:albedo_app/modules/admin/view/teacher_report_page.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -40,9 +41,9 @@ class ReportsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _tabs(context),
-                  const SizedBox(height: 16),
                   _filters(context),
+                  const SizedBox(height: 16),
+                  _tabs(context),
                   const SizedBox(height: 16),
                   Expanded(child: Obx(() => _tabView(context))),
                 ],
@@ -110,14 +111,13 @@ class ReportsPage extends StatelessWidget {
 
   // FILTER BAR
   Widget _filters(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: CustomWidgets().premiumSearch(context,
-              hint: 'Search reports...',
-              onChanged: (val) => c.searchQuery.value = val),
-        ),
-        const SizedBox(width: 12),
+    return HeaderWithSearch(
+      title: "Reports",
+      hint: "Search reports...",
+      isSearching: c.isSearching,
+      searchQuery: c.searchQuery,
+      onSearchChanged: () {},
+      actions: [
         Obx(() => PopupMenuButton(
               padding: EdgeInsets.zero,
               offset: const Offset(0, 45),
@@ -138,23 +138,26 @@ class ReportsPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .shadow
-                            .withOpacity(0.08),
-                        blurRadius: 10)
+                      color: Theme.of(context)
+                          .colorScheme
+                          .shadow
+                          .withOpacity(0.08),
+                      blurRadius: 10,
+                    )
                   ],
                 ),
                 child: Row(
                   children: [
-                    Text(c.selectedRange.value,
-                        style: const TextStyle(fontWeight: FontWeight.w500)),
+                    Text(
+                      c.selectedRange.value,
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
                     const SizedBox(width: 6),
-                    const Icon(Icons.keyboard_arrow_down_rounded, size: 20)
+                    const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
                   ],
                 ),
               ),
-            ))
+            )),
       ],
     );
   }

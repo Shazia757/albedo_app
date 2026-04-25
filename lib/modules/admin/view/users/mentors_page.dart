@@ -1,3 +1,5 @@
+import 'package:albedo_app/config/root.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/session_model.dart';
@@ -135,7 +137,12 @@ class MentorsPage extends StatelessWidget {
                                         InfoAction(
                                           icon: Icons.dashboard,
                                           color: cs.primary,
-                                          onTap: () {},
+                                          onTap: () {   final auth =
+                                              Get.find<AuthController>();
+                                          final user = mentorToUser(mentor);
+
+                                          auth.startImpersonation(user);
+                                          Get.offAll(() => const Root());},
                                         ),
                                         InfoAction(
                                           icon: Icons.edit,

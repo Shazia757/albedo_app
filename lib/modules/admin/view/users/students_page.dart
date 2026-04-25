@@ -1,8 +1,11 @@
+import 'package:albedo_app/config/root.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -31,78 +34,34 @@ class StudentsPage extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                /// 🔍 Search + Sort
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Obx(() {
-                    final searching = c.isSearching.value;
-
-                    return Row(
-                      children: [
-                        const SizedBox(width: 10),
-
-                        if (!searching)
-                          Expanded(
-                            child: Text(
-                              "Students",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                          )
-                        else
-                          Expanded(
-                            child: CustomWidgets().premiumSearch(
-                              context,
-                              hint: "Search students...",
-                              onChanged: (value) {
-                                c.searchQuery.value = value;
-                                c.applyFilters();
-                              },
-                            ),
-                          ),
-
-                        /// 🔍 SEARCH TOGGLE
-                        IconButton(
-                          icon: Icon(searching ? Icons.close : Icons.search),
-                          onPressed: () {
-                            c.isSearching.value = !searching;
-
-                            if (searching) {
-                              c.searchQuery.value = "";
-                              c.applyFilters();
-                            }
-                          },
-                        ),
-
-                        /// 🔽 SORT
-                        IconButton(
-                          icon: const Icon(Icons.sort),
-                          onPressed: () =>
-                              CustomWidgets().showSortSheet<SortType>(
-                            title: "Sort Students",
-                            options: [
-                              SortOption(
-                                  label: "Newest",
-                                  value: SortType.newest,
-                                  icon: Icons.schedule),
-                              SortOption(
-                                  label: "Oldest",
-                                  value: SortType.oldest,
-                                  icon: Icons.history),
-                              SortOption(
-                                  label: "Name A-Z",
-                                  value: SortType.name,
-                                  icon: Icons.sort_by_alpha),
-                            ],
-                            selectedValue: c.sortType.value,
-                            onSelected: (val) {
-                              c.sortType.value = val;
-                              c.applyFilters();
-                            },
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
+                HeaderWithSearch(
+                  title: "Students",
+                  hint: "Search students...",
+                  isSearching: c.isSearching,
+                  searchQuery: c.searchQuery,
+                  onSearchChanged: () => c.applyFilters(),
+                  onSortTap: () => CustomWidgets().showSortSheet<SortType>(
+                    title: "Sort Students",
+                    options: [
+                      SortOption(
+                          label: "Newest",
+                          value: SortType.newest,
+                          icon: Icons.schedule),
+                      SortOption(
+                          label: "Oldest",
+                          value: SortType.oldest,
+                          icon: Icons.history),
+                      SortOption(
+                          label: "Name A-Z",
+                          value: SortType.name,
+                          icon: Icons.sort_by_alpha),
+                    ],
+                    selectedValue: c.sortType.value,
+                    onSelected: (val) {
+                      c.sortType.value = val;
+                      c.applyFilters();
+                    },
+                  ),
                 ),
 
                 /// 🧭 Tabs
@@ -183,7 +142,13 @@ class StudentsPage extends StatelessWidget {
                                     InfoAction(
                                       icon: Icons.dashboard,
                                       color: cs.primary,
-                                      onTap: () {},
+                                      onTap: () {
+                                        final auth = Get.find<AuthController>();
+                                        final user = studentToUser(student);
+
+                                        auth.startImpersonation(user);
+                                        Get.offAll(() => const Root());
+                                      },
                                     ),
                                     if (student?.status != 'Inactive')
                                       InfoAction(

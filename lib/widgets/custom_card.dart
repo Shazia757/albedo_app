@@ -458,3 +458,29 @@ class InfoAction {
     this.label,
   });
 }
+
+class InfoActionButton extends StatelessWidget {
+  final InfoAction action;
+
+  const InfoActionButton({super.key, required this.action});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: action.onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: action.color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(
+          action.icon,
+          color: action.color,
+          size: 20,
+        ),
+      ),
+    );
+  }
+}
