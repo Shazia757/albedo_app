@@ -9,6 +9,8 @@ class LocalStorage {
   writeUser(Users user) {
     try {
       _box.write('user', user.toJson());
+      _box.write('isLoggedIn', true);
+      print("SAVED USER: ${_box.read('user')}");
     } catch (e) {
       log(e.toString());
     }
@@ -44,6 +46,7 @@ class LocalStorage {
   Users? readUser() {
     try {
       final data = _box.read('user');
+      print("RAW DATA FROM STORAGE: $data");
       if (data == null) return null;
 
       return Users.fromJson(data);

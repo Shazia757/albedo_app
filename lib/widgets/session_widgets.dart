@@ -531,21 +531,98 @@ Widget infoRow({
   );
 }
 
-String formatDate(DateTime dateTime) {
-  return "${dateTime.day.toString().padLeft(2, '0')}/"
-      "${dateTime.month.toString().padLeft(2, '0')}/"
-      "${dateTime.year}";
+FloatingActionButton buildAddTicketFAB({
+  required BuildContext context,
+  required TextEditingController titleController,
+  required TextEditingController categoryController,
+  required TextEditingController priorityController,
+  required TextEditingController descriptionController,
+  required RxString selectedType,
+  required VoidCallback onSubmit,
+}) {
+  return FloatingActionButton(
+    onPressed: () {},
+    mini: true,
+    backgroundColor: context.theme.colorScheme.primary,
+    child: Icon(
+      Icons.add,
+      color: context.theme.colorScheme.onPrimary,
+    ),
+  );
 }
 
-String formatTime(DateTime dt) {
-  final hour = dt.hour > 12 ? dt.hour - 12 : dt.hour;
-  final ampm = dt.hour >= 12 ? "PM" : "AM";
-  return "$hour:${dt.minute.toString().padLeft(2, '0')} $ampm";
+// ── Icon chip (search toggle) ─────────────────────────────────────────
+class IconChip extends StatelessWidget {
+  final IconData icon;
+  final ColorScheme cs;
+  final VoidCallback onTap;
+
+  const IconChip({required this.icon, required this.cs, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerHighest.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(12),
+          border:
+              Border.all(color: cs.outlineVariant.withOpacity(0.5), width: 1),
+        ),
+        child: Icon(icon, size: 19, color: cs.onSurface),
+      ),
+    );
+  }
+}
+
+// ── Meta item (label + value inline) ─────────────────────────────────
+class MetaItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color textSecondary;
+
+  const MetaItem({
+    required this.label,
+    required this.value,
+    required this.textSecondary,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        SizedBox(
+          width: 46,
+          child: Text(
+            label,
+            style: TextStyle(fontSize: 11, color: textSecondary),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: cs.onSurface.withOpacity(0.8),
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 void openStudentProfile(BuildContext context, Student data) {
   final color = getRoleColor(context, "student");
-  final c = Get.put(SessionController());
   openGenericProfile(
     context: context,
     title: "Student Profile",
@@ -834,15 +911,15 @@ void openBatchProfile(BuildContext context, Batch data) {
             color: Colors.indigo,
             title: "Assigned Personnel",
             children: [
-              if (data.coordinatorName != null)
+              if (data.coordinator?.name != null)
                 detailCard(
                   context,
                   title: "Coordinator",
-                  name: data.coordinatorName ?? "-",
+                  name: data.coordinator?.name ?? "-",
                   id: data.coordinatorId ?? "-",
                   onTap: () {},
                 ),
-              if (data.coordinatorName == null)
+              if (data.coordinator?.name == null)
                 simpleText("No coordinator assigned"),
               const SizedBox(height: 6),
               EditableDetailCard(
@@ -1275,5 +1352,416 @@ Color getStatusColor(String? status) {
       return Colors.red;
     default:
       return Colors.grey;
+  }
+}
+
+String formatDate(DateTime dateTime) {
+  return "${dateTime.day.toString().padLeft(2, '0')}/"
+      "${dateTime.month.toString().padLeft(2, '0')}/"
+      "${dateTime.year}";
+}
+
+String formatTime(DateTime dt) {
+  final hour = dt.hour > 12 ? dt.hour - 12 : dt.hour;
+  final ampm = dt.hour >= 12 ? "PM" : "AM";
+  return "$hour:${dt.minute.toString().padLeft(2, '0')} $ampm";
+}
+
+// ── Status badge ──────────────────────────────────────────────────────
+class StatusBadge extends StatelessWidget {
+  final String status;
+  final Color color;
+
+  const StatusBadge({required this.status, required this.color});
+
+  String get _label {
+    final words =
+        status.split('_').map((w) => w[0].toUpperCase() + w.substring(1));
+    return words.join(' ');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 5,
+            height: 5,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            _label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Name cell (Student / Teacher) ─────────────────────────────────────
+class NameCell extends StatelessWidget {
+  final String label;
+  final String name;
+  final Color textPrimary;
+  final Color textSecondary;
+
+  const NameCell({
+    required this.label,
+    required this.name,
+    required this.textPrimary,
+    required this.textSecondary,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: textSecondary,
+            letterSpacing: 0.6,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          name,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: textPrimary,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ADD SESSION FAB
+// ═══════════════════════════════════════════════════════════════════════
+class AddSessionFAB extends StatelessWidget {
+  final SessionController c;
+  const AddSessionFAB({required this.c});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppFAB(
+      label: "Add Session",
+      icon: Icons.add_rounded,
+      onPressed: () => _showAddDialog(context),
+    );
+  }
+
+  void _showAddDialog(BuildContext context) {
+    AppFormDialog.show(
+        context: context,
+        title: Obx(() => Text(
+              c.selectedType.value == "session"
+                  ? "Add Class Session"
+                  : "Add Meet Session",
+            )),
+        onSubmit: () {},
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.75,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// 🔹 TYPE TOGGLE
+                  Obx(() => Row(
+                        children: [
+                          Expanded(
+                            child: RadioListTile(
+                              dense: true,
+                              title: const Text('Class Session'),
+                              value: "session",
+                              groupValue: c.selectedType.value,
+                              onChanged: (value) =>
+                                  c.selectedType.value = value!,
+                            ),
+                          ),
+                          Expanded(
+                            child: RadioListTile(
+                              dense: true,
+                              title: const Text('Meet'),
+                              value: "meet",
+                              groupValue: c.selectedType.value,
+                              onChanged: (value) =>
+                                  c.selectedType.value = value!,
+                            ),
+                          ),
+                        ],
+                      )),
+
+                  const SizedBox(height: 10),
+
+                  /// 🔹 FORM SWITCH
+                  Obx(() {
+                    if (c.selectedType.value == 'session') {
+                      return _ClassSessionForm(c: c);
+                    }
+                    if (c.selectedType.value == 'meet') {
+                      return _MeetSessionForm(c: c);
+                    }
+                    return const SizedBox();
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ]);
+  }
+}
+
+// ── Class session form ────────────────────────────────────────────────
+class _ClassSessionForm extends StatelessWidget {
+  final SessionController c;
+  const _ClassSessionForm({required this.c});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomWidgets().labelWithAsterisk('Select Student', required: true),
+        const SizedBox(height: 8),
+        CustomWidgets().customDropdownField(
+          context: context,
+          hint: 'Select Student',
+          items: c.teacherList,
+          onChanged: (p0) => c.selectedTeacher.value = p0.name,
+        ),
+        const SizedBox(height: 12),
+        CustomWidgets()
+            .labelWithAsterisk('Search and Select Teacher', required: true),
+        const SizedBox(height: 8),
+        CustomWidgets().customDropdownField(
+          context: context,
+          hint: 'Select Teacher',
+          items: c.teacherList,
+          onChanged: (p0) => c.selectedTeacher.value = p0.name,
+        ),
+        const SizedBox(height: 12),
+        CustomWidgets().labelWithAsterisk('Teacher Salary'),
+        const SizedBox(height: 8),
+        CustomWidgets().dropdownStyledTextField(
+            context: context,
+            hint: 'Teacher salary',
+            controller: c.salaryController),
+        const SizedBox(height: 12),
+        CustomWidgets().labelWithAsterisk('Session Date', required: true),
+        const SizedBox(height: 8),
+        CustomWidgets().customDatePickerField(
+            context: context,
+            controller: c.dateController,
+            selectedDate: c.selectedDate),
+        const SizedBox(height: 12),
+        CustomWidgets().labelWithAsterisk('Session Time', required: true),
+        const SizedBox(height: 8),
+        CustomWidgets().timePickerStyledField(
+            context: context,
+            controller: c.timeController,
+            selectedTime: c.selectedTime),
+        const SizedBox(height: 12),
+        CustomWidgets().labelWithAsterisk('Select Duration', required: true),
+        const SizedBox(height: 8),
+        CustomWidgets().durationPickerStyledField(
+            context: context,
+            hint: 'Select Duration',
+            controller: c.durationController,
+            selectedDuration: c.selectedDuration),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+}
+
+// ── Meet session form ─────────────────────────────────────────────────
+class _MeetSessionForm extends StatelessWidget {
+  final SessionController c;
+  const _MeetSessionForm({required this.c});
+
+  Widget _selectAllRow(
+      String label, RxBool allToggle, RxList selected, List all) {
+    return Row(
+      children: [
+        Obx(() => Checkbox(
+              value: allToggle.value,
+              onChanged: (val) {
+                if (val == null) return;
+                allToggle.value = val;
+                val ? selected.assignAll(all) : selected.clear();
+              },
+            )),
+        Text(label, style: const TextStyle(fontSize: 13)),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomWidgets().labelWithAsterisk('Meet Title', required: true),
+        const SizedBox(height: 8),
+        CustomWidgets().dropdownStyledTextField(
+            context: context,
+            hint: 'Meet title',
+            controller: c.meetTitleController),
+        const SizedBox(height: 14),
+        const Text("Participants",
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const SizedBox(height: 10),
+        _selectAllRow('Select All Mentors', c.selectAllMentors,
+            c.selectedMentors, c.mentorsList),
+        CustomWidgets().customMultiDropdownField(
+            context: context,
+            hint: 'Select Mentors (${c.mentorsList.length} available)',
+            items: c.mentorsList,
+            selectedItems: c.selectedMentors),
+        const SizedBox(height: 10),
+        _selectAllRow('Select All Teachers', c.selectAllTeachers,
+            c.selectedTeachers, c.teacherList),
+        CustomWidgets().customMultiDropdownField(
+            context: context,
+            hint: 'Select Teachers (${c.teacherList.length} available)',
+            items: c.teacherList,
+            selectedItems: c.selectedTeachers),
+        const SizedBox(height: 10),
+        _selectAllRow('Select All Students', c.selectAllStudents,
+            c.selectedStudents, c.studentsList),
+        CustomWidgets().customMultiDropdownField(
+            context: context,
+            hint: 'Select Students (${c.studentsList.length} available)',
+            items: c.studentsList,
+            selectedItems: c.selectedStudents),
+        const SizedBox(height: 10),
+        _selectAllRow('Select All Coordinators', c.selectAllCoordinators,
+            c.selectedCoordinators, c.coordinatorsList),
+        CustomWidgets().customMultiDropdownField(
+            context: context,
+            hint:
+                'Select Coordinators (${c.coordinatorsList.length} available)',
+            items: c.coordinatorsList,
+            selectedItems: c.selectedCoordinators),
+        const SizedBox(height: 10),
+        _selectAllRow('Select All Advisors', c.selectAllAdvisors,
+            c.selectedAdvisors, c.advisorsList),
+        CustomWidgets().customMultiDropdownField(
+            context: context,
+            hint: 'Select Advisors (${c.advisorsList.length} available)',
+            items: c.advisorsList,
+            selectedItems: c.selectedAdvisors),
+        const SizedBox(height: 10),
+        _selectAllRow('Select All Other Users', c.selectAllOtherUsers,
+            c.selectedOtherUsers, c.otherUsersList),
+        CustomWidgets().customMultiDropdownField(
+            context: context,
+            hint: 'Select Other Users (${c.otherUsersList.length} available)',
+            items: c.otherUsersList,
+            selectedItems: c.selectedOtherUsers),
+        const SizedBox(height: 14),
+        const Text("Session Details",
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const SizedBox(height: 10),
+        CustomWidgets().labelWithAsterisk('Session Date', required: true),
+        const SizedBox(height: 8),
+        CustomWidgets().customDatePickerField(
+            context: context,
+            controller: c.dateController,
+            selectedDate: c.selectedDate),
+        const SizedBox(height: 12),
+        CustomWidgets().labelWithAsterisk('Start Time', required: true),
+        const SizedBox(height: 8),
+        CustomWidgets().durationPickerStyledField(
+            context: context,
+            controller: c.timeController,
+            selectedDuration: c.selectedDuration),
+        const SizedBox(height: 12),
+        CustomWidgets().labelWithAsterisk('Description', required: true),
+        const SizedBox(height: 8),
+        CustomWidgets().dropdownStyledTextField(
+            context: context,
+            hint: 'Description',
+            controller: c.descriptionController),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// EMPTY STATE
+// ═══════════════════════════════════════════════════════════════════════
+class EmptyState extends StatelessWidget {
+  final ColorScheme cs;
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  const EmptyState({
+    required this.cs,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: cs.primaryContainer.withOpacity(0.35),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 38,
+              color: cs.primary.withOpacity(0.6),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: cs.onSurface.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            subtitle,
+            style:
+                TextStyle(fontSize: 13, color: cs.onSurface.withOpacity(0.4)),
+          ),
+        ],
+      ),
+    );
   }
 }

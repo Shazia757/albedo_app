@@ -1,5 +1,5 @@
 class Mentor {
-    final String id;
+  final String id;
   final String name;
   String? email;
   String? imageUrl;
@@ -14,6 +14,7 @@ class Mentor {
   String? pincode;
   String? address;
   String? timezone;
+  final String? coordinatorId;
   String? prefLanguage;
   String? accountNumber;
   String? accountHolder;
@@ -23,29 +24,30 @@ class Mentor {
   String? bankBranch;
   int? salary;
 
-  Mentor(
-      {required this.name,
-      required this.id,
-      required this.joinedAt,
-      this.email,
-      this.gender,
-      this.status,
-      this.phone,
-      this.imageUrl,
-      this.whatsapp,
-      this.timezone,
-      this.salary,
-      this.accountHolder,
-      this.accountNumber,
-      this.accountType,
-      this.address,
-      this.bankBranch,
-      this.bankName,
-      this.dob,
-      this.pincode,
-      this.place,
-      this.prefLanguage,
-      this.qualification,
-      this.upiId,
-      });
+  Mentor({
+    required this.name,
+    required this.id,
+    required this.joinedAt,
+    this.email,
+    this.gender,
+    this.status,
+    this.phone,
+    this.imageUrl,
+    this.coordinatorId,
+    this.whatsapp,
+    this.timezone,
+    this.salary,
+    this.accountHolder,
+    this.accountNumber,
+    this.accountType,
+    this.address,
+    this.bankBranch,
+    this.bankName,
+    this.dob,
+    this.pincode,
+    this.place,
+    this.prefLanguage,
+    this.qualification,
+    this.upiId,
+  });
 }

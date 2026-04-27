@@ -7,6 +7,7 @@ import 'package:albedo_app/model/settings/notification_model.dart';
 import 'package:albedo_app/model/settings/rating_value_model.dart';
 import 'package:albedo_app/model/settings/recommendations_model.dart';
 import 'package:albedo_app/model/support_model.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,7 +23,8 @@ enum VisibleTo {
 class SettingsController extends GetxController {
   RxBool isLoading = true.obs;
   var selectedTab = 0.obs;
-
+  final RxString feeType = "percentage".obs;
+  final RxString status = "inactive".obs;
   var syllabusList = <String>[].obs;
   var syllabus = [].obs;
   var course = [].obs;
@@ -32,6 +34,12 @@ class SettingsController extends GetxController {
   var standard = [].obs;
   var referralSource = [].obs;
   var assessmentAttentionQn = <String>[].obs;
+var restrictedUsers = <DeadlineConfig>[
+  DeadlineConfig(role: 'Teacher', type: 'hours', value: 48),
+  DeadlineConfig(role: 'Mentor', type: 'dayOfMonth', value: 2),
+  DeadlineConfig(role: 'Coordinator', type: 'dayOfMonth', value: 3),
+  DeadlineConfig(role: 'Advisor', type: 'dayOfMonth', value: 3),
+].obs;
   var users = [].obs;
   var notifications = <Notifications>[].obs;
   var banners = <Banners>[].obs;

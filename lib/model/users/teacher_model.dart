@@ -8,7 +8,7 @@ class Teacher {
 
   final String status;
   final String gender;
-  String? type; 
+  String? type;
   final DateTime joinedAt;
   String? phone;
   String? whatsapp;
@@ -33,6 +33,8 @@ class Teacher {
   double? balance;
   double? totalSessions;
   double? totalHours;
+  final String? coordinatorId;
+  final String? mentorId;
 
   Teacher(
       {required this.id,
@@ -47,6 +49,8 @@ class Teacher {
       this.whatsapp,
       this.totalStudents,
       this.totalPackages,
+      this.coordinatorId,
+      this.mentorId,
       this.totalSessions,
       this.totalHours,
       this.salary,

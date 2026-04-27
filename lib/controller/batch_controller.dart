@@ -1,12 +1,16 @@
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum SortType { newest, oldest, name }
 
 class BatchController extends GetxController {
+  final AuthController auth = Get.find();
+
   RxBool isSearching = false.obs;
 
   var batches = <Batch>[].obs;
@@ -136,6 +140,31 @@ class BatchController extends GetxController {
     batchModeController.text = batch.mode.toString();
     batchNameController.text = batch.batchName.toString();
     mentorController.text = batch.mentorName.toString();
+  }
+
+  void handleDelete(BuildContext context, Batch batch) {
+    final user = auth.activeUser;
+
+    if (user?.role == "coordinator") {
+      CustomWidgets().showDeleteDialog(
+        context: context,
+        text: "Do you want to request deletion of this batch?",
+        onConfirm: () => requestDelete(batch.id!),
+      );
+    } else {
+      CustomWidgets().showDeleteDialog(
+        context: context,
+        text: "Are you sure you want to delete this batch permanently?",
+        onConfirm: () => delete(batch.id!),
+      );
+    }
+  }
+
+  void requestDelete(String batchId) {
+    print("Request sent to delete batch: $batchId");
+
+    // TODO:
+    // Call API → create approval request
   }
 
   delete(String id) {

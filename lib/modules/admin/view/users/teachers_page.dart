@@ -11,6 +11,7 @@ import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class TeachersPage extends StatelessWidget {
@@ -106,86 +107,89 @@ class TeachersPage extends StatelessWidget {
                       return const Center(child: Text("No teachers found"));
                     }
 
-                    return ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        itemCount: c.filteredTeachers.length,
-                        itemBuilder: (context, index) {
-                          final teacher = c.filteredTeachers[index];
-                          final cs = Theme.of(context).colorScheme;
+                    return LayoutBuilder(builder: (context, constraints) {
+                      int crossAxisCount = 1;
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 700),
-                                child: PremiumInfoCard(
-                                  id: teacher.id ?? "",
-                                  title: teacher?.name ?? "",
-                                  subtitle: teacher?.email ?? "",
-                                  status: teacher?.status,
-                                  statusColor: getStatusColor(teacher?.status),
-                                  footerText:
-                                      "Joined • ${teacher?.joinedAt.toString().substring(0, 16)}",
-                                  extraInfo: teacher?.phone != null
-                                      ? "Contact • ${teacher!.phone}"
-                                      : null,
-                                  onTap: () {
-                                    if (teacher != null) {
-                                      openTeacherProfile(
-                                        context,
-                                        teacher,
-                                        toUser: (p0) => teacherToUser(teacher),
-                                      );
-                                    }
-                                  },
-                                  actions: [
-                                    InfoAction(
-                                      icon: Icons.dashboard,
-                                      color: cs.primary,
-                                      onTap: () {
-                                        final auth = Get.find<AuthController>();
-                                        final user = teacherToUser(teacher);
+                      if (constraints.maxWidth > 1200) {
+                        crossAxisCount = 3;
+                      } else if (constraints.maxWidth > 700) {
+                        crossAxisCount = 2;
+                      }
 
-                                        auth.startImpersonation(user);
-                                        Get.offAll(() => const Root());
-                                      },
-                                    ),
-                                    InfoAction(
-                                      icon: Icons.edit,
-                                      color: cs.secondary,
-                                      onTap: () {
-                                        if (teacher != null) {
-                                          c.loadTeachers(teacher);
-                                          editTeacher(context);
-                                        }
-                                      },
-                                    ),
-                                    InfoAction(
-                                        icon: Icons.block,
-                                        color: cs.error,
-                                        onTap: () => CustomWidgets()
-                                                .showDeactivateDialog(
-                                              text:
-                                                  'Are you sure you want to deactivate this student permanently?',
-                                              context: context,
-                                              onConfirm: () =>
-                                                  c.deactivate(teacher.id!),
-                                            )),
-                                    InfoAction(
-                                      icon: Icons.delete,
-                                      color: cs.error,
-                                      onTap: () =>
-                                          CustomWidgets().showDeleteDialog(
-                                        text:
-                                            'Are you sure you want to delete this teacher permanently?',
-                                        context: context,
-                                        onConfirm: () => c.delete(teacher!.id),
+                      return MasonryGridView.count(
+                          crossAxisCount: crossAxisCount,
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          itemCount: c.filteredTeachers.length,
+                          itemBuilder: (context, index) {
+                            final teacher = c.filteredTeachers[index];
+                            final cs = Theme.of(context).colorScheme;
+
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              child: ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 700),
+                                  child: PremiumInfoCard(
+                                    id: teacher.id ?? "",
+                                    title: teacher?.name ?? "",
+                                    subtitle: teacher?.email ?? "",
+                                    status: teacher?.status,
+                                    statusColor:
+                                        getStatusColor(teacher?.status),
+                                    footerText:
+                                        "Joined • ${teacher?.joinedAt.toString().substring(0, 16)}",
+                                    extraInfo: teacher?.phone != null
+                                        ? "Contact • ${teacher!.phone}"
+                                        : null,
+                                    onTap: () {
+                                      if (teacher != null) {
+                                        openTeacherProfile(
+                                          context,
+                                          teacher,
+                                          toUser: (p0) =>
+                                              teacherToUser(teacher),
+                                        );
+                                      }
+                                    },
+                                    actions: [
+                                      InfoAction(
+                                        icon: Icons.dashboard,
+                                        color: cs.primary,
+                                        onTap: () {
+                                          final auth =
+                                              Get.find<AuthController>();
+                                          final user = teacherToUser(teacher);
+
+                                          auth.startImpersonation(user);
+                                          Get.offAll(() => const Root());
+                                        },
                                       ),
-                                    ),
-                                  ],
-                                )),
-                          );
-                        });
+                                      InfoAction(
+                                        icon: Icons.edit,
+                                        color: cs.secondary,
+                                        onTap: () {
+                                          if (teacher != null) {
+                                            c.loadTeachers(teacher);
+                                            editTeacher(context);
+                                          }
+                                        },
+                                      ),
+                                      InfoAction(
+                                          icon: Icons.block,
+                                          color: cs.error,
+                                          onTap: () => c.handleDeactivate(
+                                              context, teacher)),
+                                      InfoAction(
+                                          icon: Icons.delete,
+                                          color: cs.error,
+                                          onTap: () =>
+                                              c.handleDelete(context, teacher)),
+                                    ],
+                                  )),
+                            );
+                          });
+                    });
                   }),
                 ),
               ],

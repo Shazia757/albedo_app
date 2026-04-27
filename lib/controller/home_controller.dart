@@ -1,3 +1,4 @@
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,6 +9,7 @@ class HomeController extends GetxController {
   var teacherCount = 0.obs;
   var coordinatorCount = 0.obs;
   var mentorCount = 0.obs;
+  
 
   var studentData = <double>[].obs;
   var teacherData = <double>[].obs;
@@ -297,4 +299,5 @@ class HomeController extends GetxController {
 
     expenseRatio.value = (totalExpense.value / totalIncome.value) * 100;
   }
+  
 }

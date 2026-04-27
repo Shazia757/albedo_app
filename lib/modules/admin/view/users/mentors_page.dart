@@ -137,12 +137,14 @@ class MentorsPage extends StatelessWidget {
                                         InfoAction(
                                           icon: Icons.dashboard,
                                           color: cs.primary,
-                                          onTap: () {   final auth =
-                                              Get.find<AuthController>();
-                                          final user = mentorToUser(mentor);
+                                          onTap: () {
+                                            final auth =
+                                                Get.find<AuthController>();
+                                            final user = mentorToUser(mentor);
 
-                                          auth.startImpersonation(user);
-                                          Get.offAll(() => const Root());},
+                                            auth.startImpersonation(user);
+                                            Get.offAll(() => const Root());
+                                          },
                                         ),
                                         InfoAction(
                                           icon: Icons.edit,
@@ -157,26 +159,13 @@ class MentorsPage extends StatelessWidget {
                                         InfoAction(
                                             icon: Icons.block,
                                             color: cs.error,
-                                            onTap: () => CustomWidgets()
-                                                    .showDeactivateDialog(
-                                                  text:
-                                                      'Are you sure you want to deactivate this mentor permanently?',
-                                                  context: context,
-                                                  onConfirm: () =>
-                                                      c.deactivate(mentor.id!),
-                                                )),
+                                            onTap: () => c.handleDeactivate(
+                                                context, mentor)),
                                         InfoAction(
-                                          icon: Icons.delete,
-                                          color: cs.error,
-                                          onTap: () =>
-                                              CustomWidgets().showDeleteDialog(
-                                            text:
-                                                'Are you sure you want to delete this mentor permanently?',
-                                            context: context,
-                                            onConfirm: () =>
-                                                c.delete(mentor!.id),
-                                          ),
-                                        ),
+                                            icon: Icons.delete,
+                                            color: cs.error,
+                                            onTap: () => c.handleDelete(
+                                                context, mentor)),
                                       ],
                                     ),
                                   ),

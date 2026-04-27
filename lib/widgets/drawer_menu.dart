@@ -1,3 +1,4 @@
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/modules/admin/view/profile_page.dart';
 import 'package:albedo_app/modules/admin/view/users/advisors_page.dart';
@@ -8,7 +9,7 @@ import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:albedo_app/modules/admin/view/users/mentors_page.dart';
 import 'package:albedo_app/modules/admin/view/users/others_page.dart';
 import 'package:albedo_app/modules/admin/view/payment_page.dart';
-import 'package:albedo_app/modules/admin/view/report_page.dart';
+import 'package:albedo_app/modules/admin/view/report/report_page.dart';
 import 'package:albedo_app/modules/admin/view/sessions/session_page.dart';
 import 'package:albedo_app/modules/admin/view/settings/settings_page.dart';
 import 'package:albedo_app/modules/admin/view/users/students_page.dart';
@@ -28,12 +29,12 @@ class DrawerMenu extends StatelessWidget {
     final isDesktop = MediaQuery.of(context).size.width > 800;
 
     final sidebar = Container(
-      width: 260, // ✅ upgraded width
+      width: 260,
       decoration: BoxDecoration(
         color: cs.surface,
         border: Border(
           right: BorderSide(
-            color: cs.outline.withOpacity(0.08), // ✅ depth separation
+            color: cs.outline.withOpacity(0.08),
           ),
         ),
       ),
@@ -43,62 +44,79 @@ class DrawerMenu extends StatelessWidget {
 
           /// 🔹 MENU LIST
           Expanded(
-            child: Obx(
-              () => ListView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                children: [
-                  _menuItem(
-                    context,
-                    Icons.home,
-                    "Home",
-                    active: c.selectedIndex.value == 0,
-                    onPressed: () {
-                      c.setIndex(0);
-                      c.selectedParentIndex.value = -1;
-                      c.selectedSubIndex.value = -1;
-                      Get.back();
-                      Get.offAll(() => HomeView());
-                    },
-                  ),
-                  DrawerExpansionMenu(
-                    title: 'Sessions',
-                    icon: Icons.video_collection,
-                    parentIndex: 1,
-                    selectedParentIndex: c.selectedParentIndex,
-                    selectedSubIndex: c.selectedSubIndex,
-                    children: [
-                      DrawerSubItem(
-                        title: 'Sessions',
-                        index: 10,
-                        onTap: () => Get.offAll(SessionPage()),
-                      ),
-                      DrawerSubItem(
-                        title: 'Batches',
-                        index: 11,
-                        onTap: () => Get.offAll(BatchesListPage()),
-                      ),
-                    ],
-                  ),
-                  DrawerExpansionMenu(
-                    title: 'Users',
-                    icon: Icons.people,
-                    parentIndex: 7,
-                    selectedParentIndex: c.selectedParentIndex,
-                    selectedSubIndex: c.selectedSubIndex,
-                    children: [
-                      DrawerSubItem(
-                          title: "Students",
-                          index: 20,
-                          onTap: () => Get.offAll(StudentsPage())),
-                      DrawerSubItem(
-                          title: "Teachers",
-                          index: 21,
-                          onTap: () => Get.offAll(TeachersPage())),
-                      DrawerSubItem(
-                          title: "Mentors",
-                          index: 22,
-                          onTap: () => Get.offAll(MentorsPage())),
+            child: Obx(() {
+              final auth = Get.find<AuthController>();
+
+              final user = auth.activeUser;
+              if (user == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final role = auth.activeUser?.role;
+              final isAdmin = role == "admin";
+
+              final List<Widget> menuItems = [];
+
+              menuItems.add(
+                _menuItem(
+                  context,
+                  Icons.home,
+                  "Home",
+                  active: c.selectedIndex.value == 0,
+                  onPressed: () {
+                    c.setIndex(0);
+                    c.selectedParentIndex.value = -1;
+                    c.selectedSubIndex.value = -1;
+                    Get.back();
+                    Get.offAll(() => HomeView());
+                  },
+                ),
+              );
+
+              /// ✅ SESSIONS
+              menuItems.add(
+                DrawerExpansionMenu(
+                  title: 'Sessions',
+                  icon: Icons.video_collection,
+                  parentIndex: 1,
+                  selectedParentIndex: c.selectedParentIndex,
+                  selectedSubIndex: c.selectedSubIndex,
+                  children: [
+                    DrawerSubItem(
+                      title: 'Sessions',
+                      index: 10,
+                      onTap: () => Get.offAll(SessionPage()),
+                    ),
+                    DrawerSubItem(
+                      title: 'Batches',
+                      index: 11,
+                      onTap: () => Get.offAll(BatchesListPage()),
+                    ),
+                  ],
+                ),
+              );
+
+              /// ✅ USERS (filtered)
+              menuItems.add(
+                DrawerExpansionMenu(
+                  title: 'Users',
+                  icon: Icons.people,
+                  parentIndex: 7,
+                  selectedParentIndex: c.selectedParentIndex,
+                  selectedSubIndex: c.selectedSubIndex,
+                  children: [
+                    DrawerSubItem(
+                        title: "Students",
+                        index: 20,
+                        onTap: () => Get.offAll(StudentsPage())),
+                    DrawerSubItem(
+                        title: "Teachers",
+                        index: 21,
+                        onTap: () => Get.offAll(TeachersPage())),
+                    DrawerSubItem(
+                        title: "Mentors",
+                        index: 22,
+                        onTap: () => Get.offAll(MentorsPage())),
+                    if (isAdmin) ...[
                       DrawerSubItem(
                           title: "Coordinators",
                           index: 23,
@@ -112,20 +130,30 @@ class DrawerMenu extends StatelessWidget {
                           index: 25,
                           onTap: () => Get.offAll(OthersPage())),
                     ],
-                  ),
-                  _menuItem(
-                    context,
-                    Icons.group,
-                    "Batch",
-                    active: c.selectedIndex.value == 2,
-                    onPressed: () {
-                      c.setIndex(2);
-                      c.selectedParentIndex.value = -1;
-                      c.selectedSubIndex.value = -1;
-                      Get.back();
-                      Get.offAll(() => BatchesPage());
-                    },
-                  ),
+                  ],
+                ),
+              );
+
+              /// ✅ BATCH
+              menuItems.add(
+                _menuItem(
+                  context,
+                  Icons.group,
+                  "Batch",
+                  active: c.selectedIndex.value == 2,
+                  onPressed: () {
+                    c.setIndex(2);
+                    c.selectedParentIndex.value = -1;
+                    c.selectedSubIndex.value = -1;
+                    Get.back();
+                    Get.offAll(() => BatchesPage());
+                  },
+                ),
+              );
+
+              /// 🔥 INSERT PAYMENTS ONLY FOR ADMIN (after batch)
+              if (isAdmin) {
+                menuItems.add(
                   DrawerExpansionMenu(
                     title: 'Payments',
                     icon: Icons.payment,
@@ -145,32 +173,46 @@ class DrawerMenu extends StatelessWidget {
                               PaymentPage(type: PaymentUserType.teacher))),
                     ],
                   ),
-                  _menuItem(
-                    context,
-                    Icons.bar_chart,
-                    "Reports",
-                    active: c.selectedIndex.value == 4,
-                    onPressed: () {
-                      c.setIndex(4);
-                      c.selectedParentIndex.value = -1;
-                      c.selectedSubIndex.value = -1;
-                      Get.back();
-                      Get.offAll(() => ReportsPage());
-                    },
-                  ),
-                  _menuItem(
-                    context,
-                    Icons.support_agent,
-                    "Supports",
-                    active: c.selectedIndex.value == 5,
-                    onPressed: () {
-                      c.setIndex(5);
-                      c.selectedParentIndex.value = -1;
-                      c.selectedSubIndex.value = -1;
-                      Get.back();
-                      Get.offAll(() => SupportsPage());
-                    },
-                  ),
+                );
+              }
+
+              /// ✅ REPORTS
+              menuItems.add(
+                _menuItem(
+                  context,
+                  Icons.bar_chart,
+                  "Reports",
+                  active: c.selectedIndex.value == 4,
+                  onPressed: () {
+                    c.setIndex(4);
+                    c.selectedParentIndex.value = -1;
+                    c.selectedSubIndex.value = -1;
+                    Get.back();
+                    Get.offAll(() => ReportsPage());
+                  },
+                ),
+              );
+
+              /// ✅ SUPPORT
+              menuItems.add(
+                _menuItem(
+                  context,
+                  Icons.support_agent,
+                  "Supports",
+                  active: c.selectedIndex.value == 5,
+                  onPressed: () {
+                    c.setIndex(5);
+                    c.selectedParentIndex.value = -1;
+                    c.selectedSubIndex.value = -1;
+                    Get.back();
+                    Get.offAll(() => SupportsPage());
+                  },
+                ),
+              );
+
+              /// 🔥 SETTINGS ONLY FOR ADMIN (always last)
+              if (isAdmin) {
+                menuItems.add(
                   _menuItem(
                     context,
                     Icons.settings,
@@ -184,9 +226,15 @@ class DrawerMenu extends StatelessWidget {
                       Get.offAll(() => SettingsPage());
                     },
                   ),
-                ],
-              ),
-            ),
+                );
+              }
+
+              return ListView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                children: menuItems,
+              );
+            }),
           ),
 
           /// 🔻 PROFILE SECTION (NEW)
@@ -202,6 +250,7 @@ class DrawerMenu extends StatelessWidget {
 
   Widget _header(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final auth = Get.find<AuthController>();
 
     return Container(
       width: double.infinity,
@@ -219,7 +268,7 @@ class DrawerMenu extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Admin Panel",
+                auth.activeUser?.name ?? '',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
@@ -227,7 +276,7 @@ class DrawerMenu extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                "admin@albedo.com",
+                auth.activeUser?.email ?? '',
                 style: TextStyle(
                   fontSize: 11,
                   color: cs.onSurface.withOpacity(0.6),

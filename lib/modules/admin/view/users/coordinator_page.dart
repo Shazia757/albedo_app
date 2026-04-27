@@ -171,6 +171,7 @@ class CoordinatorPage extends StatelessWidget {
                                                 coordinatorToUser(coordinator);
 
                                             auth.startImpersonation(user);
+
                                             Get.offAll(() => const Root());
                                           },
                                         ),

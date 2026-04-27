@@ -2,12 +2,9 @@ import 'package:albedo_app/config/color_schemes.dart';
 import 'package:albedo_app/config/text_theme.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/user_controller.dart';
-import 'package:albedo_app/modules/admin/view/sessions/batch_session_page.dart';
-import 'package:albedo_app/modules/admin/view/sessions/session_page.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:albedo_app/common_views/login_page.dart';
-import 'package:albedo_app/modules/admin/view/users/students_page.dart';
-import 'package:albedo_app/modules/admin/view/users/teachers_page.dart';
+import 'package:albedo_app/modules/admin/view/report/report_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -42,6 +39,6 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         themeMode: ThemeMode.light,
-        home: isLoggedIn ? TeachersPage() : TeachersPage());
+        home: isLoggedIn ? ReportsPage() : LoginView());
   }
 }

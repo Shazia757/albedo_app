@@ -5,6 +5,7 @@ import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class PaymentPage extends StatelessWidget {
@@ -20,281 +21,518 @@ class PaymentPage extends StatelessWidget {
 
   final PaymentController c = Get.put(PaymentController());
 
+  bool get _isStudent => type == PaymentUserType.student;
+
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final isDesktop = Responsive.isDesktop(context);
-    final isStudent = type == PaymentUserType.student;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
-         appBar: const CustomAppBar(),
-
+      appBar: const CustomAppBar(),
+      backgroundColor: cs.surfaceContainerLowest,
       drawer: isDesktop ? null : const DrawerMenu(),
-      body: Column(
+      body: Row(
         children: [
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: CustomWidgets().premiumSearch(
-              context,
-              hint: isStudent ? "Search students..." : "Search teachers...",
-              onChanged: (p0) => c.searchQuery.value = p0,
-            ),
-          ),
-          _tabs(),
+          if (isDesktop) const DrawerMenu(),
           Expanded(
-            child: Obx(() => ListView.builder(
-                  // padding: const EdgeInsets.all(16),
-                  itemCount: isStudent
-                      ? c.filteredStudentPayments.length
-                      : c.filteredTeacherPayments.length,
-                  itemBuilder: (_, i) => _card(
-                    context,
-                    (type == PaymentUserType.student)
-                        ? c.filteredStudentPayments[i]
-                        : null,
-                    (type == PaymentUserType.teacher)
-                        ? c.filteredTeacherPayments[i]
-                        : null,
-                  ),
-                )),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _tabs() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: Theme.of(Get.context!).colorScheme.onPrimary,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color:
-                  Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.05),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            )
-          ],
-        ),
-        child: Row(
-          children: [
-            _tabItem("Pending", 0),
-            _tabItem("Approved", 1),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _tabItem(String title, int index) {
-    return Expanded(
-      child: Obx(() {
-        final isSelected = c.selectedTab.value == index;
-
-        return GestureDetector(
-          onTap: () => c.selectedTab.value = index,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              gradient: isSelected
-                  ? const LinearGradient(
-                      colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
-                    )
-                  : null,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: isSelected
-                      ? Theme.of(Get.context!).colorScheme.onPrimary
-                      : Theme.of(Get.context!).colorScheme.outline,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        );
-      }),
-    );
-  }
-
-  Widget _card(
-      BuildContext context, StudentPaymentModel? s, TeacherPaymentModel? t) {
-    final isStudent = (type == PaymentUserType.student);
-
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(Get.context!).colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color:
-                  Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.06),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            )
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 42,
-                  width: 42,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Center(
-                    child: Text(
-                      isStudent ? s!.name[0] : t!.name[0],
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontSize: 20),
-                    ),
+                // ── Search ────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: CustomWidgets().premiumSearch(
+                    context,
+                    hint: _isStudent
+                        ? "Search students..."
+                        : "Search teachers...",
+                    onChanged: (v) => c.searchQuery.value = v,
                   ),
                 ),
-                const SizedBox(width: 14),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isStudent ? s!.name : t!.name,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12),
-                    ),
-                    Text(isStudent ? s!.id : t!.id,
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline,
-                            fontSize: 11)),
-                  ],
-                )
+
+                // ── Tabs ──────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: _Tabs(c: c),
+                ),
+
+                const SizedBox(height: 12),
+
+                // ── List ──────────────────────────────────────────────
+                Expanded(
+                  child: Obx(() {
+                    final students = c.filteredStudentPayments;
+                    final teachers = c.filteredTeacherPayments;
+                    final count =
+                        _isStudent ? students.length : teachers.length;
+
+                    if (count == 0) {
+                      return _EmptyState(cs: cs);
+                    }
+
+                    return LayoutBuilder(builder: (context, constraints) {
+                      int crossAxisCount = 1;
+
+                      if (constraints.maxWidth > 1200) {
+                        crossAxisCount = 3;
+                      } else if (constraints.maxWidth > 700) {
+                        crossAxisCount = 2;
+                      }
+                      return SizedBox.expand(
+                        child: MasonryGridView.count(
+                          crossAxisCount: crossAxisCount,
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                          itemCount: count,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          physics: const BouncingScrollPhysics(),
+                          itemBuilder: (_, i) => _PaymentCard(
+                            type: type,
+                            student: _isStudent ? students[i] : null,
+                            teacher: _isStudent ? null : teachers[i],
+                          ),
+                        ),
+                      );
+                    });
+                  }),
+                ),
               ],
             ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFEAF1FB), Color(0xFFF7F9FF)],
-                ),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Column(children: [
-                Text(
-                  isStudent
-                      ? "₹${s?.balance?.toStringAsFixed(2)}"
-                      : "₹${t?.balance?.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D6CDF),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text("Current Balance",
-                    style: TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .shadow
-                            .withOpacity(0.8),
-                        fontSize: 12)),
-                const SizedBox(height: 8),
-                Divider(
-                    color:
-                        Theme.of(context).colorScheme.outline.withOpacity(0.5)),
-                if (type == PaymentUserType.student)
-                  _fullTile(context, "₹${s?.admissionFee}", "Adm. Fee"),
-                const SizedBox(height: 8),
-                _rowTiles(
-                    context,
-                    isStudent ? s!.depTxns.toString() : t!.total.toString(),
-                    isStudent ? "Dep Txns" : "Total",
-                    isStudent ? s!.credTxns.toString() : t!.pending.toString(),
-                    isStudent ? "Cred Txns" : "Pending"),
-                const SizedBox(height: 8),
-                if (isStudent)
-                  _rowTiles(context, "₹${s?.deposited}", "Deposited",
-                      "₹${s?.creditLimit}", "Credit Limit"),
-                if (isStudent) const SizedBox(height: 8),
-                if (isStudent)
-                  _rowTiles(context, "₹${s?.depPending}", "Dep Pending",
-                      "₹${s?.creditAmount}", "Credit"),
-                if (!isStudent)
-                  _fullTile(context, "${t?.totalWithdawal}", 'Total Withdrawal')
-              ]),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _fullTile(BuildContext context, String value, String label) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(value,
-              style:
-                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-          const SizedBox(height: 4),
-          Text(label,
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.outline, fontSize: 12))
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _rowTiles(
-      BuildContext context, String v1, String l1, String v2, String l2) {
-    return Row(
+// ═══════════════════════════════════════════════════════════════════════
+// TABS — full width, underline style
+// ═══════════════════════════════════════════════════════════════════════
+class _Tabs extends StatelessWidget {
+  final PaymentController c;
+  const _Tabs({required this.c});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _smallTile(context, v1, l1)),
-        const SizedBox(width: 12),
-        Expanded(child: _smallTile(context, v2, l2)),
+        Row(
+          children: [
+            _TabItem(label: "Pending", index: 0, c: c, cs: cs),
+            _TabItem(label: "Approved", index: 1, c: c, cs: cs),
+          ],
+        ),
+        Divider(
+            height: 1,
+            thickness: 0.5,
+            color: cs.outlineVariant.withOpacity(0.4)),
       ],
     );
   }
+}
 
-  Widget _smallTile(BuildContext context, String value, String label) {
+class _TabItem extends StatelessWidget {
+  final String label;
+  final int index;
+  final PaymentController c;
+  final ColorScheme cs;
+
+  const _TabItem({
+    required this.label,
+    required this.index,
+    required this.c,
+    required this.cs,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final isOn = c.selectedTab.value == index;
+
+      return Expanded(
+        child: GestureDetector(
+          onTap: () => c.selectedTab.value = index,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: isOn ? cs.primary : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+            ),
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isOn ? FontWeight.w500 : FontWeight.w400,
+                color: isOn ? cs.primary : cs.onSurface.withOpacity(0.45),
+              ),
+            ),
+          ),
+        ),
+      );
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// PAYMENT CARD
+// ═══════════════════════════════════════════════════════════════════════
+class _PaymentCard extends StatelessWidget {
+  final PaymentUserType type;
+  final StudentPaymentModel? student;
+  final TeacherPaymentModel? teacher;
+
+  const _PaymentCard({
+    required this.type,
+    this.student,
+    this.teacher,
+  });
+
+  bool get _isStudent => type == PaymentUserType.student;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final name = _isStudent ? student!.name : teacher!.name;
+    final id = _isStudent ? student!.id : teacher!.id;
+    final bal = _isStudent ? student!.balance : teacher!.balance;
+    final accentColor = _isStudent ? cs.primary : cs.secondary;
+
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(12),
+        border:
+            Border.all(color: cs.outlineVariant.withOpacity(0.4), width: 0.5),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Tinted header ───────────────────────────────────────
+          Container(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            decoration: BoxDecoration(
+              color: accentColor.withOpacity(0.06),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Avatar
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    name.isNotEmpty ? name[0].toUpperCase() : "?",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: accentColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                // Name + ID
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: cs.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        id,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: cs.onSurface.withOpacity(0.45),
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Balance — right side, colored
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      "BALANCE",
+                      style: TextStyle(
+                        fontSize: 10,
+                        letterSpacing: 0.5,
+                        color: cs.onSurface.withOpacity(0.4),
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      "₹${bal?.toStringAsFixed(2) ?? "—"}",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        color: accentColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // ── Divider ─────────────────────────────────────────────
+          Divider(
+              height: 1,
+              thickness: 0.5,
+              color: cs.outlineVariant.withOpacity(0.4)),
+
+          // ── Stats grid ──────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: _isStudent
+                ? _StudentStats(s: student!, cs: cs)
+                : _TeacherStats(t: teacher!, cs: cs),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// STUDENT STATS GRID
+// ═══════════════════════════════════════════════════════════════════════
+class _StudentStats extends StatelessWidget {
+  final StudentPaymentModel s;
+  final ColorScheme cs;
+
+  const _StudentStats({required this.s, required this.cs});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cols = constraints.maxWidth < 340 ? 2 : 3;
+        final ratio = constraints.maxWidth < 340 ? 1.6 : 2.0;
+        return GridView.count(
+          crossAxisCount: cols,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: ratio,
+          children: [
+            _StatCell(label: "Adm. Fee", value: "₹${s.admissionFee}", cs: cs),
+            _StatCell(
+                label: "Deposited",
+                value: "₹${s.deposited}",
+                variant: _Variant.positive,
+                cs: cs),
+            _StatCell(
+                label: "Credit",
+                value: "₹${s.creditAmount}",
+                variant: _Variant.info,
+                cs: cs),
+            _StatCell(
+                label: "Dep Pending",
+                value: "₹${s.depPending}",
+                variant: _Variant.warning,
+                cs: cs),
+            _StatCell(
+                label: "Credit Limit", value: "₹${s.creditLimit}", cs: cs),
+            _StatCell(label: "Dep Txns", value: s.depTxns.toString(), cs: cs),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// TEACHER STATS GRID
+// ═══════════════════════════════════════════════════════════════════════
+class _TeacherStats extends StatelessWidget {
+  final TeacherPaymentModel t;
+  final ColorScheme cs;
+
+  const _TeacherStats({required this.t, required this.cs});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final ratio = constraints.maxWidth < 340 ? 1.6 : 2.0;
+      return GridView.count(
+        crossAxisCount: 3,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: ratio,
+        children: [
+          _StatCell(label: "Total", value: "₹${t.total}", cs: cs),
+          _StatCell(
+              label: "Pending",
+              value: "₹${t.pending}",
+              variant: _Variant.warning,
+              cs: cs),
+          _StatCell(label: "Withdrawal", value: "₹${t.totalWithdawal}", cs: cs),
+        ],
+      );
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// STAT CELL
+// ═══════════════════════════════════════════════════════════════════════
+enum _Variant { neutral, positive, warning, info }
+
+class _StatCell extends StatelessWidget {
+  final String label;
+  final String value;
+  final _Variant variant;
+  final ColorScheme cs;
+
+  const _StatCell({
+    required this.label,
+    required this.value,
+    this.variant = _Variant.neutral,
+    required this.cs,
+  });
+
+  Color _valueColor() {
+    switch (variant) {
+      case _Variant.positive:
+        return const Color(0xFF0F6E56);
+      case _Variant.warning:
+        return const Color(0xFF854F0B);
+      case _Variant.info:
+        return const Color(0xFF058DCE);
+      case _Variant.neutral:
+        return cs.onSurface;
+    }
+  }
+
+  Color _bgColor() {
+    switch (variant) {
+      case _Variant.positive:
+        return const Color(0xFF0F6E56).withOpacity(0.07);
+      case _Variant.warning:
+        return const Color(0xFFBA7517).withOpacity(0.07);
+      case _Variant.info:
+        return const Color(0xFF058DCE).withOpacity(0.06);
+      case _Variant.neutral:
+        return cs.surfaceContainerLowest;
+    }
+  }
+
+  Color _borderColor() {
+    switch (variant) {
+      case _Variant.positive:
+        return const Color(0xFF0F6E56).withOpacity(0.18);
+      case _Variant.warning:
+        return const Color(0xFFBA7517).withOpacity(0.2);
+      case _Variant.info:
+        return const Color(0xFF058DCE).withOpacity(0.18);
+      case _Variant.neutral:
+        return cs.outlineVariant.withOpacity(0.3);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: _bgColor(),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _borderColor(), width: 0.5),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(value,
-              style:
-                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-          const SizedBox(height: 4),
-          Text(label,
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.outline, fontSize: 11))
+          Text(
+            label,
+            style:
+                TextStyle(fontSize: 11, color: cs.onSurface.withOpacity(0.45)),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: _valueColor(),
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// EMPTY STATE
+// ═══════════════════════════════════════════════════════════════════════
+class _EmptyState extends StatelessWidget {
+  final ColorScheme cs;
+  const _EmptyState({required this.cs});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: cs.primaryContainer.withOpacity(0.35),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.receipt_long_outlined,
+              size: 36,
+              color: cs.primary.withOpacity(0.6),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "No payments found",
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: cs.onSurface.withOpacity(0.65),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            "Try adjusting your search or filter",
+            style:
+                TextStyle(fontSize: 13, color: cs.onSurface.withOpacity(0.4)),
+          ),
         ],
       ),
     );

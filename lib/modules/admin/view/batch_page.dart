@@ -9,6 +9,7 @@ import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class BatchesPage extends StatelessWidget {
@@ -97,69 +98,74 @@ class BatchesPage extends StatelessWidget {
                       return const Center(child: Text("No batches found"));
                     }
 
-                    return ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        itemCount: c.filteredBatches.length,
-                        itemBuilder: (context, index) {
-                          final batch = c.filteredBatches[index];
+                    return LayoutBuilder(builder: (context, constraints) {
+                      int crossAxisCount = 1;
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 700),
-                                child: PremiumInfoCard(
-                                  id: batch.id ?? "",
-                                  title: batch?.batchName ?? "",
-                                  subtitle: batch?.batchID ?? "",
-                                  status: batch?.status,
-                                  statusColor: getStatusColor(batch?.status),
-                                  extraInfo: "",
-                                  footerText: "",
-                                  onTap: () {
-                                    if (batch != null) {
-                                      {
-                                        openBatchProfile(
-                                          context,
-                                          batch,
-                                        );
-                                      }
-                                    }
-                                  },
-                                  actions: [
-                                    InfoAction(
-                                      icon: Icons.edit,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      onTap: () {
-                                        if (batch != null) {
-                                          c.loadBatches(batch);
-                                          editBatch(context);
+                      if (constraints.maxWidth > 1200) {
+                        crossAxisCount = 3;
+                      } else if (constraints.maxWidth > 700) {
+                        crossAxisCount = 2;
+                      }
+                      return MasonryGridView.count(
+                          crossAxisCount: crossAxisCount,
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          itemCount: c.filteredBatches.length,
+                          itemBuilder: (context, index) {
+                            final batch = c.filteredBatches[index];
+
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 700),
+                                  child: PremiumInfoCard(
+                                    id: batch.id ?? "",
+                                    title: batch?.batchName ?? "",
+                                    subtitle: batch?.batchID ?? "",
+                                    status: batch?.status,
+                                    statusColor: getStatusColor(batch?.status),
+                                    extraInfo: "",
+                                    footerText: "",
+                                    onTap: () {
+                                      if (batch != null) {
+                                        {
+                                          openBatchProfile(
+                                            context,
+                                            batch,
+                                          );
                                         }
-                                      },
-                                    ),
-                                    InfoAction(
-                                      icon: Icons.delete,
-                                      color:
-                                          Theme.of(context).colorScheme.error,
-                                      onTap: () =>
-                                          CustomWidgets().showDeleteDialog(
-                                        text:
-                                            'Are you sure you want to delete this batch permanently?',
-                                        context: context,
-                                        onConfirm: () =>
-                                            c.delete(batch!.batchID ?? ''),
+                                      }
+                                    },
+                                    actions: [
+                                      InfoAction(
+                                        icon: Icons.edit,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        onTap: () {
+                                          if (batch != null) {
+                                            c.loadBatches(batch);
+                                            editBatch(context);
+                                          }
+                                        },
                                       ),
-                                    ),
-                                  ],
+                                      InfoAction(
+                                          icon: Icons.delete,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error,
+                                          onTap: () =>
+                                              c.handleDelete(context, batch)),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        });
+                            );
+                          });
+                    });
                   }),
                 ),
               ],

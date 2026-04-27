@@ -1,4 +1,6 @@
+import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/responsive.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:flutter/material.dart';
 
 class InfoCard extends StatelessWidget {
@@ -341,7 +343,10 @@ class PremiumInfoCard extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
-                      _statusBadge(),
+                      StatusBadge(
+                        status: status ?? "-",
+                        color: statusColor.withOpacity(0.12),
+                      ),
                     ],
                   ),
 
@@ -415,23 +420,25 @@ class PremiumInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _statusBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        status ?? "-",
-        style: TextStyle(
-          color: statusColor,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
+  
+
+  // Widget _statusBadge() {
+  //   return Container(
+  //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+  //     decoration: BoxDecoration(
+  //       color: statusColor.withOpacity(0.12),
+  //       borderRadius: BorderRadius.circular(20),
+  //     ),
+  //     child: Text(
+  //       status ?? "-",
+  //       style: TextStyle(
+  //         color: statusColor,
+  //         fontSize: 11,
+  //         fontWeight: FontWeight.w600,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _actionBtn(InfoAction a) {
     return InkWell(
@@ -484,3 +491,60 @@ class InfoActionButton extends StatelessWidget {
     );
   }
 }
+
+class AppCard extends StatelessWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+  final Color? accentColor;
+
+  const AppCard({
+    super.key,
+    required this.child,
+    this.onTap,
+    this.accentColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final dividerColor = cs.outlineVariant.withOpacity(0.35);
+
+    return Material(
+      color: cs.surface,
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        hoverColor: cs.onSurface.withOpacity(0.03),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: dividerColor, width: 0.8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (accentColor != null)
+                Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: accentColor,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(10),
+                    ),
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: child,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

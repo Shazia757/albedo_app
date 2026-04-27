@@ -17,7 +17,6 @@ class Root extends GetView<AuthController> {
   Widget build(BuildContext context) {
     return Obx(() {
       final user = controller.activeUser;
-      print("ROOT sees user: $user");
 
       if (user == null) {
         return LoginView();
@@ -40,7 +39,7 @@ class Root extends GetView<AuthController> {
           page = MentorDashboard();
           break;
         case "coordinator":
-          page = CoordinatorDashboard();
+          page = HomeView();
           break;
         case "advisor":
           page = AdvisorDashboard();

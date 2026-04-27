@@ -1,3 +1,4 @@
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';

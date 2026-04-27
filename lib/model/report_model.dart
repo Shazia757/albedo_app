@@ -13,6 +13,7 @@ class PackageReportModel {
   final String course;
   final String advisor;
   final String status;
+  final String type;
   int? totalHour;
   double? amountPerHour;
   double? regFee;
@@ -21,7 +22,6 @@ class PackageReportModel {
   String? category;
   String? email;
   DateTime? admissionDate;
-  String? type; // Batch / TBA
   DateTime? joinedAt;
   int? totalSession;
 
@@ -29,6 +29,7 @@ class PackageReportModel {
   PackageReportModel({
     required this.studentName,
     required this.studentId,
+    required this.type,
     required this.contact,
     required this.whatsapp,
     required this.classHours,

@@ -1107,102 +1107,112 @@ class CustomWidgets {
         insetPadding: const EdgeInsets.symmetric(horizontal: 16),
         child: Form(
           key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              /// 🔷 HEADER
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      cs.primary,
-                      cs.secondary.withOpacity(0.4),
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(28),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    if (icon != null)
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(icon, color: Colors.white),
-                      ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: DefaultTextStyle(
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                        child: title,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Get.back(),
-                      icon: Icon(Icons.close, color: Colors.white),
-                    )
-                  ],
-                ),
-              ),
-
-              /// 🔷 BODY
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
-                child: Column(children: sections),
-              ),
-
-              /// 🔷 ACTIONS
-              if (isViewOnly == false)
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// 🔷 HEADER
                 Container(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
                   decoration: BoxDecoration(
-                    color: context.theme.colorScheme.outline.withOpacity(0.03),
+                    gradient: LinearGradient(
+                      colors: [
+                        cs.primary,
+                        cs.secondary.withOpacity(0.4),
+                      ],
+                    ),
                     borderRadius: const BorderRadius.vertical(
-                      bottom: Radius.circular(28),
+                      top: Radius.circular(28),
                     ),
                   ),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Get.back(),
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(
-                                color: context.theme.colorScheme.onSurface),
+                      if (icon != null)
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
                           ),
+                          child: Icon(icon, color: Colors.white),
+                        ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DefaultTextStyle(
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          child: title,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  context.theme.colorScheme.secondary),
-                          onPressed: () {
-                            if (!formKey.currentState!.validate()) return;
-                            onSubmit();
-                            Get.back();
-                          },
-                          child: Text(
-                            submitText,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
+                      IconButton(
+                        onPressed: () => Get.back(),
+                        icon: Icon(Icons.close, color: Colors.white),
+                      )
                     ],
                   ),
                 ),
-            ],
+
+                /// 🔷 BODY
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
+                      child: Column(children: sections),
+                    ),
+                  ),
+                ),
+
+                /// 🔷 ACTIONS
+                if (isViewOnly == false)
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+                    decoration: BoxDecoration(
+                      color:
+                          context.theme.colorScheme.outline.withOpacity(0.03),
+                      borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(28),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Get.back(),
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                  color: context.theme.colorScheme.onSurface),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    context.theme.colorScheme.secondary),
+                            onPressed: () {
+                              if (!formKey.currentState!.validate()) return;
+                              onSubmit();
+                              Get.back();
+                            },
+                            child: Text(
+                              submitText,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1897,6 +1907,71 @@ class CustomWidgets {
           borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
         ),
       ),
+    );
+  }
+}
+
+class AppFAB extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const AppFAB({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.icon = Icons.add_rounded,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return FloatingActionButton.extended(
+      onPressed: onPressed,
+      backgroundColor: cs.primary,
+      foregroundColor: cs.onPrimary,
+      elevation: 3,
+      icon: Icon(icon, size: 20),
+      label: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+        ),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+}
+
+class AppFormDialog {
+  static void show({
+    required BuildContext context,
+    required Widget title,
+    required List<Widget> children,
+    required VoidCallback onSubmit,
+    GlobalKey<FormState>? formKey,
+    bool isViewOnly = false,
+    String submitText = "Save",
+  }) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: title,
+      formKey: formKey ?? GlobalKey<FormState>(),
+      onSubmit: onSubmit,
+      isViewOnly: isViewOnly,
+      submitText: submitText,
+      sections: [
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          ),
+        ),
+      ],
     );
   }
 }

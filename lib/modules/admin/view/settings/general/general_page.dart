@@ -9,7 +9,6 @@ import 'package:albedo_app/modules/admin/view/settings/general/referral_source_p
 import 'package:albedo_app/modules/admin/view/settings/general/refund_page.dart';
 import 'package:albedo_app/modules/admin/view/settings/general/standard_page.dart';
 import 'package:albedo_app/modules/admin/view/settings/general/syllabus_page.dart';
-import 'package:albedo_app/modules/admin/view/settings/general/tax_page.dart';
 import 'package:albedo_app/modules/admin/view/settings/general/terms_page.dart';
 import 'package:albedo_app/modules/admin/view/settings/general/support_category_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
@@ -86,7 +85,96 @@ class GeneralPage extends StatelessWidget {
             onSubmit: () {},
           );
         }),
-        _Item("Tax", Icons.receipt_long, (ctx) => Get.to(TaxPage())),
+        _Item("Tax", Icons.receipt_long, (ctx) {
+          final _formKey = GlobalKey<FormState>();
+          final c = Get.put(SettingsController());
+
+          CustomWidgets().showCustomDialog(
+            context: ctx,
+            title: Text('Update Salary Invoice Tax'),
+            formKey: _formKey,
+            submitText: 'Update',
+            sections: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Please click update button after changing'),
+
+                  const SizedBox(height: 12),
+
+                  /// 🔘 TYPE SELECTION
+                  Obx(() => Row(
+                        children: [
+                          Expanded(
+                            child: RadioListTile<String>(
+                              title: const Text("Percentage"),
+                              value: "percentage",
+                              groupValue: c.feeType.value,
+                              onChanged: (val) => c.feeType.value = val!,
+                              contentPadding: EdgeInsets.zero,
+                              dense: true,
+                            ),
+                          ),
+                          Expanded(
+                            child: RadioListTile<String>(
+                              title: const Text("Amount"),
+                              value: "amount",
+                              groupValue: c.feeType.value,
+                              onChanged: (val) => c.feeType.value = val!,
+                              contentPadding: EdgeInsets.zero,
+                              dense: true,
+                            ),
+                          ),
+                        ],
+                      )),
+
+                  const SizedBox(height: 8),
+
+                  /// 💰 INPUT FIELD
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 150),
+                    child: Obx(
+                      () => CustomWidgets().dropdownStyledTextField(
+                        context: ctx,
+                        hint: c.feeType.value == "percentage" ? '0%' : '₹0.0',
+                        controller: c.regFeeController,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  /// 🔁 STATUS TOGGLE
+                  Obx(() => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Status",
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          Row(
+                            children: [
+                              ChoiceChip(
+                                label: const Text("Active"),
+                                selected: c.status.value == "active",
+                                onSelected: (_) => c.status.value = "active",
+                              ),
+                              const SizedBox(width: 8),
+                              ChoiceChip(
+                                label: const Text("Inactive"),
+                                selected: c.status.value == "inactive",
+                                onSelected: (_) => c.status.value = "inactive",
+                              ),
+                            ],
+                          ),
+                        ],
+                      )),
+                ],
+              )
+            ],
+            onSubmit: () {},
+          );
+        }),
       ],
     ),
     _Section(
@@ -115,7 +203,7 @@ class GeneralPage extends StatelessWidget {
       title: "System Rules",
       icon: Icons.rule,
       items: [
-        _Item("Deadline", Icons.timer, (ctx) => Get.to(() => DeadlinePage())),
+        _Item("Completion Deadline", Icons.timer, (ctx) => Get.to(() => DeadlinePage())),
         _Item("Assessment Questions", Icons.help_outline,
             (ctx) => Get.to(() => AssessmentAttentionQuestionPage())),
       ],

@@ -29,6 +29,7 @@ class Student {
   String? course;
   String? subjects;
   String? syllabus;
+  String? syllabusId;
 
   String? advisorName;
   String? advisorId;
@@ -36,6 +37,7 @@ class Student {
   String? coordinatorId;
   String? mentorName;
   String? mentorId;
+    final String? teacherId;
 
   String? referralName;
   String? referralRole;
@@ -58,6 +60,7 @@ class Student {
     this.parentOccupation,
     this.status,
     this.mentor,
+    this.teacherId,
     this.imageUrl,
     this.type,
     this.address,
@@ -85,6 +88,7 @@ class Student {
     this.referralName,
     this.referralRole,
     this.subjects,
+    this.syllabusId,
     this.syllabus,
     this.category,
     this.regFee,

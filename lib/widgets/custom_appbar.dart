@@ -64,6 +64,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         const SizedBox(width: 8),
         _actionButton(
+          icon: Icons.install_mobile,
+          color: cs,
+          onTap: () {},
+        ),
+        const SizedBox(width: 8),
+        _actionButton(
           icon: Icons.notifications_none,
           color: cs,
           onTap: () {},

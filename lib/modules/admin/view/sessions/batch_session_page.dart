@@ -1,10 +1,10 @@
 import 'package:albedo_app/controller/batch_list_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/widgets/batch_widgets.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
-import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -18,11 +18,12 @@ class BatchesListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
-      floatingActionButton: addSessionBtn(context),
+      backgroundColor: cs.surfaceContainerLowest,
+      floatingActionButton: AddBatchSessionFAB(c: c),
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -32,7 +33,7 @@ class BatchesListPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _topBar(context, c),
+                  BatchTopBar(c: c),
                   const SizedBox(height: 12),
                   Obx(
                     () => CustomWidgets().customTabs(context,
@@ -55,16 +56,12 @@ class BatchesListPage extends StatelessWidget {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (data.isEmpty) {
-                        return const Center(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.inbox, size: 40, color: Colors.grey),
-                            SizedBox(height: 10),
-                            Text("No batches found"),
-                            Text("Try changing filters or search"),
-                          ],
-                        ));
+                        return EmptyState(
+                          cs: cs,
+                          title: "No batches found",
+                          subtitle: "Try adjusting filters or add a batch",
+                          icon: Icons.groups_outlined,
+                        );
                       }
 
                       return LayoutBuilder(
@@ -78,22 +75,16 @@ class BatchesListPage extends StatelessWidget {
                           }
 
                           return MasonryGridView.count(
-                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 80),
                             crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 8,
                             itemCount: data.length,
-                            itemBuilder: (_, i) => InkWell(
-                              borderRadius: BorderRadius.circular(16),
+                            itemBuilder: (_, i) => BatchCard(
+                              batch: data[i],
+                              statusColor:
+                                  getStatusColor(context, data[i].status ?? ""),
                               onTap: () => openBatchDetails(context, data, i),
-                              child: InfoCard(
-                                id: data[i].id ?? '',
-                                status: data[i].status ?? '',
-                                statusColor: getStatusColor(
-                                    context, data[i].status ?? ''),
-                                infoRows: [
-                                  _buildBatchPersonSection(context, data[i]),
-                                  _buildBatchDetailsSection(context, data[i]),
-                                ],
-                              ),
                             ),
                           );
                         },
@@ -292,12 +283,13 @@ class BatchesListPage extends StatelessWidget {
     final handlers = {
       "teacher": () {
         final t = c.getTeacherById(id);
-        if (t != null){
+        if (t != null) {
           openTeacherProfile(
             context,
             t,
             toUser: (p0) => teacherToUser(t),
-          );}
+          );
+        }
       },
       "batch": () {
         final b = c.getBatchById(id);
@@ -312,7 +304,6 @@ class BatchesListPage extends StatelessWidget {
     }
   }
 
-
   FloatingActionButton addSessionBtn(BuildContext context) {
     return FloatingActionButton(
       onPressed: () => CustomWidgets().showCustomDialog(
@@ -320,72 +311,7 @@ class BatchesListPage extends StatelessWidget {
         title: Text("Add Session"),
         formKey: GlobalKey<FormState>(),
         onSubmit: () {},
-        sections: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.75,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  CustomWidgets()
-                      .labelWithAsterisk('Select Batch', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().customDropdownField(
-                    context: context,
-                    hint: 'Select Batch',
-                    items: c.batches,
-                    onChanged: (p0) => c.selectedBatch.value = p0,
-                  ),
-                  const SizedBox(height: 10),
-                  CustomWidgets()
-                      .labelWithAsterisk('Select Teacher', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().customDropdownField(
-                    context: context,
-                    hint: 'Select Teacher',
-                    items: c.teachersList,
-                    onChanged: (p0) => c.selectedTeacher.value = p0,
-                  ),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk(
-                      'Teacher Salary (per hour - optional)',
-                      required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: 'Teacher Salary',
-                      controller: c.salaryController,
-                      isNumber: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets()
-                      .labelWithAsterisk('Class Date', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().customDatePickerField(
-                    context: context,
-                    controller: c.dateController,
-                    selectedDate: c.selectedDate,
-                  ),
-                  const SizedBox(height: 10),
-                  CustomWidgets()
-                      .labelWithAsterisk('Class Time', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().timePickerStyledField(
-                      context: context,
-                      controller: c.timeController,
-                      selectedTime: c.selectedTime),
-                  const SizedBox(height: 10),
-                  CustomWidgets()
-                      .labelWithAsterisk('Select Duration', required: true),
-                  const SizedBox(height: 20),
-                  CustomWidgets().durationPickerStyledField(
-                      context: context,
-                      hint: 'Select Duration',
-                      controller: c.durationController,
-                      selectedDuration: c.selectedDuration)
-                ],
-              ),
-            ),
-          ),
-        ],
+        sections: [],
       ),
       mini: true,
       backgroundColor: context.theme.colorScheme.primary,
@@ -683,96 +609,6 @@ class BatchesListPage extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Widget _topBar(BuildContext context, BatchListController c) {
-    final isMobile = Responsive.isMobile(context);
-
-    return Obx(() {
-      final searching = c.isSearching.value;
-
-      /// =========================
-      /// MOBILE
-      /// =========================
-      if (isMobile) {
-        return Row(
-          children: [
-            const SizedBox(width: 10),
-            if (!searching)
-              Expanded(
-                child: Text(
-                  "Batches",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              )
-            else
-              Expanded(
-                child: CustomWidgets().premiumSearch(
-                  context,
-                  hint: "Search batches...",
-                  onChanged: (val) {
-                    c.searchQuery.value = val;
-                    c.applyFilters();
-                  },
-                ),
-              ),
-            IconButton(
-              icon: Icon(searching ? Icons.close : Icons.search),
-              onPressed: () {
-                c.isSearching.value = !searching;
-
-                if (searching) {
-                  c.searchQuery.value = "";
-                  c.applyFilters();
-                }
-              },
-            ),
-          ],
-        );
-      }
-
-      /// =========================
-      /// DESKTOP
-      /// =========================
-      return Row(
-        children: [
-          /// TITLE / SEARCH (LEFT)
-          if (!searching)
-            Expanded(
-              flex: 2,
-              child: Text(
-                "Batches",
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            )
-          else
-            Expanded(
-              flex: 3,
-              child: CustomWidgets().premiumSearch(
-                context,
-                hint: "Search batches...",
-                onChanged: (val) {
-                  c.searchQuery.value = val;
-                  c.applyFilters();
-                },
-              ),
-            ),
-
-          /// SEARCH TOGGLE ICON
-          IconButton(
-            icon: Icon(searching ? Icons.close : Icons.search),
-            onPressed: () {
-              c.isSearching.value = !searching;
-
-              if (searching) {
-                c.searchQuery.value = "";
-                c.applyFilters();
-              }
-            },
-          ),
-        ],
-      );
-    });
   }
 
   Widget _miniInfo(

@@ -64,7 +64,7 @@ class CustomTextField extends StatelessWidget {
             controller: controller,
             obscureText: isPassword ? obscure.value : false,
             style: TextStyle(
-              color: cs.onSurface,
+              color: Colors.white,
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
@@ -73,7 +73,7 @@ class CustomTextField extends StatelessWidget {
                 prefixIcon,
                 color: isFocused.value
                     ? cs.secondary
-                    : cs.onSurface.withOpacity(0.6),
+                    : Colors.white.withOpacity(0.6),
               ),
               hintText: hint,
               hintStyle: TextStyle(

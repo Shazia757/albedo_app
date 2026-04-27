@@ -1,12 +1,14 @@
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/users/student_model.dart';
-import 'package:albedo_app/model/users/user_model.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum SortType { newest, oldest, name }
 
-
 class StudentController extends GetxController {
+  final AuthController auth = Get.find();
+
   var students = <Student>[].obs;
   var filteredStudents = <Student>[].obs;
 
@@ -68,42 +70,66 @@ class StudentController extends GetxController {
     fetchStudents();
   }
 
-  /// --------------------------
-  /// Fetch
-  /// --------------------------
-  void fetchStudents() async {
+  Future<void> fetchStudents() async {
     try {
       isLoading.value = true;
 
-      // 🔥 Replace with your API call
+      final user = auth.activeUser;
+
       await Future.delayed(const Duration(seconds: 2));
 
-      students.assignAll([
-        Student(
-          admissionDate: DateTime.parse('2023-01-15 12:00:00'),
-          studentId: "STU1001",
-          name: "Riya Shah",
-          email: "riya@email.com",
-          status: "Active", //TODO: status to be active if number of sessions more than 5 in a month
-          type: "Batch",
-          joinedAt: DateTime.now(),
-        ),
-        Student(
-          admissionDate: DateTime.parse('2023-01-15 12:00:00'),
-          studentId: "STU1002",
-          name: "Ameen",
-          email: "ameen@email.com",
-          status: "Inactive",
-          type: "TBA",
-          joinedAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-      ]);
-      filteredStudents.assignAll(students);
+      final allStudents = _getDummyStudents();
+
+      List<Student> result;
+
+      if (user?.role == "admin") {
+        result = allStudents; // full access
+      } else if (user?.role == "coordinator") {
+        result = allStudents.where((s) => s.coordinatorId == user!.id).toList();
+      } else if (user?.role == "teacher") {
+        result = allStudents.where((s) => s.teacherId == user!.id).toList();
+      } else if (user?.role == "mentor") {
+        result = allStudents.where((s) => s.mentorId == user!.id).toList();
+      } else {
+        result = [];
+      }
+
+      students.assignAll(result);
+      filteredStudents.assignAll(result);
     } catch (e) {
       print("Error: $e");
     } finally {
       isLoading.value = false;
     }
+  }
+
+  List<Student> _getDummyStudents() {
+    return [
+      Student(
+        studentId: "STU1001",
+        name: "Riya Shah",
+        email: "riya@email.com",
+        status: "Active",
+        type: "Batch",
+        joinedAt: DateTime.now(),
+        admissionDate: DateTime.parse('2023-01-15 12:00:00'),
+        teacherId: "T001",
+        mentorId: "MTR001",
+        coordinatorId: "COO1001",
+      ),
+      Student(
+        studentId: "STU1002",
+        name: "Ameen",
+        email: "ameen@email.com",
+        status: "Inactive",
+        type: "TBA",
+        joinedAt: DateTime.now(),
+        admissionDate: DateTime.parse('2023-01-15 12:00:00'),
+        teacherId: "T002",
+        mentorId: "MTR002",
+        coordinatorId: "COO1002",
+      ),
+    ];
   }
 
   /// --------------------------
@@ -147,7 +173,7 @@ class StudentController extends GetxController {
       temp.sort((a, b) => b.joinedAt.compareTo(a.joinedAt));
     } else if (sortType.value == SortType.oldest) {
       temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
-    }else if (sortType.value == SortType.name) {
+    } else if (sortType.value == SortType.name) {
       temp.sort((a, b) => a.name.compareTo(b.name));
     }
 
@@ -189,8 +215,45 @@ class StudentController extends GetxController {
     //   },
     // );
   }
+
+  void handleDelete(BuildContext context, Student student) {
+    final user = auth.activeUser;
+
+    if (user?.role == "coordinator") {
+      CustomWidgets().showDeleteDialog(
+        context: context,
+        text: "Do you want to request deletion of this student?",
+        onConfirm: () => requestDelete(student.studentId!),
+      );
+    } else {
+      CustomWidgets().showDeleteDialog(
+        context: context,
+        text: "Are you sure you want to delete this student permanently?",
+        onConfirm: () => delete(student.studentId!),
+      );
+    }
+  }
+
+  void handleDeactivate(BuildContext context, Student student) {
+    final user = auth.activeUser;
+
+    if (user?.role == "coordinator") {
+      CustomWidgets().showDeactivateDialog(
+        context: context,
+        text: "Do you want to request inactivation for this student?",
+        onConfirm: () => requestDeactivate(student.studentId!),
+      );
+    } else {
+      CustomWidgets().showDeactivateDialog(
+        context: context,
+        text: "Are you sure you want to deactivate this student permanently?",
+        onConfirm: () => deactivate(student.studentId!),
+      );
+    }
+  }
+
   deactivate(String id) {
-    isDeactivateButtonLoading.value = true;
+    isDeleteButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {
     //     if (value?.status == true) {
@@ -207,5 +270,18 @@ class StudentController extends GetxController {
     // );
   }
 
+  void requestDeactivate(String studentId) {
+    print("Request sent to deactivate student: $studentId");
 
+    // TODO:
+    // Call API → create approval request
+    // Show snackbar
+  }
+
+  void requestDelete(String studentId) {
+    print("Request sent to delete student: $studentId");
+
+    // TODO:
+    // Call API → create approval request
+  }
 }

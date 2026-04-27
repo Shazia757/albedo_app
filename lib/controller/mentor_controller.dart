@@ -1,11 +1,15 @@
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum SortType { newest, oldest, name }
 
 class MentorController extends GetxController {
+  final AuthController auth = Get.find();
+
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
   var mentors = <Mentor>[].obs;
@@ -58,35 +62,59 @@ class MentorController extends GetxController {
     fetchMentors();
   }
 
-  void fetchMentors() async {
+  Future<void> fetchMentors() async {
     try {
       isLoading.value = true;
 
+      final user = auth.activeUser;
+
       await Future.delayed(const Duration(seconds: 2));
 
-      mentors.assignAll([
-        Mentor(
-          id: "MTR1001",
-          name: "Maria",
-          email: "maria@email.com",
-          status: "Active",
-          phone: "123456",
-          joinedAt: DateTime.now(),
-        ),
-        Mentor(
-          id: "MTR1002",
-          name: "Nick",
-          email: "nick@email.com",
-          status: "Inactive",
-          phone: "+9876543210",
-          joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-        ),
-      ]);
+      final allMentors = _getDummyMentors();
 
+      List<Mentor> result;
+
+      if (user?.role == "admin") {
+        result = allMentors;
+      } else if (user?.role == "coordinator") {
+        result = allMentors.where((m) => m.coordinatorId == user!.id).toList();
+      } else if (user?.role == "mentor") {
+        // Mentor should usually see only themselves
+        result = allMentors.where((m) => m.id == user!.id).toList();
+      } else {
+        result = [];
+      }
+
+      mentors.assignAll(result);
       applyFilters();
+    } catch (e) {
+      print("Error: $e");
     } finally {
       isLoading.value = false;
     }
+  }
+
+  List<Mentor> _getDummyMentors() {
+    return [
+      Mentor(
+        id: "MTR1001",
+        name: "Maria",
+        email: "maria@email.com",
+        status: "Active",
+        phone: "123456",
+        joinedAt: DateTime.now(),
+        coordinatorId: "COO1001",
+      ),
+      Mentor(
+        id: "MTR1002",
+        name: "Nick",
+        email: "nick@email.com",
+        status: "Inactive",
+        phone: "+9876543210",
+        joinedAt: DateTime.parse('2024-12-01 09:00:00'),
+        coordinatorId: "COO1002",
+      ),
+    ];
   }
 
   void applyFilters() {
@@ -152,7 +180,43 @@ class MentorController extends GetxController {
     );
   }
 
-  delete(id) {
+  void handleDelete(BuildContext context, Mentor mentor) {
+    final user = auth.activeUser;
+
+    if (user?.role == "coordinator") {
+      CustomWidgets().showDeleteDialog(
+        context: context,
+        text: "Do you want to request deletion of this mentor?",
+        onConfirm: () => requestDelete(mentor.id!),
+      );
+    } else {
+      CustomWidgets().showDeleteDialog(
+        context: context,
+        text: "Are you sure you want to delete this mentor permanently?",
+        onConfirm: () => delete(mentor.id!),
+      );
+    }
+  }
+
+  void handleDeactivate(BuildContext context, Mentor mentor) {
+    final user = auth.activeUser;
+
+    if (user?.role == "coordinator") {
+      CustomWidgets().showDeactivateDialog(
+        context: context,
+        text: "Do you want to request inactivation for this mentor?",
+        onConfirm: () => requestDeactivate(mentor.id!),
+      );
+    } else {
+      CustomWidgets().showDeactivateDialog(
+        context: context,
+        text: "Are you sure you want to deactivate this mentor permanently?",
+        onConfirm: () => deactivate(mentor.id!),
+      );
+    }
+  }
+
+  deactivate(String id) {
     isDeleteButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {
@@ -170,8 +234,23 @@ class MentorController extends GetxController {
     // );
   }
 
-  deactivate(String id) {
-    isDeactivateButtonLoading.value = true;
+  void requestDeactivate(String mentorId) {
+    print("Request sent to deactivate mentor: $mentorId");
+
+    // TODO:
+    // Call API → create approval request
+    // Show snackbar
+  }
+
+  void requestDelete(String mentorId) {
+    print("Request sent to delete mentor: $mentorId");
+
+    // TODO:
+    // Call API → create approval request
+  }
+
+  delete(String id) {
+    isDeleteButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {
     //     if (value?.status == true) {

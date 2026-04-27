@@ -39,3 +39,17 @@ class Users {
     );
   }
 }
+
+class DeadlineConfig {
+  String role; // Teacher, Mentor, etc
+  String type; // "hours" or "dayOfMonth"
+  int value;
+  bool enabled;
+
+  DeadlineConfig({
+    required this.role,
+    required this.type,
+    required this.value,
+    this.enabled = true,
+  });
+}

@@ -1,12 +1,15 @@
 import 'package:albedo_app/controller/support_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/support_model.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class SupportsPage extends StatelessWidget {
@@ -89,7 +92,6 @@ class SupportsPage extends StatelessWidget {
   Widget _list(BuildContext context) {
     return Obx(() {
       final data = c.filteredTickets;
-      int crossAxisCount = 1;
 
       if (c.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
@@ -97,64 +99,70 @@ class SupportsPage extends StatelessWidget {
       if (data.isEmpty) {
         return const Center(child: Text("No tickets found"));
       }
-      return ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        itemCount: data.length,
-        itemBuilder: (_, i) {
-          final s = data[i];
-          final isOpen = s.status == "open";
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InfoCard(
-              id: s.id,
-              status: isOpen ? "Open" : "Closed",
-              statusColor: isOpen
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.error,
 
-              /// ✅ Use infoColumns for structured data
-              infoColumns: [
-                {"label": "Title", "value": s.title},
-              ],
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          int crossAxisCount = 1;
 
-              /// ✅ Use infoRows for full-width content (description)
-              infoRows: [
-                Text(
-                  s.description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
-                  ),
-                ),
-              ],
+          if (constraints.maxWidth > 1200) {
+            crossAxisCount = 3;
+          } else if (constraints.maxWidth > 700) {
+            crossAxisCount = 2;
+          }
 
-              /// ✅ Actions
-              actions: [
-                CustomWidgets().iconBtn(
-                  icon: Icons.edit,
-                  onTap: () {
-                    if (s != null) {
+          return MasonryGridView.count(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            itemCount: data.length,
+            itemBuilder: (_, i) {
+              final s = data[i];
+              final isOpen = s.status == "open";
+
+              return PremiumInfoCard(
+                id: s.id,
+
+                /// 🔹 Main content
+                title: s.title ?? "No Title",
+                subtitle: s.description ?? "",
+
+                /// 🔹 Status
+                status: isOpen ? "Open" : "Closed",
+                statusColor: isOpen
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.error,
+
+                /// 🔹 Extra + Footer
+                extraInfo: null, // you can move something here later if needed
+                footerText: "", // or add created date like: "Created • ..."
+
+                /// 🔹 Actions
+                actions: [
+                  InfoAction(
+                    icon: Icons.edit,
+                    color: Theme.of(context).colorScheme.primary,
+                    onTap: () {
                       c.loadTicket(s);
                       editTicket(context);
-                    }
-                  },
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                CustomWidgets().iconBtn(
-                  icon: Icons.delete,
-                  onTap: () => CustomWidgets().showDeleteDialog(
-                    text:
-                        'Are you sure you want to delete this ticket permanently?',
-                    context: context,
-                    onConfirm: () => c.delete(c.filteredTickets[i].id),
+                    },
                   ),
-                  color: Theme.of(context).colorScheme.error,
-                ),
-              ],
-            ),
+                  InfoAction(
+                    icon: Icons.delete,
+                    color: Theme.of(context).colorScheme.error,
+                    onTap: () => CustomWidgets().showDeleteDialog(
+                      text:
+                          'Are you sure you want to delete this ticket permanently?',
+                      context: context,
+                      onConfirm: () => c.delete(s.id),
+                    ),
+                  ),
+                ],
+
+                /// 🔹 Tap
+                onTap: () => _openTicketDialog(context, s),
+              );
+            },
           );
         },
       );
@@ -353,6 +361,320 @@ class SupportsPage extends StatelessWidget {
             ))
       ],
       onSubmit: () {},
+    );
+  }
+
+  void _openTicketDialog(BuildContext context, Ticket s) {
+    final formKey = GlobalKey<FormState>();
+    final messageController = TextEditingController();
+
+    final RxString selectedTemplate = "".obs;
+    final RxBool canSubmit = false.obs;
+
+    messageController.addListener(() {
+      canSubmit.value = messageController.text.trim().isNotEmpty;
+    });
+
+    CustomWidgets().showCustomDialog(
+      context: context,
+      icon: Icons.confirmation_number,
+      title: Text("Ticket #${s.id}"),
+      formKey: formKey,
+
+      /// 🔹 SECTIONS
+      sections: [
+        /// 📌 BASIC INFO
+        _sectionCard(
+          context,
+          title: Text(
+            "Ticket Info",
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+          children: [
+            infoRow(label: "Status", value: s.status),
+            infoRow(label: "Date", value: s.createdAt.toString()),
+          ],
+        ),
+
+        /// 📝 DESCRIPTION
+        _sectionCard(
+          context,
+          title: Text(
+            'Description',
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+          children: [
+            Text(
+              s.description ?? "-",
+              style: TextStyle(
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+
+        /// 📎 ATTACHMENT
+        if (s.attachmentUrl != null)
+          _sectionCard(
+            context,
+            title: Text(
+              "Attachment",
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+            children: [
+              InkWell(
+                onTap: () {
+                  // open file
+                },
+                child: Row(
+                  children: const [
+                    Icon(Icons.attach_file, size: 18),
+                    SizedBox(width: 6),
+                    Text("View Attachment"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+        /// 💬 REPLIES
+        _sectionCard(
+          context,
+          title: Text(
+            "Replies (${s.replies.length})",
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+          children: s.replies.isEmpty
+              ? [const Text("No replies yet")]
+              : s.replies.map<Widget>((r) => _replyItem(r)).toList(),
+        ),
+
+        /// ✍️ REPLY FORM
+        _sectionCard(
+          context,
+          title:
+              CustomWidgets().labelWithAsterisk('Your Message', required: true),
+          children: [
+            /// ✍️ Message
+            TextFormField(
+              controller: messageController,
+              maxLength: 1000,
+              maxLines: 4,
+              decoration: const InputDecoration(
+                hintText: "Your message...",
+                border: OutlineInputBorder(),
+              ),
+              validator: (val) =>
+                  val == null || val.trim().isEmpty ? "Required" : null,
+            ),
+
+            const SizedBox(height: 8),
+
+            CustomWidgets()
+                .labelWithAsterisk('Quick Response Templates (Optional)'),
+
+            /// ⚡ Quick Templates
+            Obx(() => DropdownButtonFormField<String>(
+                  value: selectedTemplate.value.isEmpty
+                      ? null
+                      : selectedTemplate.value,
+                  hint: const Text("Quick response"),
+                  items: [
+                    "We are checking this",
+                    "Resolved. Please confirm",
+                    "Need more details"
+                  ]
+                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                      .toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      selectedTemplate.value = val;
+                      messageController.text = val;
+                    }
+                  },
+                )),
+
+            const SizedBox(height: 10),
+
+            /// 📎 Attach
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.attach_file),
+                  onPressed: () {
+                    // pick file
+                  },
+                ),
+                CustomWidgets().labelWithAsterisk('Attach File (optional)')
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () async {
+                // TODO: open file picker
+                // final file = await pickFile();
+                // if (file != null) { ... }
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color:
+                        Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                  ),
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                child: Row(
+                  children: [
+                    /// 📎 ICON
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.upload_file,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    /// 🔹 TEXT
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Upload File",
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "PDF, DOC, Images (max 10MB)",
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withOpacity(0.6),
+                                    ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    /// ➡️ ICON
+                    const Icon(Icons.arrow_forward_ios, size: 14),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+
+      /// 🔹 SUBMIT
+      onSubmit: () {
+        c.postReply(
+          ticketId: s.id,
+          message: messageController.text,
+          template: selectedTemplate.value,
+        );
+      },
+
+      submitText: "Post Reply",
+    );
+  }
+
+  Widget _sectionCard(
+    BuildContext context, {
+    required Widget title,
+    required List<Widget> children,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: cs.shadow.withOpacity(0.05),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 🔹 TITLE
+          DefaultTextStyle(
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+            child: title,
+          ),
+
+          const SizedBox(height: 8),
+
+          /// 🔹 CONTENT (force vertical)
+          ...children.map(
+            (child) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: child,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _replyItem(Reply r) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.grey.withOpacity(0.05),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(r.message),
+          const SizedBox(height: 2),
+          Text(
+            r.createdAt.toString(),
+            style: const TextStyle(fontSize: 10),
+          ),
+        ],
+      ),
     );
   }
 

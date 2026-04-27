@@ -136,7 +136,7 @@ class HiringPage extends StatelessWidget {
                                 context: context,
                                 text:
                                     'Are you sure you want to delete this hiring ad?',
-                                onConfirm: () => c.delete(item.id),
+                                onConfirm: () => c.delete(item.adId),
                               ),
                             ),
                           ],

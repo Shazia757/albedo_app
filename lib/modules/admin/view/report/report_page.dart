@@ -1,9 +1,12 @@
 // PREMIUM + RESPONSIVE REPORTS PAGE (IMPROVED UI)
 import 'package:albedo_app/controller/report_controller.dart';
-import 'package:albedo_app/modules/admin/view/student_report_page.dart';
-import 'package:albedo_app/modules/admin/view/teacher_report_page.dart';
+import 'package:albedo_app/modules/admin/view/report/advisor_report_page.dart';
+import 'package:albedo_app/modules/admin/view/report/hiring_report.dart';
+import 'package:albedo_app/modules/admin/view/report/recommendation_report.dart';
+import 'package:albedo_app/modules/admin/view/report/som_report_page.dart';
+import 'package:albedo_app/modules/admin/view/report/student_report_page.dart';
+import 'package:albedo_app/modules/admin/view/report/teacher_report_page.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
-import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -15,14 +18,46 @@ class ReportsPage extends StatelessWidget {
 
   final ReportsController c = Get.put(ReportsController());
 
-  final tabs = const [
-    "Packages",
-    "Students",
-    "Teachers",
-    "Advisors",
-    "Recommendations",
-    "Star of the Month"
-  ];
+  List<String> get tabs {
+    final role = c.auth.activeUser?.role;
+
+    if (role == "admin") {
+      return [
+        "Students",
+        "Teachers",
+        "Advisors",
+        "Recommendations",
+        "Hirings",
+        "Star of Month"
+      ];
+    }
+
+    if (role == "coordinator") {
+      return [
+        "Students",
+        "Teachers",
+        "Recommendations",
+        "Hirings",
+      ];
+    }
+
+    if (role == "teacher") {
+      return [
+        "Students",
+        "Hirings",
+      ];
+    }
+
+    if (role == "mentor") {
+      return [
+        "Students",
+        "Teachers",
+        "Recommendations",
+      ];
+    }
+
+    return [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,53 +93,57 @@ class ReportsPage extends StatelessWidget {
   // PREMIUM TABS
   Widget _tabs(BuildContext context) {
     return Obx(() => SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: List.generate(tabs.length, (index) {
-              final isSelected = c.selectedTab.value == index;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                margin: const EdgeInsets.only(right: 10),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? LinearGradient(colors: [
-                          Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.secondary,
-                        ])
-                      : null,
-                  color: isSelected
-                      ? null
-                      : Theme.of(context).colorScheme.onPrimary,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .shadow
-                          .withOpacity(0.08),
-                      blurRadius: 5,
-                    )
-                  ],
-                ),
-                child: GestureDetector(
-                  onTap: () => c.selectedTab.value = index,
-                  child: Text(
-                    tabs[index],
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.onPrimary
-                          : Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.6),
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(tabs.length, (index) {
+                final tab = tabs[index];
+                final isSelected = c.selectedTab.value == tab;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin: const EdgeInsets.only(right: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  decoration: BoxDecoration(
+                    gradient: isSelected
+                        ? LinearGradient(colors: [
+                            Theme.of(context).colorScheme.primary,
+                            Theme.of(context).colorScheme.secondary,
+                          ])
+                        : null,
+                    color: isSelected
+                        ? null
+                        : Theme.of(context).colorScheme.onPrimary,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .shadow
+                            .withOpacity(0.08),
+                        blurRadius: 5,
+                      )
+                    ],
+                  ),
+                  child: GestureDetector(
+                    onTap: () => c.selectedTab.value = tabs[index],
+                    child: Text(
+                      tabs[index],
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.6),
+                      ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
         ));
   }
@@ -347,17 +386,22 @@ class ReportsPage extends StatelessWidget {
   }
 
   Widget _tabView(BuildContext context) {
-    return IndexedStack(
-      index: c.selectedTab.value,
-      children: [
-        _packagesTable(context),
-        studentsTab(context),
-        teachersTab(),
-        _placeholder(context, "Advisors"),
-        _placeholder(context, "Recommendations"),
-        _placeholder(context, "Star of the Month"),
-      ],
-    );
+    switch (c.selectedTab.value) {
+      case "Students":
+        return studentsTab(context);
+      case "Teachers":
+        return teachersTab(context);
+      case "Advisors":
+        return advisorsTab(context);
+      case "Recommendations":
+        return recommendationsTab(context);
+      case "Hirings":
+        return hiringsTab(context);
+      case "Star of Month":
+        return starOfMonthTab(context);
+      default:
+        return _placeholder(context, "Coming Soon");
+    }
   }
 
   Widget _placeholder(BuildContext context, String title) {
@@ -370,102 +414,6 @@ class ReportsPage extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
-    );
-  }
-
-  // PREMIUM TABLE
-  Widget _packagesTable(BuildContext context) {
-    return Obx(() {
-      final data = c.filteredPackages;
-
-      return Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onPrimary,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
-                blurRadius: 14)
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columnSpacing: 28,
-              headingRowHeight: 50,
-              dataRowHeight: 68,
-              headingRowColor: MaterialStateProperty.all(
-                Theme.of(context).colorScheme.primaryContainer,
-              ),
-              columns: const [
-                DataColumn(label: Text("Student Info")),
-                DataColumn(label: Text("Contact")),
-                DataColumn(label: Text("WhatsApp")),
-                DataColumn(label: Text("Hours")),
-                DataColumn(label: Text("Classes")),
-                DataColumn(label: Text("Amount")),
-                DataColumn(label: Text("Total")),
-                DataColumn(label: Text("Paid")),
-                DataColumn(label: Text("Balance")),
-              ],
-              rows: data.map((e) {
-                return DataRow(cells: [
-                  DataCell(_studentCell(e)),
-                  DataCell(Text(e.contact)),
-                  DataCell(Text(e.whatsapp)),
-                  DataCell(_badge(context, e.classHours.toString(),
-                      Theme.of(context).colorScheme.primary)),
-                  DataCell(_badge(context, e.classesTaken.toString(),
-                      Theme.of(context).colorScheme.secondary)),
-                  DataCell(Text("₹${e.amount}")),
-                  DataCell(Text("₹${e.totalAmount}")),
-                  DataCell(Text("₹${e.totalPaid}")),
-                  DataCell(Text(
-                    "₹${e.balance}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: e.balance > 0
-                          ? Theme.of(context).colorScheme.onTertiaryContainer
-                          : Theme.of(context).colorScheme.primary,
-                    ),
-                  )),
-                ]);
-              }).toList(),
-            ),
-          ),
-        ),
-      );
-    });
-  }
-
-  Widget _studentCell(e) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(e.studentName,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
-        Text(e.studentId,
-            style: TextStyle(
-                color:
-                    Theme.of(Get.context!).colorScheme.shadow.withOpacity(0.08),
-                fontSize: 12)),
-      ],
-    );
-  }
-
-  Widget _badge(BuildContext context, String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(text, style: TextStyle(color: color)),
     );
   }
 }
