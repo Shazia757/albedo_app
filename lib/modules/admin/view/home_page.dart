@@ -1,4 +1,5 @@
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/role_service.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,10 @@ class HomeView extends StatelessWidget {
               if (c.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
               }
+              final auth = Get.find<AuthController>();
+              final user = auth.currentUser.value;
+              final role = auth.activeUser?.role;
+              final isAdmin = role == "admin";
 
               return SingleChildScrollView(
                 padding:
@@ -68,45 +73,47 @@ class HomeView extends StatelessWidget {
                     const SizedBox(height: 14),
                     _summaryCard(context),
                     const SizedBox(height: 14),
-                    _chartCard(
-                      context,
-                      icon: Icons.people_outline,
-                      iconColor: context.theme.colorScheme.secondary,
-                      title: "Mentors Count",
-                      count: c.mentorCount.value.toString(),
-                      data: c.mentorData,
-                      color: Theme.of(context).colorScheme.primary,
-                      selectedFilter: c.selectedFilter.value,
-                      onFilterChanged: (p0) {
-                        c.selectedFilter.value = p0;
-                        c.updateMentorData();
-                      },
-                      selectedRange: c.mentorRange,
-                      onRangeChanged: (p0) {
-                        c.mentorRange.value = p0;
-                        c.updateMentorData(range: p0);
-                      },
-                    ),
-                    const SizedBox(height: 14),
-                    _chartCard(
-                      context,
-                      title: "Coordinators Count",
-                      count: c.coordinatorCount.value.toString(),
-                      data: c.coordinatorData,
-                      color: Theme.of(context).colorScheme.primary,
-                      icon: Icons.people_outline,
-                      iconColor: context.theme.colorScheme.primary,
-                      selectedFilter: c.selectedFilter.value,
-                      onFilterChanged: (filter) {
-                        c.selectedFilter.value = filter;
-                        c.updatecoordinatorData();
-                      },
-                      selectedRange: c.coordinatorRange,
-                      onRangeChanged: (value) {
-                        c.coordinatorRange.value = value;
-                        c.updatecoordinatorData(range: value);
-                      },
-                    ),
+                    if (isAdmin) ...[
+                      _chartCard(
+                        context,
+                        icon: Icons.people_outline,
+                        iconColor: context.theme.colorScheme.secondary,
+                        title: "Mentors Count",
+                        count: c.mentorCount.value.toString(),
+                        data: c.mentorData,
+                        color: Theme.of(context).colorScheme.primary,
+                        selectedFilter: c.selectedFilter.value,
+                        onFilterChanged: (p0) {
+                          c.selectedFilter.value = p0;
+                          c.updateMentorData();
+                        },
+                        selectedRange: c.mentorRange,
+                        onRangeChanged: (p0) {
+                          c.mentorRange.value = p0;
+                          c.updateMentorData(range: p0);
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                      _chartCard(
+                        context,
+                        title: "Coordinators Count",
+                        count: c.coordinatorCount.value.toString(),
+                        data: c.coordinatorData,
+                        color: Theme.of(context).colorScheme.primary,
+                        icon: Icons.people_outline,
+                        iconColor: context.theme.colorScheme.primary,
+                        selectedFilter: c.selectedFilter.value,
+                        onFilterChanged: (filter) {
+                          c.selectedFilter.value = filter;
+                          c.updatecoordinatorData();
+                        },
+                        selectedRange: c.coordinatorRange,
+                        onRangeChanged: (value) {
+                          c.coordinatorRange.value = value;
+                          c.updatecoordinatorData(range: value);
+                        },
+                      ),
+                    ]
                   ],
                 ),
               );

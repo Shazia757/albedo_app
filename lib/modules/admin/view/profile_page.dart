@@ -1,4 +1,5 @@
 import 'package:albedo_app/controller/account_controller.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -20,7 +21,8 @@ class ProfilePage extends StatelessWidget {
       drawer: isWide ? null : const DrawerMenu(),
       backgroundColor: cs.surfaceContainerLowest,
       body: Obx(() {
-        final user = c.user.value;
+        final AuthController auth = Get.find<AuthController>();
+        final user = auth.activeUser;
 
         return Center(
           child: ConstrainedBox(
@@ -42,21 +44,21 @@ class ProfilePage extends StatelessWidget {
                     children: [
                       _InfoRow(
                         label: "Employee ID",
-                        value: user.id ?? "—",
+                        value: user?.id ?? "—",
                         icon: Icons.fingerprint,
                         cs: cs,
                       ),
                       _Divider(cs: cs),
                       _InfoRow(
                         label: "Email",
-                        value: user.email ?? "—",
+                        value: user?.email ?? "—",
                         icon: Icons.mail_outline_rounded,
                         cs: cs,
                       ),
                       _Divider(cs: cs),
                       _InfoRow(
                         label: "Phone",
-                        value: user.contact ?? "—",
+                        value: user?.contact ?? "—",
                         icon: Icons.phone_outlined,
                         cs: cs,
                       ),

@@ -32,7 +32,7 @@ class ReportsPage extends StatelessWidget {
       ];
     }
 
-    if (role == "coordinator") {
+    if ((role == "coordinator") || (role == "mentor")) {
       return [
         "Students",
         "Teachers",
@@ -45,14 +45,6 @@ class ReportsPage extends StatelessWidget {
       return [
         "Students",
         "Hirings",
-      ];
-    }
-
-    if (role == "mentor") {
-      return [
-        "Students",
-        "Teachers",
-        "Recommendations",
       ];
     }
 

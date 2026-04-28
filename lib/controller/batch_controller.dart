@@ -1,6 +1,5 @@
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
-import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -145,7 +144,7 @@ class BatchController extends GetxController {
   void handleDelete(BuildContext context, Batch batch) {
     final user = auth.activeUser;
 
-    if (user?.role == "coordinator") {
+    if ((user?.role == "coordinator") || (user?.role == "mentor")) {
       CustomWidgets().showDeleteDialog(
         context: context,
         text: "Do you want to request deletion of this batch?",

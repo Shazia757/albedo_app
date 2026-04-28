@@ -1,5 +1,6 @@
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
+import 'package:albedo_app/modules/admin/view/feedback_page.dart';
 import 'package:albedo_app/modules/admin/view/profile_page.dart';
 import 'package:albedo_app/modules/admin/view/users/advisors_page.dart';
 import 'package:albedo_app/modules/admin/view/batch_page.dart';
@@ -53,6 +54,7 @@ class DrawerMenu extends StatelessWidget {
               }
               final role = auth.activeUser?.role;
               final isAdmin = role == "admin";
+              final isMentor = role == "mentor";
 
               final List<Widget> menuItems = [];
 
@@ -96,43 +98,89 @@ class DrawerMenu extends StatelessWidget {
               );
 
               /// ✅ USERS (filtered)
-              menuItems.add(
-                DrawerExpansionMenu(
-                  title: 'Users',
-                  icon: Icons.people,
-                  parentIndex: 7,
-                  selectedParentIndex: c.selectedParentIndex,
-                  selectedSubIndex: c.selectedSubIndex,
-                  children: [
-                    DrawerSubItem(
-                        title: "Students",
-                        index: 20,
-                        onTap: () => Get.offAll(StudentsPage())),
-                    DrawerSubItem(
-                        title: "Teachers",
-                        index: 21,
-                        onTap: () => Get.offAll(TeachersPage())),
-                    DrawerSubItem(
-                        title: "Mentors",
-                        index: 22,
-                        onTap: () => Get.offAll(MentorsPage())),
-                    if (isAdmin) ...[
+              if (!isMentor) {
+                menuItems.add(
+                  DrawerExpansionMenu(
+                    title: 'Users',
+                    icon: Icons.people,
+                    parentIndex: 7,
+                    selectedParentIndex: c.selectedParentIndex,
+                    selectedSubIndex: c.selectedSubIndex,
+                    children: [
                       DrawerSubItem(
-                          title: "Coordinators",
-                          index: 23,
-                          onTap: () => Get.offAll(CoordinatorPage())),
+                          title: "Students",
+                          index: 20,
+                          onTap: () => Get.offAll(StudentsPage())),
                       DrawerSubItem(
-                          title: "Advisors",
-                          index: 24,
-                          onTap: () => Get.offAll(AdvisorsPage())),
+                          title: "Teachers",
+                          index: 21,
+                          onTap: () => Get.offAll(TeachersPage())),
                       DrawerSubItem(
-                          title: "Others",
-                          index: 25,
-                          onTap: () => Get.offAll(OthersPage())),
+                          title: "Mentors",
+                          index: 22,
+                          onTap: () => Get.offAll(MentorsPage())),
+                      if (isAdmin) ...[
+                        DrawerSubItem(
+                            title: "Coordinators",
+                            index: 23,
+                            onTap: () => Get.offAll(CoordinatorPage())),
+                        DrawerSubItem(
+                            title: "Advisors",
+                            index: 24,
+                            onTap: () => Get.offAll(AdvisorsPage())),
+                        DrawerSubItem(
+                            title: "Others",
+                            index: 25,
+                            onTap: () => Get.offAll(OthersPage())),
+                      ],
                     ],
-                  ],
-                ),
-              );
+                  ),
+                );
+              }
+              if (isMentor) {
+                menuItems.add(
+                  _menuItem(
+                    context,
+                    Icons.school,
+                    "Students",
+                    active: c.selectedIndex.value == 20,
+                    onPressed: () {
+                      c.setIndex(20);
+                      Get.back();
+                      Get.offAll(() => StudentsPage());
+                    },
+                  ),
+                );
+
+                menuItems.add(
+                  _menuItem(
+                    context,
+                    Icons.person,
+                    "Teachers",
+                    active: c.selectedIndex.value == 21,
+                    onPressed: () {
+                      c.setIndex(21);
+                      Get.back();
+                      Get.offAll(() => TeachersPage());
+                    },
+                  ),
+                );
+                menuItems.add(
+                  _menuItem(
+                    context,
+                    Icons.feedback_outlined,
+                    "Feedback",
+                    active: c.selectedIndex.value == 40,
+                    onPressed: () {
+                      c.setIndex(40);
+                      c.selectedParentIndex.value = -1;
+                      c.selectedSubIndex.value = -1;
+                      Get.back();
+                      Get.offAll(() => FeedbackPage());
+                    },
+                  ),
+                );
+              }
 
               /// ✅ BATCH
               menuItems.add(

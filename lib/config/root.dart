@@ -2,8 +2,6 @@ import 'package:albedo_app/common_views/login_page.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/modules/admin/view/home_page.dart';
 import 'package:albedo_app/modules/advisor/dashboard.dart';
-import 'package:albedo_app/modules/coordinator/dashboard.dart';
-import 'package:albedo_app/modules/mentor/dashboard.dart';
 import 'package:albedo_app/modules/student/home_page.dart';
 import 'package:albedo_app/modules/teacher/dashboard.dart';
 import 'package:albedo_app/widgets/impersonation_banner.dart';
@@ -36,7 +34,7 @@ class Root extends GetView<AuthController> {
           page = TeacherDashboard();
           break;
         case "mentor":
-          page = MentorDashboard();
+          page = HomeView();
           break;
         case "coordinator":
           page = HomeView();
