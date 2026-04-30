@@ -93,7 +93,7 @@ class CustomTextField extends StatelessWidget {
                         obscure.value
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
-                        color: cs.onSurface.withOpacity(0.6),
+                        color: Colors.white.withOpacity(0.6),
                       ),
                       onPressed: () => obscure.value = !obscure.value,
                     )

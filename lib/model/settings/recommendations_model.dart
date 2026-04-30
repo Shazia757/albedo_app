@@ -1,6 +1,7 @@
 import 'package:albedo_app/model/users/student_model.dart';
 
 class Recommendations {
+  String? image;
   String id;
   String? package;
   String? batch;
@@ -12,6 +13,7 @@ class Recommendations {
   Recommendations({
     required this.id,
     this.batch,
+    this.image,
     this.package,
     this.startDate,
     this.endDate,

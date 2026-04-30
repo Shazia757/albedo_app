@@ -2,6 +2,7 @@ class Users {
   String? name;
   String? id;
   String? role;
+  DateTime? joinedAt;
   String? email;
   String? contact;
   String? profileImage;
@@ -11,6 +12,7 @@ class Users {
     this.id,
     this.role,
     this.email,
+    this.joinedAt,
     this.contact,
     this.profileImage,
   });

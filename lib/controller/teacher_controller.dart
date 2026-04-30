@@ -1,4 +1,6 @@
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -85,9 +87,10 @@ class TeacherController extends GetxController {
       if (user?.role == "admin") {
         result = allTeachers;
       } else if (user?.role == "coordinator") {
-        result = allTeachers.where((t) => t.coordinatorId == user!.id).toList();
+        result =
+            allTeachers.where((t) => t.coordinator?.id == user!.id).toList();
       } else if (user?.role == "mentor") {
-        result = allTeachers.where((t) => t.mentorId == user!.id).toList();
+        result = allTeachers.where((t) => t.mentor?.id == user!.id).toList();
       } else {
         result = []; // teachers shouldn't see other teachers usually
       }
@@ -104,17 +107,20 @@ class TeacherController extends GetxController {
   List<Teacher> _getDummyTeachers() {
     return [
       Teacher(
-        id: "TEA1001",
-        name: "John",
-        email: "john@email.com",
-        status: "Active",
-        type: "Batch",
-        phone: "123456",
-        joinedAt: DateTime.now(),
-        gender: 'Male',
-        coordinatorId: "COO1001",
-        mentorId: "MTR001",
-      ),
+          id: "TEA1001",
+          name: "John",
+          email: "john@email.com",
+          status: "Active",
+          type: "Batch",
+          phone: "123456",
+          joinedAt: DateTime.now(),
+          gender: 'Male',
+          coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
+          mentor: Mentor(
+            name: '',
+            id: '',
+            joinedAt: DateTime.now(),
+          )),
       Teacher(
         id: "TEA1002",
         name: "Ms. Smith",
@@ -124,9 +130,13 @@ class TeacherController extends GetxController {
         phone: "+9876543210",
         joinedAt: DateTime.parse('2024-12-01 09:00:00'),
         gender: 'Female',
-        coordinatorId: "COO1002",
-        mentorId: "MTR002",
-      ),
+        coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
+        mentor: Mentor(
+          name: '',
+          id: '',
+          joinedAt: DateTime.now(),
+        ),
+      )
     ];
   }
 

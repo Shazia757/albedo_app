@@ -3,6 +3,7 @@ import 'package:albedo_app/model/report_model.dart';
 import 'package:albedo_app/model/settings/hiring_ad_model.dart';
 import 'package:albedo_app/model/settings/recommendations_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
@@ -55,7 +56,7 @@ class ReportsController extends GetxController {
         studentResult =
             allStudents.where((s) => s.coordinatorId == user!.id).toList();
         teacherResult =
-            allTeachers.where((s) => s.coordinatorId == user!.id).toList();
+            allTeachers.where((s) => s.coordinator?.id == user!.id).toList();
         advisorResult =
             allAdvisors.where((a) => a.coordinatorId == user!.id).toList();
       } else if (user?.role == "teacher") {
@@ -67,7 +68,7 @@ class ReportsController extends GetxController {
         studentResult =
             allStudents.where((s) => s.mentorId == user!.id).toList();
         teacherResult =
-            allTeachers.where((s) => s.mentorId == user!.id).toList();
+            allTeachers.where((s) => s.mentor?.id == user!.id).toList();
         advisorResult =
             allAdvisors.where((a) => a.mentorId == user!.id).toList();
       } else {
@@ -142,29 +143,35 @@ class ReportsController extends GetxController {
   List<Teacher> _getDummyTeachers() {
     return [
       Teacher(
-        id: "TEA1001",
-        name: "John",
-        email: "john@email.com",
-        status: "Active",
-        type: "Batch",
-        phone: "123456",
-        joinedAt: DateTime.now(),
-        gender: 'Male',
-        coordinatorId: "COO1001",
-        mentorId: "MTR001",
-      ),
+          id: "TEA1001",
+          name: "John",
+          email: "john@email.com",
+          status: "Active",
+          type: "Batch",
+          phone: "123456",
+          joinedAt: DateTime.now(),
+          gender: 'Male',
+          coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
+          mentor: Mentor(
+            name: '',
+            id: '',
+            joinedAt: DateTime.now(),
+          )),
       Teacher(
-        id: "TEA1002",
-        name: "Ms. Smith",
-        email: "smith@email.com",
-        status: "Inactive",
-        type: "Batch",
-        phone: "+9876543210",
-        joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-        gender: 'Female',
-        coordinatorId: "COO1002",
-        mentorId: "MTR002",
-      ),
+          id: "TEA1002",
+          name: "Ms. Smith",
+          email: "smith@email.com",
+          status: "Inactive",
+          type: "Batch",
+          phone: "+9876543210",
+          joinedAt: DateTime.parse('2024-12-01 09:00:00'),
+          gender: 'Female',
+          coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
+          mentor: Mentor(
+            name: '',
+            id: '',
+            joinedAt: DateTime.now(),
+          )),
     ];
   }
 
@@ -288,6 +295,7 @@ class ReportsController extends GetxController {
       return e.name.toLowerCase().contains(searchQuery.value.toLowerCase());
     }).toList();
   }
+
   List<Mentor> get filteredMentors {
     return mentors.where((e) {
       return e.name.toLowerCase().contains(searchQuery.value.toLowerCase());

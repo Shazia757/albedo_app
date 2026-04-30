@@ -1,3 +1,5 @@
+import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:flutter/material.dart';
 
 class Teacher {
@@ -33,8 +35,8 @@ class Teacher {
   double? balance;
   double? totalSessions;
   double? totalHours;
-  final String? coordinatorId;
-  final String? mentorId;
+  Coordinator? coordinator;
+  Mentor? mentor;
 
   Teacher(
       {required this.id,
@@ -49,8 +51,8 @@ class Teacher {
       this.whatsapp,
       this.totalStudents,
       this.totalPackages,
-      this.coordinatorId,
-      this.mentorId,
+      this.coordinator,
+      this.mentor,
       this.totalSessions,
       this.totalHours,
       this.salary,

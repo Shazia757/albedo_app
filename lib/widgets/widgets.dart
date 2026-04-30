@@ -740,13 +740,12 @@ class CustomWidgets {
     required Function(T) onChanged,
   }) {
     final cs = Theme.of(context).colorScheme;
+    final textController = TextEditingController();
 
     final LayerLink layerLink = LayerLink();
     OverlayEntry? overlayEntry;
 
-    final textController = TextEditingController(
-      text: value?.toString() ?? "",
-    );
+    textController.text = value?.toString() ?? "";
 
     List<T> filteredItems = List.from(items);
 
@@ -901,7 +900,7 @@ class CustomWidgets {
     required BuildContext context,
     required String hint,
     required List<T> items,
-    required RxList<T> selectedItems, // 🔥 important change
+    required RxList<T> selectedItems,
   }) {
     final cs = Theme.of(context).colorScheme;
 

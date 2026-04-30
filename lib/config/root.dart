@@ -1,9 +1,6 @@
 import 'package:albedo_app/common_views/login_page.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
-import 'package:albedo_app/modules/admin/view/home_page.dart';
-import 'package:albedo_app/modules/advisor/dashboard.dart';
-import 'package:albedo_app/modules/student/home_page.dart';
-import 'package:albedo_app/modules/teacher/dashboard.dart';
+import 'package:albedo_app/view/home_page.dart';
 import 'package:albedo_app/widgets/impersonation_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,37 +17,11 @@ class Root extends GetView<AuthController> {
         return LoginView();
       }
 
-      Widget page;
-
-      switch (user.role) {
-        case "admin":
-          page = HomeView();
-          break;
-
-        case "student":
-          page = HomePage();
-          break;
-        case "teacher":
-          page = TeacherDashboard();
-          break;
-        case "mentor":
-          page = HomeView();
-          break;
-        case "coordinator":
-          page = HomeView();
-          break;
-        case "advisor":
-          page = AdvisorDashboard();
-          break;
-        default:
-          page = LoginView();
-      }
-
       return Scaffold(
         body: Column(
           children: [
             const ImpersonationBanner(),
-            Expanded(child: page),
+            Expanded(child: HomeView()),
           ],
         ),
       );

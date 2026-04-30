@@ -1,3 +1,7 @@
+import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/view/notifications_page.dart';
+import 'package:albedo_app/view/students/student_wallet_page.dart';
+import 'package:albedo_app/view/teacher/teachers_wallet_page.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,6 +19,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Get.isDarkMode;
     final isDesktop = Responsive.isDesktop(context);
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+    final isTeacher = role == 'teacher';
+    final isStudent = role == 'student';
 
     return AppBar(
       backgroundColor: cs.surface.withOpacity(0.95), // subtle depth
@@ -69,10 +77,24 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           onTap: () {},
         ),
         const SizedBox(width: 8),
+        if (isTeacher || isStudent) ...[
+          _actionButton(
+            icon: Icons.wallet,
+            color: cs,
+            onTap: () {
+              if (isStudent) {
+                Get.to(() => StudentWalletPage());
+              } else if (isTeacher) {
+                Get.to(() => TeacherWalletPage());
+              }
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
         _actionButton(
           icon: Icons.notifications_none,
           color: cs,
-          onTap: () {},
+          onTap: () => Get.offAll(NotificationsPage()),
         ),
         const SizedBox(width: 12),
       ],

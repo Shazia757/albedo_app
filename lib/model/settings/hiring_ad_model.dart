@@ -3,6 +3,7 @@ import 'package:albedo_app/model/users/teacher_model.dart';
 enum Days { all, monday, tuesday, wednesday, thursday, friday, saturday, sunday }
 
 class HiringAd {
+  String? image;
   String? adId;
   String package;
   String? time;
@@ -13,6 +14,7 @@ class HiringAd {
   HiringAd({
     required this.package,
     this.adId,
+    this.image,
     this.time,
     this.startDate,
     this.endDate,
