@@ -93,6 +93,30 @@ class AccountController extends GetxController {
           email: emailController.text,
           contact: '4444444444',
         );
+      } else if (emailController.text.contains("finance")) {
+        user = Users(
+          name: 'Finance User',
+          id: 'FIN001',
+          role: 'finance',
+          email: emailController.text,
+          contact: '0000000000',
+        );
+      } else if (emailController.text.contains("hr")) {
+        user = Users(
+          name: 'HR User',
+          id: 'HR001',
+          role: 'hr',
+          email: emailController.text,
+          contact: '4444444444',
+        );
+      } else if (emailController.text.contains("sales")) {
+        user = Users(
+          name: 'Sales User',
+          id: 'SAL001',
+          role: 'sales',
+          email: emailController.text,
+          contact: '4444444444',
+        );
       } else {
         /// default fallback
         user = Users(

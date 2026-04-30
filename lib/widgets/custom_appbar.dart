@@ -6,105 +6,126 @@ import 'package:albedo_app/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'dart:ui'; // ✅ for blur
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
 
   const CustomAppBar({super.key, this.title});
 
   @override
-  Size get preferredSize => const Size.fromHeight(64); // slightly taller
+  Size get preferredSize => const Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Get.isDarkMode;
     final isDesktop = Responsive.isDesktop(context);
+
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
     final isTeacher = role == 'teacher';
     final isStudent = role == 'student';
 
-    return AppBar(
-      backgroundColor: cs.surface.withOpacity(0.95), // subtle depth
-      elevation: 0,
-      scrolledUnderElevation: 6, // smoother scroll effect
-      automaticallyImplyLeading: !isDesktop,
-      centerTitle: false,
-      surfaceTintColor: Colors.transparent, // removes M3 overlay tint
+    // ✅ Responsive height
+    final height = isDesktop ? 72.0 : 60.0;
 
-      iconTheme: IconThemeData(
-        color: cs.onSurface,
-        size: 22,
-      ),
+    return PreferredSize(
+      preferredSize: Size.fromHeight(height),
 
-      // ✅ TITLE / LOGO
-      title: title != null
-          ? Text(
-              title!,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: cs.onSurface,
-                    letterSpacing: 0.2,
-                  ),
-            )
-          : Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.asset(
-                    "assets/images/logo.png",
-                    height: 30,
-                  ),
-                ),
-                const SizedBox(width: 10),
-              ],
+      // ✨ GLASS EFFECT WRAPPER
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: AppBar(
+            toolbarHeight: height,
+
+            // 🎨 UPDATED BACKGROUND
+            backgroundColor: cs.surface.withOpacity(0.75),
+            elevation: 0,
+            scrolledUnderElevation: 4,
+            surfaceTintColor: Colors.transparent,
+
+            automaticallyImplyLeading: !isDesktop,
+            centerTitle: false,
+
+            iconTheme: IconThemeData(
+              color: cs.onSurface,
+              size: isDesktop ? 22 : 20, // ✅ responsive icon size
             ),
 
-      // ✅ ACTIONS (polished spacing + touch feel)
-      actions: [
-        _actionButton(
-          icon: isDark ? Icons.light_mode : Icons.dark_mode,
-          color: cs,
-          onTap: () {
-            Get.changeThemeMode(
-              isDark ? ThemeMode.light : ThemeMode.dark,
-            );
-          },
-        ),
-        const SizedBox(width: 8),
-        _actionButton(
-          icon: Icons.install_mobile,
-          color: cs,
-          onTap: () {},
-        ),
-        const SizedBox(width: 8),
-        if (isTeacher || isStudent) ...[
-          _actionButton(
-            icon: Icons.wallet,
-            color: cs,
-            onTap: () {
-              if (isStudent) {
-                Get.to(() => StudentWalletPage());
-              } else if (isTeacher) {
-                Get.to(() => TeacherWalletPage());
-              }
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
-        _actionButton(
-          icon: Icons.notifications_none,
-          color: cs,
-          onTap: () => Get.offAll(NotificationsPage()),
-        ),
-        const SizedBox(width: 12),
-      ],
+            // ✅ TITLE / LOGO
+            title: title != null
+                ? Text(
+                    title!,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: cs.onSurface,
+                          letterSpacing: 0.2,
+                        ),
+                  )
+                : Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: Image.asset(
+                          "assets/images/logo.png",
+                          height: isDesktop ? 32 : 28, // responsive
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                  ),
 
-      // ✅ subtle bottom divider (premium feel)
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(
-          height: 1,
-          color: cs.outline.withOpacity(0.2),
+            // ✅ ACTIONS (responsive spacing)
+            actions: [
+              const SizedBox(width: 6),
+              _actionButton(
+                icon: isDark ? Icons.light_mode : Icons.dark_mode,
+                color: cs,
+                onTap: () {
+                  Get.changeThemeMode(
+                    isDark ? ThemeMode.light : ThemeMode.dark,
+                  );
+                },
+              ),
+              SizedBox(width: isDesktop ? 10 : 6),
+              _actionButton(
+                icon: Icons.install_mobile,
+                color: cs,
+                onTap: () {},
+              ),
+              SizedBox(width: isDesktop ? 10 : 6),
+              if (isTeacher || isStudent) ...[
+                _actionButton(
+                  icon: Icons.wallet,
+                  color: cs,
+                  onTap: () {
+                    if (isStudent) {
+                      Get.to(() => StudentWalletPage());
+                    } else {
+                      Get.to(() => TeacherWalletPage());
+                    }
+                  },
+                ),
+                SizedBox(width: isDesktop ? 10 : 6),
+              ],
+              _actionButton(
+                icon: Icons.notifications_none,
+                color: cs,
+                onTap: () => Get.offAll(NotificationsPage()),
+              ),
+              const SizedBox(width: 12),
+            ],
+
+            // subtle divider (slightly softer now)
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(1),
+              child: Container(
+                height: 1,
+                color: cs.outline.withOpacity(0.12),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -120,7 +141,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       onTap: onTap,
       child: Ink(
         decoration: BoxDecoration(
-          color: color.onSurface.withOpacity(0.06),
+          // 🎨 slightly improved contrast for glass bg
+          color: color.onSurface.withOpacity(0.08),
           shape: BoxShape.circle,
         ),
         child: Padding(

@@ -17,11 +17,13 @@ class HomeController extends GetxController {
   var teacherCount = 0.obs;
   var coordinatorCount = 0.obs;
   var mentorCount = 0.obs;
+  var advisorCount = 0.obs;
 
   var studentData = <double>[].obs;
   var session = <Session>[].obs;
   var teacherData = <double>[].obs;
   var coordinatorData = <double>[].obs;
+  var advisorData = <double>[].obs;
   var mentorData = <double>[].obs;
   var isLoading = true.obs;
   var isUsersExpanded = false.obs;
@@ -56,13 +58,16 @@ class HomeController extends GetxController {
   var selectedFilter = TimeFilter.all.obs;
   var studentRange = "All".obs;
   var teacherRange = "All".obs;
+  var advisorRange = "All".obs;
   var coordinatorRange = "All".obs;
   var mentorRange = "All".obs;
   var summaryRange = "All".obs;
   var expenseRange = "All".obs;
 
+  RxList<String> xLabels = <String>[].obs;
   var studentLabels = <String>[].obs;
   var teacherLabels = <String>[].obs;
+  var advisorLabels = <String>[].obs;
   var coordinatorLabels = <String>[].obs;
   var mentorLabels = <String>[].obs;
   var expenseLabels = <String>[].obs;
@@ -134,7 +139,7 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         date: DateTime(2026, 4, 28),
-        time: DateTime(2026, 4, 23, 10, 30),
+        time: const TimeOfDay(hour: 13, minute: 0),
         status: "started",
       ),
       Session(
@@ -160,7 +165,7 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().add(const Duration(days: 1)),
-        time: DateTime.now(),
+        time: const TimeOfDay(hour: 13, minute: 0),
         status: "upcoming",
       ),
       Session(
@@ -186,7 +191,7 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now(),
-        time: DateTime.now(),
+        time: const TimeOfDay(hour: 13, minute: 0),
         status: "pending",
       ),
       Session(
@@ -212,7 +217,7 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().subtract(const Duration(days: 3)),
-        time: DateTime.now(),
+        time: const TimeOfDay(hour: 13, minute: 0),
         status: "completed",
       ),
       Session(
@@ -238,7 +243,7 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now(),
-        time: DateTime.now(),
+        time: const TimeOfDay(hour: 13, minute: 0),
         status: "no_balance",
       ),
       Session(
@@ -264,7 +269,7 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().subtract(const Duration(hours: 5)),
-        time: DateTime.now(),
+        time: const TimeOfDay(hour: 13, minute: 0),
         status: "meet_done",
       ),
       Session(
@@ -290,7 +295,7 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().add(const Duration(hours: 3)),
-        time: DateTime.now(),
+        time: const TimeOfDay(hour: 13, minute: 0),
         status: "started",
       ),
     ];
@@ -501,6 +506,26 @@ class HomeController extends GetxController {
     }
   }
 
+  void updateAdvisorData({String? range}) {
+    switch (range) {
+      case "All":
+        advisorData.assignAll([2, 5, 3, 6, 4, 7]);
+        advisorLabels.assignAll(["Jan", "Feb", "Mar", "Apr", "May", "Jun"]);
+        break;
+
+      case "This Month":
+        advisorData.assignAll([1, 2, 3, 2, 4, 3]);
+        advisorLabels.assignAll(["W1", "W2", "W3", "W4", "W5", "W6"]);
+        break;
+
+      case "This Year":
+        advisorData.assignAll([10, 20, 30, 25, 35, 40]);
+        advisorLabels
+            .assignAll(["2019", "2020", "2021", "2022", "2023", "2024"]);
+        break;
+    }
+  }
+
   void updatecoordinatorData({String? range}) {
     switch (range) {
       case "All":
@@ -590,34 +615,111 @@ class HomeController extends GetxController {
   }
 
   void updateExpenseData(String range) {
+    final now = DateTime.now();
+
+    List<double> hours = [];
+    List<double> amount = [];
+    List<double> salary = [];
+    List<String> labels = [];
+
     switch (range) {
+      /// 🔹 ALL TIME (2021 → current year)
       case "All":
-        loadChartData();
-        expenseLabels
-            .assignAll(["2021", "2022", "2023", "2024", "2025", "2026"]);
+        final startYear = 2021;
+        final currentYear = now.year;
+
+        for (int y = startYear; y <= currentYear; y++) {
+          labels.add(y.toString());
+
+          hours.add(_mock(y));
+          amount.add(_mock(y) * 100000);
+          salary.add(_mock(y) * 50000);
+        }
         break;
 
+      /// 🔹 TODAY (0–23 hours)
+      case "Today":
+        for (int h = 0; h < 24; h++) {
+          labels.add("${h}h");
+
+          hours.add(_mock(h));
+          amount.add(_mock(h) * 10000);
+          salary.add(_mock(h) * 5000);
+        }
+        break;
+
+      /// 🔹 THIS WEEK (Mon → today)
+      case "This Week":
+        final start = now.subtract(Duration(days: now.weekday - 1));
+
+        for (int i = 0; i < now.weekday; i++) {
+          final d = start.add(Duration(days: i));
+          labels.add("${d.day}/${d.month}");
+
+          hours.add(_mock(i));
+          amount.add(_mock(i) * 50000);
+          salary.add(_mock(i) * 20000);
+        }
+        break;
+
+      /// 🔹 THIS MONTH (Week 1 → current week)
       case "This Month":
-        totalHours.assignAll([0, 0, 10, 20, 30, 40]);
-        classAmount.assignAll([0, 0, 2000000, 4000000, 6000000, 8000000]);
-        totalSalary.assignAll([0, 0, 1000000, 2000000, 3000000, 4000000]);
-        expenseLabels.assignAll(["W1", "W2", "W3", "W4", "W5", "W6"]);
+        int currentWeek = ((now.day - 1) ~/ 7) + 1;
+
+        for (int w = 1; w <= currentWeek; w++) {
+          labels.add("W$w");
+
+          hours.add(_mock(w));
+          amount.add(_mock(w) * 200000);
+          salary.add(_mock(w) * 100000);
+        }
         break;
 
+      /// 🔹 THIS YEAR (Jan → Dec)
       case "This Year":
-        totalHours.assignAll([50, 80, 100, 120, 150, 200]);
-        classAmount.assignAll(
-            [5000000, 8000000, 10000000, 15000000, 18000000, 20000000]);
-        totalSalary.assignAll(
-            [2000000, 4000000, 6000000, 8000000, 10000000, 12000000]);
-        expenseLabels
-            .assignAll(["2019", "2020", "2021", "2022", "2023", "2024"]);
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec"
+        ];
+
+        for (int i = 0; i < 12; i++) {
+          labels.add(months[i]);
+
+          hours.add(_mock(i));
+          amount.add(_mock(i) * 300000);
+          salary.add(_mock(i) * 150000);
+        }
         break;
     }
 
-    totalExpense.value = totalSalary.reduce((a, b) => a + b);
-    totalIncome.value = classAmount.reduce((a, b) => a + b);
-    expenseRatio.value = (totalExpense.value / totalIncome.value) * 100;
+    /// ✅ Assign to Rx
+    totalHours.assignAll(hours);
+    classAmount.assignAll(amount);
+    totalSalary.assignAll(salary);
+    expenseLabels.assignAll(labels);
+
+    /// ✅ Safe calculations
+    totalExpense.value = salary.isEmpty ? 0 : salary.reduce((a, b) => a + b);
+
+    totalIncome.value = amount.isEmpty ? 0 : amount.reduce((a, b) => a + b);
+
+    expenseRatio.value = totalIncome.value == 0
+        ? 0
+        : (totalExpense.value / totalIncome.value) * 100;
+  }
+
+  double _mock(int seed) {
+    return (seed * 10 + 20).toDouble();
   }
 
   @override
@@ -679,33 +781,6 @@ class HomeController extends GetxController {
 
     years.assignAll(["Jan", "Feb", "Mar", "Apr", "May", "Jun"]);
   }
-
-//   Future<void> fetchStudentAnalytics(String range) async {
-//   try {
-//     isLoading.value = true;
-
-//     // 🔹 Call your API here
-//     final response = await apiService.getStudentAnalytics(range);
-
-//     // 🔹 Map response → controller variables
-//     totalStudents.value = response.totalStudents;
-
-//     totalSalary.value = response.totalSalary;
-//     receivedSalary.value = response.receivedSalary;
-
-//     // 🔹 Chart data
-//     totalSalaryData.assignAll(response.totalSalaryList);
-//     pendingSalaryData.assignAll(response.pendingSalaryList);
-//     receivedSalaryData.assignAll(response.receivedSalaryList);
-//     totalHoursData.assignAll(response.totalHoursList);
-
-//     years.assignAll(response.labels); // months / years
-//   } catch (e) {
-//     debugPrint("Error fetching analytics: $e");
-//   } finally {
-//     isLoading.value = false;
-//   }
-// }
 
   void toggleUsers() {
     isUsersExpanded.value = !isUsersExpanded.value;

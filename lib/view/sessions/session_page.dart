@@ -1,6 +1,7 @@
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -145,18 +146,56 @@ class SessionPage extends StatelessWidget {
               height: MediaQuery.of(context).size.height * 0.75,
               child: Column(
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: currentIndex > 0
+                            ? () => setState(() => currentIndex--)
+                            : null,
+                        icon: const Icon(Icons.arrow_back_ios),
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            "Session ${currentIndex + 1} of ${sessions.length}",
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              sessions.length,
+                              (i) => Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 2),
+                                width: i == currentIndex ? 18 : 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: i == currentIndex
+                                      ? cs.primary
+                                      : cs.outlineVariant.withOpacity(0.4),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        onPressed: currentIndex < sessions.length - 1
+                            ? () => setState(() => currentIndex++)
+                            : null,
+                        icon: const Icon(Icons.arrow_forward_ios),
+                      ),
+                    ],
+                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.fromLTRB(0, 4, 0, 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // People section label
-                          _DetailSectionLabel(
-                              label: "Participants",
-                              icon: Icons.people_outline),
-                          const SizedBox(height: 8),
-
                           detailCard(context,
                               title: "Student",
                               name: data.student?.name ?? '',
@@ -169,31 +208,30 @@ class SessionPage extends StatelessWidget {
                               id: data.teacher?.id ?? '',
                               onTap: () => _onUserTap(
                                   context, "teacher", data.teacher?.id)),
-                          detailCard(context,
-                              title: "Mentor",
-                              name: data.mentor?.name ?? "-",
-                              id: data.mentor?.id ?? "-",
-                              onTap: () => _onUserTap(
-                                  context, "mentor", data.mentor?.id)),
-                          detailCard(context,
-                              title: "Coordinator",
-                              name: data.coordinator?.name ?? "-",
-                              id: data.coordinator?.id ?? "-",
-                              onTap: () => _onUserTap(context, "coordinator",
-                                  data.coordinator?.id)),
-                          detailCard(context,
-                              title: "Advisor",
-                              name: data.advisor?.name ?? "-",
-                              id: data.advisor?.id ?? "-",
-                              onTap: () => _onUserTap(
-                                  context, "advisor", data.advisor?.id)),
-
+                          buildRoleCard(
+                            context: context,
+                            title: "Mentor",
+                            user: data.mentor,
+                            onTap: (id) => _onUserTap(context, "mentor", id),
+                          ),
+                          buildRoleCard(
+                            context: context,
+                            title: "Coordinator",
+                            user: data.coordinator,
+                            onTap: (id) =>
+                                _onUserTap(context, "coordinator", id),
+                          ),
+                          buildRoleCard(
+                            context: context,
+                            title: "Advisor",
+                            user: data.advisor,
+                            onTap: (id) => _onUserTap(context, "advisor", id),
+                          ),
                           const SizedBox(height: 16),
                           _DetailSectionLabel(
                               label: "Schedule & Info",
                               icon: Icons.event_outlined),
                           const SizedBox(height: 8),
-
                           EditableInfoCard(
                             type: "schedule",
                             icon: Icons.schedule_outlined,
@@ -216,12 +254,10 @@ class SessionPage extends StatelessWidget {
                                   value: data.syllabus ?? "-"),
                             ],
                           ),
-
                           const SizedBox(height: 16),
                           _DetailSectionLabel(
                               label: "Status", icon: Icons.flag_outlined),
                           const SizedBox(height: 8),
-
                           infoCard(
                             context,
                             type: "status",
@@ -241,12 +277,12 @@ class SessionPage extends StatelessWidget {
                   // ── ACTION BUTTONS ──────────────────────────────────
                   if (data.status != 'completed' && data.status != 'meet_done')
                     Container(
-                      padding: const EdgeInsets.fromLTRB(0, 12, 0, 4),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
+                        color: cs.surface,
                         border: Border(
                           top: BorderSide(
-                            color: cs.outlineVariant.withOpacity(0.4),
-                            width: 1,
+                            color: cs.outlineVariant.withOpacity(0.2),
                           ),
                         ),
                       ),
@@ -291,6 +327,29 @@ class SessionPage extends StatelessWidget {
                         ],
                       ),
                     ),
+                  SizedBox(height: 10),
+                  if (data.status == 'active')
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _DetailActionButton(
+                            onTap: () {},
+                            icon: Icons.arrow_forward_rounded,
+                            label: "Join",
+                            color: cs.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _DetailActionButton(
+                            color: cs.secondary,
+                            onTap: () {},
+                            icon: Icons.share,
+                            label: "Share",
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             );
@@ -323,17 +382,21 @@ class SessionPage extends StatelessWidget {
                 const SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Category', required: true),
                 const SizedBox(height: 8),
-                CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Select category',
-                    controller: c.categoryController),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select category',
+                  items: c.categoryList,
+                  onChanged: (p0) {},
+                ),
                 const SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Priority', required: true),
                 const SizedBox(height: 8),
-                CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Select priority',
-                    controller: c.priorityController),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select priority',
+                  items: ['High', 'Medium', 'Low'],
+                  onChanged: (p0) {},
+                ),
                 const SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('User', required: true),
                 const SizedBox(height: 8),
@@ -362,15 +425,32 @@ class SessionPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Obx(() {
                   if (c.selectedType.value == 'student') {
-                    return CustomWidgets().dropdownStyledTextField(
-                        context: context, hint: 'Select student');
+                    return CustomWidgets().customDropdownField(
+                        items: c.studentsList,
+                        onChanged: (p0) {},
+                        context: context,
+                        hint: 'Select student');
                   }
                   if (c.selectedType.value == 'teacher') {
-                    return CustomWidgets().dropdownStyledTextField(
-                        context: context, hint: 'Select teacher');
+                    return CustomWidgets().customDropdownField(
+                        items: c.teacherList,
+                        onChanged: (p0) {},
+                        context: context,
+                        hint: 'Select teacher');
                   }
                   return const SizedBox();
                 }),
+                const SizedBox(height: 12),
+                CustomWidgets().labelWithAsterisk('Attachment'),
+                const SizedBox(height: 8),
+                CustomWidgets().attachmentStyledField(
+                  context: context,
+                  label: "Attachment",
+                  hint: "Choose a file",
+                  fileName: c.selectedFile,
+                  onTap: () {},
+                  onClear: () {},
+                ),
                 const SizedBox(height: 12),
                 CustomWidgets()
                     .labelWithAsterisk('Description', required: true),
@@ -447,9 +527,9 @@ class SessionPage extends StatelessWidget {
                         CustomWidgets()
                             .labelWithAsterisk('Session Date', required: true),
                         const SizedBox(height: 8),
-                        CustomWidgets().dropdownStyledTextField(
+                        CustomWidgets().customDatePickerField(
                             context: context,
-                            hint: 'Date',
+                            selectedDate: c.selectedDate,
                             controller: c.dateController),
                       ],
                     ),
@@ -462,7 +542,8 @@ class SessionPage extends StatelessWidget {
                         CustomWidgets()
                             .labelWithAsterisk('Session Time', required: true),
                         const SizedBox(height: 8),
-                        CustomWidgets().dropdownStyledTextField(
+                        CustomWidgets().timePickerStyledField(
+                            selectedTime: c.selectedTime,
                             context: context,
                             hint: 'Time',
                             controller: c.timeController),
@@ -482,11 +563,12 @@ class SessionPage extends StatelessWidget {
                   CustomWidgets().labelWithAsterisk('Duration', required: true),
                   const SizedBox(height: 8),
                   CustomWidgets().customDropdownField(
-                      context: context,
-                      hint: 'Select Duration',
-                      value: c.selectedDuration.value,
-                      items: [],
-                      onChanged: (p0) => c.selectedDuration.value = p0),
+                    context: context,
+                    hint: 'Select Duration',
+                    items:
+                        c.durationOptions.map((e) => "${(e)} minutes").toList(),
+                    onChanged: (p0) {},
+                  ),
                   const SizedBox(height: 12),
                   CustomWidgets().labelWithAsterisk('Teacher', required: true),
                   const SizedBox(height: 8),
@@ -534,7 +616,9 @@ class SessionPage extends StatelessWidget {
       case "pending":
         return cs.tertiary; // orange
       case "no_balance":
-        return cs.error; // red — needs attention
+        return cs.tertiary; // red — needs attention
+        case "no_link":
+        return cs.error;
       case "completed":
         return cs.outline; // neutral grey
       case "meet_done":
@@ -693,18 +777,15 @@ class _SessionCard extends StatelessWidget {
                     ),
                     if (isStudent || isTeacher) ...[
                       const SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton.icon(
-                          onPressed: () =>
-                              _openRescheduleDialog(context, session),
-                          icon: const Icon(Icons.schedule, size: 18),
-                          label: const Text("Reschedule"),
-                          style: TextButton.styleFrom(
-                            foregroundColor: cs.primary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                          ),
+                      TextButton.icon(
+                        onPressed: () =>
+                            _openRescheduleDialog(context, session),
+                        icon: const Icon(Icons.schedule, size: 18),
+                        label: const Text("Reschedule"),
+                        style: TextButton.styleFrom(
+                          foregroundColor: cs.primary,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                         ),
                       ),
                     ],
@@ -819,18 +900,6 @@ class _TopBar extends StatelessWidget {
         },
       );
 
-      Widget filterBtn = _ChipButton(
-        icon: Icons.tune_rounded,
-        label: "Filter",
-        cs: cs,
-        onTap: () => CustomWidgets().showFilterSheet(
-          title: "Filter Sessions",
-          options: _filterOptions,
-          selectedValue: c.filterType.value,
-          onSelected: (val) => c.filterType.value = val,
-        ),
-      );
-
       Widget sortBtn = _ChipButton(
         icon: Icons.swap_vert_rounded,
         label: "Sort",
@@ -843,52 +912,42 @@ class _TopBar extends StatelessWidget {
         ),
       );
 
-      if (isMobile) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                if (!searching) ...[
-                  Expanded(child: pageTitle),
-                ] else ...[
-                  Expanded(child: searchField),
-                ],
-                const SizedBox(width: 8),
-                searchToggle,
-              ],
+      return HeaderWithSearch(
+        title: "Sessions",
+        hint: "Search sessions...",
+        isSearching: c.isSearching,
+        searchQuery: c.searchQuery,
+        onSearchChanged: () => c.applyFilters(),
+        onSortTap: () => CustomWidgets().showSortSheet<SortType>(
+          title: "Sort Sessions",
+          options: [
+            SortOption(
+              label: "Latest First",
+              value: SortType.newest,
+              icon: Icons.schedule,
             ),
-            if (!searching) ...[
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(child: filterBtn),
-                  const SizedBox(width: 8),
-                  Expanded(child: sortBtn),
-                ],
-              ),
-            ],
+            SortOption(
+              label: "Oldest First",
+              value: SortType.oldest,
+              icon: Icons.history,
+            ),
+            SortOption(
+              label: "Student Name",
+              value: SortType.student,
+              icon: Icons.person_outline,
+            ),
+            SortOption(
+              label: "Teacher Name",
+              value: SortType.teacher,
+              icon: Icons.school_outlined,
+            ),
           ],
-        );
-      }
-
-      return Row(
-        children: [
-          if (!searching) ...[
-            pageTitle,
-            const Spacer(),
-          ] else ...[
-            Expanded(flex: 3, child: searchField),
-          ],
-          const SizedBox(width: 10),
-          searchToggle,
-          if (!searching) ...[
-            const SizedBox(width: 8),
-            filterBtn,
-            const SizedBox(width: 8),
-            sortBtn,
-          ],
-        ],
+          selectedValue: c.sortType.value,
+          onSelected: (val) {
+            c.sortType.value = val;
+            c.applyFilters();
+          },
+        ),
       );
     });
   }

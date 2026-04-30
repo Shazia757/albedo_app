@@ -14,6 +14,7 @@ import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class EditableInfoCard extends StatefulWidget {
   final String type;
@@ -348,19 +349,56 @@ class _EditableDetailCardState extends State<EditableDetailCard> {
   }
 }
 
+Widget buildRoleCard({
+  required BuildContext context,
+  required String title,
+  required dynamic user,
+  required Function(String?) onTap,
+}) {
+  final name = user?.name;
+  final id = user?.id;
+
+  final isMissing =
+      (name == null || name.isEmpty) && (id == null || id.isEmpty);
+
+  if (isMissing) {
+    return detailCard(
+      context,
+      title: title,
+      name: "Not assigned",
+      id: "",
+      onTap: null,
+    );
+  }
+
+  return detailCard(
+    context,
+    title: title,
+    name: name ?? "-",
+    id: id ?? "-",
+    onTap: () => onTap(id),
+  );
+}
+
 Widget detailCard(
   BuildContext context, {
   required String title,
-  required String name,
-  required String id,
-  required VoidCallback onTap,
+  required String? name,
+  required String? id,
+  required VoidCallback? onTap,
   String? Function()? getImageUrl,
 }) {
   final color = getRoleColor(context, title.toLowerCase());
+  final cs = Theme.of(context).colorScheme;
+  final textTheme = Theme.of(context).textTheme;
+
   final imageUrl = getImageUrl?.call();
 
+  final isMissing =
+      (name == null || name.isEmpty) && (id == null || id.isEmpty);
+
   return InkWell(
-    onTap: onTap,
+    onTap: isMissing ? null : onTap,
     borderRadius: BorderRadius.circular(14),
     child: Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -373,11 +411,13 @@ Widget detailCard(
       child: Row(
         children: [
           CircleAvatar(
-              radius: 18,
-              // backgroundColor: color.withOpacity(0.15),
-              child: imageUrl == null
-                  ? Image.asset('assets/images/logo.png')
-                  : null),
+            radius: 18,
+            backgroundColor: color.withOpacity(0.15),
+            backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
+            child: imageUrl == null
+                ? Icon(Icons.person, size: 18, color: color)
+                : null,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -385,27 +425,30 @@ Widget detailCard(
               children: [
                 Text(
                   title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(color: color),
+                  style: textTheme.labelSmall?.copyWith(color: color),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  name,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  isMissing ? "Not assigned" : (name ?? "-"),
+                  style: textTheme.titleSmall?.copyWith(
+                    color: isMissing
+                        ? cs.onSurface.withOpacity(0.5)
+                        : cs.onSurface,
+                  ),
                 ),
-                Text(
-                  id,
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(color: color),
-                ),
+                if (!isMissing)
+                  Text(
+                    id ?? "",
+                    style: textTheme.labelSmall?.copyWith(color: color),
+                  ),
               ],
             ),
           ),
-          Icon(Icons.arrow_forward_ios, size: 14, color: color),
+          Icon(
+            Icons.arrow_forward_ios,
+            size: 14,
+            color: isMissing ? cs.onSurface.withOpacity(0.3) : color,
+          ),
         ],
       ),
     ),
@@ -1355,16 +1398,14 @@ Color getStatusColor(String? status) {
   }
 }
 
-String formatDate(DateTime dateTime) {
-  return "${dateTime.day.toString().padLeft(2, '0')}/"
-      "${dateTime.month.toString().padLeft(2, '0')}/"
-      "${dateTime.year}";
+String formatDate(DateTime date) {
+  return DateFormat('dd MMM yyyy').format(date);
 }
 
-String formatTime(DateTime dt) {
-  final hour = dt.hour > 12 ? dt.hour - 12 : dt.hour;
-  final ampm = dt.hour >= 12 ? "PM" : "AM";
-  return "$hour:${dt.minute.toString().padLeft(2, '0')} $ampm";
+String formatTime(TimeOfDay time) {
+  final now = DateTime.now();
+  final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+  return DateFormat('hh:mm a').format(dt);
 }
 
 // ── Status badge ──────────────────────────────────────────────────────
@@ -1479,6 +1520,7 @@ class AddSessionFAB extends StatelessWidget {
                   : "Add Meet Session",
             )),
         onSubmit: () {},
+        submitText: 'Add Session',
         children: [
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.75,
@@ -1584,11 +1626,12 @@ class _ClassSessionForm extends StatelessWidget {
         const SizedBox(height: 12),
         CustomWidgets().labelWithAsterisk('Select Duration', required: true),
         const SizedBox(height: 8),
-        CustomWidgets().durationPickerStyledField(
-            context: context,
-            hint: 'Select Duration',
-            controller: c.durationController,
-            selectedDuration: c.selectedDuration),
+        CustomWidgets().customDropdownField(
+          context: context,
+          hint: 'Select Duration',
+          items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
+          onChanged: (p0) {},
+        ),
         const SizedBox(height: 16),
       ],
     );
@@ -1693,10 +1736,12 @@ class _MeetSessionForm extends StatelessWidget {
         const SizedBox(height: 12),
         CustomWidgets().labelWithAsterisk('Start Time', required: true),
         const SizedBox(height: 8),
-        CustomWidgets().durationPickerStyledField(
-            context: context,
-            controller: c.timeController,
-            selectedDuration: c.selectedDuration),
+        CustomWidgets().customDropdownField(
+          context: context,
+          items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
+          hint: 'Select Duration',
+          onChanged: (p0) {},
+        ),
         const SizedBox(height: 12),
         CustomWidgets().labelWithAsterisk('Description', required: true),
         const SizedBox(height: 8),
@@ -1709,7 +1754,6 @@ class _MeetSessionForm extends StatelessWidget {
     );
   }
 }
-
 
 // ═══════════════════════════════════════════════════════════════════════
 // EMPTY STATE

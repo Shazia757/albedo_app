@@ -69,4 +69,7 @@ class TrStudentsController extends GetxController {
   List<Package> getPackagesByStudent(String? teacherId) {
     return packages.where((p) => p.teacherId == teacherId).toList();
   }
+
+  var searchQuery = ''.obs;
+  var isSearching=false.obs;
 }

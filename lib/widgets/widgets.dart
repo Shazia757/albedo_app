@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 typedef StringValueOf<T> = String Function(T item);
 
@@ -469,130 +470,127 @@ class CustomWidgets {
     required String text,
     required VoidCallback onConfirm,
   }) {
+    final cs = Theme.of(context).colorScheme;
+
     Get.dialog(
       Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 40),
-        child: Stack(
-          children: [
-            /// 🔷 MAIN CARD
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(26),
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+          decoration: BoxDecoration(
+            color: cs.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: cs.error.withOpacity(0.2),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// 🔥 ICON (danger cue)
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: cs.error.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.delete_outline,
+                  color: cs.error,
+                  size: 28,
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              /// 🔹 TITLE
+              Text(
+                "Delete Session?",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              /// 🔹 MESSAGE
+              Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  height: 1.5,
+                  color: cs.onSurface.withOpacity(0.6),
+                ),
+              ),
+
+              const SizedBox(height: 22),
+
+              /// 🔹 ACTIONS
+              Row(
                 children: [
-                  // /// 🗑️ ICON
-                  // Image.asset(
-                  //   "assets/icons/delete.png", // 👈 use your asset
-                  //   height: 70,
-                  // ),
-
-                  // const SizedBox(height: 16),
-
-                  /// 🔹 TITLE
-                  Text(
-                    "Are you sure?",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: context.theme.colorScheme.inverseSurface,
+                  /// CANCEL
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(
+                          color: cs.outline.withOpacity(0.4),
+                        ),
+                      ),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: cs.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(width: 10),
 
-                  /// 🔹 MESSAGE
-                  Text(
-                    text,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF6B7280),
-                      height: 1.5,
+                  /// DELETE
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        onConfirm();
+                        Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.error,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        "Yes",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 22),
-
-                  /// 🔹 BUTTONS
-                  Row(
-                    children: [
-                      /// NO BUTTON
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: TextButton(
-                            onPressed: () => Get.back(),
-                            child: Text(
-                              "No",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: context.theme.colorScheme.inverseSurface,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      /// YES BUTTON
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              onConfirm();
-                              Get.back();
-                            },
-                            child: Text(
-                              "Yes",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
-            ),
-
-            /// ❌ CLOSE BUTTON (TOP RIGHT)
-            Positioned(
-              right: 8,
-              top: 8,
-              child: GestureDetector(
-                onTap: () => Get.back(),
-                child: Container(
-                  height: 36,
-                  width: 36,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.close,
-                    size: 20,
-                    color: context.theme.colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -603,130 +601,127 @@ class CustomWidgets {
     required VoidCallback onConfirm,
     required String text,
   }) {
+    final cs = Theme.of(context).colorScheme;
+
     Get.dialog(
       Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 40),
-        child: Stack(
-          children: [
-            /// 🔷 MAIN CARD
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(26),
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+          decoration: BoxDecoration(
+            color: cs.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: cs.secondary.withOpacity(0.2),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// 🟡 WARNING ICON (not error)
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: cs.secondary.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.pause_circle_outline,
+                  color: cs.secondary,
+                  size: 28,
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              /// 🔹 TITLE (specific intent)
+              Text(
+                "Deactivate Account?",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              /// 🔹 MESSAGE
+              Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  height: 1.5,
+                  color: cs.onSurface.withOpacity(0.6),
+                ),
+              ),
+
+              const SizedBox(height: 22),
+
+              /// 🔹 ACTIONS
+              Row(
                 children: [
-                  // /// 🗑️ ICON
-                  // Image.asset(
-                  //   "assets/icons/delete.png", // 👈 use your asset
-                  //   height: 70,
-                  // ),
-
-                  // const SizedBox(height: 16),
-
-                  /// 🔹 TITLE
-                  Text(
-                    "Are you sure?",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: context.theme.colorScheme.inverseSurface,
+                  /// CANCEL
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(
+                          color: cs.outline.withOpacity(0.4),
+                        ),
+                      ),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: cs.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(width: 10),
 
-                  /// 🔹 MESSAGE
-                  Text(
-                    text,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF6B7280),
-                      height: 1.5,
+                  /// DEACTIVATE
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        onConfirm();
+                        Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.secondary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        "Deactivate",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 22),
-
-                  /// 🔹 BUTTONS
-                  Row(
-                    children: [
-                      /// NO BUTTON
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: TextButton(
-                            onPressed: () => Get.back(),
-                            child: Text(
-                              "No",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: context.theme.colorScheme.onSurface,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      /// YES BUTTON
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: context.theme.colorScheme.secondary,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              onConfirm();
-                              Get.back();
-                            },
-                            child: Text(
-                              "Yes",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
-            ),
-
-            /// ❌ CLOSE BUTTON (TOP RIGHT)
-            Positioned(
-              right: 8,
-              top: 8,
-              child: GestureDetector(
-                onTap: () => Get.back(),
-                child: Container(
-                  height: 36,
-                  width: 36,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.close,
-                    size: 20,
-                    color: context.theme.colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1273,6 +1268,83 @@ class CustomWidgets {
     );
   }
 
+  Widget attachmentStyledField({
+    required BuildContext context,
+    required String hint,
+    String? label,
+    String? fileName,
+    VoidCallback? onTap,
+    VoidCallback? onClear,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final hasFile = fileName != null && fileName.isNotEmpty;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        decoration: BoxDecoration(
+          color: cs.outline.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.transparent),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.attach_file,
+              size: 18,
+              color: cs.onSurface.withOpacity(0.7),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (label != null)
+                    Text(
+                      label,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: cs.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  Text(
+                    hasFile ? fileName : hint,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: hasFile
+                          ? cs.onSurface
+                          : cs.onSurface.withOpacity(0.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (hasFile && onClear != null)
+              IconButton(
+                icon: Icon(
+                  Icons.close,
+                  size: 16,
+                  color: cs.error,
+                ),
+                onPressed: onClear,
+                splashRadius: 18,
+              )
+            else
+              Icon(
+                Icons.upload_file,
+                size: 18,
+                color: cs.onSurface.withOpacity(0.5),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget dropdownStyledTextField({
     required BuildContext context,
     required String hint,
@@ -1386,8 +1458,7 @@ class CustomWidgets {
                     context: context,
                     selectedDate: selectedDate.value,
                     onDateSelected: (date) {
-                      controller.text =
-                          "${date.day} ${monthName(date.month)} ${date.year}";
+                      controller.text = DateFormat('dd MMM yyyy').format(date);
                       selectedDate.value = date;
                       overlayEntry?.remove();
                     },
@@ -1732,7 +1803,16 @@ class CustomWidgets {
 
       if (picked != null) {
         selectedTime.value = picked;
-        controller.text = picked.format(context);
+        final now = DateTime.now();
+        final dt = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          picked.hour,
+          picked.minute,
+        );
+
+        controller.text = DateFormat('hh:mm a').format(dt);
       }
     }
 
@@ -1755,144 +1835,6 @@ class CustomWidgets {
           vertical: 11,
         ),
         suffixIcon: const Icon(Icons.access_time),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.transparent),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.transparent),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
-        ),
-      ),
-    );
-  }
-
-  Widget durationPickerStyledField({
-    required BuildContext context,
-    required TextEditingController controller,
-    required Rxn<int> selectedDuration, // in minutes
-    String hint = "Select Duration",
-    String? label,
-  }) {
-    final cs = Theme.of(context).colorScheme;
-
-    Future<void> pickDuration() async {
-      int totalMinutes = selectedDuration.value ?? 0;
-
-      await showModalBottomSheet(
-        context: context,
-        builder: (_) {
-          int hours = totalMinutes ~/ 60;
-          int minutes = totalMinutes % 60;
-
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return Container(
-                padding: const EdgeInsets.all(16),
-                height: 250,
-                child: Column(
-                  children: [
-                    const Text(
-                      "Select Duration",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Hours
-                        Column(
-                          children: [
-                            const Text("Hours"),
-                            DropdownButton<int>(
-                              value: hours,
-                              items: List.generate(
-                                24,
-                                (i) => DropdownMenuItem(
-                                  value: i,
-                                  child: Text(i.toString()),
-                                ),
-                              ),
-                              onChanged: (val) => setState(() => hours = val!),
-                            ),
-                          ],
-                        ),
-
-                        // Minutes
-                        Column(
-                          children: [
-                            const Text("Minutes"),
-                            DropdownButton<int>(
-                              value: minutes,
-                              items: List.generate(
-                                60,
-                                (i) => DropdownMenuItem(
-                                  value: i,
-                                  child: Text(i.toString().padLeft(2, '0')),
-                                ),
-                              ),
-                              onChanged: (val) =>
-                                  setState(() => minutes = val!),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    ElevatedButton(
-                      onPressed: () {
-                        final int total = hours * 60 + minutes;
-
-                        if (selectedDuration != null) {
-                          selectedDuration.value = total;
-                        }
-
-                        // format text
-                        if (hours > 0 && minutes > 0) {
-                          controller.text = "${hours}h ${minutes}m";
-                        } else if (hours > 0) {
-                          controller.text = "${hours}h";
-                        } else {
-                          controller.text = "${minutes}m";
-                        }
-
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Done"),
-                    )
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      );
-    }
-
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: pickDuration,
-      style: const TextStyle(fontSize: 12),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        hintStyle: TextStyle(
-          fontSize: 12,
-          color: context.theme.colorScheme.onSurface,
-        ),
-        filled: true,
-        fillColor: cs.outline.withOpacity(0.1),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 11,
-        ),
-        suffixIcon: const Icon(Icons.timer),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.transparent),

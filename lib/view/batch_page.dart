@@ -1,5 +1,4 @@
 import 'package:albedo_app/controller/batch_controller.dart';
-import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';

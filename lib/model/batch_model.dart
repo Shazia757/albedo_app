@@ -1,4 +1,5 @@
 import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 
 class Batch {
@@ -6,6 +7,7 @@ class Batch {
   String? batchID;
   String? batchName;
   String? mode;
+  Student? student;
   String? course;
   String? imageUrl;
   Teacher? teacher;
@@ -32,6 +34,7 @@ class Batch {
     this.batchName,
     this.teacher,
     this.mode,
+    this.student,
     this.totalFee,
     this.totalPaid,
     this.balance,

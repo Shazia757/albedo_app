@@ -6,6 +6,7 @@ import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../controller/home_controller.dart';
 import '../../../../widgets/drawer_menu.dart';
@@ -21,7 +22,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MediaQuery.of(context).size.width > 800 ? null : DrawerMenu(),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.outline.withOpacity(0.1),
       appBar: CustomAppBar(),
       body: Row(
         children: [
@@ -65,6 +66,12 @@ class HomeView extends StatelessWidget {
 
       case "admin":
         return _adminDashboard(context);
+
+      case "finance":
+        return _financeDashboard(context);
+
+      case "sales":
+        return _salesheadDashboard(context);
 
       default:
         return const SizedBox();
@@ -352,6 +359,106 @@ class HomeView extends StatelessWidget {
 
         /// 🔹 HIRING
         _hiringSection(context),
+      ],
+    );
+  }
+
+  Widget _financeDashboard(BuildContext context) {
+    return Column(
+      children: [
+        /// 🔹 EXPENSE
+        _expenseChartCard(context),
+        const SizedBox(height: 14),
+
+        /// 🔹 VIDEO
+        _youtubeCard(context),
+        const SizedBox(height: 14),
+
+        /// 🔹 STUDENTS COUNT
+        _chartCard(
+          context,
+          title: "Students Count",
+          count: c.studentCount.value.toString(),
+          data: c.studentData,
+          color: Theme.of(context).colorScheme.primary,
+          selectedFilter: TimeFilter.all,
+          onFilterChanged: (_) {},
+          selectedRange: c.studentRange,
+          onRangeChanged: (v) {
+            c.studentRange.value = v;
+            c.updateStudentData(range: v);
+          },
+        ),
+        const SizedBox(height: 14),
+
+        /// 🔹 TEACHERS COUNT
+        _chartCard(
+          context,
+          title: "Teachers Count",
+          count: c.teacherCount.value.toString(),
+          data: c.teacherData,
+          color: Theme.of(context).colorScheme.secondary,
+          selectedFilter: c.selectedFilter.value,
+          onFilterChanged: (f) {
+            c.selectedFilter.value = f;
+            c.updateTeacherData();
+          },
+          selectedRange: c.teacherRange,
+          onRangeChanged: (v) {
+            c.teacherRange.value = v;
+            c.updateTeacherData(range: v);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _salesheadDashboard(BuildContext context) {
+    return Column(
+      children: [
+        /// 🔹 EXPENSE
+        _studentsAnalyticsCard(context),
+        const SizedBox(height: 14),
+
+        /// 🔹 VIDEO
+        _youtubeCard(context),
+        const SizedBox(height: 14),
+
+        /// 🔹 STUDENTS COUNT
+        _chartCard(
+          context,
+          title: "Students Count",
+          count: c.studentCount.value.toString(),
+          data: c.studentData,
+          color: Theme.of(context).colorScheme.primary,
+          selectedFilter: TimeFilter.all,
+          onFilterChanged: (_) {},
+          selectedRange: c.studentRange,
+          onRangeChanged: (v) {
+            c.studentRange.value = v;
+            c.updateStudentData(range: v);
+          },
+        ),
+        const SizedBox(height: 14),
+
+        /// 🔹 TEACHERS COUNT
+        _chartCard(
+          context,
+          title: "Advisors Count",
+          count: c.advisorCount.value.toString(),
+          data: c.advisorData,
+          color: Theme.of(context).colorScheme.secondary,
+          selectedFilter: c.selectedFilter.value,
+          onFilterChanged: (f) {
+            c.selectedFilter.value = f;
+            c.updateAdvisorData();
+          },
+          selectedRange: c.teacherRange,
+          onRangeChanged: (v) {
+            c.advisorRange.value = v;
+            c.updateAdvisorData(range: v);
+          },
+        ),
       ],
     );
   }
@@ -663,7 +770,6 @@ class HomeView extends StatelessWidget {
                 Obx(() => PopupMenuButton(
                       padding: EdgeInsets.zero,
                       offset: const Offset(0, 45),
-                      color: context.theme.cardColor,
                       elevation: 0,
                       itemBuilder: (context) => [
                         PopupMenuItem(
@@ -682,17 +788,6 @@ class HomeView extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: context.theme.cardColor,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: context.theme.colorScheme.shadow
-                                  .withOpacity(0.08),
-                              blurRadius: 10,
-                            )
-                          ],
-                        ),
                         child: Row(
                           children: [
                             Text(c.summaryRange.value,
@@ -950,11 +1045,11 @@ class HomeView extends StatelessWidget {
             // 🔹 LEGEND (compact like chart style)
             Row(
               children: [
-                _legendDot(context, cs.primary, "Hours"),
+                _legendDot(context, cs.primary, "Total Hours"),
                 const SizedBox(width: 12),
-                _legendDot(context, cs.secondary, "Amount"),
+                _legendDot(context, cs.secondary, "Class Taken Amount"),
                 const SizedBox(width: 12),
-                _legendDot(context, cs.tertiary, "Salary"),
+                _legendDot(context, cs.tertiary, "Total Salary"),
               ],
             ),
 
@@ -962,76 +1057,87 @@ class HomeView extends StatelessWidget {
 
             // 🔹 CHART (same style)
             Expanded(
-              child: LineChart(
-                LineChartData(
-                  minX: 0,
-                  maxX: 5,
-                  minY: 0,
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    horizontalInterval: 5000000,
-                    getDrawingHorizontalLine: (value) => FlLine(
-                      color: (context.theme.colorScheme.outline ?? Colors.grey)
-                          .withOpacity(0.3),
-                      strokeWidth: 1,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: LineChart(
+                  LineChartData(
+                    clipData: FlClipData.all(),
+                    minX: 0,
+                    maxX: (c.expenseLabels.length - 1).toDouble(),
+                    minY: 0,
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      horizontalInterval: 5000000,
+                      getDrawingHorizontalLine: (value) => FlLine(
+                        color:
+                            (context.theme.colorScheme.outline ?? Colors.grey)
+                                .withOpacity(0.3),
+                        strokeWidth: 1,
+                      ),
                     ),
-                  ),
-                  titlesData: FlTitlesData(
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 1,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            c.years[value.toInt()],
-                            style: context.textTheme.labelSmall?.copyWith(
-                              color: context.theme.colorScheme.outline,
-                            ),
-                          );
+                    titlesData: FlTitlesData(
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: 1,
+                          getTitlesWidget: (value, meta) {
+                            final index = value.toInt();
+
+                            if (index < 0 || index >= c.expenseLabels.length) {
+                              return const SizedBox();
+                            }
+
+                            return Text(
+                              c.expenseLabels[index],
+                              style: context.textTheme.labelSmall?.copyWith(
+                                color: context.theme.colorScheme.outline,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 40,
+                          getTitlesWidget: (value, meta) {
+                            return Text(
+                              _formatCompact(value),
+                              style: context.textTheme.labelSmall?.copyWith(
+                                color: context.theme.colorScheme.outline,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      rightTitles:
+                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles:
+                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    lineTouchData: LineTouchData(
+                      touchTooltipData: LineTouchTooltipData(
+                        tooltipRoundedRadius: 8,
+                        getTooltipItems: (spots) {
+                          return spots.map((spot) {
+                            return LineTooltipItem(
+                                _formatCompact(spot.y),
+                                TextStyle(
+                                  color: context.theme.colorScheme.onSurface,
+                                  fontWeight: FontWeight.w600,
+                                ));
+                          }).toList();
                         },
                       ),
                     ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 40,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            _formatCompact(value),
-                            style: context.textTheme.labelSmall?.copyWith(
-                              color: context.theme.colorScheme.outline,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    rightTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    lineBarsData: [
+                      _line(c.totalHours, cs.primary),
+                      _line(c.classAmount, cs.secondary),
+                      _line(c.totalSalary, cs.tertiary),
+                    ],
                   ),
-                  borderData: FlBorderData(show: false),
-                  lineTouchData: LineTouchData(
-                    touchTooltipData: LineTouchTooltipData(
-                      tooltipRoundedRadius: 8,
-                      getTooltipItems: (spots) {
-                        return spots.map((spot) {
-                          return LineTooltipItem(
-                              _formatCompact(spot.y),
-                              TextStyle(
-                                color: context.theme.colorScheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                              ));
-                        }).toList();
-                      },
-                    ),
-                  ),
-                  lineBarsData: [
-                    _line(c.totalHours, cs.primary),
-                    _line(c.classAmount, cs.secondary),
-                    _line(c.totalSalary, cs.tertiary),
-                  ],
                 ),
               ),
             ),
@@ -1046,6 +1152,7 @@ class HomeView extends StatelessWidget {
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
     final isAdvisor = role == "advisor";
+    final isSales = role == 'sales';
 
     return Obx(() {
       return Container(
@@ -1128,13 +1235,15 @@ class HomeView extends StatelessWidget {
                 _legendDot(
                   context,
                   cs.primary,
-                  isAdvisor ? "Total Package Amount" : "Total Salary",
+                  (isAdvisor || isSales)
+                      ? "Total Package Amount"
+                      : "Total Salary",
                 ),
                 const SizedBox(width: 10),
                 _legendDot(context, cs.secondary,
-                    isAdvisor ? "Total Spot Amount" : "Pending"),
+                    (isAdvisor || isSales) ? "Total Spot Amount" : "Pending"),
                 const SizedBox(width: 10),
-                if (!isAdvisor) ...[
+                if (!isAdvisor || !isSales) ...[
                   _legendDot(context, cs.tertiary, "Received"),
                   const SizedBox(width: 10),
                   _legendDot(context, Colors.green, "Hours"),
@@ -1960,7 +2069,7 @@ class HomeView extends StatelessWidget {
 
                 /// Time
                 Text(
-                  _formatTime(session.time),
+                  formatTime(session.time),
                   style: context.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
@@ -1992,9 +2101,10 @@ class HomeView extends StatelessWidget {
     return "${date.day}/${date.month}/${date.year}";
   }
 
-  String _formatTime(DateTime? time) {
-    if (time == null) return "-";
-    return "${time.hour}:${time.minute.toString().padLeft(2, '0')}";
+  String formatTime(TimeOfDay time) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return DateFormat('hh:mm a').format(dt);
   }
 
   Widget _infoCard(
@@ -2094,9 +2204,11 @@ class HomeView extends StatelessWidget {
     required Function(String) onSelected,
   }) {
     final ranges = [
-      "All",
+      "Today",
+      "This Week",
       "This Month",
       "This Year",
+      "All",
     ];
 
     return Container(

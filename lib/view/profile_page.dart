@@ -39,28 +39,24 @@ class ProfilePage extends StatelessWidget {
                 _SectionCard(
                   title: "Account Info",
                   icon: Icons.badge_outlined,
-                  cs: cs,
                   child: Column(
                     children: [
                       _InfoRow(
                         label: "Employee ID",
                         value: user?.id ?? "—",
                         icon: Icons.fingerprint,
-                        cs: cs,
                       ),
                       _Divider(cs: cs),
                       _InfoRow(
                         label: "Email",
                         value: user?.email ?? "—",
                         icon: Icons.mail_outline_rounded,
-                        cs: cs,
                       ),
                       _Divider(cs: cs),
                       _InfoRow(
                         label: "Phone",
                         value: user?.contact ?? "—",
                         icon: Icons.phone_outlined,
-                        cs: cs,
                       ),
                     ],
                   ),
@@ -72,14 +68,12 @@ class ProfilePage extends StatelessWidget {
                 _SectionCard(
                   title: "Quick Access",
                   icon: Icons.grid_view_rounded,
-                  cs: cs,
                   child: Column(
                     children: [
                       _QuickAccessTile(
                         label: "Android App",
                         icon: Icons.android_rounded,
                         iconColor: const Color(0xFF3DDC84),
-                        cs: cs,
                         onTap: () {},
                       ),
                       _Divider(cs: cs),
@@ -87,7 +81,6 @@ class ProfilePage extends StatelessWidget {
                         label: "iOS App",
                         icon: Icons.phone_iphone_rounded,
                         iconColor: const Color(0xFF007AFF),
-                        cs: cs,
                         onTap: () {},
                       ),
                       _Divider(cs: cs),
@@ -95,7 +88,6 @@ class ProfilePage extends StatelessWidget {
                         label: "Documentation",
                         icon: Icons.menu_book_rounded,
                         iconColor: const Color(0xFFFF9500),
-                        cs: cs,
                         onTap: () {},
                       ),
                       _Divider(cs: cs),
@@ -103,7 +95,6 @@ class ProfilePage extends StatelessWidget {
                         label: "Calculator",
                         icon: Icons.calculate_rounded,
                         iconColor: const Color(0xFF5856D6),
-                        cs: cs,
                         onTap: () {},
                       ),
                     ],
@@ -200,7 +191,7 @@ class _ProfileHeroCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Stack(
         children: [
@@ -457,71 +448,55 @@ class _HeroButton extends StatelessWidget {
 class _SectionCard extends StatelessWidget {
   final String title;
   final IconData icon;
-  final ColorScheme cs;
   final Widget child;
 
   const _SectionCard({
     required this.title,
     required this.icon,
-    required this.cs,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: cs.outlineVariant.withOpacity(0.5),
-          width: 1,
+          color: cs.outline.withOpacity(0.12),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
-            child: Row(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(7),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: cs.primaryContainer.withOpacity(0.6),
+                    color: cs.primaryContainer.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(icon, size: 16, color: cs.primary),
+                  child: Icon(icon, size: 18, color: cs.primary),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: cs.onSurface,
-                    letterSpacing: -0.1,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
-          ),
-
-          const SizedBox(height: 14),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-            child: child,
-          ),
-        ],
+            const SizedBox(height: 16),
+            child,
+          ],
+        ),
       ),
     );
   }
@@ -534,19 +509,20 @@ class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
-  final ColorScheme cs;
 
   const _InfoRow({
     required this.label,
     required this.value,
     required this.icon,
-    required this.cs,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
           Icon(icon, size: 18, color: cs.primary.withOpacity(0.7)),
@@ -554,24 +530,17 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 13,
-                color: cs.onSurface.withOpacity(0.55),
-                fontWeight: FontWeight.w500,
+              style: textTheme.bodySmall?.copyWith(
+                color: cs.onSurface.withOpacity(0.6),
               ),
             ),
           ),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w600,
-                color: cs.onSurface,
-              ),
-              overflow: TextOverflow.ellipsis,
+          Text(
+            value,
+            style: textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
             ),
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -582,55 +551,63 @@ class _InfoRow extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────
 // QUICK ACCESS TILE
 // ─────────────────────────────────────────────────────────────
-class _QuickAccessTile extends StatelessWidget {
+class _QuickAccessTile extends StatefulWidget {
   final String label;
   final IconData icon;
   final Color iconColor;
-  final ColorScheme cs;
   final VoidCallback onTap;
 
   const _QuickAccessTile({
     required this.label,
     required this.icon,
     required this.iconColor,
-    required this.cs,
     required this.onTap,
   });
 
   @override
+  State<_QuickAccessTile> createState() => _QuickAccessTileState();
+}
+
+class _QuickAccessTileState extends State<_QuickAccessTile> {
+  bool hovering = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 11),
+    final cs = Theme.of(context).colorScheme;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => hovering = true),
+      onExit: (_) => setState(() => hovering = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          decoration: BoxDecoration(
+            color: hovering ? cs.primary.withOpacity(0.06) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  color: widget.iconColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, size: 18, color: iconColor),
+                child: Icon(widget.icon, size: 18, color: widget.iconColor),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: cs.onSurface,
-                  ),
+                  widget.label,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
               Icon(
-                Icons.chevron_right_rounded,
-                size: 20,
-                color: cs.onSurface.withOpacity(0.3),
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: cs.onSurface.withOpacity(0.4),
               ),
             ],
           ),

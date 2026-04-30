@@ -6,6 +6,7 @@ import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -44,8 +45,10 @@ class SessionController extends GetxController {
   var selectedTime = Rxn<TimeOfDay>();
   RxString selectedType = "session".obs;
   RxList<Student> studentsList = <Student>[].obs;
+  String selectedFile = '';
   RxList<Teacher> teacherList = <Teacher>[].obs;
   RxList<Mentor> mentorsList = <Mentor>[].obs;
+  RxList<Category> categoryList = <Category>[].obs;
   RxList<Coordinator> coordinatorsList = <Coordinator>[].obs;
   RxList<Advisor> advisorsList = <Advisor>[].obs;
   RxList<String> otherUsersList = <String>[].obs;
@@ -57,11 +60,11 @@ class SessionController extends GetxController {
   TextEditingController teacherController = TextEditingController();
   TextEditingController meetTitleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
- TextEditingController titleController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
   TextEditingController priorityController = TextEditingController();
   TextEditingController userTypeController = TextEditingController();
-  
+
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
 
   final packageOptions = ['Package A', 'Package B', 'Package C'];
@@ -180,203 +183,208 @@ class SessionController extends GetxController {
     }
   }
 
-  List<Session> _getDummySessions() {
-    return [
-      Session(
-        id: "S001",
-        student: Student(
-          studentId: "STU001",
-          name: "Aisha",
-          joinedAt: DateTime.now(),
-        ),
-        package: "Premium Package",
-        syllabus: "CBSE Mathematics",
-        className: "Class 10",
-        teacher: Teacher(
-          id: "T001",
-          name: "Ameen Rahman",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          id: "MTR001",
-          name: "Saeeda",
-          joinedAt: DateTime.now(),
-        ),
-        coordinator: Coordinator(
-          id: "COO1001",
-          name: "Maria",
-          joinedAt: DateTime.now(),
-        ),
-        advisor: Advisor(
-          id: "ADV001",
-          name: "Fathima",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime(2026, 4, 23),
-        time: DateTime(2026, 4, 23, 10, 30),
-        status: "started",
+List<Session> _getDummySessions() {
+  return [
+    Session(
+      id: "S001",
+      student: Student(
+        studentId: "STU001",
+        name: "Aisha",
+        joinedAt: DateTime.now(),
       ),
-      Session(
-        id: "S002",
-        student: Student(
-          studentId: "STU002",
-          name: "Rahul",
-          joinedAt: DateTime.now(),
-        ),
-        package: "Science",
-        syllabus: "SCERT",
-        className: "9B",
-        teacher: Teacher(
-          id: "T002",
-          name: "David",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          id: "MTR002",
-          name: "David",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now().add(const Duration(days: 1)),
-        time: DateTime.now(),
-        status: "upcoming",
+      package: "Premium Package",
+      syllabus: "CBSE Mathematics",
+      className: "Class 10",
+      teacher: Teacher(
+        id: "T001",
+        name: "Ameen Rahman",
+        status: "Active",
+        gender: "Male",
+        joinedAt: DateTime.now(),
       ),
-      Session(
-        id: "S003",
-        student: Student(
-          studentId: "STU003",
-          name: "Fatima",
-          joinedAt: DateTime.now(),
-        ),
-        package: "English",
-        syllabus: "CBSE",
-        className: "8C",
-        teacher: Teacher(
-          id: "T001",
-          name: "John",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          id: "MTR001",
-          name: "Saeeda",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now(),
-        time: DateTime.now(),
-        status: "pending",
+      mentor: Mentor(
+        id: "MTR001",
+        name: "Saeeda",
+        joinedAt: DateTime.now(),
       ),
-      Session(
-        id: "S004",
-        student: Student(
-          studentId: "ST04",
-          name: "Arjun",
-          joinedAt: DateTime.now(),
-        ),
-        package: "Physics",
-        syllabus: "SCERT",
-        className: "11A",
-        teacher: Teacher(
-          id: "T003",
-          name: "Meera",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          id: "MTR002",
-          name: "David",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now().subtract(const Duration(days: 3)),
-        time: DateTime.now(),
-        status: "completed",
+      coordinator: Coordinator(
+        id: "COO1001",
+        name: "Maria",
+        joinedAt: DateTime.now(),
       ),
-      Session(
-        id: "S005",
-        student: Student(
-          studentId: "ST05",
-          name: "Nisha",
-          joinedAt: DateTime.now(),
-        ),
-        package: "Chemistry",
-        syllabus: "CBSE",
-        className: "12B",
-        teacher: Teacher(
-          id: "T002",
-          name: "David",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          id: "MTR001",
-          name: "Saeeda",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now(),
-        time: DateTime.now(),
-        status: "no_balance",
+      advisor: Advisor(
+        id: "ADV001",
+        name: "Fathima",
+        joinedAt: DateTime.now(),
       ),
-      Session(
-        id: "S006",
-        student: Student(
-          studentId: "ST06",
-          name: "Ali",
-          joinedAt: DateTime.now(),
-        ),
-        package: "Biology",
-        syllabus: "SCERT",
-        className: "10A",
-        teacher: Teacher(
-          id: "T003",
-          name: "Meera",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          id: "MTR002",
-          name: "David",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now().subtract(const Duration(hours: 5)),
-        time: DateTime.now(),
-        status: "meet_done",
-      ),
-      Session(
-        id: "S007",
-        student: Student(
-          studentId: "ST07",
-          name: "Sneha",
-          joinedAt: DateTime.now(),
-        ),
-        package: "Math",
-        syllabus: "CBSE",
-        className: "9A",
-        teacher: Teacher(
-          id: "T001",
-          name: "Ameen Rahman",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          id: "MTR001",
-          name: "Saeeda",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now().add(const Duration(hours: 3)),
-        time: DateTime.now(),
-        status: "started",
-      ),
-    ];
-  }
+      date: DateTime(2026, 4, 23),
+      time: const TimeOfDay(hour: 10, minute: 30),
+      status: "started",
+    ),
 
+    Session(
+      id: "S002",
+      student: Student(
+        studentId: "STU002",
+        name: "Rahul",
+        joinedAt: DateTime.now(),
+      ),
+      package: "Science",
+      syllabus: "SCERT",
+      className: "9B",
+      teacher: Teacher(
+        id: "T002",
+        name: "David",
+        status: "Active",
+        gender: "Male",
+        joinedAt: DateTime.now(),
+      ),
+      mentor: Mentor(
+        id: "MTR002",
+        name: "David",
+        joinedAt: DateTime.now(),
+      ),
+      date: DateTime.now().add(const Duration(days: 1)),
+      time: const TimeOfDay(hour: 9, minute: 0),
+      status: "upcoming",
+    ),
+
+    Session(
+      id: "S003",
+      student: Student(
+        studentId: "STU003",
+        name: "Fatima",
+        joinedAt: DateTime.now(),
+      ),
+      package: "English",
+      syllabus: "CBSE",
+      className: "8C",
+      teacher: Teacher(
+        id: "T001",
+        name: "John",
+        status: "Active",
+        gender: "Male",
+        joinedAt: DateTime.now(),
+      ),
+      mentor: Mentor(
+        id: "MTR001",
+        name: "Saeeda",
+        joinedAt: DateTime.now(),
+      ),
+      date: DateTime.now(),
+      time: const TimeOfDay(hour: 11, minute: 15),
+      status: "pending",
+    ),
+
+    Session(
+      id: "S004",
+      student: Student(
+        studentId: "ST04",
+        name: "Arjun",
+        joinedAt: DateTime.now(),
+      ),
+      package: "Physics",
+      syllabus: "SCERT",
+      className: "11A",
+      teacher: Teacher(
+        id: "T003",
+        name: "Meera",
+        status: "Active",
+        gender: "Male",
+        joinedAt: DateTime.now(),
+      ),
+      mentor: Mentor(
+        id: "MTR002",
+        name: "David",
+        joinedAt: DateTime.now(),
+      ),
+      date: DateTime.now().subtract(const Duration(days: 3)),
+      time: const TimeOfDay(hour: 14, minute: 0),
+      status: "completed",
+    ),
+
+    Session(
+      id: "S005",
+      student: Student(
+        studentId: "ST05",
+        name: "Nisha",
+        joinedAt: DateTime.now(),
+      ),
+      package: "Chemistry",
+      syllabus: "CBSE",
+      className: "12B",
+      teacher: Teacher(
+        id: "T002",
+        name: "David",
+        status: "Active",
+        gender: "Male",
+        joinedAt: DateTime.now(),
+      ),
+      mentor: Mentor(
+        id: "MTR001",
+        name: "Saeeda",
+        joinedAt: DateTime.now(),
+      ),
+      date: DateTime.now(),
+      time: const TimeOfDay(hour: 16, minute: 30),
+      status: "no_balance",
+    ),
+
+    Session(
+      id: "S006",
+      student: Student(
+        studentId: "ST06",
+        name: "Ali",
+        joinedAt: DateTime.now(),
+      ),
+      package: "Biology",
+      syllabus: "SCERT",
+      className: "10A",
+      teacher: Teacher(
+        id: "T003",
+        name: "Meera",
+        status: "Active",
+        gender: "Male",
+        joinedAt: DateTime.now(),
+      ),
+      mentor: Mentor(
+        id: "MTR002",
+        name: "David",
+        joinedAt: DateTime.now(),
+      ),
+      date: DateTime.now().subtract(const Duration(hours: 5)),
+      time: const TimeOfDay(hour: 8, minute: 45),
+      status: "meet_done",
+    ),
+
+    Session(
+      id: "S007",
+      student: Student(
+        studentId: "ST07",
+        name: "Sneha",
+        joinedAt: DateTime.now(),
+      ),
+      package: "Math",
+      syllabus: "CBSE",
+      className: "9A",
+      teacher: Teacher(
+        id: "T001",
+        name: "Ameen Rahman",
+        status: "Active",
+        gender: "Male",
+        joinedAt: DateTime.now(),
+      ),
+      mentor: Mentor(
+        id: "MTR001",
+        name: "Saeeda",
+        joinedAt: DateTime.now(),
+      ),
+      date: DateTime.now().add(const Duration(hours: 3)),
+      time: const TimeOfDay(hour: 13, minute: 0),
+      status: "started",
+    ),
+  ];
+}
   Future<void> fetchStudentDetail() async {
     try {
       isLoading.value = true;

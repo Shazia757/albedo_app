@@ -1,3 +1,4 @@
+import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:get/get.dart';
 
@@ -7,23 +8,19 @@ class PaymentController extends GetxController {
 
   var allStudentPayments = <StudentPaymentModel>[].obs;
   var allTeacherPayments = <TeacherPaymentModel>[].obs;
+  var allBatchPayments = <BatchPaymentModel>[].obs;
   var studentPayments = <StudentPaymentModel>[].obs;
   var teacherPayments = <TeacherPaymentModel>[].obs;
+  var batchPayments = <BatchPaymentModel>[].obs;
   var searchQuery = ''.obs;
 
   List<String> statusMap = ["pending", "approved"];
 
-
-  // void fetchPayments() async {
-  //   // 🔥 Call API based on type
-  //   // Example:
-  //   // final data = await api.getPayments(type: selectedType.value);
-
-  //   // dummy
-  //   allPayments.value = [];
-
-  //   applyFilters();
-  // }
+  @override
+  void onInit() {
+    super.onInit();
+    fetchBatches();
+  }
 
   void fetchStudents() {
     studentPayments.value = [
@@ -79,6 +76,94 @@ class PaymentController extends GetxController {
     ];
   }
 
+  void fetchBatches() {
+    batchPayments.value = [
+      BatchPaymentModel(
+        batch: Batch(
+          batchName: "ATTC",
+          batchID: "ALB/BAT/01234",
+          mentorName: "John Mentor",
+        ),
+        status: "pending",
+        payments: [
+          PaymentItem(
+            id: "P001",
+            studentName: "Akhil",
+            studentId: "STU1001",
+            paymentDate: DateTime(2026, 4, 10),
+            amount: 5000,
+            balance: 1500,
+            status: "pending",
+          ),
+          PaymentItem(
+            id: "P002",
+            studentName: "Nihal",
+            studentId: "STU1002",
+            paymentDate: DateTime(2026, 4, 12),
+            amount: 4500,
+            balance: 1000,
+            status: "completed",
+          ),
+          PaymentItem(
+            id: "P003",
+            studentName: "Sana",
+            studentId: "STU1003",
+            paymentDate: DateTime(2026, 4, 15),
+            amount: 6000,
+            balance: 2000,
+            status: "declined",
+          ),
+        ],
+      ),
+      BatchPaymentModel(
+        batch: Batch(
+          batchName: "10th CBSE",
+          batchID: "ALB/BAT/05678",
+          mentorName: "Mary Teacher",
+        ),
+        status: "approved",
+        payments: [
+          PaymentItem(
+            id: "P101",
+            studentName: "Arjun",
+            studentId: "STU2001",
+            paymentDate: DateTime(2026, 4, 5),
+            amount: 7000,
+            balance: 3000,
+            status: "completed",
+          ),
+          PaymentItem(
+            id: "P102",
+            studentName: "Diya",
+            studentId: "STU2002",
+            paymentDate: DateTime(2026, 4, 8),
+            amount: 6500,
+            balance: 2500,
+            status: "pending",
+          ),
+          PaymentItem(
+            id: "P103",
+            studentName: "Rohan",
+            studentId: "STU2003",
+            paymentDate: DateTime(2026, 4, 11),
+            amount: 8000,
+            balance: 0,
+            status: "completed",
+          ),
+          PaymentItem(
+            id: "P104",
+            studentName: "Ananya",
+            studentId: "STU2004",
+            paymentDate: DateTime(2026, 4, 18),
+            amount: 5000,
+            balance: 500,
+            status: "declined",
+          ),
+        ],
+      ),
+    ];
+  }
+
   List<StudentPaymentModel> get filteredStudentPayments {
     return studentPayments.where((e) {
       return selectedTab.value == 0
@@ -86,8 +171,17 @@ class PaymentController extends GetxController {
           : e.status == 'approved';
     }).toList();
   }
+
   List<TeacherPaymentModel> get filteredTeacherPayments {
     return teacherPayments.where((e) {
+      return selectedTab.value == 0
+          ? e.status == 'pending'
+          : e.status == 'approved';
+    }).toList();
+  }
+
+  List<BatchPaymentModel> get filteredBatchPayments {
+    return batchPayments.where((e) {
       return selectedTab.value == 0
           ? e.status == 'pending'
           : e.status == 'approved';

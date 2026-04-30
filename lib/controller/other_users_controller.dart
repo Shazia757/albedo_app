@@ -40,13 +40,13 @@ class OtherUsersController extends GetxController {
 
       otherUsers.assignAll([
         OtherUsers(
-          id: "EMP1001",
-          name: "Maria",
-          email: "maria@email.com",
-          status: 'Active',
-          phone: "123456",
-          joinedAt: DateTime.now(),
-        ),
+            id: "EMP1001",
+            name: "Maria",
+            email: "maria@email.com",
+            status: 'Active',
+            phone: "123456",
+            joinedAt: DateTime.now(),
+            role: 'Finance'),
         OtherUsers(
           id: "EMP1002",
           name: "Nick",

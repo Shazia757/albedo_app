@@ -1,3 +1,5 @@
+import 'package:albedo_app/model/batch_model.dart';
+
 enum PaymentUserType { student, teacher }
 
 class StudentPaymentModel {
@@ -45,5 +47,37 @@ class TeacherPaymentModel {
     this.totalWithdawal,
     this.pending,
     this.status,
+  });
+}
+
+class BatchPaymentModel {
+  String? status;
+  Batch batch;
+   List<PaymentItem> payments;
+
+  BatchPaymentModel({
+    this.status,
+    required this.batch,
+      required this.payments,
+  });
+}
+
+class PaymentItem {
+  String id;
+  String studentName;
+  String studentId;
+  DateTime paymentDate;
+  double amount;
+  double balance;
+  String status; // pending / completed / declined
+
+  PaymentItem({
+    required this.id,
+    required this.studentName,
+    required this.studentId,
+    required this.paymentDate,
+    required this.amount,
+    required this.balance,
+    required this.status,
   });
 }

@@ -1,6 +1,7 @@
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/view/batch_page.dart';
+import 'package:albedo_app/view/batch_payment_page.dart';
 import 'package:albedo_app/view/feedback_page.dart';
 import 'package:albedo_app/view/home_page.dart';
 import 'package:albedo_app/view/payment_page.dart';
@@ -18,6 +19,7 @@ import 'package:albedo_app/view/teacher/students_page.dart';
 import 'package:albedo_app/view/users/advisors_page.dart';
 import 'package:albedo_app/view/users/coordinator_page.dart';
 import 'package:albedo_app/view/users/mentors_page.dart';
+import 'package:albedo_app/view/users/others_page.dart';
 import 'package:albedo_app/view/users/students_page.dart';
 import 'package:albedo_app/view/users/teachers_page.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +65,8 @@ class DrawerMenu extends StatelessWidget {
               final isTeacher = role == 'teacher';
               final isStudent = role == 'student';
               final isCoordinator = role == 'coordinator';
+              final isFinance = role == 'finance';
+              final isSales = role == 'sales';
 
               final List<Widget> menuItems = _buildMenuByRole(
                 context,
@@ -73,6 +77,8 @@ class DrawerMenu extends StatelessWidget {
                 isTeacher: isTeacher,
                 isStudent: isStudent,
                 isCoordinator: isCoordinator,
+                isFinance: isFinance,
+                isSales: isSales,
               );
 
               return ListView(
@@ -101,6 +107,8 @@ class DrawerMenu extends StatelessWidget {
     required bool isTeacher,
     required bool isStudent,
     required bool isCoordinator,
+    required bool isFinance,
+    required bool isSales,
   }) {
     List<Widget> items = [];
 
@@ -187,6 +195,12 @@ class DrawerMenu extends StatelessWidget {
             index: 24,
             onTap: () => Get.offAll(AdvisorsPage()),
           ),
+        if (isAdmin)
+          DrawerSubItem(
+            title: "Others",
+            index: 25,
+            onTap: () => Get.offAll(OthersPage()),
+          ),
       ],
     );
 
@@ -216,6 +230,11 @@ class DrawerMenu extends StatelessWidget {
           index: 31,
           onTap: () =>
               Get.offAll(() => PaymentPage(type: PaymentUserType.teacher)),
+        ),
+        DrawerSubItem(
+          title: "Batches",
+          index: 32,
+          onTap: () => Get.offAll(() => BatchPaymentPage()),
         ),
       ],
     );
@@ -288,9 +307,7 @@ class DrawerMenu extends StatelessWidget {
         supports,
         feedback,
       ];
-    }
-
-    if (isStudent) {
+    } else if (isStudent) {
       items = [
         home,
         sessions,
@@ -302,9 +319,7 @@ class DrawerMenu extends StatelessWidget {
         feedback,
         downloads,
       ];
-    }
-
-    if (isMentor) {
+    } else if (isMentor) {
       items = [
         home,
         sessions,
@@ -317,9 +332,7 @@ class DrawerMenu extends StatelessWidget {
         supports,
         feedback,
       ];
-    }
-
-    if (isCoordinator) {
+    } else if (isCoordinator) {
       items = [
         home,
         sessions,
@@ -328,9 +341,7 @@ class DrawerMenu extends StatelessWidget {
         reports,
         supports,
       ];
-    }
-
-    if (isAdvisor) {
+    } else if (isAdvisor) {
       items = [
         home,
         _menuItem(context, Icons.school, "Students",
@@ -338,9 +349,7 @@ class DrawerMenu extends StatelessWidget {
         reports,
         supports,
       ];
-    }
-
-    if (isAdmin) {
+    } else if (isAdmin) {
       items = [
         home,
         sessions,
@@ -350,6 +359,32 @@ class DrawerMenu extends StatelessWidget {
         reports,
         supports,
         settings,
+      ];
+    } else if (isFinance) {
+      items = [
+        home,
+        payments,
+        reports,
+      ];
+    } else if (isSales) {
+      items = [
+        home,
+        _menuItem(
+          context,
+          Icons.school,
+          "Students",
+          index: 20,
+          onPressed: () => Get.offAll(StudentsPage()),
+        ),
+        _menuItem(
+          context,
+          Icons.person,
+          "Advisors",
+          index: 24,
+          onPressed: () => Get.offAll(AdvisorsPage()),
+        ),
+        reports,
+        supports,
       ];
     }
 

@@ -17,7 +17,7 @@ class Session {
   Advisor? advisor;
 
   final DateTime date;
-  final DateTime time;
+  final TimeOfDay time;
   final String status;
   int? duration;
   double? teacherSalary;

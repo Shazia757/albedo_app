@@ -41,7 +41,6 @@ class SupportsPage extends StatelessWidget {
     );
   }
 
-  // 🔍 Custom Search Bar
 
   // 📊 Tabs
   Widget _tabs(BuildContext context) {

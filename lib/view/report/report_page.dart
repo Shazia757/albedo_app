@@ -54,6 +54,12 @@ class ReportsPage extends StatelessWidget {
         "Hirings",
       ];
     }
+    if (role == "finance") {
+      return ["Students", "Teachers"];
+    }
+    if (role == "sales") {
+      return ["Students", "Advisors"];
+    }
     if (role == "advisor") {
       return [
         "Students",

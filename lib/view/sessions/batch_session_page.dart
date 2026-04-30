@@ -322,157 +322,6 @@ class BatchesListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBatchPersonSection(BuildContext context, Batch data) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isSmall = constraints.maxWidth < 320;
-
-        return isSmall
-            ? Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _personCompact(
-                        context,
-                        "Batch",
-                        data.batchName ?? '',
-                        data.batchID ?? '',
-                      ),
-                      const SizedBox(height: 8),
-                      _personCompact(
-                        context,
-                        "Teacher",
-                        data.teacher?.name ?? '',
-                        data.teacher?.id ?? '',
-                      ),
-                    ],
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _personCompact(
-                      context,
-                      "Batch",
-                      data.batchName ?? '',
-                      data.batchID ?? '',
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _personCompact(
-                      context,
-                      "Teacher",
-                      data.teacher?.name ?? '',
-                      data.teacher?.id ?? '',
-                    ),
-                  ),
-                ],
-              );
-      },
-    );
-  }
-
-  Widget _buildBatchDetailsSection(BuildContext context, Batch data) {
-    final cs = Theme.of(context).colorScheme;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isSmall = constraints.maxWidth < 320;
-
-        return Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: cs.outlineVariant.withOpacity(0.03),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: isSmall
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // _miniInfo(
-                        //     context: context,
-                        //     label: "package",
-                        //     value: data.package ?? ''),
-                        if (data.syllabus != null && data.syllabus != '')
-                          _miniInfo(
-                              context: context,
-                              label: "Syllabus",
-                              value: data.syllabus ?? ''),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _miniInfo(
-                            context: context,
-                            label: "Date",
-                            value: data.date.toString()),
-                        _miniInfo(
-                          context: context,
-                          label: "Time",
-                          value: "${data.startTime} - ${data.endTime}",
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-
-              /// 🔥 DESKTOP/TABLET → 2 COLUMN STRUCTURE
-              : Row(
-                  children: [
-                    /// LEFT COLUMN
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // _miniInfo(
-                          //     context: context,
-                          //     label: "Package",
-                          //     value: data.package ?? ''),
-                          const SizedBox(height: 6),
-                          if (data.syllabus != null && data.syllabus != '')
-                            _miniInfo(
-                                context: context,
-                                label: "Syllabus",
-                                value: data.syllabus ?? ''),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
-                    /// RIGHT COLUMN
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _miniInfo(
-                              context: context,
-                              label: "Date",
-                              value: data.date.toString()),
-                          const SizedBox(height: 6),
-                          if (data.startTime != null)
-                            _miniInfo(
-                              context: context,
-                              label: "Time",
-                              value: "${data.startTime} - ${data.endTime}",
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-        );
-      },
-    );
-  }
-
   void editSession(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
@@ -666,7 +515,9 @@ class BatchesListPage extends StatelessWidget {
       case "started":
         return Theme.of(context).colorScheme.onInverseSurface;
       case "no_balance":
-        return Theme.of(context).colorScheme.onTertiary;
+        return Theme.of(context).colorScheme.tertiary;
+      case "no_link":
+        return Theme.of(context).colorScheme.error;
       case "upcoming":
         return Theme.of(context).colorScheme.primary;
       case "pending":
