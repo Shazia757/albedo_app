@@ -392,16 +392,8 @@ class PremiumInfoCard extends StatelessWidget {
                   if (extraWidget != null) ...[
                     const SizedBox(height: 8),
                     extraWidget!,
-                  ] else if (extraInfo != null && extraInfo!.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      extraInfo!,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: cs.onSurface.withOpacity(0.5),
-                      ),
-                    ),
-                  ],
+                  ] ,
+                  
                   const SizedBox(height: 6),
 
                   /// FOOTER

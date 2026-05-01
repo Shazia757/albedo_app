@@ -253,7 +253,8 @@ class AddBatchSessionFAB extends StatelessWidget {
                 CustomWidgets().customDropdownField(
                   context: context,
                   hint: 'Select Duration',
-                  items: c.durationOptions,
+                  items:
+                      c.durationOptions.map((e) => "${(e)} minutes").toList(),
                   onChanged: (p0) {},
                 )
               ],

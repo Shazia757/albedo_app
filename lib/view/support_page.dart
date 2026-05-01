@@ -1,6 +1,7 @@
 import 'package:albedo_app/controller/support_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/support_model.dart';
+import 'package:albedo_app/widgets/custom_tab.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -32,7 +33,17 @@ class SupportsPage extends StatelessWidget {
           children: [
             _topBar(context, c),
             const SizedBox(height: 10),
-            _tabs(context),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Tabs(
+                selectedIndex: c.selectedTab,
+                labels: ['Open', 'Closed'],
+                onTap: (p0) {
+                  c.selectedTab.value = p0;
+                  c.applyFilters();
+                },
+              ),
+            ),
             const SizedBox(height: 10),
             Expanded(child: _list(context)),
           ],
@@ -40,7 +51,6 @@ class SupportsPage extends StatelessWidget {
       ),
     );
   }
-
 
   // 📊 Tabs
   Widget _tabs(BuildContext context) {
@@ -257,12 +267,19 @@ class SupportsPage extends StatelessWidget {
         color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+        ),
       ),
       child: InkWell(
-        onTap: () {
-          // TODO: open filter bottom sheet
-        },
+        onTap: () => CustomWidgets().showFilterSheet<PriorityFilter>(
+          title: "Filter by Priority",
+          options: c.priorityOptions,
+          selectedValue: c.selectedPriority.value,
+          onSelected: (val) {
+            c.selectedPriority.value = val;
+            c.applyFilters();
+          },
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: const [
@@ -677,102 +694,107 @@ class SupportsPage extends StatelessWidget {
     );
   }
 
-  FloatingActionButton addTicket(BuildContext context) {
-    return FloatingActionButton(
+  Widget addTicket(BuildContext context) {
+    return AppFAB(
+      label: "Add Ticket",
+      icon: Icons.add_rounded,
       onPressed: () => CustomWidgets().showCustomDialog(
         context: context,
-        title: Text('Add New Ticket'),
+        title: const Text('Add New Ticket'),
         formKey: GlobalKey<FormState>(),
         sections: [
           SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    CustomWidgets().labelWithAsterisk('Title', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: '',
-                        controller: c.titleController),
-                    const SizedBox(height: 10),
-                    CustomWidgets()
-                        .labelWithAsterisk('Category', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: '',
-                        controller: c.categoryController),
-                    const SizedBox(height: 10),
-                    CustomWidgets()
-                        .labelWithAsterisk('Priority', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: '',
-                        controller: c.priorityController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('User', required: true),
-                    const SizedBox(height: 10),
-                    Obx(
-                      () => Row(
-                        children: [
-                          Expanded(
-                            child: RadioListTile(
-                              dense: true,
-                              title: Text('Student'),
-                              value: "student",
-                              groupValue: c.selectedType.value,
-                              onChanged: (value) =>
-                                  c.selectedType.value = value!,
-                            ),
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  CustomWidgets().labelWithAsterisk('Title', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Ticket Title',
+                    controller: c.titleController,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Category', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                    context: context,
+                    hint: 'Select Category',
+                    items: c.categoryList,
+                    onChanged: (p0) {},
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Priority', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().customDropdownField(
+                    context: context,
+                    hint: 'Select Priority',
+                    items: const ['High', 'Medium', 'Low'],
+                    onChanged: (p0) {},
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('User', required: true),
+                  const SizedBox(height: 10),
+                  Obx(
+                    () => Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile(
+                            dense: true,
+                            title: const Text('Student'),
+                            value: "student",
+                            groupValue: c.selectedType.value,
+                            onChanged: (value) => c.selectedType.value = value!,
                           ),
-                          Expanded(
-                            child: RadioListTile(
-                              title: Text('Teacher'),
-                              value: "teacher",
-                              groupValue: c.selectedType.value,
-                              onChanged: (value) =>
-                                  c.selectedType.value = value!,
-                            ),
+                        ),
+                        Expanded(
+                          child: RadioListTile(
+                            dense: true,
+                            title: const Text('Teacher'),
+                            value: "teacher",
+                            groupValue: c.selectedType.value,
+                            onChanged: (value) => c.selectedType.value = value!,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 10),
-                    Obx(() {
-                      if (c.selectedType.value == 'student') {
-                        return CustomWidgets().dropdownStyledTextField(
-                            context: context, hint: 'Select Student');
-                      }
-                      if (c.selectedType.value == 'teacher') {
-                        return CustomWidgets().dropdownStyledTextField(
-                            context: context, hint: 'Select Teacher');
-                      }
-                      return const SizedBox();
-                    }),
-                    const SizedBox(height: 10),
-                    CustomWidgets()
-                        .labelWithAsterisk('Description', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.descriptionController,
-                      isMultiline: true,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ))
+                  ),
+                  const SizedBox(height: 10),
+                  Obx(() {
+                    if (c.selectedType.value == 'student') {
+                      return CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select Student',
+                      );
+                    }
+                    if (c.selectedType.value == 'teacher') {
+                      return CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select Teacher',
+                      );
+                    }
+                    return const SizedBox();
+                  }),
+                  const SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Description', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: '',
+                    controller: c.descriptionController,
+                    isMultiline: true,
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
         ],
-        onSubmit: () {},
-      ),
-      mini: true,
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
+        onSubmit: () {
+          // TODO: submit ticket
+        },
       ),
     );
   }

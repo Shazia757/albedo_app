@@ -183,7 +183,8 @@ class _CompletedSection extends StatelessWidget {
         CustomWidgets().customDropdownField(
           hint: "Duration",
           context: context,
-          items: controller.durationOptions,
+          items:
+              controller.durationOptions.map((e) => "${(e)} minutes").toList(),
           onChanged: (p0) {},
         ),
       ],
@@ -269,8 +270,8 @@ class _StudentInfoCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text("ID: ${report.studentId}"),
-                Text("Package: ${report.package}"),
+                Text("ID: ${report.studentId ?? report.batchId}"),
+                Text("Package: ${report.package.subjectName}"),
                 Text("Duration: ${report.duration}"),
               ],
             ),

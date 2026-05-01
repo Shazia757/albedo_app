@@ -122,6 +122,7 @@ class BatchesListPage extends StatelessWidget {
         StatefulBuilder(
           builder: (context, setState) {
             final data = batches[index];
+            final cs = Theme.of(context).colorScheme;
 
             return SizedBox(
               height: MediaQuery.of(context).size.height * 0.75,
@@ -215,53 +216,191 @@ class BatchesListPage extends StatelessWidget {
 
                           const SizedBox(height: 10),
 
+                          // ───────── REPORT SECTION ─────────
+                          if (data.status == 'pending')
+                            infoCard(
+                              context,
+                              type: "report",
+                              icon: Icons.description,
+                              title: "Session Report",
+                              children: [
+                                Obx(() {
+                                  final report = c.reportRx.value;
+
+                                  if (report == null) {
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                            "No session report available yet."),
+                                        const SizedBox(height: 8),
+                                        ElevatedButton.icon(
+                                          onPressed: () {
+                                            c.openSessionReportDialog(data);
+                                          },
+                                          icon: const Icon(Icons.add),
+                                          label: const Text("Add Report"),
+                                        ),
+                                      ],
+                                    );
+                                  }
+
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // 📦 Report summary
+                                      ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        title: Text(report.studentName),
+                                        subtitle: Text(
+                                          report.isCompleted
+                                              ? "Completed"
+                                              : "Not Completed",
+                                        ),
+                                        trailing: TextButton.icon(
+                                          onPressed: () =>
+                                              c.openSessionReportDialog(data),
+                                          icon:
+                                              const Icon(Icons.edit, size: 18),
+                                          label: const Text("Edit"),
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 8),
+
+                                      if (!report.isCompleted &&
+                                          report.reason != null)
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.withOpacity(0.05),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Text(
+                                            "Reason: ${report.reason}",
+                                            style: const TextStyle(
+                                                color: Colors.red),
+                                          ),
+                                        ),
+
+                                      if (report.isCompleted) ...[
+                                        Text(
+                                            "Topics: ${report.topicsCovered ?? '-'}"),
+                                        Text(
+                                            "Notes: ${report.teacherNotes ?? '-'}"),
+                                      ],
+                                    ],
+                                  );
+                                })
+                              ],
+                            ),
+
+                          if (data.status == 'completed')
+                            infoCard(
+                              context,
+                              type: "report",
+                              icon: Icons.description,
+                              title: "Session Report",
+                              children: [
+                                Obx(() {
+                                  final report = c.reportRx.value;
+
+                                  if (report == null) {
+                                    return const Text("No report available");
+                                  }
+
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // 📦 HEADER
+                                      ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        title: Text(report.studentName),
+                                        subtitle: const Text("Session Report"),
+                                        trailing: TextButton.icon(
+                                          onPressed: () =>
+                                              c.openSessionReportDialog(data),
+                                          icon:
+                                              const Icon(Icons.edit, size: 18),
+                                          label: const Text("Edit Report"),
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 8),
+
+                                      // 🎯 ALWAYS SHOW FOR COMPLETED
+                                      infoRow(
+                                        label: "Topics Covered",
+                                        value: report.topicsCovered ?? "-",
+                                      ),
+
+                                      infoRow(
+                                        label: "Teacher Notes",
+                                        value: report.teacherNotes ?? "-",
+                                      ),
+                                    ],
+                                  );
+                                }),
+                              ],
+                            ),
+
                           if (data.status != 'completed')
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SizedBox(
-                                  width: 110,
-                                  child: ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                    ),
-                                    onPressed: () {
+                                Expanded(
+                                  child: _DetailActionButton(
+                                    label: "Edit",
+                                    icon: Icons.edit_outlined,
+                                    color: cs.secondary,
+                                    onTap: () {
                                       c.loadBatch(data);
                                       editSession(context);
                                     },
-                                    icon: const Icon(Icons.edit,
-                                        size: 16, color: Colors.white),
-                                    label: const Text(
-                                      "Edit",
-                                      style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _DetailActionButton(
+                                    label: "Delete",
+                                    icon: Icons.delete_outline,
+                                    color: cs.error,
+                                    onTap: () =>
+                                        CustomWidgets().showDeleteDialog(
+                                      text:
+                                          'Are you sure you want to delete this batch permanently?',
+                                      context: context,
+                                      onConfirm: () => c.delete(data.id ?? ''),
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                SizedBox(
-                                  width: 110,
-                                  child: ElevatedButton.icon(
-                                    onPressed: () {
-                                      CustomWidgets().showDeleteDialog(
-                                        context: context,
-                                        text: "Delete this batch permanently?",
-                                        onConfirm: () =>
-                                            c.delete(data.id ?? ''),
-                                      );
-                                    },
-                                    icon: const Icon(Icons.delete,
-                                        size: 16, color: Colors.white),
-                                    label: const Text("Delete",
-                                        style: TextStyle(color: Colors.white)),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .errorContainer,
-                                    ),
+                                Expanded(
+                                  child: _DetailActionButton(
+                                    label: "Support",
+                                    icon: Icons.support_agent_outlined,
+                                    color: cs.tertiary,
+                                    onTap: () => _addSupport(context),
                                   ),
                                 ),
+                                if (data.status == 'pending') ...[
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: _DetailActionButton(
+                                      label: "Complete",
+                                      icon: Icons.check_outlined,
+                                      color: cs.primary,
+                                      onTap: () => _markSessionCompleted(
+                                        context,
+                                        data.date ?? DateTime.now(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                         ],
@@ -274,6 +413,155 @@ class BatchesListPage extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+
+  void _markSessionCompleted(BuildContext context, DateTime date) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: const Text('Mark Session as Completed'),
+      formKey: GlobalKey<FormState>(),
+      sections: [
+        Column(
+          children: [
+            CustomWidgets().labelWithAsterisk('Session Date', required: true),
+            const SizedBox(height: 8),
+            CustomWidgets().customDatePickerField(
+                context: context,
+                selectedDate: c.selectedDate,
+                controller: c.dateController),
+            const SizedBox(width: 12),
+            CustomWidgets().labelWithAsterisk('Start Time', required: true),
+            const SizedBox(height: 8),
+            CustomWidgets().timePickerStyledField(
+                selectedTime: c.selectedTime,
+                context: context,
+                hint: 'Time',
+                controller: c.timeController),
+            const SizedBox(height: 12),
+            CustomWidgets().labelWithAsterisk('Duration', required: true),
+            const SizedBox(height: 8),
+            CustomWidgets().customDropdownField(
+              context: context,
+              hint: 'Select Duration',
+              items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
+              onChanged: (p0) {},
+            ),
+          ],
+        ),
+      ],
+      onSubmit: () {},
+    );
+  }
+
+  void _addSupport(BuildContext context) {
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: const Text('Add New Ticket'),
+      icon: Icons.support_agent_outlined,
+      formKey: GlobalKey<FormState>(),
+      sections: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.5,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomWidgets().labelWithAsterisk('Title', required: true),
+                const SizedBox(height: 8),
+                CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Enter ticket title',
+                    controller: c.titleController),
+                const SizedBox(height: 12),
+                CustomWidgets().labelWithAsterisk('Category', required: true),
+                const SizedBox(height: 8),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select category',
+                  items: c.categoryList,
+                  onChanged: (p0) {},
+                ),
+                const SizedBox(height: 12),
+                CustomWidgets().labelWithAsterisk('Priority', required: true),
+                const SizedBox(height: 8),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select priority',
+                  items: ['High', 'Medium', 'Low'],
+                  onChanged: (p0) {},
+                ),
+                const SizedBox(height: 12),
+                CustomWidgets().labelWithAsterisk('User', required: true),
+                const SizedBox(height: 8),
+                Obx(() => Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile(
+                            dense: true,
+                            title: const Text('Student'),
+                            value: "student",
+                            groupValue: c.selectedType.value,
+                            onChanged: (value) => c.selectedType.value = value!,
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile(
+                            dense: true,
+                            title: const Text('Teacher'),
+                            value: "teacher",
+                            groupValue: c.selectedType.value,
+                            onChanged: (value) => c.selectedType.value = value!,
+                          ),
+                        ),
+                      ],
+                    )),
+                const SizedBox(height: 8),
+                Obx(() {
+                  if (c.selectedType.value == 'student') {
+                    return CustomWidgets().customDropdownField(
+                        items: c.studentsList,
+                        onChanged: (p0) {},
+                        context: context,
+                        hint: 'Select student');
+                  }
+                  if (c.selectedType.value == 'teacher') {
+                    return CustomWidgets().customDropdownField(
+                        items: c.teacherList,
+                        onChanged: (p0) {},
+                        context: context,
+                        hint: 'Select teacher');
+                  }
+                  return const SizedBox();
+                }),
+                const SizedBox(height: 12),
+                CustomWidgets().labelWithAsterisk('Attachment'),
+                const SizedBox(height: 8),
+                CustomWidgets().attachmentStyledField(
+                  context: context,
+                  label: "Attachment",
+                  hint: "Choose a file",
+                  fileName: c.selectedFile,
+                  onTap: () {},
+                  onClear: () {},
+                ),
+                const SizedBox(height: 12),
+                CustomWidgets()
+                    .labelWithAsterisk('Description', required: true),
+                const SizedBox(height: 8),
+                CustomWidgets().dropdownStyledTextField(
+                  context: context,
+                  hint: 'Describe the issue...',
+                  controller: c.descriptionController,
+                  isMultiline: true,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+      ],
+      onSubmit: () {},
     );
   }
 
@@ -302,24 +590,6 @@ class BatchesListPage extends StatelessWidget {
     } else {
       Get.snackbar("Error", "$role not found");
     }
-  }
-
-  FloatingActionButton addSessionBtn(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () => CustomWidgets().showCustomDialog(
-        context: context,
-        title: Text("Add Session"),
-        formKey: GlobalKey<FormState>(),
-        onSubmit: () {},
-        sections: [],
-      ),
-      mini: true,
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
-    );
   }
 
   void editSession(BuildContext context) {
@@ -529,5 +799,35 @@ class BatchesListPage extends StatelessWidget {
       default:
         return Theme.of(context).colorScheme.shadow;
     }
+  }
+}
+
+class _DetailActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _DetailActionButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 15, color: Colors.white),
+      label: Text(label,
+          style: const TextStyle(color: Colors.white, fontSize: 13)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 }

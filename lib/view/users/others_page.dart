@@ -41,7 +41,7 @@ class OthersPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   Expanded(
                     child: Obx(() {
-                      final data = c.otherUsers;
+                      final data = c.filteredOtherUsers;
                       int crossAxisCount = 1;
 
                       if (c.isLoading.value) {
@@ -186,11 +186,11 @@ class OthersPage extends StatelessWidget {
                                                           ),
                                                         ),
                                                         if ((otherUsers.role !=
-                                                                'finance') ||
+                                                                'finance') &&
                                                             (otherUsers.role !=
-                                                                'sales') ||
+                                                                'sales') &&
                                                             (otherUsers.role !=
-                                                                'admin') ||
+                                                                'admin') &&
                                                             (otherUsers.role !=
                                                                 'hr'))
                                                           InfoActionButton(
@@ -400,32 +400,36 @@ class OthersPage extends StatelessWidget {
 
   Widget _filterButton(BuildContext context) {
     return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
-      ),
-      child: InkWell(
-        onTap: () {
-          // TODO: open filter bottom sheet
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.filter_list, size: 18),
-            SizedBox(width: 6),
-            Text("Filter", style: TextStyle(fontSize: 13)),
-          ],
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onPrimary,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
         ),
-      ),
-    );
+        child: InkWell(
+          onTap: () => CustomWidgets().showFilterSheet<String>(
+            title: "Filter by Role",
+            options: c.roleFilters,
+            selectedValue: c.selectedRole.value,
+            onSelected: (value) => c.updateRole(value),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.filter_list, size: 18),
+              SizedBox(width: 6),
+              Text("Filter", style: TextStyle(fontSize: 13)),
+            ],
+          ),
+        ));
   }
 
-  FloatingActionButton addOtherUsers(BuildContext context) {
-    return FloatingActionButton(
+  Widget addOtherUsers(BuildContext context) {
+    return AppFAB(
+      label: "Add User",
+      icon: Icons.add_rounded,
       onPressed: () => CustomWidgets().showCustomDialog(
         context: context,
         title: const Text('Add New User'),
@@ -437,16 +441,17 @@ class OthersPage extends StatelessWidget {
                 /// 🔹 Profile
                 const Text('Profile Photo (Max: 50 MB)'),
                 const SizedBox(height: 10),
+
                 InkWell(
                   onTap: () {},
-                  child: CircleAvatar(
+                  child: const CircleAvatar(
                     radius: 35,
                     child: ClipOval(
                       child: SizedBox(
                         width: 60,
                         height: 60,
-                        child: Image.asset(
-                          'assets/images/logo.png',
+                        child: Image(
+                          image: AssetImage('assets/images/logo.png'),
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -458,7 +463,6 @@ class OthersPage extends StatelessWidget {
 
                 /// 🔹 Basic Info
                 CustomWidgets().labelWithAsterisk('Name', required: true),
-                const SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter name',
@@ -468,7 +472,6 @@ class OthersPage extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 CustomWidgets().labelWithAsterisk('Email', required: true),
-                const SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter email',
@@ -479,7 +482,6 @@ class OthersPage extends StatelessWidget {
 
                 CustomWidgets()
                     .labelWithAsterisk('Phone Number', required: true),
-                const SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter phone number',
@@ -490,13 +492,45 @@ class OthersPage extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 CustomWidgets().labelWithAsterisk('Position', required: true),
-                const SizedBox(height: 8),
-                CustomWidgets().dropdownStyledTextField(
+                CustomWidgets().customDropdownField(
                   context: context,
                   hint: 'Select Position',
-                  controller: c.positionController,
-                  isNumber: true,
+                  items: const [
+                    'Admin',
+                    'HR',
+                    'Finance',
+                    'Sales Head',
+                    'Others'
+                  ],
+                  value: c.selectedPosition.value.isEmpty
+                      ? null
+                      : c.selectedPosition.value,
+                  onChanged: (p0) => c.selectedPosition.value = p0,
                 ),
+
+                /// 🔹 Conditional Custom Position
+                Obx(
+                  () => c.selectedPosition.value != "Others"
+                      ? const SizedBox()
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomWidgets()
+                                  .labelWithAsterisk('Custom Position'),
+                              const SizedBox(height: 10),
+                              CustomWidgets().dropdownStyledTextField(
+                                context: context,
+                                hint: 'Enter Custom Position',
+                                controller: c.customPositionController,
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -504,12 +538,6 @@ class OthersPage extends StatelessWidget {
         onSubmit: () {
           // TODO: implement submit
         },
-      ),
-      mini: true,
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
       ),
     );
   }

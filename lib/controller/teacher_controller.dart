@@ -16,6 +16,8 @@ class TeacherController extends GetxController {
   var filteredTeachers = <Teacher>[].obs;
   final tabs = ["All", "Active", "Batch", "Inactive"];
   var selectedTab = 0.obs;
+    var selectedDate = Rxn<DateTime>();
+
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
   var isSearching = false.obs;

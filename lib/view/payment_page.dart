@@ -1,5 +1,6 @@
 import 'package:albedo_app/controller/payment_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
+import 'package:albedo_app/widgets/custom_tab.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -54,7 +55,11 @@ class PaymentPage extends StatelessWidget {
                 // ── Tabs ──────────────────────────────────────────────
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: _Tabs(c: c),
+                  child: Tabs(
+                    selectedIndex: c.selectedTab,
+                    onTap: (i) => c.selectedTab.value = i,
+                    labels: ['Pending', 'Approved'],
+                  ),
                 ),
 
                 const SizedBox(height: 12),
@@ -103,83 +108,6 @@ class PaymentPage extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// TABS — full width, underline style
-// ═══════════════════════════════════════════════════════════════════════
-class _Tabs extends StatelessWidget {
-  final PaymentController c;
-  const _Tabs({required this.c});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            _TabItem(label: "Pending", index: 0, c: c, cs: cs),
-            _TabItem(label: "Approved", index: 1, c: c, cs: cs),
-          ],
-        ),
-        Divider(
-            height: 1,
-            thickness: 0.5,
-            color: cs.outlineVariant.withOpacity(0.4)),
-      ],
-    );
-  }
-}
-
-class _TabItem extends StatelessWidget {
-  final String label;
-  final int index;
-  final PaymentController c;
-  final ColorScheme cs;
-
-  const _TabItem({
-    required this.label,
-    required this.index,
-    required this.c,
-    required this.cs,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      final isOn = c.selectedTab.value == index;
-
-      return Expanded(
-        child: GestureDetector(
-          onTap: () => c.selectedTab.value = index,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: isOn ? cs.primary : Colors.transparent,
-                  width: 2,
-                ),
-              ),
-            ),
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isOn ? FontWeight.w500 : FontWeight.w400,
-                color: isOn ? cs.primary : cs.onSurface.withOpacity(0.45),
-              ),
-            ),
-          ),
-        ),
-      );
-    });
   }
 }
 

@@ -1,3 +1,5 @@
+import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,7 +15,6 @@ class SessionReportController extends GetxController {
   var selectedTime = Rxn<TimeOfDay>();
 
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
-
 
   SessionReport? report;
 
@@ -42,7 +43,39 @@ class SessionReportController extends GetxController {
     report = SessionReport(
       studentName: session.student?.name ?? "",
       studentId: session.student?.studentId ?? "",
-      package: session.package ?? "",
+      package: session.package,
+      sessionDate: session.date.toString(),
+      duration: session.duration?.toString() ?? "",
+      isCompleted: false,
+    );
+
+    isCompleted.value = report!.isCompleted;
+
+    // optional reset
+    _clearFields();
+  }
+
+  void initFromBatchSession(Batch session) {
+    report = SessionReport(
+      studentName: session.student?.name ?? "",
+      studentId: session.student?.studentId ?? "",
+      package: session.package ??
+          Package(
+              teacherId: '',
+              teacherName: '',
+              teacherImage: '',
+              subjectId: '',
+              subjectName: '',
+              standard: '',
+              syllabus: '',
+              status: '',
+              packageFee: 0,
+              takenFee: 0,
+              balance: 0,
+              withdrawals: [],
+              time: '',
+              duration: '',
+              note: ''),
       sessionDate: session.date.toString(),
       duration: session.duration?.toString() ?? "",
       isCompleted: false,

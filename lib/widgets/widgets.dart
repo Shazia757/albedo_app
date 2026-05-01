@@ -308,100 +308,100 @@ class CustomWidgets {
                 top: Radius.circular(24),
               ),
             ),
-            child: StatefulBuilder(
-              builder: (context, setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    /// Handle
-                    Container(
-                      width: 40,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: cs.outline.withOpacity(0.4),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// Handle
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: cs.outline.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
 
-                    /// Title
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface,
-                      ),
-                    ),
+                /// Title
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: cs.onSurface,
+                  ),
+                ),
 
-                    const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                    /// Options
-                    ...options.map((e) {
-                      final isSelected = tempSelected == e.value;
+                /// 🔥 FIX: scrollable options
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: options.map((e) {
+                        final isSelected = tempSelected == e.value;
 
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() => tempSelected = e.value);
-                          onSelected(e.value);
-                          Get.back();
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? cs.primary.withOpacity(0.08)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected
-                                  ? cs.primary
-                                  : cs.outline.withOpacity(0.3),
+                        return GestureDetector(
+                          onTap: () {
+                            onSelected(e.value);
+                            Get.back();
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                e.icon,
-                                size: 18,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? cs.primary.withOpacity(0.08)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
                                 color: isSelected
                                     ? cs.primary
-                                    : cs.onSurface.withOpacity(0.6),
+                                    : cs.outline.withOpacity(0.3),
                               ),
-                              const SizedBox(width: 10),
-
-                              /// Label
-                              Expanded(
-                                child: Text(
-                                  e.label,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: isSelected
-                                        ? FontWeight.w600
-                                        : FontWeight.w400,
-                                    color:
-                                        isSelected ? cs.primary : cs.onSurface,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  e.icon,
+                                  size: 18,
+                                  color: isSelected
+                                      ? cs.primary
+                                      : cs.onSurface.withOpacity(0.6),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    e.label,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
+                                      color: isSelected
+                                          ? cs.primary
+                                          : cs.onSurface,
+                                    ),
                                   ),
                                 ),
-                              ),
-
-                              /// Check
-                              if (isSelected)
-                                Icon(
-                                  Icons.check_circle,
-                                  color: cs.primary,
-                                  size: 18,
-                                )
-                            ],
+                                if (isSelected)
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: cs.primary,
+                                    size: 18,
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }),
-                  ],
-                );
-              },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -755,7 +755,19 @@ class CustomWidgets {
         void openDropdown(BuildContext fieldContext) {
           final renderBox = fieldContext.findRenderObject() as RenderBox;
           final size = renderBox.size;
+          final offset = renderBox.localToGlobal(Offset.zero);
 
+          final screenHeight = MediaQuery.of(fieldContext).size.height;
+
+          final spaceBelow = screenHeight - (offset.dy + size.height);
+          final spaceAbove = offset.dy;
+
+          final shouldOpenUp = spaceBelow < 250 && spaceAbove > spaceBelow;
+
+          final maxHeight = (shouldOpenUp ? spaceAbove : spaceBelow) - 20;
+          final itemHeight = 48.0;
+          final listHeight = filteredItems.length * itemHeight;
+          final finalHeight = listHeight.clamp(0, maxHeight).toDouble();
           overlayEntry = OverlayEntry(
             builder: (_) {
               return GestureDetector(
@@ -767,15 +779,15 @@ class CustomWidgets {
                       width: size.width,
                       child: CompositedTransformFollower(
                         link: layerLink,
-                        offset: Offset(0, size.height + 4),
+                        offset: shouldOpenUp
+                            ? Offset(0, -finalHeight - 4) // 👈 open upward
+                            : Offset(0, size.height + 4), // 👈 open downward
                         child: Material(
                           elevation: 4,
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
                             constraints: BoxConstraints(
-                              maxHeight: filteredItems.isEmpty
-                                  ? 60
-                                  : (filteredItems.length * 48.0).clamp(0, 240),
+                              maxHeight: finalHeight,
                             ),
                             decoration: BoxDecoration(
                               color: cs.outline.withOpacity(0.1),

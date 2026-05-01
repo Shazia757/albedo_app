@@ -41,7 +41,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             toolbarHeight: height,
 
             // 🎨 UPDATED BACKGROUND
-            backgroundColor: cs.surface.withOpacity(0.75),
+            backgroundColor: cs.onPrimary,
             elevation: 0,
             scrolledUnderElevation: 4,
             surfaceTintColor: Colors.transparent,
@@ -51,10 +51,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
             iconTheme: IconThemeData(
               color: cs.onSurface,
-              size: isDesktop ? 22 : 20, // ✅ responsive icon size
+              size: isDesktop ? 22 : 20,
             ),
 
-            // ✅ TITLE / LOGO
             title: title != null
                 ? Text(
                     title!,
@@ -75,29 +74,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       const SizedBox(width: 10),
                     ],
                   ),
-
             // ✅ ACTIONS (responsive spacing)
             actions: [
-              const SizedBox(width: 6),
               _actionButton(
-                icon: isDark ? Icons.light_mode : Icons.dark_mode,
+                icon: Icons.notifications_none,
                 color: cs,
-                onTap: () {
-                  Get.changeThemeMode(
-                    isDark ? ThemeMode.light : ThemeMode.dark,
-                  );
-                },
-              ),
-              SizedBox(width: isDesktop ? 10 : 6),
-              _actionButton(
-                icon: Icons.install_mobile,
-                color: cs,
-                onTap: () {},
+                onTap: () => Get.offAll(NotificationsPage()),
               ),
               SizedBox(width: isDesktop ? 10 : 6),
               if (isTeacher || isStudent) ...[
                 _actionButton(
-                  icon: Icons.wallet,
+                  icon: Icons.account_balance_wallet_outlined,
                   color: cs,
                   onTap: () {
                     if (isStudent) {
@@ -110,11 +97,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 SizedBox(width: isDesktop ? 10 : 6),
               ],
               _actionButton(
-                icon: Icons.notifications_none,
+                icon: isDark ? Icons.light_mode : Icons.dark_mode_outlined,
                 color: cs,
-                onTap: () => Get.offAll(NotificationsPage()),
+                onTap: () {
+                  Get.changeThemeMode(
+                    isDark ? ThemeMode.light : ThemeMode.dark,
+                  );
+                },
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: isDesktop ? 10 : 6),
             ],
 
             // subtle divider (slightly softer now)
@@ -122,7 +113,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               preferredSize: const Size.fromHeight(1),
               child: Container(
                 height: 1,
-                color: cs.outline.withOpacity(0.12),
+                color: cs.outline.withOpacity(0.3),
               ),
             ),
           ),

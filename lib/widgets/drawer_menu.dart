@@ -38,7 +38,7 @@ class DrawerMenu extends StatelessWidget {
     final sidebar = Container(
       width: 260,
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cs.onPrimary,
         border: Border(
           right: BorderSide(
             color: cs.outline.withOpacity(0.08),
@@ -118,7 +118,7 @@ class DrawerMenu extends StatelessWidget {
     // ================= COMMON =================
     Widget home = _menuItem(
       context,
-      Icons.home,
+      Icons.home_outlined,
       "Home",
       index: 0,
       onPressed: () => Get.offAll(() => HomeView()),
@@ -129,7 +129,7 @@ class DrawerMenu extends StatelessWidget {
     if (isStudent || isTeacher) {
       sessions = _menuItem(
         context,
-        Icons.video_collection,
+        Icons.calendar_today_outlined,
         "Sessions",
         index: 10,
         onPressed: () => Get.offAll(SessionPage()),
@@ -137,7 +137,7 @@ class DrawerMenu extends StatelessWidget {
     } else {
       sessions = DrawerExpansionMenu(
         title: 'Sessions',
-        icon: Icons.video_collection,
+        icon: Icons.calendar_today_outlined,
         parentIndex: 1,
         selectedParentIndex: c.selectedParentIndex,
         selectedSubIndex: c.selectedSubIndex,
@@ -165,7 +165,7 @@ class DrawerMenu extends StatelessWidget {
     }
     Widget users = DrawerExpansionMenu(
       title: 'Users',
-      icon: Icons.people,
+      icon: Icons.people_alt_outlined,
       parentIndex: 7,
       selectedParentIndex: c.selectedParentIndex,
       selectedSubIndex: c.selectedSubIndex,
@@ -209,7 +209,7 @@ class DrawerMenu extends StatelessWidget {
 
     Widget batch = _menuItem(
       context,
-      Icons.group,
+      Icons.layers_outlined,
       "Batch",
       index: 2,
       onPressed: () => Get.offAll(() => BatchesPage()),
@@ -217,7 +217,7 @@ class DrawerMenu extends StatelessWidget {
 
     Widget payments = DrawerExpansionMenu(
       title: 'Payments',
-      icon: Icons.payment,
+      icon: Icons.payments_outlined,
       parentIndex: 8,
       selectedParentIndex: c.selectedParentIndex,
       selectedSubIndex: c.selectedSubIndex,
@@ -244,7 +244,7 @@ class DrawerMenu extends StatelessWidget {
 
     Widget reports = _menuItem(
       context,
-      Icons.bar_chart,
+      Icons.analytics_outlined,
       "Reports",
       index: 4,
       onPressed: () => Get.offAll(() => ReportsPage()),

@@ -1,3 +1,4 @@
+import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/material.dart';
 class Session {
   final String id;
   Student? student;
-  final String package;
+  final Package package;
   final String syllabus;
   final String className;
   Teacher? teacher;
@@ -42,9 +43,10 @@ class Session {
 class SessionReport {
   final String studentName;
   final String studentId;
-  final String package;
+  final Package package;
   final String sessionDate;
    String? duration;
+   String? batchId;
 
   bool isCompleted;
 
@@ -64,6 +66,7 @@ class SessionReport {
     required this.duration,
     this.isCompleted = false,
     this.topicsCovered,
+    this.batchId,
     this.teacherNotes,
     this.startTime,
     this.reason,

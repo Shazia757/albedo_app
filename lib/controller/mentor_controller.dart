@@ -1,4 +1,6 @@
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -15,11 +17,18 @@ class MentorController extends GetxController {
   var mentors = <Mentor>[].obs;
   var selectedTab = 0.obs;
   var filteredMentors = <Mentor>[].obs;
-  final tabs = ["Active", "Inactive"];
+  var tabs = <String>[].obs;
   var isSearching = false.obs;
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
+  final ratingFilters = [
+    FilterOption<int>(label: "All", value: 0, icon: Icons.filter_alt),
+    FilterOption<int>(label: "2 & Up", value: 2, icon: Icons.star),
+    FilterOption<int>(label: "3 & Up", value: 3, icon: Icons.star),
+    FilterOption<int>(label: "4 & Up", value: 4, icon: Icons.star),
+  ];
+  var selectedRating = 0.obs; // 0 = All
 
   var experiences = <ExperienceModel>[].obs;
 
@@ -27,14 +36,19 @@ class MentorController extends GetxController {
   // Counts for tabs
   // --------------------------
 
-  int get activeCount => mentors.where((e) => e.status == "Active").length;
+  int getCount(int index) {
+    if (tabs.isEmpty || index >= tabs.length) return 0;
 
-  int get inactiveCount => mentors.where((e) => e.status == "Inactive").length;
+    final tab = tabs[index];
 
-  List<Map<String, dynamic>> get tabData => [
-        {"label": "Active", "count": activeCount},
-        {"label": "Inactive", "count": inactiveCount},
-      ];
+    if (tab == "All") return mentors.length;
+
+    if (tab == "Unassigned") {
+      return mentors.where((m) => m.coordinator == null).length;
+    }
+
+    return mentors.where((m) => m.coordinator?.name == tab).length;
+  }
 
   TextEditingController nameController = TextEditingController();
   TextEditingController empIdController = TextEditingController();
@@ -77,7 +91,8 @@ class MentorController extends GetxController {
       if (user?.role == "admin") {
         result = allMentors;
       } else if (user?.role == "coordinator") {
-        result = allMentors.where((m) => m.coordinatorId == user!.id).toList();
+        result =
+            allMentors.where((m) => m.coordinator?.id == user!.id).toList();
       } else if (user?.role == "mentor") {
         // Mentor should usually see only themselves
         result = allMentors.where((m) => m.id == user!.id).toList();
@@ -86,6 +101,7 @@ class MentorController extends GetxController {
       }
 
       mentors.assignAll(result);
+      buildTabs();
       applyFilters();
     } catch (e) {
       print("Error: $e");
@@ -94,42 +110,82 @@ class MentorController extends GetxController {
     }
   }
 
+  void buildTabs() {
+    final coordinatorNames = mentors
+        .map((m) => m.coordinator?.name)
+        .whereType<String>() // removes null safely
+        .toSet()
+        .toList()
+      ..sort();
+
+    tabs.value = [
+      "All",
+      ...coordinatorNames,
+      "Unassigned",
+    ];
+
+    selectedTab.value = 0;
+  }
+
   List<Mentor> _getDummyMentors() {
     return [
       Mentor(
         id: "MTR1001",
         name: "Maria",
-        email: "maria@email.com",
         status: "Active",
         phone: "123456",
         joinedAt: DateTime.now(),
-        coordinatorId: "COO1001",
+        coordinator: Coordinator(
+          id: "COO1001",
+          name: "Ameen",
+          joinedAt: DateTime.now(),
+        ),
       ),
       Mentor(
         id: "MTR1002",
         name: "Nick",
-        email: "nick@email.com",
         status: "Inactive",
         phone: "+9876543210",
         joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-        coordinatorId: "COO1002",
+        coordinator: Coordinator(
+          id: "COO1002",
+          name: "Rahul",
+          joinedAt: DateTime.now(),
+        ),
+      ),
+      Mentor(
+        id: "MTR1003",
+        name: "Sara",
+        status: "Active",
+        phone: "55555",
+        joinedAt: DateTime.now(),
+        coordinator: null, // 👈 Unassigned
       ),
     ];
   }
 
   void applyFilters() {
+    if (tabs.isEmpty) return;
+
     List<Mentor> temp = mentors;
 
-    switch (selectedTab.value) {
-      case 0:
-        temp = temp.where((t) => t.status == "Active").toList();
-        break;
+    final selected = tabs[selectedTab.value];
 
-      case 1:
-        temp = temp.where((t) => t.status == "Inactive").toList();
-        break;
+    // 🎯 Tab filter
+    if (selected == "All") {
+      // no filter
+    } else if (selected == "Unassigned") {
+      temp = temp.where((t) => t.coordinator == null).toList();
+    } else {
+      temp = temp.where((t) => t.coordinator?.name == selected).toList();
     }
 
+    if (selectedRating.value != 0) {
+      temp =
+          temp.where((t) => (t.rating ?? 0) >= selectedRating.value).toList();
+    }
+
+    // 🔍 Search
     if (searchQuery.value.isNotEmpty) {
       temp = temp
           .where((t) =>
@@ -137,7 +193,7 @@ class MentorController extends GetxController {
           .toList();
     }
 
-    // Sort
+    // 🔃 Sort
     if (sortType.value == SortType.newest) {
       temp.sort((a, b) => b.joinedAt.compareTo(a.joinedAt));
     } else if (sortType.value == SortType.oldest) {

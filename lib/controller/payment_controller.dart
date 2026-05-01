@@ -188,14 +188,4 @@ class PaymentController extends GetxController {
     }).toList();
   }
 
-  // void switchType(PaymentUserType type) {
-  //   selectedType.value = type;
-  //   fetchPayments();
-  // }
-
-  // void applyFilters() {
-  //   filteredPayments.value = allPayments
-  //       .where((e) => e.status == statusMap[selectedTab.value])
-  //       .toList();
-  // }
 }

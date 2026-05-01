@@ -11,6 +11,8 @@ class Student {
   String? address;
   String? place;
   String? referredBy;
+  bool? isFeePaid;
+  
 
   int? classHours;
   int? pincode;
@@ -65,6 +67,7 @@ class Student {
     this.type,
     this.address,
     this.gender,
+    this.isFeePaid,
     this.timezone,
     this.place,
     this.studentId,

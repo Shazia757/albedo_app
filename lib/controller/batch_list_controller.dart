@@ -1,8 +1,14 @@
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/session_report_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/view/sessions/session_report_dialog.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,13 +16,30 @@ class BatchListController extends GetxController {
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
   RxBool isSearching = false.obs;
+  RxList<String> categoryList = <String>[].obs;
+
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController categoryController = TextEditingController();
+  TextEditingController priorityController = TextEditingController();
+  TextEditingController userTypeController = TextEditingController();
 
   var selectedTab = 0.obs;
   var batches = <String>[].obs;
+  RxList<SessionReport> reports = <SessionReport>[].obs;
+
   RxList<Batch> batchList = <Batch>[].obs;
+  RxList<Student> studentsList = <Student>[].obs;
   RxList<Teacher> teacherList = <Teacher>[].obs;
+  String selectedFile = '';
+
+  Rxn<SessionReport> reportRx = Rxn<SessionReport>();
+
+  bool get hasReport => reportRx.value != null;
+
   RxList<Mentor> mentorsList = <Mentor>[].obs;
   RxList<Coordinator> coordinatorsList = <Coordinator>[].obs;
+  RxString selectedType = "batch".obs;
 
   var selectedBatch = RxnString();
   final auth = Get.find<AuthController>();
@@ -97,7 +120,22 @@ class BatchListController extends GetxController {
         id: "S001",
         batchName: "10A",
         batchID: "BT01",
-        package: ["Math"],
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         students: 5,
         coordinator: Coordinator(
           id: "COO1001",
@@ -118,7 +156,22 @@ class BatchListController extends GetxController {
         id: "S002",
         batchName: "ATTC",
         batchID: "BT02",
-        package: ["Science"],
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         teacher: Teacher(
           id: "T02",
           name: "David",
@@ -133,7 +186,22 @@ class BatchListController extends GetxController {
         id: "S003",
         batchName: "9B",
         batchID: "ST03",
-        package: ["English"],
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         teacher: Teacher(
           id: "T001",
           name: "John",
@@ -148,7 +216,22 @@ class BatchListController extends GetxController {
         id: "S004",
         batchName: "11A",
         batchID: "ST04",
-        package: ["Physics"],
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         teacher: Teacher(
           id: "T003",
           name: "Meera",
@@ -163,7 +246,22 @@ class BatchListController extends GetxController {
         id: "S005",
         batchName: "12B",
         batchID: "ST05",
-        package: ["Chemistry"],
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         teacher: Teacher(
           id: "T02",
           name: "David",
@@ -178,7 +276,22 @@ class BatchListController extends GetxController {
         id: "S006",
         batchName: "10A",
         batchID: "ST06",
-        package: ["Biology"],
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         teacher: Teacher(
           id: "T003",
           name: "Meera",
@@ -193,7 +306,22 @@ class BatchListController extends GetxController {
         id: "S007",
         batchName: "9A",
         batchID: "ST07",
-        package: ["Math"],
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         teacher: Teacher(
           id: "T01",
           name: "John",
@@ -328,5 +456,34 @@ class BatchListController extends GetxController {
     } catch (e) {
       return null;
     }
+  }
+
+  void addOrUpdateReport(SessionReport report) {
+    final index = reports.indexWhere((r) => r.studentId == report.studentId);
+
+    if (index == -1) {
+      reports.add(report);
+    } else {
+      reports[index] = report;
+    }
+  }
+
+  void openSessionReportDialog(Batch session) {
+    final controller = Get.put(SessionReportController());
+
+    controller.initFromBatchSession(session);
+
+    CustomWidgets().showCustomDialog(
+      context: Get.context!,
+      title: const Text("Edit Session Report"),
+      icon: Icons.description,
+      formKey: GlobalKey<FormState>(),
+      isViewOnly: false,
+      submitText: "Save Report",
+      onSubmit: controller.saveReport,
+      sections: [
+        SessionReportDialogBody(controller: controller),
+      ],
+    );
   }
 }

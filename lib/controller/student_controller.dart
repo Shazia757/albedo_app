@@ -112,6 +112,7 @@ class StudentController extends GetxController {
         status: "Active",
         type: "Batch",
         joinedAt: DateTime.now(),
+        isFeePaid: true,
         admissionDate: DateTime.parse('2023-01-15 12:00:00'),
         teacherId: "T001",
         mentorId: "MTR001",

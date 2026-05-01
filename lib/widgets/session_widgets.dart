@@ -483,7 +483,7 @@ Color getRoleColor(BuildContext context, String role) {
 Widget infoCard(
   BuildContext context, {
   required String type,
-IconData? icon,
+  IconData? icon,
   required String title,
   required List<Widget> children,
   VoidCallback? onEdit,
@@ -714,6 +714,10 @@ void openStudentProfile(BuildContext context, Student data) {
           infoRow(label: "Syllabus", value: data.syllabus ?? "-"),
           infoRow(label: "Category", value: data.category ?? "-"),
           infoRow(label: "Standard", value: data.standard?.toString() ?? "-"),
+          infoRow(
+            label: "Fee",
+            value: (data.totalPaid ?? 0) > 0 ? "Paid ₹500" : "Unpaid",
+          ),
         ],
       ),
     ],
@@ -930,10 +934,19 @@ void openBatchProfile(BuildContext context, Batch data) {
             icon: Icons.bar_chart,
             title: "Batch Statistics",
             children: [
-              infoRow(label: "Students", value: data.students.toString()),
-              infoRow(
-                  label: "Packages",
-                  value: data.package?.length.toString() ?? ''),
+              Row(
+                children: [
+                  Expanded(
+                      child: infoRow(
+                          label: "Students", value: data.students.toString())),
+                  Expanded(
+                    child: infoRow(
+                        label: "Packages",
+                        value:
+                            data.package?.subjectName.length.toString() ?? ''),
+                  ),
+                ],
+              ),
             ],
           ),
           infoCard(
@@ -942,11 +955,39 @@ void openBatchProfile(BuildContext context, Batch data) {
             icon: Icons.account_balance_wallet,
             title: "Payment Summary",
             children: [
-              infoRow(label: "Total Fee", value: data.totalFee.toString()),
-              infoRow(label: "Total Paid", value: data.totalPaid.toString()),
-              infoRow(label: "Balance", value: data.balance.toString()),
-              infoRow(
-                  label: "Expense Ratio", value: data.expenseRatio.toString()),
+              Row(
+                children: [
+                  Expanded(
+                    child: infoRow(
+                      label: "Total Fee",
+                      value: data.totalFee.toString(),
+                    ),
+                  ),
+                  Expanded(
+                    child: infoRow(
+                      label: "Total Paid",
+                      value: data.totalPaid.toString(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: infoRow(
+                      label: "Balance",
+                      value: data.balance.toString(),
+                    ),
+                  ),
+                  Expanded(
+                    child: infoRow(
+                      label: "Expense Ratio",
+                      value: data.expenseRatio.toString(),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
           profileCard(
@@ -1593,8 +1634,14 @@ class _ClassSessionForm extends StatelessWidget {
           onChanged: (p0) => c.selectedTeacher.value = p0.name,
         ),
         const SizedBox(height: 12),
-        CustomWidgets()
-            .labelWithAsterisk('Search and Select Teacher', required: true),
+        CustomWidgets().customDropdownField(
+          context: context,
+          hint: 'Select Package',
+          items: c.packageOptions,
+          onChanged: (p0) => c.selectedPackage.value = p0,
+        ),
+        const SizedBox(height: 12),
+        CustomWidgets().labelWithAsterisk('Select Teacher', required: true),
         const SizedBox(height: 8),
         CustomWidgets().customDropdownField(
           context: context,
@@ -1672,7 +1719,7 @@ class _MeetSessionForm extends StatelessWidget {
             hint: 'Meet title',
             controller: c.meetTitleController),
         const SizedBox(height: 14),
-        const Text("Participants",
+        const Text("Select Participants",
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 10),
         _selectAllRow('Select All Mentors', c.selectAllMentors,

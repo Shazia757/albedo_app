@@ -1,6 +1,7 @@
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/session_report_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
+import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
@@ -10,7 +11,6 @@ import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/view/sessions/session_report_dialog.dart';
 import 'package:albedo_app/widgets/widgets.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -55,7 +55,7 @@ class SessionController extends GetxController {
   String selectedFile = '';
   RxList<Teacher> teacherList = <Teacher>[].obs;
   RxList<Mentor> mentorsList = <Mentor>[].obs;
-  RxList<Category> categoryList = <Category>[].obs;
+  RxList<String> categoryList = <String>[].obs;
   RxList<Coordinator> coordinatorsList = <Coordinator>[].obs;
   RxList<Advisor> advisorsList = <Advisor>[].obs;
   RxList<String> otherUsersList = <String>[].obs;
@@ -121,7 +121,7 @@ class SessionController extends GetxController {
               .toLowerCase()
               .contains(searchQuery.value.toLowerCase()) ||
           s.id.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          s.package.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          s.package.subjectName. toLowerCase().contains(searchQuery.value.toLowerCase()) ||
           s.className.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
           s.date.toString().contains(searchQuery.value.toLowerCase());
 
@@ -243,7 +243,22 @@ class SessionController extends GetxController {
           name: "Aisha",
           joinedAt: DateTime.now(),
         ),
-        package: "Premium Package",
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         syllabus: "CBSE Mathematics",
         className: "Class 10",
         teacher: Teacher(
@@ -279,7 +294,22 @@ class SessionController extends GetxController {
           name: "Rahul",
           joinedAt: DateTime.now(),
         ),
-        package: "Science",
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         syllabus: "SCERT",
         className: "9B",
         teacher: Teacher(
@@ -305,7 +335,22 @@ class SessionController extends GetxController {
           name: "Fatima",
           joinedAt: DateTime.now(),
         ),
-        package: "English",
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         syllabus: "CBSE",
         className: "8C",
         teacher: Teacher(
@@ -331,7 +376,22 @@ class SessionController extends GetxController {
           name: "Arjun",
           joinedAt: DateTime.now(),
         ),
-        package: "Physics",
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         syllabus: "SCERT",
         className: "11A",
         teacher: Teacher(
@@ -357,7 +417,22 @@ class SessionController extends GetxController {
           name: "Nisha",
           joinedAt: DateTime.now(),
         ),
-        package: "Chemistry",
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         syllabus: "CBSE",
         className: "12B",
         teacher: Teacher(
@@ -383,7 +458,22 @@ class SessionController extends GetxController {
           name: "Ali",
           joinedAt: DateTime.now(),
         ),
-        package: "Biology",
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         syllabus: "SCERT",
         className: "10A",
         teacher: Teacher(
@@ -409,7 +499,22 @@ class SessionController extends GetxController {
           name: "Sneha",
           joinedAt: DateTime.now(),
         ),
-        package: "Math",
+        package: Package(
+            teacherId: '',
+            teacherName: '',
+            teacherImage: '',
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: ''),
         syllabus: "CBSE",
         className: "9A",
         teacher: Teacher(

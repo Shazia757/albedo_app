@@ -381,7 +381,7 @@ class SessionPage extends StatelessWidget {
                           children: [
                             infoRow(
                               label: "Subject",
-                              value: data.package ?? "-",
+                              value: data.package.subjectName ?? "-",
                             ),
                             infoRow(
                               label: "Syllabus",
@@ -547,7 +547,7 @@ class SessionPage extends StatelessWidget {
                 ),
 
                 // ───────── ACTION BUTTONS ─────────
-                if (data.status != 'completed' && data.status != 'meet_done')
+                if (data.status != 'completed')
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -1220,7 +1220,7 @@ class _SessionCard extends StatelessWidget {
                             children: [
                               MetaItem(
                                   label: "Subject",
-                                  value: session.package ?? "—",
+                                  value: session.package.subjectName ?? "—",
                                   textSecondary: textSecondary),
                               const SizedBox(height: 4),
                               MetaItem(

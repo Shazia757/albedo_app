@@ -16,6 +16,8 @@ class CoordinatorController extends GetxController {
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
   var isSearching = false.obs;
+  var selectedDate = Rxn<DateTime>();
+
 
   var experiences = <ExperienceModel>[].obs;
 

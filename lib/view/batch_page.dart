@@ -2,6 +2,7 @@ import 'package:albedo_app/controller/batch_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
+import 'package:albedo_app/widgets/custom_tab.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -63,24 +64,14 @@ class BatchesPage extends StatelessWidget {
                 ),
 
                 /// 🧭 Tabs
-                Obx(
-                  () => CustomWidgets().customTabs(
-                    context,
-                    tabs: c.tabs,
-                    selectedIndex: c.selectedTab.value,
-                    onTap: (index) {
-                      c.selectedTab.value = index;
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: Tabs(
+                    selectedIndex: c.selectedTab,
+                    labels: ['Active', 'Inactive'],
+                    onTap: (p0) {
+                      c.selectedTab.value = p0;
                       c.applyFilters();
-                    },
-                    getCount: (index) {
-                      switch (index) {
-                        case 0:
-                          return c.activeCount;
-                        case 2:
-                          return c.inactiveCount;
-                        default:
-                          return 0;
-                      }
                     },
                   ),
                 ),
@@ -251,58 +242,61 @@ class BatchesPage extends StatelessWidget {
     );
   }
 
-  FloatingActionButton addBatch(BuildContext context) {
-    return FloatingActionButton(
+  Widget addBatch(BuildContext context) {
+    return AppFAB(
+      label: "Add Batch",
+      icon: Icons.add_rounded,
       onPressed: () => CustomWidgets().showCustomDialog(
         context: context,
-        title: Text('Add New Batch'),
+        title: const Text('Add New Batch'),
         formKey: GlobalKey<FormState>(),
         sections: [
           SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    CustomWidgets()
-                        .labelWithAsterisk('Batch Name', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter batch name',
-                        controller: c.batchNameController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Mode', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Select modes',
-                        controller: c.batchModeController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Course', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Select Course',
-                        controller: c.courseController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Mentor', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Select Mentor',
-                        controller: c.mentorController),
-                    const SizedBox(height: 10),
-                  ],
-                ),
-              ))
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  CustomWidgets()
+                      .labelWithAsterisk('Batch Name', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Enter batch name',
+                    controller: c.batchNameController,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Mode', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Select mode',
+                    controller: c.batchModeController,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Course', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Select course',
+                    controller: c.courseController,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Mentor', required: true),
+                  const SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Select mentor',
+                    controller: c.mentorController,
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
         ],
-        onSubmit: () {},
-      ),
-      mini: true,
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
+        onSubmit: () {
+          // TODO: implement submit
+        },
       ),
     );
   }

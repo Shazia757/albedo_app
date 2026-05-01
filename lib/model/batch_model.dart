@@ -1,3 +1,4 @@
+import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
@@ -21,7 +22,7 @@ class Batch {
  String? mentorId;
   Coordinator? coordinator;
   final String? coordinatorId;
-  final List<String>? package;
+  final Package? package;
   final String? syllabus;
   final DateTime? date;
   final String? startTime;
