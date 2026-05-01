@@ -22,6 +22,12 @@ class FeedbackController extends GetxController {
     "To Student",
     "To Teacher",
   ];
+  List<String> hrTabs = [
+    "Student",
+    "Teacher",
+    "Mentor",
+    
+  ];
 
   var feedbacks = <Feedbacks>[].obs;
 

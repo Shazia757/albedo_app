@@ -60,6 +60,9 @@ class ReportsPage extends StatelessWidget {
     if (role == "sales") {
       return ["Students", "Advisors"];
     }
+    if (role == "hr") {
+      return ["Teachers", "Hirings","Star of Month"];
+    }
     if (role == "advisor") {
       return [
         "Students",

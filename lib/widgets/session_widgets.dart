@@ -483,7 +483,7 @@ Color getRoleColor(BuildContext context, String role) {
 Widget infoCard(
   BuildContext context, {
   required String type,
-  required IconData icon,
+IconData? icon,
   required String title,
   required List<Widget> children,
   VoidCallback? onEdit,

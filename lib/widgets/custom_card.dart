@@ -272,6 +272,7 @@ class PremiumInfoCard extends StatelessWidget {
   final Color statusColor;
   final String footerText;
   final String? extraInfo;
+  final Widget? extraWidget;
   final bool hideIfEmpty;
   final List<InfoAction> actions;
   final VoidCallback? onTap;
@@ -288,6 +289,7 @@ class PremiumInfoCard extends StatelessWidget {
     required this.footerText,
     required this.actions,
     this.onTap,
+    this.extraWidget,
   });
 
   @override
@@ -387,6 +389,20 @@ class PremiumInfoCard extends StatelessWidget {
                   ],
 
                   const SizedBox(height: 6),
+                  if (extraWidget != null) ...[
+                    const SizedBox(height: 8),
+                    extraWidget!,
+                  ] else if (extraInfo != null && extraInfo!.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      extraInfo!,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: cs.onSurface.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 6),
 
                   /// FOOTER
                   Text(
@@ -419,8 +435,6 @@ class PremiumInfoCard extends StatelessWidget {
       ),
     );
   }
-
-  
 
   // Widget _statusBadge() {
   //   return Container(
@@ -547,4 +561,3 @@ class AppCard extends StatelessWidget {
     );
   }
 }
-

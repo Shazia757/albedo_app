@@ -39,6 +39,36 @@ class Session {
     this.teacherSalary,
   });
 }
+class SessionReport {
+  final String studentName;
+  final String studentId;
+  final String package;
+  final String sessionDate;
+   String? duration;
+
+  bool isCompleted;
+
+  // Completed fields
+  String? topicsCovered;
+  String? teacherNotes;
+  String? startTime;
+
+  // Not completed
+  String? reason;
+
+  SessionReport({
+    required this.studentName,
+    required this.studentId,
+    required this.package,
+    required this.sessionDate,
+    required this.duration,
+    this.isCompleted = false,
+    this.topicsCovered,
+    this.teacherNotes,
+    this.startTime,
+    this.reason,
+  });
+}
 
 class SortOption<T> {
   final String label;

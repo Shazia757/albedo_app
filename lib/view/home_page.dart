@@ -72,6 +72,8 @@ class HomeView extends StatelessWidget {
 
       case "sales":
         return _salesheadDashboard(context);
+      case "hr":
+        return _hrDashboard(context);
 
       default:
         return const SizedBox();
@@ -459,6 +461,16 @@ class HomeView extends StatelessWidget {
             c.updateAdvisorData(range: v);
           },
         ),
+      ],
+    );
+  }
+
+  Widget _hrDashboard(BuildContext context) {
+    return Column(
+      children: [
+        /// 🔹 VIDEO
+        _youtubeCard(context),
+        const SizedBox(height: 14),
       ],
     );
   }

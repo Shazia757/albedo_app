@@ -4,6 +4,7 @@ import 'package:albedo_app/controller/other_users_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/other_users_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
+import 'package:albedo_app/view/permissions_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -184,6 +185,27 @@ class OthersPage extends StatelessWidget {
                                                             },
                                                           ),
                                                         ),
+                                                        if ((otherUsers.role !=
+                                                                'finance') ||
+                                                            (otherUsers.role !=
+                                                                'sales') ||
+                                                            (otherUsers.role !=
+                                                                'admin') ||
+                                                            (otherUsers.role !=
+                                                                'hr'))
+                                                          InfoActionButton(
+                                                            action: InfoAction(
+                                                              icon: Icons
+                                                                  .accessibility_new,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .tertiary,
+                                                              onTap: () =>
+                                                                  Get.offAll(
+                                                                      PermissionsPage()),
+                                                            ),
+                                                          ),
                                                         InfoActionButton(
                                                           action: InfoAction(
                                                             icon: Icons.edit,

@@ -67,6 +67,7 @@ class DrawerMenu extends StatelessWidget {
               final isCoordinator = role == 'coordinator';
               final isFinance = role == 'finance';
               final isSales = role == 'sales';
+              final isHr = role == 'hr';
 
               final List<Widget> menuItems = _buildMenuByRole(
                 context,
@@ -79,6 +80,7 @@ class DrawerMenu extends StatelessWidget {
                 isCoordinator: isCoordinator,
                 isFinance: isFinance,
                 isSales: isSales,
+                isHr: isHr,
               );
 
               return ListView(
@@ -109,6 +111,7 @@ class DrawerMenu extends StatelessWidget {
     required bool isCoordinator,
     required bool isFinance,
     required bool isSales,
+    required bool isHr,
   }) {
     List<Widget> items = [];
 
@@ -385,6 +388,20 @@ class DrawerMenu extends StatelessWidget {
         ),
         reports,
         supports,
+      ];
+    } else if (isHr) {
+      items = [
+        home,
+        sessions,
+        _menuItem(
+          context,
+          Icons.person,
+          "Teachers",
+          index: 24,
+          onPressed: () => Get.offAll(TeachersPage()),
+        ),
+        reports,
+        feedback,
       ];
     }
 

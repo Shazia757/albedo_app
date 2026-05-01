@@ -54,6 +54,7 @@ class OtherUsersController extends GetxController {
           email: "nick@email.com",
           phone: "+9876543210",
           joinedAt: DateTime.parse('2024-12-01 09:00:00'),
+          role: 'HR'
         ),
       ]);
 
