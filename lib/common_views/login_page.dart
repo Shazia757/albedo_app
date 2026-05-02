@@ -15,6 +15,7 @@ class LoginView extends StatelessWidget {
       backgroundColor: const Color(0xFF0D0D1B), // Deep dark background
       body: Stack(
         children: [
+        
           _background(),
           Center(
             child: SingleChildScrollView(
