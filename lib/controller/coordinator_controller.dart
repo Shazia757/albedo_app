@@ -171,7 +171,7 @@ class CoordinatorController extends GetxController {
     // );
   }
 
-    deactivate(String id) {
+    resign(String id) {
     isDeactivateButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {

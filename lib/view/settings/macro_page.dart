@@ -20,7 +20,8 @@ class MacroPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+         backgroundColor: Theme.of(context).colorScheme.surface,
+
       floatingActionButton: addSupportBtn(context),
       body: Row(
         children: [

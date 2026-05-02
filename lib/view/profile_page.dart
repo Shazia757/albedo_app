@@ -19,7 +19,8 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: const CustomAppBar(),
       drawer: isWide ? null : const DrawerMenu(),
-      backgroundColor: cs.surfaceContainerLowest,
+           backgroundColor: Theme.of(context).colorScheme.surface,
+
       body: Obx(() {
         final AuthController auth = Get.find<AuthController>();
         final user = auth.activeUser;

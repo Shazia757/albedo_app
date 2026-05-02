@@ -9,18 +9,18 @@ class HeaderWithSearch extends StatelessWidget {
   final RxString searchQuery;
   final VoidCallback onSearchChanged;
   final VoidCallback? onSortTap;
-  final VoidCallback? onAdd;
+  final VoidCallback? onRequestTap;
   final List<Widget>? actions;
 
   const HeaderWithSearch({
     super.key,
     required this.title,
+    this.onRequestTap,
     required this.hint,
     required this.isSearching,
     required this.searchQuery,
     required this.onSearchChanged,
     this.onSortTap,
-    this.onAdd,
     this.actions,
   });
 
@@ -75,11 +75,11 @@ class HeaderWithSearch extends StatelessWidget {
                 onPressed: onSortTap,
               ),
 
-            /// ➕ ADD (optional)
-            if (onAdd != null)
+            if (onRequestTap != null)
               IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: onAdd,
+                icon: const Icon(Icons.inbox_outlined), // you can change icon
+                tooltip: "Requests",
+                onPressed: onRequestTap,
               ),
           ],
         );

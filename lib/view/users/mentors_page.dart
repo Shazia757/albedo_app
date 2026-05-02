@@ -1,7 +1,9 @@
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/mentor_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/mentor_feedback_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -20,12 +22,28 @@ class MentorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
-      floatingActionButton: addMentor(context),
+      floatingActionButton: (!isCustom || PermissionService.can("add_mentors"))
+          ? addMentor(context)
+          : null,
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
@@ -91,74 +109,66 @@ class MentorsPage extends StatelessWidget {
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 12),
-                                child: InkWell(
-                                  onTap: () => openMentorProfile(
-                                    context,
-                                    mentor,
-                                    (p0) => mentorToUser(mentor),
-                                  ),
-                                  child: ConstrainedBox(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 700),
-                                    child: PremiumInfoCard(
-                                      id: mentor.id ?? "",
-                                      title: mentor?.name ?? "",
-                                      subtitle: mentor?.email ?? "",
-                                      status: mentor?.status,
-                                      statusColor:
-                                          getStatusColor(mentor?.status),
-                                      footerText:
-                                          "Joined • ${mentor?.joinedAt.toString().substring(0, 16)}",
-                                      extraInfo: mentor?.phone != null
-                                          ? "Contact • ${mentor!.phone}"
-                                          : null,
+                                child: PremiumInfoCard(
+                                  id: mentor.id ?? "-",
+                                  title: mentor?.name ?? "-",
+                                  subtitle: mentor?.email ?? "-",
+                                  status: mentor?.status,
+                                  statusColor: getStatusColor(mentor?.status),
+                                  footerText:
+                                      "Joined • ${mentor?.joinedAt.toString().substring(0, 16)}",
+                                  extraInfo: mentor?.phone != null
+                                      ? "Contact • ${mentor!.phone}"
+                                      : null,
+                                  onTap: (!isCustom ||
+                                          PermissionService.can("view_mentors"))
+                                      ? () => openMentorProfile(
+                                            context,
+                                            mentor,
+                                            (p0) => mentorToUser(mentor),
+                                          )
+                                      : null,
+                                  actions: [
+                                    InfoAction(
+                                      icon: Icons.dashboard,
+                                      color: cs.primary,
                                       onTap: () {
-                                        if (mentor != null) {
-                                          {
-                                            openMentorProfile(
-                                              context,
-                                              mentor,
-                                              (p0) => mentorToUser(mentor),
-                                            );
-                                          }
-                                        }
-                                      },
-                                      actions: [
-                                        InfoAction(
-                                          icon: Icons.dashboard,
-                                          color: cs.primary,
-                                          onTap: () {
-                                            final auth =
-                                                Get.find<AuthController>();
-                                            final user = mentorToUser(mentor);
+                                        final auth = Get.find<AuthController>();
+                                        final user = mentorToUser(mentor);
 
-                                            auth.startImpersonation(user);
-                                            Get.offAll(() => const Root());
-                                          },
-                                        ),
-                                        InfoAction(
-                                          icon: Icons.edit,
-                                          color: cs.secondary,
-                                          onTap: () {
-                                            if (mentor != null) {
-                                              c.loadMentors(mentor);
-                                              editMentor(context);
-                                            }
-                                          },
-                                        ),
-                                        InfoAction(
-                                            icon: Icons.block,
-                                            color: cs.error,
-                                            onTap: () => c.handleDeactivate(
-                                                context, mentor)),
-                                        InfoAction(
-                                            icon: Icons.delete,
-                                            color: cs.error,
-                                            onTap: () => c.handleDelete(
-                                                context, mentor)),
-                                      ],
+                                        auth.startImpersonation(user);
+                                        Get.offAll(() => const Root());
+                                      },
                                     ),
-                                  ),
+                                    if ((!isCustom ||
+                                        PermissionService.can("edit_mentors")))
+                                      InfoAction(
+                                        icon: Icons.edit,
+                                        color: cs.secondary,
+                                        onTap: () {
+                                          if (mentor != null) {
+                                            c.loadMentors(mentor);
+                                            editMentor(context);
+                                          }
+                                        },
+                                      ),
+                                    if ((!isCustom ||
+                                        PermissionService.can(
+                                            "resign_mentors")))
+                                      InfoAction(
+                                          icon: Icons.block,
+                                          color: cs.error,
+                                          onTap: () => c.handleResign(
+                                              context, mentor)),
+                                    if ((!isCustom ||
+                                        PermissionService.can(
+                                            "delete_mentors")))
+                                      InfoAction(
+                                          icon: Icons.delete,
+                                          color: cs.error,
+                                          onTap: () =>
+                                              c.handleDelete(context, mentor)),
+                                  ],
                                 ),
                               );
                             });
@@ -176,6 +186,20 @@ class MentorsPage extends StatelessWidget {
 
   Widget _topBar(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
 
     if (isMobile) {
       return Obx(() {
@@ -197,7 +221,7 @@ class MentorsPage extends StatelessWidget {
                   Expanded(
                     child: CustomWidgets().premiumSearch(
                       context,
-                      hint: "Search mentors...",
+                      hint: "Search mentors by name, ID or email...",
                       onChanged: (val) {
                         c.searchQuery.value = val;
                         c.applyFilters();
@@ -224,12 +248,20 @@ class MentorsPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                IconButton(
+                  iconSize: 20,
+                  icon: const Icon(Icons.feedback_outlined),
+                  tooltip: "Feedbacks",
+                  onPressed:
+                      (!isCustom || PermissionService.can("mentor_feedbacks"))
+                          ? () => Get.to(() => MentorFeedbackPage())
+                          : null,
+                ),
               ],
             ),
 
             const SizedBox(height: 10),
 
-            /// ✅ KEEP THIS ROW UNCHANGED
             Row(
               children: [
                 Expanded(child: _filterButton(context)),
@@ -306,7 +338,6 @@ class MentorsPage extends StatelessWidget {
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
             color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),

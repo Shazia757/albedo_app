@@ -1,6 +1,7 @@
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/coordinator_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
@@ -22,12 +23,30 @@ class CoordinatorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: const CustomAppBar(),
         drawer: isDesktop ? null : const DrawerMenu(),
-        floatingActionButton: addCoordinator(context),
+        floatingActionButton:
+            (!isCustom || PermissionService.can("add_coordinators"))
+                ? addCoordinator(context)
+                : null,
         body: Row(
           children: [
             if (isDesktop) DrawerMenu(),
@@ -66,6 +85,10 @@ class CoordinatorPage extends StatelessWidget {
                         c.applyFilters();
                       },
                     ),
+                    onRequestTap: (!isCustom ||
+                            PermissionService.can("verification_requests"))
+                        ? () {}
+                        : null,
                   ),
 
                   /// 🧭 Tabs
@@ -140,14 +163,16 @@ class CoordinatorPage extends StatelessWidget {
                                           : null,
                                       onTap: () {
                                         if (coordinator != null) {
-                                          {
-                                            openCoordinatorProfile(
-                                              context,
-                                              coordinator,
-                                              (p0) => coordinatorToUser(
-                                                  coordinator),
-                                            );
-                                          }
+                                          (!isCustom ||
+                                                  PermissionService.can(
+                                                      "view_coordinators"))
+                                              ? () => openCoordinatorProfile(
+                                                    context,
+                                                    coordinator,
+                                                    (p0) => coordinatorToUser(
+                                                        coordinator),
+                                                  )
+                                              : null;
                                         }
                                       },
                                       actions: [
@@ -165,39 +190,48 @@ class CoordinatorPage extends StatelessWidget {
                                             Get.offAll(() => const Root());
                                           },
                                         ),
-                                        InfoAction(
-                                          icon: Icons.edit,
-                                          color: cs.secondary,
-                                          onTap: () {
-                                            if (coordinator != null) {
-                                              c.loadCoordinators(coordinator);
-                                              editCoordinator(context);
-                                            }
-                                          },
-                                        ),
-                                        InfoAction(
-                                            icon: Icons.block,
+                                        if ((!isCustom ||
+                                            PermissionService.can(
+                                                "edit_coordinators")))
+                                          InfoAction(
+                                            icon: Icons.edit,
+                                            color: cs.secondary,
+                                            onTap: () {
+                                              if (coordinator != null) {
+                                                c.loadCoordinators(coordinator);
+                                                editCoordinator(context);
+                                              }
+                                            },
+                                          ),
+                                        if ((!isCustom ||
+                                            PermissionService.can(
+                                                "resign_coordinators")))
+                                          InfoAction(
+                                              icon: Icons.block,
+                                              color: cs.error,
+                                              onTap: () => CustomWidgets()
+                                                      .showDeactivateDialog(
+                                                    text:
+                                                        'Are you sure you want to resign this coordinator permanently?',
+                                                    context: context,
+                                                    onConfirm: () => c.resign(
+                                                        coordinator.id!),
+                                                  )),
+                                        if ((!isCustom ||
+                                            PermissionService.can(
+                                                "delete_coordinators")))
+                                          InfoAction(
+                                            icon: Icons.delete,
                                             color: cs.error,
                                             onTap: () => CustomWidgets()
-                                                    .showDeactivateDialog(
-                                                  text:
-                                                      'Are you sure you want to deactivate this coordinator permanently?',
-                                                  context: context,
-                                                  onConfirm: () => c.deactivate(
-                                                      coordinator.id!),
-                                                )),
-                                        InfoAction(
-                                          icon: Icons.delete,
-                                          color: cs.error,
-                                          onTap: () =>
-                                              CustomWidgets().showDeleteDialog(
-                                            text:
-                                                'Are you sure you want to delete this coordinator permanently?',
-                                            context: context,
-                                            onConfirm: () =>
-                                                c.delete(coordinator!.id),
+                                                .showDeleteDialog(
+                                              text:
+                                                  'Are you sure you want to delete this coordinator permanently?',
+                                              context: context,
+                                              onConfirm: () =>
+                                                  c.delete(coordinator!.id),
+                                            ),
                                           ),
-                                        ),
                                       ],
                                     ),
                                   ),

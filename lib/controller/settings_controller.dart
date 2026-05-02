@@ -34,12 +34,12 @@ class SettingsController extends GetxController {
   var standard = [].obs;
   var referralSource = [].obs;
   var assessmentAttentionQn = <String>[].obs;
-var restrictedUsers = <DeadlineConfig>[
-  DeadlineConfig(role: 'Teacher', type: 'hours', value: 48),
-  DeadlineConfig(role: 'Mentor', type: 'dayOfMonth', value: 2),
-  DeadlineConfig(role: 'Coordinator', type: 'dayOfMonth', value: 3),
-  DeadlineConfig(role: 'Advisor', type: 'dayOfMonth', value: 3),
-].obs;
+  var restrictedUsers = <DeadlineConfig>[
+    DeadlineConfig(role: 'Teacher', type: 'hours', value: 48),
+    DeadlineConfig(role: 'Mentor', type: 'dayOfMonth', value: 2),
+    DeadlineConfig(role: 'Coordinator', type: 'dayOfMonth', value: 3),
+    DeadlineConfig(role: 'Advisor', type: 'dayOfMonth', value: 3),
+  ].obs;
   var users = [].obs;
   var notifications = <Notifications>[].obs;
   var banners = <Banners>[].obs;
@@ -108,6 +108,20 @@ var restrictedUsers = <DeadlineConfig>[
 
   TextEditingController dateController = TextEditingController();
 
+  Map<String, String> settingsPermissions = {
+    "General": "general_settings",
+    "Notifications": "notification_settings",
+    "Banner Ads": "banner_ads",
+    "Coupons": "coupon_settings",
+    "Recommendation": "recommendation_settings",
+    "Hiring": "hiring_settings",
+    "Star of Month": "star_settings",
+    "Automation": "automation_settings",
+    "Assessments": "assessment_settings",
+    "Materials": "material_settings",
+    "Bulk Upload": "bulk_upload",
+    "Backup": "backup_settings",
+  };
   List<String> tabs = [
     "General",
     "Notifications",

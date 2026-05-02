@@ -24,6 +24,8 @@ class AdvisorsPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+
       appBar: const CustomAppBar(),
       drawer: isDesktop ? null : const DrawerMenu(),
       floatingActionButton: addAdvisor(context),

@@ -1,4 +1,5 @@
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/controller/session_report_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
@@ -28,12 +29,28 @@ class SessionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDesktop = Responsive.isDesktop(context);
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: cs.surfaceContainerLowest,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
-      floatingActionButton: AddSessionFAB(c: c),
+      floatingActionButton: (!isCustom || PermissionService.can("add_sessions"))
+          ? AddSessionFAB(c: c)
+          : null,
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
@@ -233,6 +250,19 @@ class SessionPage extends StatelessWidget {
   ) {
     final auth = Get.find<AuthController>();
     final isCoordinator = auth.activeUser?.role == "coordinator";
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
 
     final c = Get.find<SessionController>();
 
@@ -560,17 +590,19 @@ class SessionPage extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: _DetailActionButton(
-                            label: "Edit",
-                            icon: Icons.edit_outlined,
-                            color: cs.secondary,
-                            onTap: () {
-                              c.loadSession(data);
-                              editSession(context);
-                            },
+                        if ((!isCustom ||
+                            PermissionService.can("edit_sessions")))
+                          Expanded(
+                            child: _DetailActionButton(
+                              label: "Edit",
+                              icon: Icons.edit_outlined,
+                              color: cs.secondary,
+                              onTap: () {
+                                c.loadSession(data);
+                                editSession(context);
+                              },
+                            ),
                           ),
-                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: _DetailActionButton(
@@ -1345,6 +1377,20 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
     return HeaderWithSearch(
       title: "Sessions",
       hint: "Search sessions...",
@@ -1381,6 +1427,9 @@ class _TopBar extends StatelessWidget {
           c.applyFilters();
         },
       ),
+      onRequestTap: (!isCustom || PermissionService.can("reschedule_requests"))
+          ? () {}
+          : null,
     );
   }
 }

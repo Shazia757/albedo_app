@@ -1466,56 +1466,296 @@ Widget rangeItem(
   );
 }
 
-  // ================= CHART =================
+// ================= CHART =================
 
-  Widget chartCard(
-    BuildContext context, {
-    required String title,
-    required String count,
-    IconData? icon,
-    required List<double> data,
-    required Color color,
-    Color? iconColor,
-    required TimeFilter selectedFilter,
-    required Function(TimeFilter) onFilterChanged,
-    required RxString selectedRange,
-    required Function(String) onRangeChanged,
-  }) {
-    // ✅ Dynamic X-axis labels
-    List<String> getXAxisLabels(String range) {
-      switch (range) {
-        case "This Year":
-          return [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
-          ];
-        case "This Month":
-          return ["W1", "W2", "W3", "W4"];
-        case "This Week":
-          return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        default: // "All"
-          return c.years; // your existing list
-      }
+Widget chartCard(
+  BuildContext context, {
+  required String title,
+  required String count,
+  IconData? icon,
+  required List<double> data,
+  required Color color,
+  Color? iconColor,
+  required TimeFilter selectedFilter,
+  required Function(TimeFilter) onFilterChanged,
+  required RxString selectedRange,
+  required Function(String) onRangeChanged,
+}) {
+  // ✅ Dynamic X-axis labels
+  List<String> getXAxisLabels(String range) {
+    switch (range) {
+      case "This Year":
+        return [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec"
+        ];
+      case "This Month":
+        return ["W1", "W2", "W3", "W4"];
+      case "This Week":
+        return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      default: // "All"
+        return c.years; // your existing list
     }
+  }
 
-    final labels = getXAxisLabels(selectedRange.value);
+  final labels = getXAxisLabels(selectedRange.value);
 
-    double maxY = data.isEmpty ? 0 : data.reduce((a, b) => a > b ? a : b);
-    double interval = maxY / 5;
+  double maxY = data.isEmpty ? 0 : data.reduce((a, b) => a > b ? a : b);
+  double interval = maxY / 5;
 
+  return Container(
+    height: 220,
+    padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+    decoration: cardDecoration(context),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                if (icon != null) ...[
+                  Icon(icon, size: 24, color: iconColor),
+                  const SizedBox(width: 8),
+                ],
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      count,
+                      style: context.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      title,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.theme.colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Obx(() => PopupMenuButton(
+                  padding: EdgeInsets.zero,
+                  offset: const Offset(0, 45),
+                  color: context.theme.cardColor,
+                  elevation: 0,
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      enabled: false,
+                      padding: EdgeInsets.zero,
+                      child: rangeMenu(
+                        context,
+                        selectedValue: selectedRange.value,
+                        onSelected: (value) {
+                          onRangeChanged(value);
+                        },
+                      ),
+                    ),
+                  ],
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: context.theme.cardColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(selectedRange.value,
+                            style: context.textTheme.labelLarge),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.keyboard_arrow_down_rounded, size: 20)
+                      ],
+                    ),
+                  ),
+                ))
+          ],
+        ),
+        const SizedBox(height: 12),
+        const SizedBox(height: 12),
+        Expanded(
+          child: LineChart(
+            LineChartData(
+              minX: 0,
+              maxX: (labels.length - 1).toDouble(),
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: false,
+                horizontalInterval: interval == 0 ? 1 : interval,
+                getDrawingHorizontalLine: (value) => FlLine(
+                  color: context.theme.colorScheme.outline.withOpacity(0.4),
+                  strokeWidth: 1,
+                ),
+              ),
+              titlesData: FlTitlesData(
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: interval == 0 ? 1 : interval,
+                    reservedSize: 28,
+                    getTitlesWidget: (value, meta) {
+                      return Text(
+                        value.toInt().toString(),
+                        style: context.textTheme.labelSmall?.copyWith(
+                          color: context.theme.colorScheme.outline,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                // ✅ FIXED: dynamic bottom labels
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: 1,
+                    getTitlesWidget: (value, meta) {
+                      int index = value.toInt();
+
+                      if (index < 0 || index >= labels.length) {
+                        return const SizedBox();
+                      }
+
+                      return Text(
+                        labels[index],
+                        style: context.textTheme.labelSmall?.copyWith(
+                          color: context.theme.colorScheme.outline,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                rightTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              ),
+              borderData: FlBorderData(show: false),
+              lineTouchData: LineTouchData(
+                touchTooltipData: LineTouchTooltipData(
+                  tooltipRoundedRadius: 8,
+                  getTooltipItems: (spots) {
+                    return spots.map((spot) {
+                      return LineTooltipItem(
+                          "${spot.y}",
+                          TextStyle(
+                            color: context.theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ));
+                    }).toList();
+                  },
+                ),
+              ),
+              lineBarsData: [
+                LineChartBarData(
+                  isCurved: true,
+                  curveSmoothness: 0.4,
+
+                  // ✅ Ensure data matches labels length
+                  spots: data
+                      .asMap()
+                      .entries
+                      .where((e) => e.key < labels.length)
+                      .map((e) => FlSpot(e.key.toDouble(), e.value))
+                      .toList(),
+
+                  barWidth: 2.4,
+                  color: color,
+                  dotData: FlDotData(show: false),
+                  belowBarData: BarAreaData(
+                    show: true,
+                    gradient: LinearGradient(
+                      colors: [
+                        color.withOpacity(0.25),
+                        color.withOpacity(0.05),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget youtubeCard(BuildContext context) {
+  final videoUrl = "https://www.youtube.com/watch?v=bIu_QEapyJk";
+  final thumbnail = "https://img.youtube.com/vi/bIu_QEapyJk/0.jpg";
+
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: cardDecoration(context),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: GestureDetector(
+        onTap: () {
+          openVideo(videoUrl);
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 🔹 Thumbnail / fallback
+            Image.network(
+              thumbnail,
+              fit: BoxFit.cover, 
+              width: double.infinity,
+              height: 200,
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  'assets/images/logo.png',
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 200,
+                );
+              },
+            ),
+
+            // 🔹 Play button overlay
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black45,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(14),
+              child: const Icon(
+                Icons.play_arrow,
+                color: Colors.white,
+                size: 36,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget summaryCard(BuildContext context) {
+  return Obx(() {
     return Container(
-      height: 220,
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+      padding: const EdgeInsets.all(16),
       decoration: cardDecoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1523,37 +1763,15 @@ Widget rangeItem(
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: 24, color: iconColor),
-                    const SizedBox(width: 8),
-                  ],
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        count,
-                        style: context.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        title,
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: context.theme.colorScheme.outline,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              Text(
+                "Summary",
+                style: context.textTheme.titleMedium,
               ),
+
+              // 🔹 RANGE SELECTOR
               Obx(() => PopupMenuButton(
                     padding: EdgeInsets.zero,
                     offset: const Offset(0, 45),
-                    color: context.theme.cardColor,
                     elevation: 0,
                     itemBuilder: (context) => [
                       PopupMenuItem(
@@ -1561,9 +1779,10 @@ Widget rangeItem(
                         padding: EdgeInsets.zero,
                         child: rangeMenu(
                           context,
-                          selectedValue: selectedRange.value,
+                          selectedValue: c.summaryRange.value,
                           onSelected: (value) {
-                            onRangeChanged(value);
+                            c.summaryRange.value = value;
+                            c.updateSummaryData(value);
                           },
                         ),
                       ),
@@ -1571,13 +1790,9 @@ Widget rangeItem(
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: context.theme.cardColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
                       child: Row(
                         children: [
-                          Text(selectedRange.value,
+                          Text(c.summaryRange.value,
                               style: context.textTheme.labelLarge),
                           const SizedBox(width: 6),
                           const Icon(Icons.keyboard_arrow_down_rounded,
@@ -1585,235 +1800,18 @@ Widget rangeItem(
                         ],
                       ),
                     ),
-                  ))
+                  )),
             ],
           ),
-          const SizedBox(height: 12),
-          const SizedBox(height: 12),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                minX: 0,
-                maxX: (labels.length - 1).toDouble(),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: interval == 0 ? 1 : interval,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: context.theme.colorScheme.outline.withOpacity(0.4),
-                    strokeWidth: 1,
-                  ),
-                ),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      interval: interval == 0 ? 1 : interval,
-                      reservedSize: 28,
-                      getTitlesWidget: (value, meta) {
-                        return Text(
-                          value.toInt().toString(),
-                          style: context.textTheme.labelSmall?.copyWith(
-                            color: context.theme.colorScheme.outline,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  // ✅ FIXED: dynamic bottom labels
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      interval: 1,
-                      getTitlesWidget: (value, meta) {
-                        int index = value.toInt();
-
-                        if (index < 0 || index >= labels.length) {
-                          return const SizedBox();
-                        }
-
-                        return Text(
-                          labels[index],
-                          style: context.textTheme.labelSmall?.copyWith(
-                            color: context.theme.colorScheme.outline,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  rightTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                ),
-                borderData: FlBorderData(show: false),
-                lineTouchData: LineTouchData(
-                  touchTooltipData: LineTouchTooltipData(
-                    tooltipRoundedRadius: 8,
-                    getTooltipItems: (spots) {
-                      return spots.map((spot) {
-                        return LineTooltipItem(
-                            "${spot.y}",
-                            TextStyle(
-                              color: context.theme.colorScheme.onSurface,
-                              fontWeight: FontWeight.w600,
-                            ));
-                      }).toList();
-                    },
-                  ),
-                ),
-                lineBarsData: [
-                  LineChartBarData(
-                    isCurved: true,
-                    curveSmoothness: 0.4,
-
-                    // ✅ Ensure data matches labels length
-                    spots: data
-                        .asMap()
-                        .entries
-                        .where((e) => e.key < labels.length)
-                        .map((e) => FlSpot(e.key.toDouble(), e.value))
-                        .toList(),
-
-                    barWidth: 2.4,
-                    color: color,
-                    dotData: FlDotData(show: false),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      gradient: LinearGradient(
-                        colors: [
-                          color.withOpacity(0.25),
-                          color.withOpacity(0.05),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          const SizedBox(height: 14),
+          donutChart(context),
+          const SizedBox(height: 14),
+          packageList(context),
         ],
       ),
     );
-  }
-
-
-  Widget youtubeCard(BuildContext context) {
-    final videoUrl = "https://www.youtube.com/watch?v=bIu_QEapyJk";
-    final thumbnail = "https://img.youtube.com/vi/bIu_QEapyJk/0.jpg";
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: cardDecoration(context),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: GestureDetector(
-          onTap: () {
-            openVideo(videoUrl);
-          },
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // 🔹 Thumbnail / fallback
-              Image.network(
-                thumbnail,
-                fit: BoxFit.cover, // ✅ fills nicely
-                width: double.infinity,
-                height: 200,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/logo.png',
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: 200,
-                  );
-                },
-              ),
-
-              // 🔹 Play button overlay
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black45,
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(14),
-                child: const Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                  size: 36,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget summaryCard(BuildContext context) {
-    return Obx(() {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: cardDecoration(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Summary",
-                  style: context.textTheme.titleMedium,
-                ),
-
-                // 🔹 RANGE SELECTOR
-                Obx(() => PopupMenuButton(
-                      padding: EdgeInsets.zero,
-                      offset: const Offset(0, 45),
-                      elevation: 0,
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          enabled: false,
-                          padding: EdgeInsets.zero,
-                          child: rangeMenu(
-                            context,
-                            selectedValue: c.summaryRange.value,
-                            onSelected: (value) {
-                              c.summaryRange.value = value;
-                              c.updateSummaryData(value);
-                            },
-                          ),
-                        ),
-                      ],
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 8),
-                        child: Row(
-                          children: [
-                            Text(c.summaryRange.value,
-                                style: context.textTheme.labelLarge),
-                            const SizedBox(width: 6),
-                            const Icon(Icons.keyboard_arrow_down_rounded,
-                                size: 20)
-                          ],
-                        ),
-                      ),
-                    )),
-              ],
-            ),
-            const SizedBox(height: 14),
-            donutChart(context),
-            const SizedBox(height: 14),
-            packageList(context),
-          ],
-        ),
-      );
-    });
-  }
+  });
+}
 
 // ================= COMMON =================
 

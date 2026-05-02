@@ -8,7 +8,8 @@ class BackupPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+           backgroundColor: Theme.of(context).colorScheme.surface,
+
       body: Center(
         child: Card(
           elevation: 8,

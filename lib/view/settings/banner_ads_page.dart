@@ -19,7 +19,8 @@ class BannerAdsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+           backgroundColor: Theme.of(context).colorScheme.surface,
+
       floatingActionButton: addBannerBtn(context),
       body: Row(
         children: [

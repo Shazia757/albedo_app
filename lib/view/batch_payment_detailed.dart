@@ -17,6 +17,8 @@ class BatchPaymentDetailPage extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+
       appBar: CustomAppBar(),
       body: Column(
         children: [

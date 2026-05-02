@@ -26,7 +26,7 @@ class OthersPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       floatingActionButton: addOtherUsers(context),
       body: Row(
@@ -185,14 +185,14 @@ class OthersPage extends StatelessWidget {
                                                             },
                                                           ),
                                                         ),
-                                                        if ((otherUsers.role !=
-                                                                'finance') &&
-                                                            (otherUsers.role !=
-                                                                'sales') &&
-                                                            (otherUsers.role !=
-                                                                'admin') &&
-                                                            (otherUsers.role !=
-                                                                'hr'))
+                                                        if (otherUsers.role !=
+                                                                'finance' &&
+                                                            otherUsers.role !=
+                                                                'sales' &&
+                                                            otherUsers.role !=
+                                                                'admin' &&
+                                                            otherUsers.role !=
+                                                                'hr')
                                                           InfoActionButton(
                                                             action: InfoAction(
                                                               icon: Icons
@@ -202,7 +202,7 @@ class OthersPage extends StatelessWidget {
                                                                   .colorScheme
                                                                   .tertiary,
                                                               onTap: () =>
-                                                                  Get.offAll(
+                                                                  Get.to(() =>
                                                                       PermissionsPage()),
                                                             ),
                                                           ),
@@ -403,7 +403,6 @@ class OthersPage extends StatelessWidget {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
               color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
@@ -431,6 +430,7 @@ class OthersPage extends StatelessWidget {
       label: "Add User",
       icon: Icons.add_rounded,
       onPressed: () => CustomWidgets().showCustomDialog(
+        submitText: 'Add',
         context: context,
         title: const Text('Add New User'),
         formKey: GlobalKey<FormState>(),

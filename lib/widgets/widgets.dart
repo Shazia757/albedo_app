@@ -1189,6 +1189,11 @@ class CustomWidgets {
                       children: [
                         Expanded(
                           child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                             onPressed: () => Get.back(),
                             child: Text(
                               "Cancel",
@@ -1201,8 +1206,12 @@ class CustomWidgets {
                         Expanded(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    context.theme.colorScheme.secondary),
+                              backgroundColor:
+                                  context.theme.colorScheme.secondary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                             onPressed: () {
                               if (!formKey.currentState!.validate()) return;
                               onSubmit();
@@ -1910,18 +1919,29 @@ class AppFormDialog {
     bool isViewOnly = false,
     String submitText = "Save",
   }) {
+    final textTheme = Theme.of(context).textTheme;
+
     CustomWidgets().showCustomDialog(
       context: context,
-      title: title,
+      title: DefaultTextStyle(
+        style: Theme.of(context)
+            .textTheme
+            .titleLarge!
+            .copyWith(color: Colors.white),
+        child: title,
+      ),
       formKey: formKey ?? GlobalKey<FormState>(),
       onSubmit: onSubmit,
       isViewOnly: isViewOnly,
       submitText: submitText,
       sections: [
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: children,
+        DefaultTextStyle(
+          style: textTheme.bodyMedium!,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children,
+            ),
           ),
         ),
       ],

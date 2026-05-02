@@ -19,7 +19,8 @@ class TrStudentsPage extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: cs.outline.withOpacity(0.1),
+            backgroundColor: Theme.of(context).colorScheme.surface,
+
       appBar: CustomAppBar(),
       drawer: DrawerMenu(),
       body: Obx(() {

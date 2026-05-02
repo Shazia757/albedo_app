@@ -254,25 +254,25 @@ class MentorController extends GetxController {
     }
   }
 
-  void handleDeactivate(BuildContext context, Mentor mentor) {
+  void handleResign(BuildContext context, Mentor mentor) {
     final user = auth.activeUser;
 
     if (user?.role == "coordinator") {
       CustomWidgets().showDeactivateDialog(
         context: context,
-        text: "Do you want to request inactivation for this mentor?",
+        text: "Do you want to request resignation for this mentor?",
         onConfirm: () => requestDeactivate(mentor.id!),
       );
     } else {
       CustomWidgets().showDeactivateDialog(
         context: context,
-        text: "Are you sure you want to deactivate this mentor permanently?",
-        onConfirm: () => deactivate(mentor.id!),
+        text: "Are you sure you want to resign this mentor permanently?",
+        onConfirm: () => resign(mentor.id!),
       );
     }
   }
 
-  deactivate(String id) {
+  resign(String id) {
     isDeleteButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {

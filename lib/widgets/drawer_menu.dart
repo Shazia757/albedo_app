@@ -1,4 +1,5 @@
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/view/batch_page.dart';
 import 'package:albedo_app/view/batch_payment_page.dart';
@@ -68,6 +69,17 @@ class DrawerMenu extends StatelessWidget {
               final isFinance = role == 'finance';
               final isSales = role == 'sales';
               final isHr = role == 'hr';
+              final isCustom = ![
+                "admin",
+                "mentor",
+                "advisor",
+                "teacher",
+                "student",
+                "coordinator",
+                "finance",
+                "sales",
+                "hr"
+              ].contains(role);
 
               final List<Widget> menuItems = _buildMenuByRole(
                 context,
@@ -81,6 +93,7 @@ class DrawerMenu extends StatelessWidget {
                 isFinance: isFinance,
                 isSales: isSales,
                 isHr: isHr,
+                isCustom: isCustom,
               );
 
               return ListView(
@@ -112,6 +125,7 @@ class DrawerMenu extends StatelessWidget {
     required bool isFinance,
     required bool isSales,
     required bool isHr,
+    required bool isCustom,
   }) {
     List<Widget> items = [];
 
@@ -403,11 +417,95 @@ class DrawerMenu extends StatelessWidget {
         reports,
         feedback,
       ];
+    } else if (isCustom) {
+      items = [
+        home,
+        _withPermission(
+          permission: "show_sessions",
+          child: sessions,
+        ),
+        _withPermission(
+          permission: "show_students",
+          child: _menuItem(
+            context,
+            Icons.school,
+            "Students",
+            index: 20,
+            onPressed: () => Get.offAll(StudentsPage()),
+          ),
+        ),
+        _withPermission(
+          permission: "view_teachers",
+          child: _menuItem(
+            context,
+            Icons.person,
+            "Teachers",
+            index: 21,
+            onPressed: () => Get.offAll(TeachersPage()),
+          ),
+        ),
+        _withPermission(
+          permission: "show_batches",
+          child: batch,
+        ),
+        _withPermission(
+          permission: "student_payments",
+          child: payments,
+        ),
+        if (!isCustom ||
+            PermissionService.can("show_reports") ||
+            PermissionService.can("coordinator_reports") ||
+            PermissionService.can("recommendation_reports") ||
+            PermissionService.can("batch_reports") ||
+            PermissionService.can("star_month_reports") ||
+            PermissionService.can("hiring_reports") ||
+            PermissionService.can("package_reports") ||
+            PermissionService.can("student_reports") ||
+            PermissionService.can("teacher_reports")||
+            PermissionService.can("advisor_reports"))
+          _withPermission(
+            permission: "show_reports", // dummy or primary
+            child: reports,
+          ),
+        _withPermission(
+          permission: "show_tickets",
+          child: supports,
+        ),
+        if (!isCustom || canShowSettings())
+          _withPermission(
+            permission: "general_settings", // dummy
+            child: settings,
+          ),
+        _withPermission(
+          permission: "mentor_feedbacks",
+          child: feedback,
+        ),
+      ];
     }
-
     return items;
   }
 
+  bool canShowSettings() {
+    return [
+      "general_settings",
+      "notification_settings",
+      "banner_ads",
+      "coupon_settings",
+      "recommendation_settings",
+      "hiring_settings",
+      "star_settings",
+      "assessment_settings",
+      "material_settings",
+      "bulk_upload",
+    ].any((p) => PermissionService.can(p));
+  }
+
+  Widget _withPermission({
+    required String permission,
+    required Widget child,
+  }) {
+    return PermissionService.can(permission) ? child : const SizedBox.shrink();
+  }
   // ================= HEADER =================
 
   Widget _header(BuildContext context) {

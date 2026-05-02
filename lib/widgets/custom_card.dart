@@ -300,151 +300,139 @@ class PremiumInfoCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
+        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 15),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
+          color: cs.onPrimary,
           borderRadius: BorderRadius.circular(16),
-          color: cs.surface,
-          boxShadow: [
-            BoxShadow(
-              color: cs.shadow.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
+
+          // ✅ OUTLINE BORDER
+          border: Border.all(
+            color: cs.outline.withOpacity(0.5),
+            width: 1,
+          ),
         ),
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// LEFT ACCENT
-            Container(
-              width: 4,
-              height: 70,
-              decoration: BoxDecoration(
-                color: statusColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
+            /// 🔹 TOP ROW: AVATAR + NAME + ID
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                /// PROFILE AVATAR
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    color: cs.primaryContainer.withOpacity(0.4),
+                    child: Image.asset(
+                      "assets/images/logo.png",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
 
-            const SizedBox(width: 10),
+                const SizedBox(width: 10),
 
-            /// CONTENT
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /// HEADER
-                  Row(
+                /// NAME + ID COLUMN
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      /// NAME
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: cs.onSurface,
+                        ),
+                      ),
+
+                      const SizedBox(height: 2),
+
+                      /// ID
                       Text(
                         id,
                         style: TextStyle(
                           fontSize: 11,
                           color: cs.onSurface.withOpacity(0.6),
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ),
-                      const Spacer(),
-                      StatusBadge(
-                        status: status ?? "-",
-                        color: statusColor.withOpacity(0.12),
                       ),
                     ],
                   ),
+                ),
 
-                  const SizedBox(height: 6),
+                /// STATUS BADGE (optional keep)
+                if (status != null)
+                  StatusBadge(
+                    status: status!,
+                    color: statusColor,
+                  ),
+              ],
+            ),
 
-                  /// TITLE
-                  Text(
-                    title,
+            const SizedBox(height: 12),
+
+            /// 📧 EMAIL ROW
+            Row(
+              children: [
+                Icon(Icons.email_outlined,
+                    size: 14, color: cs.onSurface.withOpacity(0.6)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    subtitle,
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: cs.onSurface,
+                      fontSize: 12,
+                      color: cs.onSurface.withOpacity(0.7),
                     ),
                   ),
+                ),
+              ],
+            ),
 
-                  const SizedBox(height: 2),
+            const SizedBox(height: 6),
 
-                  /// SUBTITLE
-                  if (!(hideIfEmpty &&
-                      (subtitle.isEmpty || subtitle == "NULL")))
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-
-                  if (extraInfo != null && extraInfo!.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      extraInfo!,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: cs.onSurface.withOpacity(0.5),
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: 6),
-                  if (extraWidget != null) ...[
-                    const SizedBox(height: 8),
-                    extraWidget!,
-                  ] ,
-                  
-                  const SizedBox(height: 6),
-
-                  /// FOOTER
-                  Text(
-                    footerText,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: cs.onSurface.withOpacity(0.5),
-                    ),
+            /// 📅 DATE ROW
+            Row(
+              children: [
+                Icon(Icons.calendar_today_outlined,
+                    size: 14, color: cs.onSurface.withOpacity(0.6)),
+                const SizedBox(width: 6),
+                Text(
+                  footerText,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: cs.onSurface.withOpacity(0.6),
                   ),
+                ),
+              ],
+            ),
 
-                  const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-                  /// ACTIONS
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: actions
-                        .map(
-                          (a) => Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: _actionBtn(a),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-              ),
+            /// 🔻 DIVIDER
+            Divider(
+              height: 16,
+              thickness: 0.8,
+              color: cs.outline.withOpacity(0.12),
+            ),
+
+            /// ⚡ ACTIONS
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: actions.map((a) {
+                return _actionBtn(a);
+              }).toList(),
             ),
           ],
         ),
       ),
     );
   }
-
-  // Widget _statusBadge() {
-  //   return Container(
-  //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  //     decoration: BoxDecoration(
-  //       color: statusColor.withOpacity(0.12),
-  //       borderRadius: BorderRadius.circular(20),
-  //     ),
-  //     child: Text(
-  //       status ?? "-",
-  //       style: TextStyle(
-  //         color: statusColor,
-  //         fontSize: 11,
-  //         fontWeight: FontWeight.w600,
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _actionBtn(InfoAction a) {
     return InkWell(

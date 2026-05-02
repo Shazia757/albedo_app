@@ -1,3 +1,5 @@
+import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/settings_controller.dart';
 import 'package:albedo_app/view/notifications_page.dart';
 import 'package:albedo_app/view/settings/assessments_page.dart';
@@ -46,7 +48,7 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -54,49 +56,75 @@ class SettingsPage extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: GridView.builder(
-                itemCount: items.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1, // makes it square
-                ),
-                itemBuilder: (context, index) {
-                  final item = items[index];
+              child: Obx(
+                () {
+                  final auth = Get.find<AuthController>();
+                  final role = auth.activeUser?.role;
 
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () {
-                      Get.to(() => item.page);
-                    },
-                    child: Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            item.icon,
-                            size: 32,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              item.title,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                  final isCustom = ![
+                    "admin",
+                    "mentor",
+                    "advisor",
+                    "teacher",
+                    "student",
+                    "coordinator",
+                    "finance",
+                    "sales",
+                    "hr"
+                  ].contains(role);
+
+                  final visibleItems = !isCustom
+                      ? items
+                      : items.where((item) {
+                          final perm = c.settingsPermissions[item.title];
+                          return perm != null && PermissionService.can(perm);
+                        }).toList();
+                  return GridView.builder(
+                    itemCount: visibleItems.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1, // makes it square
                     ),
+                    itemBuilder: (context, index) {
+                      final item = visibleItems[index];
+
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          Get.to(() => item.page);
+                        },
+                        child: Card(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                item.icon,
+                                size: 32,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(height: 10),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  item.title,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

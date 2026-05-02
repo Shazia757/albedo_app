@@ -40,7 +40,7 @@ class HomeView extends StatelessWidget {
                   await c.refreshDashboard(); // we'll define this
                 },
                 child: SingleChildScrollView(
-                   physics: const AlwaysScrollableScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                   child: _buildDashboard(context, role),
@@ -82,7 +82,7 @@ class HomeView extends StatelessWidget {
         return _hrDashboard(context);
 
       default:
-        return const SizedBox();
+        return _generalDashboard(context);
     }
   }
 
@@ -367,6 +367,100 @@ class HomeView extends StatelessWidget {
 
         /// 🔹 HIRING
         hiringSection(context),
+      ],
+    );
+  }
+
+  Widget _generalDashboard(BuildContext context) {
+    return Column(
+      children: [
+        /// 🔹 EXPENSE
+        expenseChartCard(context),
+        const SizedBox(height: 14),
+
+        /// 🔹 VIDEO
+        youtubeCard(context),
+        const SizedBox(height: 14),
+
+        /// 🔹 STUDENTS COUNT
+        chartCard(
+          context,
+          title: "Students Count",
+          count: c.studentCount.value.toString(),
+          data: c.studentData,
+          color: Theme.of(context).colorScheme.primary,
+          selectedFilter: TimeFilter.all,
+          onFilterChanged: (_) {},
+          selectedRange: c.studentRange,
+          onRangeChanged: (v) {
+            c.studentRange.value = v;
+            c.updateStudentData(range: v);
+          },
+        ),
+        const SizedBox(height: 14),
+
+        /// 🔹 TEACHERS COUNT
+        chartCard(
+          context,
+          title: "Teachers Count",
+          count: c.teacherCount.value.toString(),
+          data: c.teacherData,
+          color: Theme.of(context).colorScheme.secondary,
+          selectedFilter: c.selectedFilter.value,
+          onFilterChanged: (f) {
+            c.selectedFilter.value = f;
+            c.updateTeacherData();
+          },
+          selectedRange: c.teacherRange,
+          onRangeChanged: (v) {
+            c.teacherRange.value = v;
+            c.updateTeacherData(range: v);
+          },
+        ),
+        const SizedBox(height: 14),
+
+        /// 🔹 SUMMARY
+        summaryCard(context),
+        const SizedBox(height: 14),
+
+        /// 🔹 MENTORS COUNT
+        chartCard(
+          context,
+          title: "Mentors Count",
+          count: c.mentorCount.value.toString(),
+          data: c.mentorData,
+          color: Theme.of(context).colorScheme.primary,
+          selectedFilter: c.selectedFilter.value,
+          onFilterChanged: (p0) {
+            c.selectedFilter.value = p0;
+            c.updateMentorData();
+          },
+          selectedRange: c.mentorRange,
+          onRangeChanged: (p0) {
+            c.mentorRange.value = p0;
+            c.updateMentorData(range: p0);
+          },
+        ),
+        const SizedBox(height: 14),
+
+        /// 🔹 COORDINATORS COUNT
+        chartCard(
+          context,
+          title: "Coordinators Count",
+          count: c.coordinatorCount.value.toString(),
+          data: c.coordinatorData,
+          color: Theme.of(context).colorScheme.primary,
+          selectedFilter: c.selectedFilter.value,
+          onFilterChanged: (f) {
+            c.selectedFilter.value = f;
+            c.updatecoordinatorData();
+          },
+          selectedRange: c.coordinatorRange,
+          onRangeChanged: (v) {
+            c.coordinatorRange.value = v;
+            c.updatecoordinatorData(range: v);
+          },
+        ),
       ],
     );
   }

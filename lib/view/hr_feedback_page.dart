@@ -24,7 +24,8 @@ class HrFeedbackPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: cs.surfaceContainerLowest,
+           backgroundColor: Theme.of(context).colorScheme.surface,
+
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [

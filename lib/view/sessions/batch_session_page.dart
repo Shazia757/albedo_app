@@ -22,7 +22,8 @@ class BatchesListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: cs.surfaceContainerLowest,
+            backgroundColor: Theme.of(context).colorScheme.surface,
+
       floatingActionButton: AddBatchSessionFAB(c: c),
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(

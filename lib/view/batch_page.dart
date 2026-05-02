@@ -1,4 +1,6 @@
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/batch_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
@@ -18,8 +20,23 @@ class BatchesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: Responsive.isMobile(context) ? const CustomAppBar() : null,
       drawer: isDesktop ? null : const DrawerMenu(),
       floatingActionButton: addBatch(context),
@@ -119,36 +136,38 @@ class BatchesPage extends StatelessWidget {
                                     statusColor: getStatusColor(batch?.status),
                                     extraInfo: "",
                                     footerText: "",
-                                    onTap: () {
-                                      if (batch != null) {
-                                        {
-                                          openBatchProfile(
-                                            context,
-                                            batch,
-                                          );
-                                        }
-                                      }
-                                    },
+                                    onTap: (!isCustom ||
+                                            PermissionService.can("view_batch"))
+                                        ? () => openBatchProfile(
+                                              context,
+                                              batch,
+                                            )
+                                        : null,
                                     actions: [
-                                      InfoAction(
-                                        icon: Icons.edit,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                        onTap: () {
-                                          if (batch != null) {
-                                            c.loadBatches(batch);
-                                            editBatch(context);
-                                          }
-                                        },
-                                      ),
-                                      InfoAction(
-                                          icon: Icons.delete,
+                                      if ((!isCustom ||
+                                          PermissionService.can("edit_batch")))
+                                        InfoAction(
+                                          icon: Icons.edit,
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .error,
-                                          onTap: () =>
-                                              c.handleDelete(context, batch)),
+                                              .secondary,
+                                          onTap: () {
+                                            if (batch != null) {
+                                              c.loadBatches(batch);
+                                              editBatch(context);
+                                            }
+                                          },
+                                        ),
+                                      if ((!isCustom ||
+                                          PermissionService.can(
+                                              "delete_batch")))
+                                        InfoAction(
+                                            icon: Icons.delete,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .error,
+                                            onTap: () =>
+                                                c.handleDelete(context, batch)),
                                     ],
                                   ),
                                 ),

@@ -1,4 +1,6 @@
 // PREMIUM + RESPONSIVE REPORTS PAGE (IMPROVED UI)
+import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/report_controller.dart';
 import 'package:albedo_app/view/report/advisor_report_page.dart';
 import 'package:albedo_app/view/report/hiring_report.dart';
@@ -61,12 +63,18 @@ class ReportsPage extends StatelessWidget {
       return ["Students", "Advisors"];
     }
     if (role == "hr") {
-      return ["Teachers", "Hirings","Star of Month"];
+      return ["Teachers", "Hirings", "Star of Month"];
     }
     if (role == "advisor") {
       return [
         "Students",
       ];
+    }
+    if (c.isCustom) {
+      return c.tabPermissions.entries
+          .where((e) => PermissionService.can(e.value))
+          .map((e) => e.key)
+          .toList();
     }
 
     return [];
@@ -105,60 +113,67 @@ class ReportsPage extends StatelessWidget {
 
   // PREMIUM TABS
   Widget _tabs(BuildContext context) {
-    return Obx(() => SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(tabs.length, (index) {
-                final tab = tabs[index];
-                final isSelected = c.selectedTab.value == tab;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.only(right: 10),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                  decoration: BoxDecoration(
-                    gradient: isSelected
-                        ? LinearGradient(colors: [
-                            Theme.of(context).colorScheme.primary,
-                            Theme.of(context).colorScheme.secondary,
-                          ])
-                        : null,
-                    color: isSelected
-                        ? null
-                        : Theme.of(context).colorScheme.onPrimary,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .shadow
-                            .withOpacity(0.08),
-                        blurRadius: 5,
-                      )
-                    ],
-                  ),
-                  child: GestureDetector(
-                    onTap: () => c.selectedTab.value = tabs[index],
-                    child: Text(
-                      tabs[index],
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.onPrimary
-                            : Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withOpacity(0.6),
-                      ),
+    return Obx(() {
+      final tabsList = tabs;
+
+      if (tabsList.isNotEmpty && !tabsList.contains(c.selectedTab.value)) {
+        c.selectedTab.value = tabsList.first;
+      }
+      return SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(tabs.length, (index) {
+              final tab = tabs[index];
+              final isSelected = c.selectedTab.value == tab;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                margin: const EdgeInsets.only(right: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? LinearGradient(colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.secondary,
+                        ])
+                      : null,
+                  color: isSelected
+                      ? null
+                      : Theme.of(context).colorScheme.onPrimary,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .shadow
+                          .withOpacity(0.08),
+                      blurRadius: 5,
+                    )
+                  ],
+                ),
+                child: GestureDetector(
+                  onTap: () => c.selectedTab.value = tabs[index],
+                  child: Text(
+                    tabs[index],
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
                     ),
                   ),
-                );
-              }),
-            ),
+                ),
+              );
+            }),
           ),
-        ));
+        ),
+      );
+    });
   }
 
   // FILTER BAR
@@ -399,28 +414,66 @@ class ReportsPage extends StatelessWidget {
   }
 
   Widget _tabView(BuildContext context) {
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
+
     switch (c.selectedTab.value) {
       case "Students":
-        return studentsTab(context);
+        if (!isCustom || PermissionService.can("student_reports")) {
+          return studentsTab(context);
+        }
+        break;
+
       case "Teachers":
-        return teachersTab(context);
+        if (!isCustom || PermissionService.can("teacher_reports")) {
+          return teachersTab(context);
+        }
+        break;
+
       case "Advisors":
-        return advisorsTab(context);
+        if (!isCustom || PermissionService.can("advisor_reports")) {
+          return advisorsTab(context);
+        }
+        break;
+
       case "Recommendations":
-        return recommendationsTab(context);
+        if (!isCustom || PermissionService.can("recommendation_reports")) {
+          return recommendationsTab(context);
+        }
+        break;
+
       case "Hirings":
-        return hiringsTab(context);
+        if (!isCustom || PermissionService.can("hiring_reports")) {
+          return hiringsTab(context);
+        }
+        break;
+
       case "Star of Month":
-        return starOfMonthTab(context);
-      default:
-        return _placeholder(context, "Coming Soon");
+        if (!isCustom || PermissionService.can("star_month_reports")) {
+          return starOfMonthTab(context);
+        }
+        break;
     }
+
+    return _placeholder(context, "No Permission");
   }
 
   Widget _placeholder(BuildContext context, String title) {
     return Center(
       child: Text(
-        "$title - Coming Soon",
+        title,
         style: TextStyle(
           fontSize: 16,
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),

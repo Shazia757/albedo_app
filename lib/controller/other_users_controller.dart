@@ -55,7 +55,7 @@ class OtherUsersController extends GetxController {
             status: 'Active',
             phone: "123456",
             joinedAt: DateTime.now(),
-            role: 'Finance'),
+            role: 'finance'),
         OtherUsers(
             id: "EMP1002",
             name: "Nick",
@@ -63,7 +63,15 @@ class OtherUsersController extends GetxController {
             email: "nick@email.com",
             phone: "+9876543210",
             joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-            role: 'HR'),
+            role: 'hr'),
+        OtherUsers(
+            id: "EMP1002",
+            name: "Unknown",
+            status: 'Active',
+            email: "nick@email.com",
+            phone: "+9876543210",
+            joinedAt: DateTime.parse('2024-12-01 09:00:00'),
+            role: 'Intern'),
       ]);
 
       applyFilters();

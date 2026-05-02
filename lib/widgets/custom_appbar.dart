@@ -46,11 +46,33 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             scrolledUnderElevation: 4,
             surfaceTintColor: Colors.transparent,
 
-            automaticallyImplyLeading: !isDesktop,
+            leading: Navigator.canPop(context)
+                ? IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios_new,
+                      size: 18,
+                      color: cs.onSurface,
+                    ),
+                    onPressed: () => Get.back(),
+                  )
+                : (!isDesktop
+                    ? Builder(
+                        builder: (context) => IconButton(
+                          icon: Icon(
+                            Icons.segment,
+                            color: cs.onSurface,
+                            size: 22,
+                          ),
+                          onPressed: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                        ),
+                      )
+                    : null),
             centerTitle: false,
 
             iconTheme: IconThemeData(
-              color: cs.onSurface,
+              color: cs.outline,
               size: isDesktop ? 22 : 20,
             ),
 
@@ -138,7 +160,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Icon(icon, color: color.onSurface, size: 20),
+          child: Icon(icon, color: color.onSurface.withOpacity(0.8), size: 22),
         ),
       ),
     );

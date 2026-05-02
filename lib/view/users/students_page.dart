@@ -1,7 +1,9 @@
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/students/refund_request_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -22,11 +24,27 @@ class StudentsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final tabs = ["All", "Active", "Batch", "TBA", "Inactive"];
     final isDesktop = Responsive.isDesktop(context);
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(),
-      floatingActionButton: AddStudentFAB(c: c),
+      floatingActionButton: (!isCustom || PermissionService.can("add_students"))
+          ? AddStudentFAB(c: c)
+          : null,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -36,7 +54,7 @@ class StudentsPage extends StatelessWidget {
               children: [
                 HeaderWithSearch(
                   title: "Students",
-                  hint: "Search students...",
+                  hint: "Search students by name, ID or email...",
                   isSearching: c.isSearching,
                   searchQuery: c.searchQuery,
                   onSearchChanged: () => c.applyFilters(),
@@ -62,6 +80,9 @@ class StudentsPage extends StatelessWidget {
                       c.applyFilters();
                     },
                   ),
+                  onRequestTap: (!isCustom || PermissionService.can("refunds"))
+                      ? () => Get.to(() => RefundRequestsPage())
+                      : null,
                 ),
 
                 /// 🧭 Tabs
@@ -127,8 +148,10 @@ class StudentsPage extends StatelessWidget {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 12),
                               child: InkWell(
-                                onTap: () =>
-                                    openStudentProfile(context, student),
+                                onTap: (!isCustom ||
+                                        PermissionService.can("view_students"))
+                                    ? () => openStudentProfile(context, student)
+                                    : null,
                                 child: PremiumInfoCard(
                                   extraInfo: '',
                                   id: student.studentId ?? "NULL",
@@ -150,7 +173,10 @@ class StudentsPage extends StatelessWidget {
                                         Get.offAll(() => const Root());
                                       },
                                     ),
-                                    if (student?.status != 'Inactive')
+                                    if ((!isCustom ||
+                                            PermissionService.can(
+                                                "edit_students")) &&
+                                        student?.status != 'Inactive')
                                       InfoAction(
                                         icon: Icons.edit,
                                         color: cs.secondary,
@@ -159,17 +185,23 @@ class StudentsPage extends StatelessWidget {
                                           editStudent(context);
                                         },
                                       ),
-                                    InfoAction(
-                                      icon: Icons.block,
-                                      color: cs.error,
-                                      onTap: () =>
-                                          c.handleDeactivate(context, student),
-                                    ),
-                                    InfoAction(
-                                        icon: Icons.delete,
+                                    if (!isCustom ||
+                                        PermissionService.can(
+                                            "deactivate_students"))
+                                      InfoAction(
+                                        icon: Icons.block,
                                         color: cs.error,
-                                        onTap: () =>
-                                            c.handleDelete(context, student)),
+                                        onTap: () => c.handleDeactivate(
+                                            context, student),
+                                      ),
+                                    if (!isCustom ||
+                                        (PermissionService.can(
+                                            "delete_students")))
+                                      InfoAction(
+                                          icon: Icons.delete,
+                                          color: cs.error,
+                                          onTap: () =>
+                                              c.handleDelete(context, student)),
                                   ],
                                 ),
                               ),
@@ -413,29 +445,67 @@ class AddStudentFAB extends StatelessWidget {
       context: context,
       title: const Text("Add Student"),
       onSubmit: () {},
+      submitText: 'Add',
       children: [
         SizedBox(
             height: MediaQuery.of(context).size.height * 0.5,
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Text('Profile Photo (Max: 50 MB)'),
-                  const SizedBox(height: 10),
                   InkWell(
                     onTap: () {},
-                    child: CircleAvatar(
-                      radius: 35,
-                      child: ClipOval(
-                        child: SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            fit: BoxFit.contain,
-                          ),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .outline
+                              .withOpacity(0.4),
+                          width: 1.2,
+                          style: BorderStyle.solid,
                         ),
                       ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.camera_alt_outlined,
+                            size: 28,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.6),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Upload",
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.7),
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Profile Photo (Max: 50 MB)',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .shadow
+                              .withOpacity(0.5),
+                        ),
                   ),
                   const SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Name', required: true),

@@ -1,3 +1,5 @@
+import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/support_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/support_model.dart';
@@ -21,11 +23,28 @@ class SupportsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(),
-      floatingActionButton: addTicket(context),
+      floatingActionButton:
+          (!isCustom || PermissionService.can("add_coordinators"))
+              ? addTicket(context)
+              : null,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -50,51 +69,6 @@ class SupportsPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  // 📊 Tabs
-  Widget _tabs(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Obx(() => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Row(
-            children: List.generate(2, (index) {
-              final isSelected = c.selectedTab.value == index;
-              final title = index == 0 ? "Open" : "Closed";
-
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    c.selectedTab.value = index;
-                    c.applyFilters();
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? cs.primary
-                          : cs.primaryContainer.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "$title (${c.getCount(index)})",
-                        style: TextStyle(
-                          color: isSelected
-                              ? cs.onPrimary
-                              : cs.onSurface.withOpacity(0.7),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ));
   }
 
   // 📋 List
@@ -128,49 +102,66 @@ class SupportsPage extends StatelessWidget {
             itemBuilder: (_, i) {
               final s = data[i];
               final isOpen = s.status == "open";
+              final auth = Get.find<AuthController>();
+              final role = auth.activeUser?.role;
+
+              final isCustom = ![
+                "admin",
+                "mentor",
+                "advisor",
+                "teacher",
+                "student",
+                "coordinator",
+                "finance",
+                "sales",
+                "hr"
+              ].contains(role);
 
               return PremiumInfoCard(
-                id: s.id,
+                  id: s.id,
 
-                /// 🔹 Main content
-                title: s.title ?? "No Title",
-                subtitle: s.description ?? "",
+                  /// 🔹 Main content
+                  title: s.title ?? "No Title",
+                  subtitle: s.description ?? "",
 
-                /// 🔹 Status
-                status: isOpen ? "Open" : "Closed",
-                statusColor: isOpen
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.error,
+                  /// 🔹 Status
+                  status: isOpen ? "Open" : "Closed",
+                  statusColor: isOpen
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.error,
 
-                /// 🔹 Extra + Footer
-                extraInfo: null, // you can move something here later if needed
-                footerText: "", // or add created date like: "Created • ..."
+                  /// 🔹 Extra + Footer
+                  extraInfo: null,
+                  footerText: "",
 
-                /// 🔹 Actions
-                actions: [
-                  InfoAction(
-                    icon: Icons.edit,
-                    color: Theme.of(context).colorScheme.primary,
-                    onTap: () {
-                      c.loadTicket(s);
-                      editTicket(context);
-                    },
-                  ),
-                  InfoAction(
-                    icon: Icons.delete,
-                    color: Theme.of(context).colorScheme.error,
-                    onTap: () => CustomWidgets().showDeleteDialog(
-                      text:
-                          'Are you sure you want to delete this ticket permanently?',
-                      context: context,
-                      onConfirm: () => c.delete(s.id),
-                    ),
-                  ),
-                ],
+                  /// 🔹 Actions
+                  actions: [
+                    if ((!isCustom || PermissionService.can("edit_tickets")))
+                      InfoAction(
+                        icon: Icons.edit,
+                        color: Theme.of(context).colorScheme.primary,
+                        onTap: () {
+                          c.loadTicket(s);
+                          editTicket(context);
+                        },
+                      ),
+                    if ((!isCustom || PermissionService.can("delete_tickets")))
+                      InfoAction(
+                        icon: Icons.delete,
+                        color: Theme.of(context).colorScheme.error,
+                        onTap: () => CustomWidgets().showDeleteDialog(
+                          text:
+                              'Are you sure you want to delete this ticket permanently?',
+                          context: context,
+                          onConfirm: () => c.delete(s.id),
+                        ),
+                      ),
+                  ],
 
-                /// 🔹 Tap
-                onTap: () => _openTicketDialog(context, s),
-              );
+                  /// 🔹 Tap
+                  onTap: (!isCustom || PermissionService.can("view_tickets"))
+                      ? () => _openTicketDialog(context, s)
+                      : null);
             },
           );
         },

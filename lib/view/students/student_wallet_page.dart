@@ -21,6 +21,8 @@ class StudentWalletPage extends StatelessWidget {
       child: Builder(builder: (context) {
         final tabController = DefaultTabController.of(context);
         return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+
           appBar: CustomAppBar(),
           floatingActionButton: AnimatedBuilder(
             animation: tabController,

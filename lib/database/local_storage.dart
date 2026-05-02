@@ -34,13 +34,31 @@ class LocalStorage {
     }
   }
 
+  void writePermissions(String userId, Map<String, bool> permissions) {
+    try {
+      _box.write('permissions_$userId', permissions);
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Map<String, bool>? readPermissions(String userId) {
+    try {
+      final data = _box.read('permissions_$userId');
+      if (data == null) return null;
+
+      return Map<String, bool>.from(data);
+    } catch (e) {
+      log(e.toString());
+      return null;
+    }
+  }
+
   static bool get isAdmin {
     final data = GetStorage().read('user');
-    if (data['role'] != 'vol') {
-      return true;
-    } else {
-      return false;
-    }
+    if (data == null) return false;
+
+    return data['role'] == 'admin';
   }
 
   Users? readUser() {

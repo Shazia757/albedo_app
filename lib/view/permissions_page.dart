@@ -11,54 +11,6 @@ class PermissionsPage extends StatelessWidget {
   final PermissionsController c = Get.put(PermissionsController());
 
   final Map<String, List<PermissionItem>> sections = {
-    "Reports": [
-      PermissionItem(key: "mentor_reports", title: "Show Mentor Reports"),
-      PermissionItem(
-          key: "coordinator_reports", title: "Show Coordinator Reports"),
-      PermissionItem(
-          key: "recommendation_reports", title: "Show Recommendation Reports"),
-      PermissionItem(key: "batch_reports", title: "Show Batch Reports"),
-      PermissionItem(
-          key: "star_month_reports", title: "Show Star of Month Reports"),
-      PermissionItem(key: "hiring_reports", title: "Show Hiring Reports"),
-      PermissionItem(key: "package_reports", title: "Show Package Reports"),
-      PermissionItem(key: "student_reports", title: "Show Student Reports"),
-      PermissionItem(key: "teacher_reports", title: "Show Teacher Reports"),
-    ],
-    "Coordinators": [
-      PermissionItem(key: "show_assistants", title: "Show All Assistants"),
-      PermissionItem(key: "add_assistants", title: "Add Assistants"),
-      PermissionItem(key: "edit_assistants", title: "Edit Assistants"),
-      PermissionItem(key: "delete_assistants", title: "Delete Assistants"),
-      PermissionItem(key: "resign_assistants", title: "Resign Assistants"),
-      PermissionItem(key: "view_assistants", title: "View Assistants"),
-      PermissionItem(key: "manage_mentors", title: "Manage Assigned Mentors"),
-      PermissionItem(
-          key: "verification_requests", title: "Manage Verification Requests"),
-    ],
-    "Teachers": [
-      PermissionItem(key: "add_teachers", title: "Add Teachers"),
-      PermissionItem(key: "edit_teachers", title: "Edit Teachers"),
-      PermissionItem(key: "delete_teachers", title: "Delete Teachers"),
-      PermissionItem(key: "deactivate_teachers", title: "Deactivate Teachers"),
-      PermissionItem(key: "view_teachers", title: "View Teachers"),
-      PermissionItem(key: "teacher_payments", title: "Manage Teacher Payments"),
-      PermissionItem(
-          key: "teacher_feedbacks", title: "Manage Teacher Feedbacks"),
-      PermissionItem(key: "show_all_teachers", title: "Show All Teachers"),
-    ],
-    "Mentors": [
-      PermissionItem(key: "show_mentors", title: "Show All Mentors"),
-      PermissionItem(key: "add_mentors", title: "Add Mentors"),
-      PermissionItem(key: "edit_mentors", title: "Edit Mentors"),
-      PermissionItem(key: "delete_mentors", title: "Delete Mentors"),
-      PermissionItem(key: "resign_mentors", title: "Resign Mentors"),
-      PermissionItem(key: "view_mentors", title: "View Mentors"),
-      PermissionItem(
-          key: "assigned_students", title: "Manage Assigned Students"),
-      PermissionItem(key: "star_of_month", title: "Manage Star Of Month"),
-      PermissionItem(key: "mentor_feedbacks", title: "Manage Mentor Feedbacks"),
-    ],
     "Students": [
       PermissionItem(key: "show_students", title: "Show All Students"),
       PermissionItem(key: "add_students", title: "Add Students"),
@@ -73,10 +25,57 @@ class PermissionsPage extends StatelessWidget {
       PermissionItem(key: "assessments", title: "Manage Assessments"),
       PermissionItem(key: "certificates", title: "Manage Certificates"),
     ],
+    "Mentors": [
+      PermissionItem(key: "show_mentors", title: "Show All Mentors"),
+      PermissionItem(key: "add_mentors", title: "Add Mentors"),
+      PermissionItem(key: "edit_mentors", title: "Edit Mentors"),
+      PermissionItem(key: "delete_mentors", title: "Delete Mentors"),
+      PermissionItem(key: "resign_mentors", title: "Resign Mentors"),
+      PermissionItem(key: "view_mentors", title: "View Mentors"),
+      PermissionItem(
+          key: "assigned_students", title: "Manage Assigned Students"),
+      PermissionItem(key: "star_of_month", title: "Manage Star Of Month"),
+      PermissionItem(key: "mentor_feedbacks", title: "Manage Mentor Feedbacks"),
+    ],
+    "Reports": [
+      PermissionItem(key: "show_reports", title: "Show Reports"),
+      PermissionItem(
+          key: "coordinator_reports", title: "Show Coordinator Reports"),
+      PermissionItem(
+          key: "advisor_reports", title: "Show Advisor Reports"),
+      PermissionItem(
+          key: "recommendation_reports", title: "Show Recommendation Reports"),
+      PermissionItem(key: "batch_reports", title: "Show Batch Reports"),
+      PermissionItem(
+          key: "star_month_reports", title: "Show Star of Month Reports"),
+      PermissionItem(key: "hiring_reports", title: "Show Hiring Reports"),
+      PermissionItem(key: "package_reports", title: "Show Package Reports"),
+      PermissionItem(key: "student_reports", title: "Show Student Reports"),
+      PermissionItem(key: "teacher_reports", title: "Show Teacher Reports"),
+    ],
+    "Coordinators": [
+      PermissionItem(key: "show_coordinators", title: "Show All Coordinators"),
+      PermissionItem(key: "add_coordinators", title: "Add Coordinators"),
+      PermissionItem(key: "edit_coordinators", title: "Edit Coordinators"),
+      PermissionItem(key: "delete_coordinators", title: "Delete Coordinators"),
+      PermissionItem(key: "resign_coordinators", title: "Resign Coordinators"),
+      PermissionItem(key: "view_coordinators", title: "View Coordinators"),
+      PermissionItem(
+          key: "verification_requests", title: "Manage Verification Requests"),
+    ],
+    "Teachers": [
+      PermissionItem(key: "add_teachers", title: "Add Teachers"),
+      PermissionItem(key: "edit_teachers", title: "Edit Teachers"),
+      PermissionItem(key: "delete_teachers", title: "Delete Teachers"),
+      PermissionItem(key: "deactivate_teachers", title: "Deactivate Teachers"),
+      PermissionItem(key: "view_teachers", title: "View Teachers"),
+      PermissionItem(key: "teacher_payments", title: "Manage Teacher Payments"),
+      PermissionItem(
+          key: "teacher_feedbacks", title: "Manage Teacher Feedbacks"),
+      PermissionItem(key: "show_all_teachers", title: "Show All Teachers"),
+    ],
     "Supports": [
       PermissionItem(key: "show_tickets", title: "Show All Tickets"),
-      PermissionItem(key: "open_tickets", title: "Open Tickets"),
-      PermissionItem(key: "close_tickets", title: "Close Tickets"),
       PermissionItem(key: "view_tickets", title: "View Tickets"),
       PermissionItem(key: "add_tickets", title: "Add Tickets"),
       PermissionItem(key: "edit_tickets", title: "Edit Tickets"),
@@ -110,18 +109,14 @@ class PermissionsPage extends StatelessWidget {
       PermissionItem(key: "add_batch", title: "Add Batch"),
       PermissionItem(key: "edit_batch", title: "Edit Batch"),
       PermissionItem(key: "delete_batch", title: "Delete Batch"),
-      PermissionItem(key: "deactivate_batch", title: "Deactivate Batch"),
     ],
   };
 
   @override
   Widget build(BuildContext context) {
-    final allKeys = sections.values.expand((e) => e.map((i) => i.key)).toList();
-    c.initDefaults(allKeys);
-
     return Scaffold(
       appBar: CustomAppBar(),
-      drawer: DrawerMenu(),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: ListView(padding: const EdgeInsets.all(12), children: [
         const SizedBox(height: 8),
         const Text(
@@ -161,6 +156,14 @@ class PermissionsPage extends StatelessWidget {
           color: Theme.of(Get.context!).colorScheme.surface,
         ),
         child: ExpansionTile(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+            side: BorderSide.none,
+          ),
+          collapsedShape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+            side: BorderSide.none,
+          ),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           childrenPadding: const EdgeInsets.only(bottom: 10),
 
@@ -200,7 +203,6 @@ class PermissionsPage extends StatelessWidget {
 
           // 📦 Children
           children: [
-            const Divider(height: 1),
             ...items.map((item) {
               return Container(
                 margin: const EdgeInsets.symmetric(

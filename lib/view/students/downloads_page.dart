@@ -18,6 +18,8 @@ class DownloadsPage extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+
         drawer: DrawerMenu(),
         appBar: CustomAppBar(),
         body: Column(

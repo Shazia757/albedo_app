@@ -1,7 +1,10 @@
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/feedback_page.dart';
+import 'package:albedo_app/view/mentor_feedback_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -21,12 +24,28 @@ class TeachersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final auth = Get.find<AuthController>();
+    final role = auth.activeUser?.role;
+
+    final isCustom = ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(),
       drawer: isDesktop ? null : const DrawerMenu(),
-      floatingActionButton: addTeacher(context),
+      floatingActionButton: (!isCustom || PermissionService.can("add_teachers"))
+          ? addTeacher(context)
+          : null,
       body: Row(
         children: [
           if (isDesktop) DrawerMenu(),
@@ -65,6 +84,10 @@ class TeachersPage extends StatelessWidget {
                       c.applyFilters();
                     },
                   ),
+                  onRequestTap:
+                      (!isCustom || PermissionService.can("teacher_feedbacks"))
+                          ? () => Get.to(() => MentorFeedbackPage())
+                          : null,
                 ),
 
                 /// 🧭 Tabs
@@ -143,12 +166,16 @@ class TeachersPage extends StatelessWidget {
                                         : null,
                                     onTap: () {
                                       if (teacher != null) {
-                                        openTeacherProfile(
-                                          context,
-                                          teacher,
-                                          toUser: (p0) =>
-                                              teacherToUser(teacher),
-                                        );
+                                        (!isCustom ||
+                                                PermissionService.can(
+                                                    "view_teachers"))
+                                            ? openTeacherProfile(
+                                                context,
+                                                teacher,
+                                                toUser: (p0) =>
+                                                    teacherToUser(teacher),
+                                              )
+                                            : null;
                                       }
                                     },
                                     actions: [
@@ -164,7 +191,10 @@ class TeachersPage extends StatelessWidget {
                                           Get.offAll(() => const Root());
                                         },
                                       ),
-                                      if (teacher.status != 'Inactive')
+                                      if ((!isCustom ||
+                                              PermissionService.can(
+                                                  "edit_teachers")) &&
+                                          teacher?.status != 'Inactive')
                                         InfoAction(
                                           icon: Icons.edit,
                                           color: cs.secondary,
@@ -175,16 +205,22 @@ class TeachersPage extends StatelessWidget {
                                             }
                                           },
                                         ),
-                                      InfoAction(
-                                          icon: Icons.block,
-                                          color: cs.error,
-                                          onTap: () => c.handleDeactivate(
-                                              context, teacher)),
-                                      InfoAction(
-                                          icon: Icons.delete,
-                                          color: cs.error,
-                                          onTap: () =>
-                                              c.handleDelete(context, teacher)),
+                                      if (!isCustom ||
+                                          PermissionService.can(
+                                              "deactivate_teachers"))
+                                        InfoAction(
+                                            icon: Icons.block,
+                                            color: cs.error,
+                                            onTap: () => c.handleDeactivate(
+                                                context, teacher)),
+                                      if (!isCustom ||
+                                          (PermissionService.can(
+                                              "delete_teachers")))
+                                        InfoAction(
+                                            icon: Icons.delete,
+                                            color: cs.error,
+                                            onTap: () => c.handleDelete(
+                                                context, teacher)),
                                     ],
                                   )),
                             );

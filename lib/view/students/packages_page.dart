@@ -41,9 +41,10 @@ class StudentPackagesPage extends StatelessWidget {
     ];
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+
       appBar: const CustomAppBar(),
       drawer: const DrawerMenu(),
-      backgroundColor: cs.surfaceContainerLowest,
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (packages.isEmpty) {

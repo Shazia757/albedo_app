@@ -20,7 +20,8 @@ class MaterialsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+
       floatingActionButton: addMaterialBtn(context),
       body: Row(
         children: [

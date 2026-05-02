@@ -16,6 +16,8 @@ class TeacherWalletPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+
       body: Column(
         children: [
           _totalBalance(cs),

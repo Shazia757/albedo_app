@@ -228,7 +228,8 @@ class GeneralPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+           backgroundColor: Theme.of(context).colorScheme.surface,
+
       body: Row(
         children: [
           /// 🧭 Desktop Drawer

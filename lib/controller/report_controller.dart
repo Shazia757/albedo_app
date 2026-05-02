@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 class ReportsController extends GetxController {
   final AuthController auth = Get.find();
 
-  var selectedTab = 'Students'.obs;
+  var selectedTab = ''.obs;
   var searchQuery = ''.obs;
   var selectedRange = 'This Month'.obs;
   RxBool isSearching = false.obs;
@@ -30,6 +30,37 @@ class ReportsController extends GetxController {
     super.onInit();
     loadDummyData();
   }
+
+  bool get isCustom {
+    final role = auth.activeUser?.role;
+
+    return ![
+      "admin",
+      "mentor",
+      "advisor",
+      "teacher",
+      "student",
+      "coordinator",
+      "finance",
+      "sales",
+      "hr"
+    ].contains(role);
+  }
+
+  final Map<String, String> tabPermissions = {
+    "Students": "student_reports",
+    "Teachers": "teacher_reports",
+    "Advisors": "advisor_reports",
+    "Recommendations": "recommendation_reports",
+    "Hirings": "hiring_reports",
+    "Star of Month": "star_month_reports",
+  };
+
+  void initTab(List<String> tabs) {
+  if (tabs.isNotEmpty && !tabs.contains(selectedTab.value)) {
+    selectedTab.value = tabs.first;
+  }
+}
 
   Future<void> loadDummyData() async {
     try {
