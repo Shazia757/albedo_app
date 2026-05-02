@@ -7,10 +7,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:html' as html;
 
 final c = HomeController();
 
@@ -1841,7 +1839,8 @@ BoxDecoration cardDecoration(BuildContext context) {
 
 Future<void> openVideo(String url) async {
   if (kIsWeb) {
-    html.window.open(url, "blank");
+    final uri = Uri.parse(url);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
     return;
   }
 
