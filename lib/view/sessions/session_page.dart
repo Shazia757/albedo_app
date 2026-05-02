@@ -1162,8 +1162,8 @@ class _SessionCard extends StatelessWidget {
     final isTeacher = user?.role == 'teacher';
 
     return Material(
-      color: cs.surface,
-      borderRadius: BorderRadius.circular(10),
+      color: cs.onPrimary,
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
@@ -1173,132 +1173,212 @@ class _SessionCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: dividerColor, width: 0.8),
+            border: Border.all(
+              color: cs.outline.withOpacity(0.5),
+              width: 1,
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Status accent bar ─────────────────────────────────
-              Container(
-                height: 3,
-                decoration: BoxDecoration(
-                  color: statusColor,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(10),
-                  ),
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ── Row 1: ID  +  status badge ────────────────────────
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            session.id ?? "—",
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontFamily: 'monospace',
-                              color: textSecondary,
-                              letterSpacing: 0.3,
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Row 1: ID  +  status badge ────────────────────────
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              session.id ?? "—",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontFamily: 'monospace',
+                                color: textSecondary,
+                                letterSpacing: 0.3,
+                              ),
                             ),
                           ),
-                        ),
-                        StatusBadge(status: session.status, color: statusColor),
-                      ],
-                    ),
+                          StatusBadge(
+                              status: session.status, color: statusColor),
+                        ],
+                      ),
 
-                    const SizedBox(height: 10),
+                      const SizedBox(height: 8),
 
-                    // ── Row 2: Student / Teacher names ────────────────────
-                    Row(
-                      children: [
-                        Expanded(
-                          child: NameCell(
-                            label: "Student",
-                            name: session.student?.name ?? "—",
-                            textPrimary: textPrimary,
-                            textSecondary: textSecondary,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: NameCell(
-                            label: "Teacher",
-                            name: session.teacher?.name ?? "—",
-                            textPrimary: textPrimary,
-                            textSecondary: textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
+                      Divider(
+                        height: 16,
+                        thickness: 0.8,
+                        color: cs.outline.withOpacity(0.12),
+                      ),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Divider(
-                          height: 1, thickness: 0.8, color: dividerColor),
-                    ),
-
-                    // ── Row 3: Subject / Date / Class / Time ──────────────
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MetaItem(
-                                  label: "Subject",
-                                  value: session.package.subjectName ?? "—",
-                                  textSecondary: textSecondary),
-                              const SizedBox(height: 4),
-                              MetaItem(
-                                  label: "Class",
-                                  value: session.className ?? "—",
-                                  textSecondary: textSecondary),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MetaItem(
-                                  label: "Date",
-                                  value: formatDate(session.date),
-                                  textSecondary: textSecondary),
-                              const SizedBox(height: 4),
-                              MetaItem(
-                                  label: "Time",
-                                  value: formatTime(session.time),
-                                  textSecondary: textSecondary),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (isStudent || isTeacher) ...[
                       const SizedBox(height: 10),
-                      TextButton.icon(
-                        onPressed: () =>
-                            _openRescheduleDialog(context, session),
-                        icon: const Icon(Icons.schedule, size: 18),
-                        label: const Text("Reschedule"),
-                        style: TextButton.styleFrom(
-                          foregroundColor: cs.primary,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+
+                      // ── Row 2: Student / Teacher with profile pictures ────────────
+                      Row(
+                        children: [
+                          // ── Student ─────────────────────────────
+                          Expanded(
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Image.asset(
+                                    "assets/images/logo.png",
+                                    width: 34,
+                                    height: 34,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        session.student?.name ?? "—",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: textPrimary,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        "ID: ${session.student?.studentId ?? '—'}",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: textSecondary,
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(width: 12),
+
+                          // ── Teacher ─────────────────────────────
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Image.asset(
+                                    "assets/images/logo.png",
+                                    width: 34,
+                                    height: 34,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        session.teacher?.name ?? "—",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: textPrimary,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.right,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        "ID: ${session.teacher?.id ?? '—'}",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: textSecondary,
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Divider(
+                          height: 16,
+                          thickness: 0.8,
+                          color: cs.outline.withOpacity(0.12),
                         ),
                       ),
+
+                      // ── Row 3: Subject / Date / Class / Time ──────────────
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MetaItem(
+                                    label: "Subject",
+                                    value: session.package.subjectName ?? "—",
+                                    textSecondary: textSecondary),
+                                const SizedBox(height: 4),
+                                MetaItem(
+                                    label: "Class",
+                                    value: session.className ?? "—",
+                                    textSecondary: textSecondary),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MetaItem(
+                                    label: "Date",
+                                    value: formatDate(session.date),
+                                    textSecondary: textSecondary),
+                                const SizedBox(height: 4),
+                                MetaItem(
+                                    label: "Time",
+                                    value: formatTime(session.time),
+                                    textSecondary: textSecondary),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (isStudent || isTeacher) ...[
+                        const SizedBox(height: 10),
+                        TextButton.icon(
+                          onPressed: () =>
+                              _openRescheduleDialog(context, session),
+                          icon: const Icon(Icons.schedule, size: 18),
+                          label: const Text("Reschedule"),
+                          style: TextButton.styleFrom(
+                            foregroundColor: cs.primary,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -63,6 +63,7 @@ Widget packageList(BuildContext context) {
   return Column(
     children: c.packageData.map((item) {
       final percent = item['value'] / c.totalPackage.value;
+      final isSmall = MediaQuery.of(context).size.width < 380;
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -104,7 +105,7 @@ Widget packageList(BuildContext context) {
                     ],
                   ),
 
-                  const SizedBox(height: 6),
+                  SizedBox(height: isSmall ? 6 : 12),
 
                   // PROGRESS BAR
                   ClipRRect(
@@ -161,10 +162,10 @@ String formatCurrency(double value) {
 
 Widget expenseChartCard(BuildContext context) {
   final cs = Theme.of(context).colorScheme;
+  final screenHeight = MediaQuery.of(context).size.height;
 
   return Obx(() {
     return Container(
-      height: 260,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
       decoration: cardDecoration(context),
       child: Column(
@@ -246,20 +247,24 @@ Widget expenseChartCard(BuildContext context) {
           const SizedBox(height: 12),
 
           // 🔹 LEGEND (compact like chart style)
-          Row(
-            children: [
-              legendDot(context, cs.primary, "Total Hours"),
-              const SizedBox(width: 12),
-              legendDot(context, cs.secondary, "Class Taken Amount"),
-              const SizedBox(width: 12),
-              legendDot(context, cs.tertiary, "Total Salary"),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                legendDot(context, cs.primary, "Total Hours"),
+                const SizedBox(width: 12),
+                legendDot(context, cs.secondary, "Class Taken Amount"),
+                const SizedBox(width: 12),
+                legendDot(context, cs.tertiary, "Total Salary"),
+              ],
+            ),
           ),
 
           const SizedBox(height: 10),
 
           // 🔹 CHART (same style)
-          Expanded(
+          SizedBox(
+            height: screenHeight * 0.25,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: LineChart(
@@ -1588,7 +1593,6 @@ Widget chartCard(
           ],
         ),
         const SizedBox(height: 12),
-        const SizedBox(height: 12),
         Expanded(
           child: LineChart(
             LineChartData(
@@ -1719,7 +1723,7 @@ Widget youtubeCard(BuildContext context) {
             // 🔹 Thumbnail / fallback
             Image.network(
               thumbnail,
-              fit: BoxFit.cover, 
+              fit: BoxFit.cover,
               width: double.infinity,
               height: 200,
               errorBuilder: (context, error, stackTrace) {

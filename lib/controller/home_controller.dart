@@ -36,7 +36,7 @@ class HomeController extends GetxController {
   var packageData = <Map<String, dynamic>>[].obs;
 
   RxDouble receivedSalary = 0.0.obs;
-  RxString packageRange = "This Year".obs;
+  RxString packageRange = "All".obs;
 
   RxList<double> pendingSalaryData = <double>[].obs;
   RxList<double> receivedSalaryData = <double>[].obs;
@@ -57,13 +57,13 @@ class HomeController extends GetxController {
   var totalExpense = 0.0.obs;
   var totalIncome = 0.0.obs;
   var selectedFilter = TimeFilter.all.obs;
-  var studentRange = "All".obs;
-  var teacherRange = "All".obs;
-  var advisorRange = "All".obs;
-  var coordinatorRange = "All".obs;
-  var mentorRange = "All".obs;
-  var summaryRange = "All".obs;
-  var expenseRange = "All".obs;
+  var studentRange = "This Year".obs;
+  var teacherRange = "This Year".obs;
+  var advisorRange = "This Year".obs;
+  var coordinatorRange = "This Year".obs;
+  var mentorRange = "This Year".obs;
+  var summaryRange = "This Year".obs;
+  var expenseRange = "This Year".obs;
 
   RxList<String> xLabels = <String>[].obs;
   var studentLabels = <String>[].obs;
@@ -72,20 +72,19 @@ class HomeController extends GetxController {
   var coordinatorLabels = <String>[].obs;
   var mentorLabels = <String>[].obs;
   var expenseLabels = <String>[].obs;
+  var isExpenseLoading = true.obs;
   final hiringAds = <HiringView>[].obs;
   final recommendations = <RecommendationView>[].obs;
 
   Future<void> refreshDashboard() async {
-    try {
-      isLoading.value = true;
+    isLoading.value = true;
 
-      await Future.wait<void>([
-        Future(() => updateStudentData()),
-        Future(() => updateTeacherData()),
-        Future(() => updateMentorData()),
-        Future(() => updateAdvisorData()),
-        Future(() => updatecoordinatorData()),
-      ]);
+    try {
+      updateStudentData();
+      updateTeacherData();
+      updateMentorData();
+      updateAdvisorData();
+      updatecoordinatorData();
     } finally {
       isLoading.value = false;
     }
@@ -737,6 +736,8 @@ class HomeController extends GetxController {
   }
 
   void updateExpenseData(String range) {
+    isExpenseLoading.value = true;
+
     final now = DateTime.now();
 
     List<double> hours = [];
@@ -745,32 +746,27 @@ class HomeController extends GetxController {
     List<String> labels = [];
 
     switch (range) {
-      /// 🔹 ALL TIME (2021 → current year)
       case "All":
         final startYear = 2021;
         final currentYear = now.year;
 
         for (int y = startYear; y <= currentYear; y++) {
           labels.add(y.toString());
-
           hours.add(_mock(y));
           amount.add(_mock(y) * 100000);
           salary.add(_mock(y) * 50000);
         }
         break;
 
-      /// 🔹 TODAY (0–23 hours)
       case "Today":
         for (int h = 0; h < 24; h++) {
           labels.add("${h}h");
-
           hours.add(_mock(h));
           amount.add(_mock(h) * 10000);
           salary.add(_mock(h) * 5000);
         }
         break;
 
-      /// 🔹 THIS WEEK (Mon → today)
       case "This Week":
         final start = now.subtract(Duration(days: now.weekday - 1));
 
@@ -784,7 +780,6 @@ class HomeController extends GetxController {
         }
         break;
 
-      /// 🔹 THIS MONTH (Week 1 → current week)
       case "This Month":
         int currentWeek = ((now.day - 1) ~/ 7) + 1;
 
@@ -797,7 +792,6 @@ class HomeController extends GetxController {
         }
         break;
 
-      /// 🔹 THIS YEAR (Jan → Dec)
       case "This Year":
         const months = [
           "Jan",
@@ -824,13 +818,11 @@ class HomeController extends GetxController {
         break;
     }
 
-    /// ✅ Assign to Rx
     totalHours.assignAll(hours);
     classAmount.assignAll(amount);
     totalSalary.assignAll(salary);
     expenseLabels.assignAll(labels);
 
-    /// ✅ Safe calculations
     totalExpense.value = salary.isEmpty ? 0 : salary.reduce((a, b) => a + b);
 
     totalIncome.value = amount.isEmpty ? 0 : amount.reduce((a, b) => a + b);
@@ -838,6 +830,8 @@ class HomeController extends GetxController {
     expenseRatio.value = totalIncome.value == 0
         ? 0
         : (totalExpense.value / totalIncome.value) * 100;
+
+    isExpenseLoading.value = false;
   }
 
   double _mock(int seed) {
@@ -854,6 +848,7 @@ class HomeController extends GetxController {
     loadDummyPackageAnalytics();
     fetchData();
     loadHiringAds();
+    updateExpenseData(expenseRange.value);
     totalFeeData.assignAll([10, 20, 30, 25, 40]);
     pendingFeeData.assignAll([5, 10, 15, 10, 20]);
     totalClassesData.assignAll([2, 4, 6, 5, 7]);
@@ -872,10 +867,13 @@ class HomeController extends GetxController {
       teacherCount.value = 10;
       coordinatorCount.value = 4;
       mentorCount.value = 18;
+      advisorCount.value = 6;
 
       studentData.assignAll([10, 30, 20, 40, 35, 50]);
       teacherData.assignAll([2, 5, 3, 6, 4, 7]);
       coordinatorData.assignAll([1, 2, 1, 3, 2, 4]);
+      mentorData.assignAll([3, 6, 4, 8, 5, 7]);
+      advisorData.assignAll([2, 4, 3, 5, 6, 4]);
     } catch (e) {
       print("Error: $e");
     } finally {
