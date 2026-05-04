@@ -1,3 +1,5 @@
+import 'package:albedo_app/model/package_model.dart';
+
 class Student {
   String? studentId;
   String? phone;
@@ -12,6 +14,7 @@ class Student {
   String? place;
   String? referredBy;
   bool? isFeePaid;
+  Package? package;
   
 
   int? classHours;
@@ -61,6 +64,7 @@ class Student {
     this.parentName,
     this.parentOccupation,
     this.status,
+    this.package,
     this.mentor,
     this.teacherId,
     this.imageUrl,

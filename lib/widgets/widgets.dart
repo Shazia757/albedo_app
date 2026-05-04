@@ -1,7 +1,5 @@
-import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -727,28 +725,93 @@ class CustomWidgets {
     );
   }
 
+  InputDecoration appInputDecoration({
+    required BuildContext context,
+    required String hint,
+    Widget? suffixIcon,
+    String? label,
+  }) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      hintStyle: textTheme.bodySmall?.copyWith(
+        color: cs.outline.withOpacity(0.6),
+      ),
+      filled: true,
+      fillColor: cs.onPrimary.withOpacity(0.8),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 12,
+      ),
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: cs.outline.withOpacity(0.5),
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: cs.outline.withOpacity(0.5),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: cs.outline.withOpacity(0.5),
+          width: 1.2,
+        ),
+      ),
+    );
+  }
+
+  BoxDecoration appBoxDecoration(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return BoxDecoration(
+      color: cs.onPrimary.withOpacity(0.15),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(
+        color: cs.outline.withOpacity(0.5),
+      ),
+    );
+  }
+
   Widget customDropdownField<T>({
     required BuildContext context,
     required String hint,
     required List<T> items,
     T? value,
     required Function(T) onChanged,
+    required String Function(T item) itemLabel,
   }) {
     final cs = Theme.of(context).colorScheme;
-    final textController = TextEditingController();
+
+    final TextEditingController textController = TextEditingController(
+      text: value != null ? itemLabel(value) : "",
+    );
 
     final LayerLink layerLink = LayerLink();
     OverlayEntry? overlayEntry;
-
-    textController.text = value?.toString() ?? "";
 
     List<T> filteredItems = List.from(items);
 
     return StatefulBuilder(
       builder: (context, setState) {
-        void closeDropdown() {
+        void closeDropdown({bool clearSearch = true}) {
           overlayEntry?.remove();
           overlayEntry = null;
+
+          if (clearSearch) {
+            textController.clear(); // ✅ remove search text
+            filteredItems = List.from(items);
+          }
+
           setState(() {});
         }
 
@@ -765,13 +828,18 @@ class CustomWidgets {
           final shouldOpenUp = spaceBelow < 250 && spaceAbove > spaceBelow;
 
           final maxHeight = (shouldOpenUp ? spaceAbove : spaceBelow) - 20;
+
           final itemHeight = 48.0;
-          final listHeight = filteredItems.length * itemHeight;
+          final isEmpty = filteredItems.isEmpty;
+
+          final listHeight = isEmpty ? 60.0 : filteredItems.length * itemHeight;
+
           final finalHeight = listHeight.clamp(0, maxHeight).toDouble();
+
           overlayEntry = OverlayEntry(
             builder: (_) {
               return GestureDetector(
-                onTap: closeDropdown,
+                onTap: () => closeDropdown(clearSearch: true),
                 behavior: HitTestBehavior.translucent,
                 child: Stack(
                   children: [
@@ -780,27 +848,24 @@ class CustomWidgets {
                       child: CompositedTransformFollower(
                         link: layerLink,
                         offset: shouldOpenUp
-                            ? Offset(0, -finalHeight - 4) // 👈 open upward
-                            : Offset(0, size.height + 4), // 👈 open downward
+                            ? Offset(0, -finalHeight - 4)
+                            : Offset(0, size.height + 4),
                         child: Material(
                           elevation: 4,
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
-                            constraints: BoxConstraints(
-                              maxHeight: finalHeight,
-                            ),
-                            decoration: BoxDecoration(
-                              color: cs.outline.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            constraints: BoxConstraints(maxHeight: finalHeight),
+                            decoration: appBoxDecoration(context),
                             child: filteredItems.isEmpty
-                                ? Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Text(
-                                      "No results found",
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: cs.onSurface.withOpacity(0.6),
+                                ? SizedBox(
+                                    height: 60,
+                                    child: Center(
+                                      child: Text(
+                                        "No items found",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: cs.onSurface.withOpacity(0.6),
+                                        ),
                                       ),
                                     ),
                                   )
@@ -812,9 +877,14 @@ class CustomWidgets {
 
                                       return InkWell(
                                         onTap: () {
+                                          final label = itemLabel(item);
+
                                           onChanged(item);
-                                          textController.text = item.toString();
-                                          closeDropdown();
+
+                                          textController.text =
+                                              label; // ✅ only selection
+
+                                          closeDropdown(clearSearch: false);
                                         },
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -822,7 +892,7 @@ class CustomWidgets {
                                             vertical: 12,
                                           ),
                                           child: Text(
-                                            item.toString(),
+                                            itemLabel(item),
                                             style: TextStyle(
                                               fontSize: 13,
                                               color: cs.onSurface,
@@ -846,53 +916,40 @@ class CustomWidgets {
           setState(() {});
         }
 
-        void filterItems(String query) {
-          filteredItems = items
-              .where((item) =>
-                  item.toString().toLowerCase().contains(query.toLowerCase()))
-              .toList();
-
-          overlayEntry?.markNeedsBuild();
-        }
-
         return Builder(
           builder: (fieldContext) {
             return CompositedTransformTarget(
               link: layerLink,
               child: TextFormField(
                 controller: textController,
-                readOnly: false,
                 style: TextStyle(fontSize: 13, color: cs.onSurface),
                 onTap: () {
                   if (overlayEntry == null) {
-                    filteredItems = List.from(items); // reset
+                    filteredItems = List.from(items);
                     openDropdown(fieldContext);
                   }
                 },
-                onChanged: (value) {
+                onChanged: (query) {
                   if (overlayEntry == null) {
                     openDropdown(fieldContext);
                   }
-                  filterItems(value);
+
+                  setState(() {
+                    filteredItems = items
+                        .where((item) => itemLabel(item)
+                            .toLowerCase()
+                            .contains(query.toLowerCase()))
+                        .toList();
+                  });
                 },
-                decoration: InputDecoration(
-                  hintText: hint,
-                  hintStyle: TextStyle(fontSize: 12),
-                  filled: true,
-                  fillColor: cs.outline.withOpacity(0.1),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 11,
-                  ),
+                decoration: appInputDecoration(
+                  context: context,
+                  hint: hint,
                   suffixIcon: Icon(
                     overlayEntry != null
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
                     size: 20,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
@@ -908,30 +965,25 @@ class CustomWidgets {
     required String hint,
     required List<T> items,
     required RxList<T> selectedItems,
+    required String Function(T item) itemLabel,
   }) {
     final cs = Theme.of(context).colorScheme;
 
     final LayerLink layerLink = LayerLink();
     OverlayEntry? overlayEntry;
 
-    final textController = TextEditingController();
+    VoidCallback? refreshOverlay;
 
     return StatefulBuilder(
       builder: (context, setState) {
-        bool isOpen = overlayEntry != null;
-
-        void updateText() {
-          textController.text =
-              selectedItems.isEmpty ? "" : "${selectedItems.length} selected";
-        }
-
         void toggleItem(T item) {
           if (selectedItems.contains(item)) {
             selectedItems.remove(item);
           } else {
             selectedItems.add(item);
           }
-          updateText();
+
+          refreshOverlay?.call();
           setState(() {});
         }
 
@@ -945,8 +997,14 @@ class CustomWidgets {
           final renderBox = fieldContext.findRenderObject() as RenderBox;
           final size = renderBox.size;
 
+          refreshOverlay = () {
+            overlayEntry?.markNeedsBuild();
+          };
+
           overlayEntry = OverlayEntry(
             builder: (_) {
+              final list = items;
+
               return GestureDetector(
                 onTap: closeDropdown,
                 behavior: HitTestBehavior.translucent,
@@ -962,54 +1020,63 @@ class CustomWidgets {
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
                             constraints: BoxConstraints(
-                              maxHeight:
-                                  items.length > 5 ? 240 : items.length * 48.0,
+                              maxHeight: list.isEmpty
+                                  ? 60
+                                  : list.length > 5
+                                      ? 240
+                                      : list.length * 48.0,
                             ),
-                            decoration: BoxDecoration(
-                              color: cs.outline.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Obx(() {
-                              updateText(); // 🔥 keep text synced
-
-                              return ListView.builder(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                itemCount: items.length,
-                                itemBuilder: (_, index) {
-                                  final item = items[index];
-                                  final isSelected =
-                                      selectedItems.contains(item);
-
-                                  return InkWell(
-                                    onTap: () => toggleItem(item),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 10,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Checkbox(
-                                            value: isSelected,
-                                            onChanged: (_) => toggleItem(item),
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              item.toString(),
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                color: cs.onSurface,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                            decoration: appBoxDecoration(context),
+                            child: list.isEmpty
+                                ? SizedBox(
+                                    height: 60,
+                                    child: Center(
+                                      child: Text(
+                                        "No items found",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: cs.onSurface.withOpacity(0.6),
+                                        ),
                                       ),
                                     ),
-                                  );
-                                },
-                              );
-                            }),
+                                  )
+                                : ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    itemCount: list.length,
+                                    itemBuilder: (_, index) {
+                                      final item = list[index];
+                                      final isSelected =
+                                          selectedItems.contains(item);
+
+                                      return InkWell(
+                                        onTap: () => toggleItem(item),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 10,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Checkbox(
+                                                value: isSelected,
+                                                onChanged: (_) =>
+                                                    toggleItem(item),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  itemLabel(item),
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    color: cs.onSurface,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                           ),
                         ),
                       ),
@@ -1038,51 +1105,27 @@ class CustomWidgets {
                 },
                 child: AbsorbPointer(
                   child: Obx(() {
-                    updateText(); // 🔥 update UI
+                    final text = selectedItems.isEmpty
+                        ? ""
+                        : "${selectedItems.length} selected";
 
                     return TextFormField(
-                      controller: textController,
                       readOnly: true,
                       style: TextStyle(
                         fontSize: 13,
                         color: cs.onSurface,
                       ),
-                      decoration: InputDecoration(
-                        hintText: hint,
-                        hintStyle: TextStyle(
-                          fontSize: 12,
-                          color: cs.onSurface,
-                        ),
-                        filled: true,
-                        fillColor: cs.outline.withOpacity(0.1),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 11,
-                        ),
+                      decoration: appInputDecoration(
+                        context: context,
+                        hint: hint,
                         suffixIcon: Icon(
-                          isOpen
+                          overlayEntry != null
                               ? Icons.keyboard_arrow_up
                               : Icons.keyboard_arrow_down,
                           size: 20,
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide:
-                              const BorderSide(color: Colors.transparent),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide:
-                              const BorderSide(color: Colors.transparent),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Colors.transparent,
-                            width: 1.5,
-                          ),
-                        ),
                       ),
+                      controller: TextEditingController(text: text),
                     );
                   }),
                 ),
@@ -1235,20 +1278,23 @@ class CustomWidgets {
   }
 
   Widget labelWithAsterisk(String text, {bool required = false}) {
+    final textTheme = Get.textTheme;
+
     return Align(
       alignment: Alignment.centerLeft,
       child: RichText(
         text: TextSpan(
           text: text,
-          style: TextStyle(
+          style: textTheme.titleSmall?.copyWith(
             color: Get.theme.colorScheme.onSurface,
-            fontSize: 13,
           ),
           children: required
               ? [
-                  const TextSpan(
+                  TextSpan(
                     text: " *",
-                    style: TextStyle(color: Colors.red),
+                    style: textTheme.titleSmall?.copyWith(
+                      color: Colors.red,
+                    ),
                   )
                 ]
               : [],
@@ -1306,12 +1352,8 @@ class CustomWidgets {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-        decoration: BoxDecoration(
-          color: cs.outline.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.transparent),
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: appBoxDecoration(context),
         child: Row(
           children: [
             Icon(
@@ -1377,11 +1419,15 @@ class CustomWidgets {
     bool readOnly = false,
     VoidCallback? onTap,
   }) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     return TextFormField(
       controller: controller,
-      style: TextStyle(fontSize: 12),
+      style: textTheme.bodyMedium?.copyWith(
+        color: cs.onSurface,
+      ),
       inputFormatters: isNumber
           ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))]
           : null,
@@ -1399,34 +1445,39 @@ class CustomWidgets {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        hintStyle: TextStyle(
-          fontSize: 12,
-          color: context.theme.colorScheme.onSurface,
+        hintStyle: textTheme.bodySmall?.copyWith(
+          color: cs.outline.withOpacity(0.6),
         ),
-        // isDense: true,
+
+        /// BACKGROUND
         filled: true,
-        fillColor: cs.outline.withOpacity(0.1),
+        fillColor: cs.onPrimary.withOpacity(0.8),
+
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
-          vertical: 11,
+          vertical: 12,
         ),
+
+        /// SUBTLE BORDER
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.transparent,
+            color: cs.outline.withOpacity(0.5),
           ),
         ),
+
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.transparent,
+            color: cs.outline.withOpacity(0.5),
           ),
         ),
+
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.transparent,
-            width: 1.5,
+            color: cs.outline.withOpacity(0.5),
+            width: 1.2,
           ),
         ),
       ),
@@ -1470,7 +1521,7 @@ class CustomWidgets {
                 link: layerLink,
                 offset: Offset(
                   0,
-                  showAbove ? -popupHeight - 10 : 55, // 👈 dynamic position
+                  showAbove ? -popupHeight - 10 : 55,
                 ),
                 child: Material(
                   elevation: 8,
@@ -1500,22 +1551,13 @@ class CustomWidgets {
         controller: controller,
         readOnly: true,
         onTap: showOverlay,
-        style: const TextStyle(fontSize: 12),
-        decoration: InputDecoration(
-          hintText: "Select Date",
-          hintStyle: TextStyle(
-            fontSize: 12,
-            color: context.theme.colorScheme.onSurface,
-          ),
-          filled: true,
-          fillColor: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+        decoration: appInputDecoration(
+          context: context,
+          hint: "Select Date",
           suffixIcon: const Icon(Icons.calendar_today, size: 18),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
         ),
       ),
     );
@@ -1842,109 +1884,12 @@ class CustomWidgets {
       readOnly: true,
       onTap: pickTime,
       style: const TextStyle(fontSize: 12),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        hintStyle: TextStyle(
-          fontSize: 12,
-          color: context.theme.colorScheme.onSurface,
-        ),
-        filled: true,
-        fillColor: cs.outline.withOpacity(0.1),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 11,
-        ),
+      decoration: appInputDecoration(
+        context: context,
+        hint: hint,
+        label: label,
         suffixIcon: const Icon(Icons.access_time),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.transparent),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.transparent),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
-        ),
       ),
-    );
-  }
-}
-
-class AppFAB extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  const AppFAB({
-    super.key,
-    required this.label,
-    required this.onPressed,
-    this.icon = Icons.add_rounded,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return FloatingActionButton.extended(
-      onPressed: onPressed,
-      backgroundColor: cs.primary,
-      foregroundColor: cs.onPrimary,
-      elevation: 3,
-      icon: Icon(icon, size: 20),
-      label: Text(
-        label,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
-        ),
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-    );
-  }
-}
-
-class AppFormDialog {
-  static void show({
-    required BuildContext context,
-    required Widget title,
-    required List<Widget> children,
-    required VoidCallback onSubmit,
-    GlobalKey<FormState>? formKey,
-    bool isViewOnly = false,
-    String submitText = "Save",
-  }) {
-    final textTheme = Theme.of(context).textTheme;
-
-    CustomWidgets().showCustomDialog(
-      context: context,
-      title: DefaultTextStyle(
-        style: Theme.of(context)
-            .textTheme
-            .titleLarge!
-            .copyWith(color: Colors.white),
-        child: title,
-      ),
-      formKey: formKey ?? GlobalKey<FormState>(),
-      onSubmit: onSubmit,
-      isViewOnly: isViewOnly,
-      submitText: submitText,
-      sections: [
-        DefaultTextStyle(
-          style: textTheme.bodyMedium!,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -406,7 +406,7 @@ Widget studentsAnalyticsCard(BuildContext context) {
                           selectedValue: c.studentRange.value,
                           onSelected: (value) {
                             c.studentRange.value = value;
-                            c.loadDummyStudentAnalytics();
+                            c.loadStudentAnalytics();
                           },
                         ),
                       ),
@@ -580,7 +580,7 @@ Widget packagesAnalyticsCard(BuildContext context) {
                             c.packageRange.value = value;
 
                             /// 🔹 Load data based on range
-                            c.loadDummyPackageAnalytics();
+                            c.loadPackageAnalytics();
                           },
                         ),
                       ),

@@ -459,12 +459,12 @@ class BatchesListPage extends StatelessWidget {
             const SizedBox(height: 12),
             CustomWidgets().labelWithAsterisk('Duration', required: true),
             const SizedBox(height: 8),
-            CustomWidgets().customDropdownField(
-              context: context,
-              hint: 'Select Duration',
-              items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
-              onChanged: (p0) {},
-            ),
+            // CustomWidgets().customDropdownField(
+            //   context: context,
+            //   hint: 'Select Duration',
+            //   items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
+            //   onChanged: (p0) {},
+            // ),
           ],
         ),
       ],
@@ -494,21 +494,21 @@ class BatchesListPage extends StatelessWidget {
                 const SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Category', required: true),
                 const SizedBox(height: 8),
-                CustomWidgets().customDropdownField(
-                  context: context,
-                  hint: 'Select category',
-                  items: c.categoryList,
-                  onChanged: (p0) {},
-                ),
+                // CustomWidgets().customDropdownField(
+                //   context: context,
+                //   hint: 'Select category',
+                //   items: c.categoryList,
+                //   onChanged: (p0) {},
+                // ),
                 const SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Priority', required: true),
                 const SizedBox(height: 8),
-                CustomWidgets().customDropdownField(
-                  context: context,
-                  hint: 'Select priority',
-                  items: ['High', 'Medium', 'Low'],
-                  onChanged: (p0) {},
-                ),
+                // CustomWidgets().customDropdownField(
+                //   context: context,
+                //   hint: 'Select priority',
+                //   items: ['High', 'Medium', 'Low'],
+                //   onChanged: (p0) {},
+                // ),
                 const SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('User', required: true),
                 const SizedBox(height: 8),
@@ -536,20 +536,20 @@ class BatchesListPage extends StatelessWidget {
                     )),
                 const SizedBox(height: 8),
                 Obx(() {
-                  if (c.selectedType.value == 'student') {
-                    return CustomWidgets().customDropdownField(
-                        items: c.studentsList,
-                        onChanged: (p0) {},
-                        context: context,
-                        hint: 'Select student');
-                  }
-                  if (c.selectedType.value == 'teacher') {
-                    return CustomWidgets().customDropdownField(
-                        items: c.teacherList,
-                        onChanged: (p0) {},
-                        context: context,
-                        hint: 'Select teacher');
-                  }
+                  // if (c.selectedType.value == 'student') {
+                  //   return CustomWidgets().customDropdownField(
+                  //       items: c.studentsList,
+                  //       onChanged: (p0) {},
+                  //       context: context,
+                  //       hint: 'Select student');
+                  // }
+                  // if (c.selectedType.value == 'teacher') {
+                  //   return CustomWidgets().customDropdownField(
+                  //       items: c.teacherList,
+                  //       onChanged: (p0) {},
+                  //       context: context,
+                  //       hint: 'Select teacher');
+                  // }
                   return const SizedBox();
                 }),
                 const SizedBox(height: 12),
@@ -675,16 +675,21 @@ class BatchesListPage extends StatelessWidget {
                       hint: 'Select Duration',
                       value: c.selectedDuration.value,
                       items: [],
+          itemLabel: (item) => "$item mins",
+
                       onChanged: (p0) => c.selectedDuration.value = p0),
                   const SizedBox(height: 12),
                   CustomWidgets().labelWithAsterisk('Teacher', required: true),
                   const SizedBox(height: 10),
-                  CustomWidgets().customDropdownField(
-                      context: context,
-                      hint: 'Select Teacher',
-                      items: [],
-                      value: c.selectedTeacher.value,
-                      onChanged: (p0) => c.selectedTeacher.value = p0),
+          //         CustomWidgets().customDropdownField(
+
+          //             context: context,
+          //             hint: 'Select Teacher',
+          //             items: c.teacherList,
+          //             value: c.selectedTeacher.value,
+          //             onChanged: (p0) => c.selectedTeacher.value = p0,
+          // itemLabel: (item) => item.toString()
+          //             ),
                 ],
               ),
             ),

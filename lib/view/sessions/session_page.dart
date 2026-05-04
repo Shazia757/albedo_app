@@ -4,6 +4,7 @@ import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/controller/session_report_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/sessions/add_session_page.dart';
 import 'package:albedo_app/view/sessions/session_report_dialog.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
@@ -49,7 +50,17 @@ class SessionPage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       floatingActionButton: (!isCustom || PermissionService.can("add_sessions"))
-          ? addSessionBtn(context)
+          ? FloatingActionButton(
+              onPressed: () {
+                Get.to(() => const AddSessionPage());
+              },
+              mini: true,
+              backgroundColor: context.theme.colorScheme.primary,
+              child: Icon(
+                Icons.add,
+                color: context.theme.colorScheme.onPrimary,
+              ),
+            )
           : null,
       body: Row(
         children: [
@@ -240,379 +251,6 @@ class SessionPage extends StatelessWidget {
       default:
         return cs.outline;
     }
-  }
-
-  FloatingActionButton addSessionBtn(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () => CustomWidgets().showCustomDialog(
-        context: context,
-        title: Obx(() {
-          return Text(
-            c.selectedType.value == "session"
-                ? "Add Class Session"
-                : "Add Meet Session",
-          );
-        }),
-        formKey: GlobalKey<FormState>(),
-        onSubmit: () {},
-        sections: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.75,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Obx(
-                    () => Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile(
-                            dense: true,
-                            title: Text('Class Session'),
-                            value: "session",
-                            groupValue: c.selectedType.value,
-                            onChanged: (value) => c.selectedType.value = value!,
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile(
-                            dense: true,
-                            title: Text('Meet'),
-                            value: "meet",
-                            groupValue: c.selectedType.value,
-                            onChanged: (value) => c.selectedType.value = value!,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Obx(() {
-                    if (c.selectedType.value == 'session') {
-                      return Column(
-                        children: [
-                          CustomWidgets().labelWithAsterisk('Select Student',
-                              required: true),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customDropdownField(
-                            context: context,
-                            hint: 'Select Teacher',
-                            items: c.teacherList,
-                            onChanged: (p0) =>
-                                c.selectedTeacher.value = p0.name,
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk(
-                            'Search and Select Teacher',
-                            required: true,
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customDropdownField(
-                            context: context,
-                            hint: 'Select Teacher',
-                            items: c.teacherList,
-                            onChanged: (p0) =>
-                                c.selectedTeacher.value = p0.name,
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Teacher Salary'),
-                          const SizedBox(height: 10),
-                          CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Teacher Salary',
-                              controller: c.salaryController),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Session Date',
-                              required: true),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customDatePickerField(
-                            context: context,
-                            controller: c.dateController,
-                            selectedDate: c.selectedDate,
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Session Time',
-                              required: true),
-                          const SizedBox(height: 10),
-                          CustomWidgets().timePickerStyledField(
-                              context: context,
-                              controller: c.timeController,
-                              selectedTime: c.selectedTime),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Select Duration',
-                              required: true),
-                          const SizedBox(height: 20),
-                          CustomWidgets().customDropdownField(
-                            context: context,
-                            hint: 'Select Duration',
-                            items: c.durationOptions
-                                .map((e) => "${(e)} minutes")
-                                .toList(),
-                            onChanged: (p0) {},
-                          ),
-                        ],
-                      );
-                    }
-                    if (c.selectedType.value == 'meet') {
-                      return Column(
-                        children: [
-                          CustomWidgets()
-                              .labelWithAsterisk('Meet Title', required: true),
-                          const SizedBox(height: 10),
-                          CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Meet Title',
-                              controller: c.meetTitleController),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk(
-                              'Select Participants',
-                              required: true),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Obx(
-                                () => Checkbox(
-                                  value: c.selectAllMentors.value,
-                                  onChanged: (value) {
-                                    if (value == null) return;
-
-                                    c.selectAllMentors.value = value;
-
-                                    if (value == true) {
-                                      // select all
-                                      c.selectedMentors
-                                          .assignAll(c.mentorsList);
-                                    } else {
-                                      // clear all
-                                      c.selectedMentors.clear();
-                                    }
-                                  },
-                                ),
-                              ),
-                              Text('Select All Mentors'),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customMultiDropdownField(
-                              context: context,
-                              hint:
-                                  'Select Mentors (${c.mentorsList.length} available)',
-                              items: c.mentorsList,
-                              selectedItems: c.selectedMentors),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Obx(
-                                () => Checkbox(
-                                  value: c.selectAllTeachers.value,
-                                  onChanged: (value) {
-                                    if (value == null) return;
-
-                                    c.selectAllTeachers.value = value;
-
-                                    if (value == true) {
-                                      // select all
-                                      c.selectedTeachers
-                                          .assignAll(c.teacherList);
-                                    } else {
-                                      // clear all
-                                      c.selectedTeachers.clear();
-                                    }
-                                  },
-                                ),
-                              ),
-                              Text('Select All Teachers'),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customMultiDropdownField(
-                              context: context,
-                              hint:
-                                  'Select Teachers (${c.teacherList.length} available)',
-                              items: c.teacherList,
-                              selectedItems: c.selectedTeachers),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Obx(
-                                () => Checkbox(
-                                  value: c.selectAllStudents.value,
-                                  onChanged: (value) {
-                                    if (value == null) return;
-
-                                    c.selectAllStudents.value = value;
-
-                                    if (value == true) {
-                                      // select all
-                                      c.selectedStudents
-                                          .assignAll(c.studentsList);
-                                    } else {
-                                      // clear all
-                                      c.selectedStudents.clear();
-                                    }
-                                  },
-                                ),
-                              ),
-                              Text('Select All Students'),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customMultiDropdownField(
-                              context: context,
-                              hint:
-                                  'Select Students (${c.studentsList.length} available)',
-                              items: c.studentsList,
-                              selectedItems: c.selectedStudents),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Obx(
-                                () => Checkbox(
-                                  value: c.selectAllCoordinators.value,
-                                  onChanged: (value) {
-                                    if (value == null) return;
-
-                                    c.selectAllCoordinators.value = value;
-
-                                    if (value == true) {
-                                      // select all
-                                      c.selectedCoordinators
-                                          .assignAll(c.coordinatorsList);
-                                    } else {
-                                      // clear all
-                                      c.selectedCoordinators.clear();
-                                    }
-                                  },
-                                ),
-                              ),
-                              Text('Select All Coordinators'),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customMultiDropdownField(
-                              context: context,
-                              hint:
-                                  'Select Coordinators (${c.coordinatorsList.length} available)',
-                              items: c.coordinatorsList,
-                              selectedItems: c.selectedCoordinators),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Obx(
-                                () => Checkbox(
-                                  value: c.selectAllAdvisors.value,
-                                  onChanged: (value) {
-                                    if (value == null) return;
-
-                                    c.selectAllAdvisors.value = value;
-
-                                    if (value == true) {
-                                      // select all
-                                      c.selectedAdvisors
-                                          .assignAll(c.advisorsList);
-                                    } else {
-                                      // clear all
-                                      c.selectedAdvisors.clear();
-                                    }
-                                  },
-                                ),
-                              ),
-                              Text('Select All Advisors'),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customMultiDropdownField(
-                              context: context,
-                              hint:
-                                  'Select Advisors (${c.advisorsList.length} available)',
-                              items: c.advisorsList,
-                              selectedItems: c.selectedAdvisors),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Obx(
-                                () => Checkbox(
-                                  value: c.selectAllOtherUsers.value,
-                                  onChanged: (value) {
-                                    if (value == null) return;
-
-                                    c.selectAllOtherUsers.value = value;
-
-                                    if (value == true) {
-                                      // select all
-                                      c.selectedOtherUsers
-                                          .assignAll(c.otherUsersList);
-                                    } else {
-                                      // clear all
-                                      c.selectedOtherUsers.clear();
-                                    }
-                                  },
-                                ),
-                              ),
-                              Text('Select All Other Users'),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customMultiDropdownField(
-                              context: context,
-                              hint:
-                                  'Select Other Users (${c.otherUsersList.length} available)',
-                              items: c.otherUsersList,
-                              selectedItems: c.selectedOtherUsers),
-                          const SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Session Details',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Session Date',
-                              required: true),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customDatePickerField(
-                            context: context,
-                            controller: c.dateController,
-                            selectedDate: c.selectedDate,
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets()
-                              .labelWithAsterisk('Start Time', required: true),
-                          const SizedBox(height: 10),
-                          CustomWidgets().customDropdownField(
-                            context: context,
-                            hint: 'Select Duration',
-                            items: c.durationOptions
-                                .map((e) => "${(e)} minutes")
-                                .toList(),
-                            onChanged: (p0) {},
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets()
-                              .labelWithAsterisk('Description', required: true),
-                          const SizedBox(height: 10),
-                          CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Description',
-                              controller: c.descriptionController)
-                        ],
-                      );
-                    }
-                    return const SizedBox();
-                  })
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      mini: true,
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
-    );
   }
 
   // ── SESSION DETAIL DIALOG ────────────────────────────────────────────
@@ -1113,21 +751,21 @@ class SessionPage extends StatelessWidget {
                 const SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Category', required: true),
                 const SizedBox(height: 8),
-                CustomWidgets().customDropdownField(
-                  context: context,
-                  hint: 'Select category',
-                  items: c.categoryList,
-                  onChanged: (p0) {},
-                ),
+                // CustomWidgets().customDropdownField(
+                //   context: context,
+                //   hint: 'Select category',
+                //   items: c.categoryList,
+                //   onChanged: (p0) {},
+                // ),
                 const SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Priority', required: true),
                 const SizedBox(height: 8),
-                CustomWidgets().customDropdownField(
-                  context: context,
-                  hint: 'Select priority',
-                  items: ['High', 'Medium', 'Low'],
-                  onChanged: (p0) {},
-                ),
+                // CustomWidgets().customDropdownField(
+                //   context: context,
+                //   hint: 'Select priority',
+                //   items: ['High', 'Medium', 'Low'],
+                //   onChanged: (p0) {},
+                // ),
                 const SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('User', required: true),
                 const SizedBox(height: 8),
@@ -1155,20 +793,20 @@ class SessionPage extends StatelessWidget {
                     )),
                 const SizedBox(height: 8),
                 Obx(() {
-                  if (c.selectedType.value == 'student') {
-                    return CustomWidgets().customDropdownField(
-                        items: c.studentsList,
-                        onChanged: (p0) {},
-                        context: context,
-                        hint: 'Select student');
-                  }
-                  if (c.selectedType.value == 'teacher') {
-                    return CustomWidgets().customDropdownField(
-                        items: c.teacherList,
-                        onChanged: (p0) {},
-                        context: context,
-                        hint: 'Select teacher');
-                  }
+                  // if (c.selectedType.value == 'student') {
+                  //   return CustomWidgets().customDropdownField(
+                  //       items: c.studentsList,
+                  //       onChanged: (p0) {},
+                  //       context: context,
+                  //       hint: 'Select student');
+                  // }
+                  // if (c.selectedType.value == 'teacher') {
+                  //   return CustomWidgets().customDropdownField(
+                  //       items: c.teacherList,
+                  //       onChanged: (p0) {},
+                  //       context: context,
+                  //       hint: 'Select teacher');
+                  // }
                   return const SizedBox();
                 }),
                 const SizedBox(height: 12),
@@ -1293,22 +931,22 @@ class SessionPage extends StatelessWidget {
                 children: [
                   CustomWidgets().labelWithAsterisk('Duration', required: true),
                   const SizedBox(height: 8),
-                  CustomWidgets().customDropdownField(
-                    context: context,
-                    hint: 'Select Duration',
-                    items:
-                        c.durationOptions.map((e) => "${(e)} minutes").toList(),
-                    onChanged: (p0) {},
-                  ),
+                  // CustomWidgets().customDropdownField(
+                  //   context: context,
+                  //   hint: 'Select Duration',
+                  //   items:
+                  //       c.durationOptions.map((e) => "${(e)} minutes").toList(),
+                  //   onChanged: (p0) {},
+                  // ),
                   const SizedBox(height: 12),
                   CustomWidgets().labelWithAsterisk('Teacher', required: true),
                   const SizedBox(height: 8),
-                  CustomWidgets().customDropdownField(
-                      context: context,
-                      hint: 'Select Teacher',
-                      items: [],
-                      value: c.selectedTeacher.value,
-                      onChanged: (p0) => c.selectedTeacher.value = p0),
+                  // CustomWidgets().customDropdownField(
+                  //     context: context,
+                  //     hint: 'Select Teacher',
+                  //     items: [],
+                  //     value: c.selectedTeacher.value,
+                  //     onChanged: (p0) => c.selectedTeacher.value = p0),
                 ],
               ),
             ),
@@ -1384,12 +1022,12 @@ class SessionPage extends StatelessWidget {
             const SizedBox(height: 12),
             CustomWidgets().labelWithAsterisk('Duration', required: true),
             const SizedBox(height: 8),
-            CustomWidgets().customDropdownField(
-              context: context,
-              hint: 'Select Duration',
-              items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
-              onChanged: (p0) {},
-            ),
+            // CustomWidgets().customDropdownField(
+            //   context: context,
+            //   hint: 'Select Duration',
+            //   items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
+            //   onChanged: (p0) {},
+            // ),
           ],
         ),
       ],

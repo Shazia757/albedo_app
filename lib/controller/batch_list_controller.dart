@@ -13,54 +13,57 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BatchListController extends GetxController {
-  var isLoading = true.obs;
-  var isDeleteButtonLoading = true.obs;
-  RxBool isSearching = false.obs;
-  RxList<String> categoryList = <String>[].obs;
+  final AuthController auth = Get.find();
 
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController titleController = TextEditingController();
-  TextEditingController categoryController = TextEditingController();
-  TextEditingController priorityController = TextEditingController();
-  TextEditingController userTypeController = TextEditingController();
+  /// 🔁 Toggle
+  final bool useMock = true;
+
+  /// 🔄 State
+  var isLoading = true.obs;
+  var isDeleteButtonLoading = false.obs;
+  RxBool isSearching = false.obs;
 
   var selectedTab = 0.obs;
-  var batches = <String>[].obs;
-  RxList<SessionReport> reports = <SessionReport>[].obs;
+  var searchQuery = ''.obs;
 
+  /// 📦 Data
   RxList<Batch> batchList = <Batch>[].obs;
+  RxList<String> categoryList = <String>[].obs;
   RxList<Student> studentsList = <Student>[].obs;
   RxList<Teacher> teacherList = <Teacher>[].obs;
-  String selectedFile = '';
 
-  Rxn<SessionReport> reportRx = Rxn<SessionReport>();
-
-  bool get hasReport => reportRx.value != null;
+  var batches = <String>[].obs;
+  final teachersList = ["Teacher A", "Teacher B", "Teacher C"];
 
   RxList<Mentor> mentorsList = <Mentor>[].obs;
   RxList<Coordinator> coordinatorsList = <Coordinator>[].obs;
-  RxString selectedType = "batch".obs;
 
-  var selectedBatch = RxnString();
-  final auth = Get.find<AuthController>();
+  RxList<SessionReport> reports = <SessionReport>[].obs;
+  Rxn<SessionReport> reportRx = Rxn<SessionReport>();
 
-  // RxList<Batch> filteredBatches = <Batch>[].obs;
-  var searchQuery = ''.obs;
-  final teachersList = ["Teacher A", "Teacher B", "Teacher C"];
-  var selectedDuration = Rxn<int>();
+  /// 🎯 Filters
   var selectedTeacher = RxnString();
+  var selectedBatch = RxnString();
+
+  /// 🧾 Controllers
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
+  TextEditingController salaryController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController categoryController = TextEditingController();
+
+  /// 📅 Selection
   var selectedDate = Rxn<DateTime>();
   var selectedTime = Rxn<TimeOfDay>();
-
-  final formKey = GlobalKey<FormState>();
+  var selectedDuration = Rxn<int>();
+  RxString selectedType = "batch".obs;
+  String selectedFile = '';
 
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
 
-  TextEditingController dateController = TextEditingController();
-  TextEditingController durationController = TextEditingController();
-  TextEditingController timeController = TextEditingController();
-  TextEditingController salaryController = TextEditingController();
-
+  ///  Tabs
   List<String> tabs = [
     "Active",
     "Upcoming",
@@ -75,274 +78,152 @@ class BatchListController extends GetxController {
     "completed",
   ];
 
+  /// 🚀 INIT
   @override
   void onInit() {
     super.onInit();
     fetchData();
   }
 
+  void applyFilters() {
+    List<Batch> temp = batchList;
+    final status = statusMap[selectedTab.value];
+    temp = temp.where((s) {
+      return s.status?.toLowerCase() == status.toLowerCase();
+    }).toList();
+
+    /// 🔍 Search
+    if (searchQuery.value.isNotEmpty) {
+      final query = searchQuery.value.toLowerCase();
+      temp = temp.where((s) {
+        return (s.batchName?.toLowerCase().contains(query) ?? false) ||
+            (s.teacher!.name.toLowerCase().contains(query));
+      }).toList();
+    }
+    filteredBatches.assignAll(temp);
+  }
+
+  /// 🌐 FETCH MAIN DATA
   Future<void> fetchData() async {
     try {
       isLoading.value = true;
 
       final user = auth.activeUser;
 
-      await Future.delayed(const Duration(seconds: 2));
+      final allBatches = useMock ? await _mockBatches() : await _apiBatches();
 
-      final allBatches = _getDummyBatches();
-
-      List<Batch> result;
+      List<Batch> result = [];
 
       if (user?.role == "admin") {
         result = allBatches;
       } else if (user?.role == "coordinator") {
-        /// 👉 if coordinator manages batches (depends on your model)
         result =
             allBatches.where((b) => b.coordinator?.id == user!.id).toList();
       } else if (user?.role == "teacher") {
         result = allBatches.where((b) => b.teacher?.id == user!.id).toList();
-      } else {
-        result = [];
       }
 
       batchList.assignAll(result);
-      filteredBatches.assignAll(result);
     } catch (e) {
-      print("Error: $e");
+      print("Batch Fetch Error: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
-  List<Batch> _getDummyBatches() {
-    return [
-      Batch(
-        id: "S001",
-        batchName: "10A",
-        batchID: "BT01",
-        package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        students: 5,
-        coordinator: Coordinator(
-          id: "COO1001",
-          name: "Maria",
-          joinedAt: DateTime.now(),
-        ),
-        teacher: Teacher(
-          id: "T001",
-          name: "Ameen Rahman",
-          status: "active",
-          joinedAt: DateTime(2023, 1, 1),
-          gender: "male",
-        ),
-        date: DateTime.now().subtract(const Duration(days: 1)),
-        status: "started",
-      ),
-      Batch(
-        id: "S002",
-        batchName: "ATTC",
-        batchID: "BT02",
-        package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        teacher: Teacher(
-          id: "T02",
-          name: "David",
-          status: "active",
-          joinedAt: DateTime(2023, 2, 1),
-          gender: "male",
-        ),
-        date: DateTime.now().add(const Duration(days: 1)),
-        status: "upcoming",
-      ),
-      Batch(
-        id: "S003",
-        batchName: "9B",
-        batchID: "ST03",
-        package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        teacher: Teacher(
-          id: "T001",
-          name: "John",
-          status: "active",
-          joinedAt: DateTime(2023, 1, 1),
-          gender: "male",
-        ),
-        date: DateTime.now(),
-        status: "pending",
-      ),
-      Batch(
-        id: "S004",
-        batchName: "11A",
-        batchID: "ST04",
-        package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        teacher: Teacher(
-          id: "T003",
-          name: "Meera",
-          status: "active",
-          joinedAt: DateTime(2023, 3, 1),
-          gender: "female",
-        ),
-        date: DateTime.now().subtract(const Duration(days: 3)),
-        status: "completed",
-      ),
-      Batch(
-        id: "S005",
-        batchName: "12B",
-        batchID: "ST05",
-        package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        teacher: Teacher(
-          id: "T02",
-          name: "David",
-          status: "active",
-          joinedAt: DateTime(2023, 2, 1),
-          gender: "male",
-        ),
-        date: DateTime.now(),
-        status: "no_balance",
-      ),
-      Batch(
-        id: "S006",
-        batchName: "10A",
-        batchID: "ST06",
-        package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        teacher: Teacher(
-          id: "T003",
-          name: "Meera",
-          status: "active",
-          joinedAt: DateTime(2023, 3, 1),
-          gender: "female",
-        ),
-        date: DateTime.now().subtract(const Duration(hours: 5)),
-        status: "meet_done",
-      ),
-      Batch(
-        id: "S007",
-        batchName: "9A",
-        batchID: "ST07",
-        package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        teacher: Teacher(
-          id: "T01",
-          name: "John",
-          status: "active",
-          joinedAt: DateTime(2023, 1, 1),
-          gender: "male",
-        ),
-        date: DateTime.now().add(const Duration(hours: 3)),
-        status: "started",
-      ),
-    ];
+  /// 🧪 MOCK DATA
+  Future<List<Batch>> _mockBatches() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return _getDummyBatches();
   }
 
-  void loadBatch(Batch batch) {
-    dateController.text = batch.date.toString();
-    timeController.text = batch.startTime.toString();
+  /// 🌐 API DATA
+  Future<List<Batch>> _apiBatches() async {
+    try {
+      // final res = await ApiService.getBatches();
+      // return res.map<Batch>((e) => Batch.fromJson(e)).toList();
 
-    selectedDuration.value = batch.duration;
-    selectedTeacher.value = batch.teacher?.name;
+      throw UnimplementedError();
+    } catch (e) {
+      print("API Batch Error: $e");
+      return [];
+    }
+  }
 
-    salaryController.text = batch.teacher?.salary?.toString() ?? '';
+  /// 📊 FILTERED LIST (MAIN LOGIC)
+  List<Batch> get filteredBatches {
+    final status = statusMap[selectedTab.value];
+
+    List<Batch> filtered = batchList.where((b) {
+      final matchesStatus = b.status == status;
+
+      final query = searchQuery.value.toLowerCase();
+
+      final matchesSearch =
+          (b.batchName?.toLowerCase().contains(query) ?? false) ||
+              (b.batchID?.toLowerCase().contains(query) ?? false) ||
+              (b.teacher?.name.toLowerCase().contains(query) ?? false) ||
+              (b.id?.toLowerCase().contains(query) ?? false) ||
+              b.date.toString().toLowerCase().contains(query);
+
+      return matchesStatus && matchesSearch;
+    }).toList();
+
+    /// 🎯 Teacher filter
+    if (selectedTeacher.value != null && selectedTeacher.value!.isNotEmpty) {
+      filtered = filtered
+          .where((b) => b.teacher?.name == selectedTeacher.value)
+          .toList();
+    }
+
+    /// 🔥 Sort (optional)
+    filtered.sort((a, b) => b.date!.compareTo(a.date!));
+
+    return filtered;
+  }
+
+  /// 👨‍🏫 FETCH USERS (API + MOCK)
+  Future<void> fetchTeachers() async {
+    try {
+      isLoading.value = true;
+
+      if (useMock) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        teacherList.assignAll([
+          Teacher(
+            gender: 'Male',
+            id: "T001",
+            name: "Ameen Rahman",
+            status: "Active",
+            joinedAt: DateTime.now(),
+          ),
+          Teacher(
+            gender: 'Female',
+            id: "T002",
+            name: "Fathima Noor",
+            status: "Active",
+            joinedAt: DateTime.now(),
+          ),
+        ]);
+      } else {
+        // final res = await ApiService.getTeachers();
+        // teacherList.assignAll(res);
+        throw UnimplementedError();
+      }
+    } catch (e) {
+      print("Teacher Fetch Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// 🔍 HELPERS
+  Batch? getBatchById(String id) {
+    try {
+      return batchList.firstWhere((e) => e.batchID == id);
+    } catch (e) {
+      return null;
+    }
   }
 
   Teacher? getTeacherById(String id) {
@@ -353,111 +234,37 @@ class BatchListController extends GetxController {
     }
   }
 
-  void initEdit(Batch data) {
-    final uniqueTeachers =
-        batchList.map((e) => e.teacher?.name).toSet().toList();
+  /// ✏️ LOAD FOR EDIT
+  void loadBatch(Batch batch) {
+    dateController.text = batch.date.toString();
+    timeController.text = batch.startTime ?? "";
 
-    teacherList.clear();
-    // teacherList.addAll(uniqueTeachers);
+    selectedDuration.value = batch.duration;
+    selectedTeacher.value = batch.teacher?.name;
 
-    selectedDuration.value =
-        durationOptions.contains(data.duration) ? data.duration : null;
-
-    selectedTeacher.value =
-        teacherList.contains(data.teacher?.name) ? data.teacher?.name : null;
-
-    // Controllers
-    dateController = TextEditingController(
-      text: "${data.date?.day}/${data.date?.month}/${data.date?.year}",
-    );
-
-    timeController = TextEditingController(
-      text: data.startTime,
-    );
-
-    salaryController =
-        TextEditingController(text: data.teacher?.salary.toString());
+    salaryController.text = batch.teacher?.salary?.toString() ?? '';
   }
 
-  delete(String id) {
-    isDeleteButtonLoading.value = true;
-    // Api().deleteProgram(id).then(
-    //   (value) {
-    //     if (value?.status == true) {
-    //       isDeleteButtonLoading.value = false;
-    //       Get.back();
-    //       Get.back();
-    //       Get.snackbar(
-    //           "Success", value?.message ?? "Program deleted successfully.");
-    //     } else {
-    //       // CustomWidgets.showSnackBar(
-    //       //     "Error", value?.message ?? 'Failed to delete program.');
-    //     }
-    //   },
-    // );
-  }
-
-  List<Batch> get filteredBatches {
-    final status = statusMap[selectedTab.value];
-
-    // ✅ Step 1: Filter first
-    List<Batch> filtered = batchList.where((s) {
-      final matchesStatus = s.status == status;
-
-      final matchesSearch = s.batchName!
-              .toLowerCase()
-              .contains(searchQuery.value.toLowerCase()) ||
-          s.batchID!.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          s.teacher!.id
-              .toLowerCase()
-              .contains(searchQuery.value.toLowerCase()) ||
-          s.teacher!.name
-              .toLowerCase()
-              .contains(searchQuery.value.toLowerCase()) ||
-          s.id!.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          s.date.toString().contains(searchQuery.value.toLowerCase());
-
-      return matchesStatus && matchesSearch;
-    }).toList();
-    if (selectedTeacher.value != null && selectedTeacher.value!.isNotEmpty) {
-      filtered = filtered
-          .where((s) => s.teacher?.name == selectedTeacher.value)
-          .toList();
-    }
-
-    return filtered;
-  }
-
-  void applyFilters() {
-    List<Batch> temp = batchList;
-
-    final status = statusMap[selectedTab.value];
-
-    temp = temp.where((s) {
-      return s.status?.toLowerCase() == status.toLowerCase();
-    }).toList();
-
-    /// 🔍 Search
-    if (searchQuery.value.isNotEmpty) {
-      final query = searchQuery.value.toLowerCase();
-
-      temp = temp.where((s) {
-        return (s.batchName?.toLowerCase().contains(query) ?? false) ||
-            (s.teacher!.name.toLowerCase().contains(query));
-      }).toList();
-    }
-
-    filteredBatches.assignAll(temp);
-  }
-
-  Batch? getBatchById(String id) {
+  /// 🗑 DELETE
+  void delete(String id) async {
     try {
-      return batchList.firstWhere((e) => e.batchID == id);
+      isDeleteButtonLoading.value = true;
+
+      if (!useMock) {
+        // await ApiService.deleteBatch(id);
+      }
+
+      batchList.removeWhere((b) => b.id == id);
+
+      Get.snackbar("Success", "Batch deleted successfully");
     } catch (e) {
-      return null;
+      print("Delete Error: $e");
+    } finally {
+      isDeleteButtonLoading.value = false;
     }
   }
 
+  /// 📝 REPORT
   void addOrUpdateReport(SessionReport report) {
     final index = reports.indexWhere((r) => r.studentId == report.studentId);
 
@@ -468,10 +275,10 @@ class BatchListController extends GetxController {
     }
   }
 
-  void openSessionReportDialog(Batch session) {
+  void openSessionReportDialog(Batch batch) {
     final controller = Get.put(SessionReportController());
 
-    controller.initFromBatchSession(session);
+    controller.initFromBatchSession(batch);
 
     CustomWidgets().showCustomDialog(
       context: Get.context!,
@@ -485,5 +292,68 @@ class BatchListController extends GetxController {
         SessionReportDialogBody(controller: controller),
       ],
     );
+  }
+
+  /// 🧪 DUMMY DATA
+  List<Batch> _getDummyBatches() {
+    return [
+      Batch(
+        id: "S001",
+        batchName: "10A",
+        batchID: "BT01",
+        students: 5,
+        teacher: Teacher(
+          gender: "Male",
+          id: "T001",
+          name: "Ameen Rahman",
+          status: "active",
+          joinedAt: DateTime.now(),
+        ),
+        date: DateTime.now().subtract(const Duration(days: 1)),
+        status: "started",
+      ),
+      Batch(
+        id: "S002",
+        batchName: "ATTC",
+        batchID: "BT02",
+        teacher: Teacher(
+          gender: "Female",
+          id: "T02",
+          name: "David",
+          status: "active",
+          joinedAt: DateTime.now(),
+        ),
+        date: DateTime.now().add(const Duration(days: 1)),
+        status: "upcoming",
+      ),
+      Batch(
+        id: "S003",
+        batchName: "9B",
+        batchID: "BT03",
+        teacher: Teacher(
+          gender: "Male",
+          id: "T003",
+          name: "John",
+          status: "active",
+          joinedAt: DateTime.now(),
+        ),
+        date: DateTime.now(),
+        status: "pending",
+      ),
+      Batch(
+        id: "S004",
+        batchName: "11A",
+        batchID: "BT04",
+        teacher: Teacher(
+          gender: "Female",
+          id: "T004",
+          name: "Meera",
+          status: "active",
+          joinedAt: DateTime.now(),
+        ),
+        date: DateTime.now().subtract(const Duration(days: 3)),
+        status: "completed",
+      ),
+    ];
   }
 }

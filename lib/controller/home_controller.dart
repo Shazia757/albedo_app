@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 enum TimeFilter { all, week, month, year }
 
 class HomeController extends GetxController {
+  final bool useMock = true; // 🔁 switch when API is ready
   var studentCount = 0.obs;
   var teacherCount = 0.obs;
   var coordinatorCount = 0.obs;
@@ -80,39 +81,52 @@ class HomeController extends GetxController {
     isLoading.value = true;
 
     try {
-      updateStudentData();
-      updateTeacherData();
-      updateMentorData();
-      updateAdvisorData();
-      updatecoordinatorData();
+      await updateStudentData(range: studentRange.value);
+      await updateTeacherData(range: teacherRange.value);
+      await updateMentorData(range: mentorRange.value);
+      await updateAdvisorData(range: advisorRange.value);
+      await updatecoordinatorData(range: coordinatorRange.value);
     } finally {
       isLoading.value = false;
     }
   }
 
+  Future<void> updateStudentData({String? range}) =>
+      _updateAnalytics(type: "student", range: range);
+
+  Future<void> updateTeacherData({String? range}) =>
+      _updateAnalytics(type: "teacher", range: range);
+
+  Future<void> updateMentorData({String? range}) =>
+      _updateAnalytics(type: "mentor", range: range);
+
+  Future<void> updateAdvisorData({String? range}) =>
+      _updateAnalytics(type: "advisor", range: range);
+
+  Future<void> updatecoordinatorData({String? range}) =>
+      _updateAnalytics(type: "coordinator", range: range);
+
   Future<void> fetchData() async {
     try {
       isLoading.value = true;
+
+      final sessions = useMock ? await _mockSessions() : await _apiSessions();
+
       final AuthController auth = Get.find();
-
       final user = auth.activeUser;
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      final allSessions = _getDummySessions();
 
       List<Session> result;
 
       if (user?.role == "teacher") {
-        result = allSessions.where((s) => s.teacher?.id == user!.id).toList();
+        result = sessions.where((s) => s.teacher?.id == user!.id).toList();
       } else if (user?.role == "student") {
         result =
-            allSessions.where((s) => s.student?.studentId == user!.id).toList();
+            sessions.where((s) => s.student?.studentId == user!.id).toList();
       } else {
-        result = [];
+        result = sessions;
       }
 
-      session.assignAll(allSessions);
+      session.assignAll(result);
     } catch (e) {
       print("Error: $e");
     } finally {
@@ -120,7 +134,8 @@ class HomeController extends GetxController {
     }
   }
 
-  List<Session> _getDummySessions() {
+  Future<List<Session>> _mockSessions() async {
+    await Future.delayed(const Duration(seconds: 1));
     return [
       Session(
         id: "S001",
@@ -422,6 +437,13 @@ class HomeController extends GetxController {
     ];
   }
 
+  Future<List<Session>> _apiSessions() async {
+    // final res = await ApiService.getSessions();
+    // return res.map((e) => Session.fromJson(e)).toList();
+
+    throw UnimplementedError();
+  }
+
   Session? get nextSession {
     if (session.isEmpty) return null;
 
@@ -445,8 +467,23 @@ class HomeController extends GetxController {
     return sortedSessions.first;
   }
 
-  void loadHiringAds() {
-    hiringAds.assignAll(getDummyHiring());
+  Future<void> loadHiringAds() async {
+    try {
+      if (useMock) {
+        hiringAds.assignAll(getDummyHiring());
+      } else {
+        hiringAds.assignAll(await _apiHiringAds());
+      }
+    } catch (e) {
+      print("Hiring Ads Error: $e");
+    }
+  }
+
+  Future<List<HiringView>> _apiHiringAds() async {
+    // final res = await ApiService.getHiringAds();
+    // return res.map((e) => HiringView.fromJson(e)).toList();
+
+    throw UnimplementedError();
   }
 
   List<HiringView> getDummyHiring() {
@@ -475,8 +512,23 @@ class HomeController extends GetxController {
     ];
   }
 
-  void loadRecommendations() {
-    recommendations.assignAll(getDummyRecommendations());
+  Future<void> loadRecommendations() async {
+    try {
+      if (useMock) {
+        recommendations.assignAll(getDummyRecommendations());
+      } else {
+        recommendations.assignAll(await _apiRecommendations());
+      }
+    } catch (e) {
+      print("Recommendations Error: $e");
+    }
+  }
+
+  Future<List<RecommendationView>> _apiRecommendations() async {
+    // final res = await ApiService.getRecommendations();
+    // return res.map((e) => RecommendationView.fromJson(e)).toList();
+
+    throw UnimplementedError();
   }
 
   List<RecommendationView> getDummyRecommendations() {
@@ -535,31 +587,95 @@ class HomeController extends GetxController {
     ];
   }
 
-  void updateStudentData({TimeFilter? filter, String? range}) {
-    if (range != null) {
-      switch (range) {
-        case "All":
-          studentData.assignAll([10, 30, 20, 40, 35, 50]);
-          studentLabels
-              .assignAll(["2021", "2022", "2023", "2024", "2025", "2026"]);
-          break;
-
-        case "This Month":
-          studentData.assignAll([5, 8, 6, 7, 9, 10]);
-          studentLabels.assignAll(["W1", "W2", "W3", "W4", "W5", "W6"]);
-          break;
-
-        case "This Year":
-          studentData.assignAll([100, 200, 300, 400, 500, 600]);
-          studentLabels
-              .assignAll(["2019", "2020", "2021", "2022", "2023", "2024"]);
-          break;
+  Future<void> _updateAnalytics({
+    required String type, // student / teacher / mentor / advisor / coordinator
+    required String? range,
+  }) async {
+    try {
+      if (useMock) {
+        _mockAnalytics(type, range);
+      } else {
+        await _apiAnalytics(type, range);
       }
-      return;
+    } catch (e) {
+      print("$type Analytics Error: $e");
     }
   }
 
-  void loadDummyPackageAnalytics() {
+  void _mockAnalytics(String type, String? range) {
+    List<double> data = [];
+    List<String> labels = [];
+
+    switch (range) {
+      case "All":
+        data = [2, 5, 3, 6, 4, 7];
+        labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+        break;
+
+      case "This Month":
+        data = [1, 2, 3, 2, 4, 3];
+        labels = ["W1", "W2", "W3", "W4", "W5", "W6"];
+        break;
+
+      case "This Year":
+      default:
+        data = [10, 20, 30, 25, 35, 40];
+        labels = ["2019", "2020", "2021", "2022", "2023", "2024"];
+        break;
+    }
+
+    // 🎯 assign based on type
+    switch (type) {
+      case "student":
+        studentData.assignAll(data);
+        studentLabels.assignAll(labels);
+        break;
+
+      case "teacher":
+        teacherData.assignAll(data);
+        teacherLabels.assignAll(labels);
+        break;
+
+      case "mentor":
+        mentorData.assignAll(data.map((e) => e / 2).toList());
+        mentorLabels.assignAll(labels);
+        break;
+
+      case "advisor":
+        advisorData.assignAll(data.map((e) => e * 0.8).toList());
+        advisorLabels.assignAll(labels);
+        break;
+
+      case "coordinator":
+        coordinatorData.assignAll(data.map((e) => e * 0.6).toList());
+        coordinatorLabels.assignAll(labels);
+        break;
+    }
+  }
+
+  Future<void> _apiAnalytics(String type, String? range) async {
+    // final res = await ApiService.getAnalytics(type: type, range: range);
+
+    // switch (type) {
+    //   case "student":
+    //     studentData.assignAll(res.data);
+    //     studentLabels.assignAll(res.labels);
+    //     break;
+    //   ...
+    // }
+
+    throw UnimplementedError();
+  }
+
+  Future<void> loadPackageAnalytics() async {
+    if (useMock) {
+      _mockPackageAnalytics();
+    } else {
+      await _apiPackageAnalytics();
+    }
+  }
+
+  void _mockPackageAnalytics() {
     final range = packageRange.value;
 
     if (range == "This Week") {
@@ -580,7 +696,7 @@ class HomeController extends GetxController {
       totalHoursData.assignAll([20, 28, 24, 32]);
 
       totalPackages.value = 48;
-    } else if (range == "This Year") {
+    } else {
       years.assignAll([
         "Jan",
         "Feb",
@@ -607,90 +723,40 @@ class HomeController extends GetxController {
     }
   }
 
-  void updateTeacherData({String? range}) {
-    switch (range) {
-      case "All":
-        teacherData.assignAll([2, 5, 3, 6, 4, 7]);
-        teacherLabels.assignAll(["Jan", "Feb", "Mar", "Apr", "May", "Jun"]);
-        break;
+  Future<void> _apiPackageAnalytics() async {
+    // final res = await ApiService.getPackageAnalytics(packageRange.value);
 
-      case "This Month":
-        teacherData.assignAll([1, 2, 3, 2, 4, 3]);
-        teacherLabels.assignAll(["W1", "W2", "W3", "W4", "W5", "W6"]);
-        break;
+    // years.assignAll(res.labels);
+    // totalFeeData.assignAll(res.totalFee);
+    // pendingFeeData.assignAll(res.pendingFee);
+    // totalClassesData.assignAll(res.classes);
+    // totalHoursData.assignAll(res.hours);
+    // totalPackages.value = res.totalPackages;
 
-      case "This Year":
-        teacherData.assignAll([10, 20, 30, 25, 35, 40]);
-        teacherLabels
-            .assignAll(["2019", "2020", "2021", "2022", "2023", "2024"]);
-        break;
+    throw UnimplementedError();
+  }
+
+  Future<void> updateSummaryData(String range) async {
+    try {
+      if (useMock) {
+        _mockSummary(range);
+      } else {
+        await _apiSummary(range);
+      }
+
+      totalPackage.value = packageData.fold(
+        0,
+        (sum, item) => sum + (item['value'] as double),
+      );
+    } catch (e) {
+      print("Summary Error: $e");
     }
   }
 
-  void updateAdvisorData({String? range}) {
+  void _mockSummary(String range) {
     switch (range) {
       case "All":
-        advisorData.assignAll([2, 5, 3, 6, 4, 7]);
-        advisorLabels.assignAll(["Jan", "Feb", "Mar", "Apr", "May", "Jun"]);
-        break;
-
-      case "This Month":
-        advisorData.assignAll([1, 2, 3, 2, 4, 3]);
-        advisorLabels.assignAll(["W1", "W2", "W3", "W4", "W5", "W6"]);
-        break;
-
-      case "This Year":
-        advisorData.assignAll([10, 20, 30, 25, 35, 40]);
-        advisorLabels
-            .assignAll(["2019", "2020", "2021", "2022", "2023", "2024"]);
-        break;
-    }
-  }
-
-  void updatecoordinatorData({String? range}) {
-    switch (range) {
-      case "All":
-        coordinatorData.assignAll([1, 2, 1, 3, 2, 4]);
-        coordinatorLabels.assignAll(["Jan", "Feb", "Mar", "Apr", "May", "Jun"]);
-        break;
-
-      case "This Month":
-        coordinatorData.assignAll([1, 1, 2, 1, 2, 2]);
-        coordinatorLabels.assignAll(["W1", "W2", "W3", "W4", "W5", "W6"]);
-        break;
-
-      case "This Year":
-        coordinatorData.assignAll([5, 10, 15, 20, 25, 30]);
-        coordinatorLabels
-            .assignAll(["2019", "2020", "2021", "2022", "2023", "2024"]);
-        break;
-    }
-  }
-
-  void updateMentorData({String? range}) {
-    switch (range) {
-      case "All":
-        mentorData.assignAll([1, 2, 1, 3, 2, 4]);
-        mentorLabels.assignAll(["Jan", "Feb", "Mar", "Apr", "May", "Jun"]);
-        break;
-
-      case "This Month":
-        mentorData.assignAll([1, 1, 2, 1, 2, 2]);
-        mentorLabels.assignAll(["W1", "W2", "W3", "W4", "W5", "W6"]);
-        break;
-
-      case "This Year":
-        mentorData.assignAll([5, 10, 15, 20, 25, 30]);
-        mentorLabels
-            .assignAll(["2019", "2020", "2021", "2022", "2023", "2024"]);
-        break;
-    }
-  }
-
-  void updateSummaryData(String range) {
-    switch (range) {
-      case "All":
-        loadDummyData(); // existing
+        loadDummyData();
         break;
 
       case "This Month":
@@ -699,45 +765,73 @@ class HomeController extends GetxController {
             "name": "Total Package",
             "value": 12000000.0,
             "color": Colors.orange,
-            "icon": Icons.inventory_2_outlined,
+            "icon": Icons.inventory_2_outlined
           },
           {
             "name": "To Collect",
             "value": 6000000.0,
             "color": Colors.purple,
-            "icon": Icons.currency_rupee,
+            "icon": Icons.currency_rupee
           },
         ]);
         break;
 
-      case "This Year":
+      default:
         packageData.assignAll([
           {
             "name": "Total Package",
             "value": 50000000.0,
             "color": Colors.orange,
-            "icon": Icons.inventory_2_outlined,
+            "icon": Icons.inventory_2_outlined
           },
           {
             "name": "To Collect",
             "value": 20000000.0,
             "color": Colors.purple,
-            "icon": Icons.currency_rupee,
+            "icon": Icons.currency_rupee
           },
         ]);
-        break;
     }
-
-    // recalculate total
-    totalPackage.value = packageData.fold(
-      0,
-      (sum, item) => sum + (item['value'] as double),
-    );
   }
 
-  void updateExpenseData(String range) {
+  Future<void> _apiSummary(String range) async {
+    // final res = await ApiService.getSummary(range);
+
+    // packageData.assignAll(res.data);
+
+    throw UnimplementedError();
+  }
+
+  Future<void> updateExpenseData(String range) async {
     isExpenseLoading.value = true;
 
+    try {
+      if (useMock) {
+        _mockExpense(range);
+      } else {
+        await _apiExpense(range);
+      }
+    } finally {
+      isExpenseLoading.value = false;
+    }
+  }
+
+  Future<void> _apiExpense(String range) async {
+    // final res = await ApiService.getExpense(range);
+
+    // totalHours.assignAll(res.hours);
+    // classAmount.assignAll(res.amount);
+    // totalSalary.assignAll(res.salary);
+    // expenseLabels.assignAll(res.labels);
+
+    // totalExpense.value = res.totalExpense;
+    // totalIncome.value = res.totalIncome;
+    // expenseRatio.value = res.ratio;
+
+    throw UnimplementedError();
+  }
+
+  void _mockExpense(String range) {
     final now = DateTime.now();
 
     List<double> hours = [];
@@ -818,11 +912,13 @@ class HomeController extends GetxController {
         break;
     }
 
+    // 🔥 assign values
     totalHours.assignAll(hours);
     classAmount.assignAll(amount);
     totalSalary.assignAll(salary);
     expenseLabels.assignAll(labels);
 
+    // 🔥 calculations
     totalExpense.value = salary.isEmpty ? 0 : salary.reduce((a, b) => a + b);
 
     totalIncome.value = amount.isEmpty ? 0 : amount.reduce((a, b) => a + b);
@@ -830,8 +926,6 @@ class HomeController extends GetxController {
     expenseRatio.value = totalIncome.value == 0
         ? 0
         : (totalExpense.value / totalIncome.value) * 100;
-
-    isExpenseLoading.value = false;
   }
 
   double _mock(int seed) {
@@ -839,41 +933,32 @@ class HomeController extends GetxController {
   }
 
   @override
+  @override
   void onInit() {
     super.onInit();
+
     fetchDashboardData();
-    loadDummyData();
-    loadChartData();
-    loadDummyStudentAnalytics();
-    loadDummyPackageAnalytics();
+    refreshDashboard();
     fetchData();
+
     loadHiringAds();
+    loadRecommendations();
+
+    loadPackageAnalytics();
+    loadStudentAnalytics();
+    updateSummaryData(summaryRange.value);
     updateExpenseData(expenseRange.value);
-    totalFeeData.assignAll([10, 20, 30, 25, 40]);
-    pendingFeeData.assignAll([5, 10, 15, 10, 20]);
-    totalClassesData.assignAll([2, 4, 6, 5, 7]);
-    totalHoursData.assignAll([1, 3, 5, 4, 6]);
   }
 
   Future<void> fetchDashboardData() async {
     try {
       isLoading.value = true;
 
-      // 🔥 Replace with your API call
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Example response mapping
-      studentCount.value = 1034;
-      teacherCount.value = 10;
-      coordinatorCount.value = 4;
-      mentorCount.value = 18;
-      advisorCount.value = 6;
-
-      studentData.assignAll([10, 30, 20, 40, 35, 50]);
-      teacherData.assignAll([2, 5, 3, 6, 4, 7]);
-      coordinatorData.assignAll([1, 2, 1, 3, 2, 4]);
-      mentorData.assignAll([3, 6, 4, 8, 5, 7]);
-      advisorData.assignAll([2, 4, 3, 5, 6, 4]);
+      if (useMock) {
+        await _mockDashboard();
+      } else {
+        await _apiDashboard();
+      }
     } catch (e) {
       print("Error: $e");
     } finally {
@@ -881,9 +966,46 @@ class HomeController extends GetxController {
     }
   }
 
-  void loadDummyStudentAnalytics() {
-    studentCount.value = 120;
+  Future<void> _mockDashboard() async {
+    await Future.delayed(const Duration(seconds: 2));
 
+    studentCount.value = 1034;
+    teacherCount.value = 10;
+    coordinatorCount.value = 4;
+    mentorCount.value = 18;
+    advisorCount.value = 6;
+
+    studentData.assignAll([10, 30, 20, 40, 35, 50]);
+    teacherData.assignAll([2, 5, 3, 6, 4, 7]);
+    coordinatorData.assignAll([1, 2, 1, 3, 2, 4]);
+    mentorData.assignAll([3, 6, 4, 8, 5, 7]);
+    advisorData.assignAll([2, 4, 3, 5, 6, 4]);
+  }
+
+  Future<void> _apiDashboard() async {
+    // final res = await ApiService.getDashboard();
+
+    // studentCount.value = res.studentCount;
+    // teacherCount.value = res.teacherCount;
+    // ...
+
+    throw UnimplementedError();
+  }
+
+  Future<void> loadStudentAnalytics() async {
+    try {
+      if (useMock) {
+        _mockStudentAnalytics();
+      } else {
+        await _apiStudentAnalytics();
+      }
+    } catch (e) {
+      print("Student Analytics Error: $e");
+    }
+  }
+
+  void _mockStudentAnalytics() {
+    studentCount.value = 120;
     receivedSalary.value = 320000;
 
     totalPackageData.value = [5, 8, 6, 10];
@@ -893,13 +1015,23 @@ class HomeController extends GetxController {
 
     pendingSalaryData
         .assignAll([80000, 120000, 150000, 170000, 160000, 180000]);
-
     receivedSalaryData
         .assignAll([20000, 80000, 150000, 180000, 260000, 320000]);
 
     totalHoursData.assignAll([50, 80, 120, 140, 160, 200]);
 
     years.assignAll(["Jan", "Feb", "Mar", "Apr", "May", "Jun"]);
+  }
+
+  Future<void> _apiStudentAnalytics() async {
+    // final res = await ApiService.getStudentAnalytics();
+
+    // studentCount.value = res.count;
+    // receivedSalary.value = res.receivedSalary;
+    // totalPackageData.value = res.packageData;
+    // ...
+
+    throw UnimplementedError();
   }
 
   void toggleUsers() {

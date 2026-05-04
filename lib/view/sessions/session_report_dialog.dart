@@ -180,13 +180,13 @@ class _CompletedSection extends StatelessWidget {
         const SizedBox(height: 8),
         CustomWidgets().labelWithAsterisk('Duration'),
         const SizedBox(height: 8),
-        CustomWidgets().customDropdownField(
-          hint: "Duration",
-          context: context,
-          items:
-              controller.durationOptions.map((e) => "${(e)} minutes").toList(),
-          onChanged: (p0) {},
-        ),
+        // CustomWidgets().customDropdownField(
+        //   hint: "Duration",
+        //   context: context,
+        //   items:
+        //       controller.durationOptions.map((e) => "${(e)} minutes").toList(),
+        //   onChanged: (p0) {},
+        // ),
       ],
     );
   }

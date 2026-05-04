@@ -1,5 +1,4 @@
 import 'package:albedo_app/model/users/teacher_model.dart';
-import 'package:albedo_app/model/users/user_model.dart';
 import 'package:get/get.dart';
 
 class CommonController extends GetxController {

@@ -16,9 +16,10 @@ class AccountController extends GetxController {
   final newPasswordController = TextEditingController();
   final confirmPassController = TextEditingController();
 
-  var rememberMe = true.obs;
+  final bool useMock = true;
   var obscurePassword = true.obs;
   var isLoading = false.obs;
+  var isEditing = false.obs;
 
   @override
   onInit() {
@@ -38,95 +39,9 @@ class AccountController extends GetxController {
     isLoading.value = true;
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
+      Users user = useMock ? await _mockLogin() : await _apiLogin();
 
       final AuthController auth = Get.find<AuthController>();
-
-      Users user;
-
-      /// 🔥 TEMP ROLE SWITCH (replace with API later)
-      if (emailController.text.contains("admin")) {
-        user = Users(
-          name: 'Admin',
-          id: 'EMP001',
-          role: 'admin',
-          email: emailController.text,
-          contact: '9999999999',
-        );
-      } else if (emailController.text.contains("student")) {
-        user = Users(
-          name: 'Student User',
-          id: 'STU001',
-          role: 'student',
-          email: emailController.text,
-          contact: '8888888888',
-        );
-      } else if (emailController.text.contains("teacher")) {
-        user = Users(
-          name: 'Teacher User',
-          id: 'TCH001',
-          role: 'teacher',
-          email: emailController.text,
-          contact: '7777777777',
-        );
-      } else if (emailController.text.contains("mentor")) {
-        user = Users(
-          name: 'Mentor User',
-          id: 'MTR001',
-          role: 'mentor',
-          email: emailController.text,
-          contact: '6666666666',
-        );
-      } else if (emailController.text.contains("coordinator")) {
-        user = Users(
-          name: 'Coordinator User',
-          id: 'COR001',
-          role: 'coordinator',
-          email: emailController.text,
-          contact: '5555555555',
-        );
-      } else if (emailController.text.contains("advisor")) {
-        user = Users(
-          name: 'Advisor User',
-          id: 'ADV001',
-          role: 'advisor',
-          email: emailController.text,
-          contact: '4444444444',
-        );
-      } else if (emailController.text.contains("finance")) {
-        user = Users(
-          name: 'Finance User',
-          id: 'FIN001',
-          role: 'finance',
-          email: emailController.text,
-          contact: '0000000000',
-        );
-      } else if (emailController.text.contains("hr")) {
-        user = Users(
-          name: 'HR User',
-          id: 'HR001',
-          role: 'hr',
-          email: emailController.text,
-          contact: '4444444444',
-        );
-      } else if (emailController.text.contains("sales")) {
-        user = Users(
-          name: 'Sales User',
-          id: 'SAL001',
-          role: 'sales',
-          email: emailController.text,
-          contact: '4444444444',
-        );
-      } else {
-        /// default fallback
-        user = Users(
-          name: 'Guest User',
-          id: 'GST001',
-          role: 'guest',
-          email: emailController.text,
-          contact: '0000000000',
-        );
-      }
 
       auth.currentUser.value = user;
       auth.impersonatedUser.value = null;
@@ -136,13 +51,104 @@ class AccountController extends GetxController {
       Get.snackbar("Success", "Login Successful as ${user.role}");
       Get.offAll(() => HomeView());
     } catch (e) {
-      Get.snackbar("Error", "Login Failed");
+      Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
-  var isEditing = false.obs;
+  Future<Users> _mockLogin() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    final email = emailController.text;
+
+    if (email.contains("admin")) {
+      return Users(
+          name: 'Admin',
+          id: 'EMP001',
+          role: 'admin',
+          email: email,
+          contact: '9999999999');
+    } else if (email.contains("student")) {
+      return Users(
+          name: 'Student User',
+          id: 'STU001',
+          role: 'student',
+          email: email,
+          contact: '8888888888');
+    } else if (email.contains("teacher")) {
+      return Users(
+          name: 'Teacher User',
+          id: 'TCH001',
+          role: 'teacher',
+          email: email,
+          contact: '7777777777');
+    } else if (email.contains("mentor")) {
+      return Users(
+          name: 'Mentor User',
+          id: 'MTR001',
+          role: 'mentor',
+          email: email,
+          contact: '6666666666');
+    } else if (email.contains("coordinator")) {
+      return Users(
+          name: 'Coordinator User',
+          id: 'COR001',
+          role: 'coordinator',
+          email: email,
+          contact: '5555555555');
+    } else if (email.contains("advisor")) {
+      return Users(
+          name: 'Advisor User',
+          id: 'ADV001',
+          role: 'advisor',
+          email: email,
+          contact: '4444444444');
+    } else if (email.contains("finance")) {
+      return Users(
+          name: 'Finance User',
+          id: 'FIN001',
+          role: 'finance',
+          email: email,
+          contact: '0000000000');
+    } else if (email.contains("hr")) {
+      return Users(
+          name: 'HR User',
+          id: 'HR001',
+          role: 'hr',
+          email: email,
+          contact: '4444444444');
+    } else if (email.contains("sales")) {
+      return Users(
+          name: 'Sales User',
+          id: 'SAL001',
+          role: 'sales',
+          email: email,
+          contact: '4444444444');
+    }
+
+    return Users(
+      name: 'Guest User',
+      id: 'GST001',
+      role: 'guest',
+      email: email,
+      contact: '0000000000',
+    );
+  }
+
+  Future<Users> _apiLogin() async {
+    // Example structure
+    // final response = await ApiService.login(
+    //   emailController.text,
+    //   passwordController.text,
+    // );
+
+    // if (!response.success) throw Exception(response.message);
+
+    // return Users.fromJson(response.data);
+
+    throw UnimplementedError("API not implemented yet");
+  }
 
   void toggleEdit() {
     isEditing.value = !isEditing.value;
@@ -177,58 +183,73 @@ class AccountController extends GetxController {
     required String oldPassword,
     required String newPassword,
   }) async {
+    if (email.isEmpty || oldPassword.isEmpty || newPassword.isEmpty) {
+      Get.snackbar("Error", "All fields are required");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      Get.snackbar("Error", "Password must be at least 6 characters");
+      return;
+    }
+
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
+
     try {
-      if (email.isEmpty || oldPassword.isEmpty || newPassword.isEmpty) {
-        Get.snackbar("Error", "All fields are required");
-        return;
+      if (useMock) {
+        await Future.delayed(const Duration(seconds: 2));
+      } else {
+        await _apiResetPassword(email, oldPassword, newPassword);
       }
 
-      if (newPassword.length < 6) {
-        Get.snackbar("Error", "Password must be at least 6 characters");
-        return;
-      }
-
-      /// 🔄 Show loader
-      Get.dialog(
-        const Center(child: CircularProgressIndicator()),
-        barrierDismissible: false,
-      );
-
-      /// 👉 CALL YOUR API HERE
-      // await _fakeApiCall(email, oldPassword, newPassword);
-
-      Get.back(); // close loader
-
+      Get.back();
       Get.snackbar("Success", "Password updated successfully");
     } catch (e) {
-      Get.back(); // close loader
+      Get.back();
       Get.snackbar("Error", e.toString());
     }
   }
 
-  void logout() {
-    LocalStorage().clearAll();
-    Get.offAll(LoginView()); // clears saved login
+  Future<void> _apiResetPassword(
+    String email,
+    String oldPassword,
+    String newPassword,
+  ) async {
+    // await ApiService.resetPassword(email, oldPassword, newPassword);
   }
 
-  void forgotPassword() async {
+  void logout() {
+    LocalStorage().clearAll();
+    Get.offAll(LoginView()); 
+  }
+
+  Future<void> forgotPassword() async {
     if (emailController.text.isEmpty) {
       Get.snackbar("Error", "Please enter your email address");
       return;
     }
-    isLoading.value = true;
-    try {
-      // Call your API here
-      await Future.delayed(Duration(seconds: 2));
 
-      Get.snackbar(
-        "Success",
-        "Password reset link sent to your email",
-      );
+    isLoading.value = true;
+
+    try {
+      if (useMock) {
+        await Future.delayed(const Duration(seconds: 2));
+      } else {
+        await _apiForgotPassword();
+      }
+
+      Get.snackbar("Success", "Password reset link sent");
     } catch (e) {
-      Get.snackbar("Error", "Something went wrong");
+      Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> _apiForgotPassword() async {
+    // await ApiService.forgotPassword(emailController.text);
   }
 }

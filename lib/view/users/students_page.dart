@@ -293,12 +293,12 @@ class StudentsPage extends StatelessWidget {
                   const SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Gender'),
                   const SizedBox(height: 10),
-                  CustomWidgets().customDropdownField(
-                    context: context,
-                    hint: 'Select Gender',
-                    items: ['Male', 'Female'],
-                    onChanged: (p0) {},
-                  ),
+                  // CustomWidgets().customDropdownField(
+                  //   context: context,
+                  //   hint: 'Select Gender',
+                  //   items: ['Male', 'Female'],
+                  //   onChanged: (p0) {},
+                  // ),
                   const SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Place'),
                   CustomWidgets().dropdownStyledTextField(
@@ -322,21 +322,21 @@ class StudentsPage extends StatelessWidget {
                   const SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Time Zone'),
                   const SizedBox(height: 10),
-                  CustomWidgets().customDropdownField(
-                    context: context,
-                    hint: 'Select Time Zone',
-                    items: [],
-                    onChanged: (p0) {},
-                  ),
+                  // CustomWidgets().customDropdownField(
+                  //   context: context,
+                  //   hint: 'Select Time Zone',
+                  //   items: [],
+                  //   onChanged: (p0) {},
+                  // ),
                   const SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Mentor'),
                   const SizedBox(height: 10),
-                  CustomWidgets().customDropdownField(
-                    context: context,
-                    hint: 'Select Mentor',
-                    items: c.mentorsList,
-                    onChanged: (p0) {},
-                  ),
+                  // CustomWidgets().customDropdownField(
+                  //   context: context,
+                  //   hint: 'Select Mentor',
+                  //   items: c.mentorsList,
+                  //   onChanged: (p0) {},
+                  // ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -408,12 +408,12 @@ class StudentsPage extends StatelessWidget {
                           CustomWidgets().labelWithAsterisk(
                               role[0].toUpperCase() + role.substring(1)),
                           const SizedBox(height: 10),
-                          CustomWidgets().customDropdownField(
-                            context: context,
-                            hint: 'Select',
-                            items: [],
-                            onChanged: (p0) {},
-                          ),
+                          // CustomWidgets().customDropdownField(
+                          //   context: context,
+                          //   hint: 'Select',
+                          //   items: [],
+                          //   onChanged: (p0) {},
+                          // ),
                         ]
                       ],
                     );
@@ -503,12 +503,12 @@ class StudentsPage extends StatelessWidget {
                     const SizedBox(height: 10),
                     CustomWidgets().labelWithAsterisk('Gender'),
                     const SizedBox(height: 10),
-                    CustomWidgets().customDropdownField(
-                      context: context,
-                      hint: 'Select Gender',
-                      items: ['Male', 'Female'],
-                      onChanged: (p0) {},
-                    ),
+                    // CustomWidgets().customDropdownField(
+                    //   context: context,
+                    //   hint: 'Select Gender',
+                    //   items: ['Male', 'Female'],
+                    //   onChanged: (p0) {},
+                    // ),
                     const SizedBox(height: 10),
                     CustomWidgets().labelWithAsterisk('Place'),
                     CustomWidgets().dropdownStyledTextField(
@@ -532,30 +532,30 @@ class StudentsPage extends StatelessWidget {
                     const SizedBox(height: 10),
                     CustomWidgets().labelWithAsterisk('Time Zone'),
                     const SizedBox(height: 10),
-                    CustomWidgets().customDropdownField(
-                      context: context,
-                      hint: 'Select Time Zone',
-                      items: [],
-                      onChanged: (p0) {},
-                    ),
+                    // CustomWidgets().customDropdownField(
+                    //   context: context,
+                    //   hint: 'Select Time Zone',
+                    //   items: [],
+                    //   onChanged: (p0) {},
+                    // ),
                     const SizedBox(height: 10),
                     CustomWidgets().labelWithAsterisk('Mentor'),
                     const SizedBox(height: 10),
-                    CustomWidgets().customDropdownField(
-                      context: context,
-                      hint: 'Select Mentor',
-                      items: c.mentorsList,
-                      onChanged: (p0) {},
-                    ),
+                    // CustomWidgets().customDropdownField(
+                    //   context: context,
+                    //   hint: 'Select Mentor',
+                    //   items: c.mentorsList,
+                    //   onChanged: (p0) {},
+                    // ),
                     const SizedBox(height: 10),
                     CustomWidgets().labelWithAsterisk('Advisor'),
                     const SizedBox(height: 10),
-                    CustomWidgets().customDropdownField(
-                      context: context,
-                      hint: 'Select Advisor',
-                      items: c.advisorsList,
-                      onChanged: (p0) {},
-                    ),
+                    // CustomWidgets().customDropdownField(
+                    //   context: context,
+                    //   hint: 'Select Advisor',
+                    //   items: c.advisorsList,
+                    //   onChanged: (p0) {},
+                    // ),
                     const SizedBox(height: 10),
                     Row(
                       children: [
@@ -627,12 +627,12 @@ class StudentsPage extends StatelessWidget {
                             CustomWidgets().labelWithAsterisk(
                                 role[0].toUpperCase() + role.substring(1)),
                             const SizedBox(height: 10),
-                            CustomWidgets().customDropdownField(
-                              context: context,
-                              hint: 'Select',
-                              items: [],
-                              onChanged: (p0) {},
-                            ),
+                            // CustomWidgets().customDropdownField(
+                            //   context: context,
+                            //   hint: 'Select',
+                            //   items: [],
+                            //   onChanged: (p0) {},
+                            // ),
                           ]
                         ],
                       );

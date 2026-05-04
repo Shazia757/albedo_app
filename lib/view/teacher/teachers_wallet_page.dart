@@ -60,29 +60,31 @@ class TeacherWalletPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
-          Expanded(
-            child: Obx(() {
-              return CustomWidgets().customDropdownField<String>(
-                context: context,
-                hint: "Select Month",
-                items: months,
-                value: c.selectedMonth.value,
-                onChanged: (v) => c.changeMonth(v),
-              );
-            }),
-          ),
+          // Expanded(
+          //   child: Obx(() {
+          //     return CustomWidgets().customDropdownField<String>(
+          //       context: context,
+          //       hint: "Select Month",
+          //       items: months,
+          //       value: c.selectedMonth.value,
+          //       onChanged: (v) => c.changeMonth(v),
+          //     );
+          //   }),
+          // ),
+        
           const SizedBox(width: 10),
-          Expanded(
-            child: Obx(() {
-              return CustomWidgets().customDropdownField<String>(
-                context: context,
-                hint: "Select Year",
-                items: years,
-                value: c.selectedYear.value,
-                onChanged: (v) => c.changeYear(v),
-              );
-            }),
-          ),
+          // Expanded(
+          //   child: Obx(() {
+          //     return CustomWidgets().customDropdownField<String>(
+          //       context: context,
+          //       hint: "Select Year",
+          //       items: years,
+          //       value: c.selectedYear.value,
+          //       onChanged: (v) => c.changeYear(v),
+          //     );
+          //   }),
+          // ),
+      
         ],
       ),
     );

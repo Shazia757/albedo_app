@@ -6,6 +6,7 @@ import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/other_users_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
@@ -20,6 +21,7 @@ enum FilterType { all, classSession, meetSession }
 
 class SessionController extends GetxController {
   final AuthController auth = Get.find();
+  final bool useMock = true;
   var selectedTab = 0.obs;
   var selectedStatus = 0.obs;
   final RxInt currentSessionIndex = 0.obs;
@@ -32,22 +34,26 @@ class SessionController extends GetxController {
   var selectAllAdvisors = false.obs;
   var selectAllOtherUsers = false.obs;
   var sortType = SortType.newest.obs;
-  var filterType = SortType.newest.obs;
+  var filterType = FilterType.all.obs;
   var sessions = <Session>[].obs;
   var meets = <Meet>[].obs;
   RxList<SessionReport> reports = <SessionReport>[].obs;
-  var selectedTeacher = RxnString();
+  Rx<Student?> selectedStudent = Rx<Student?>(null);
+  Rx<Teacher?> selectedTeacher = Rx<Teacher?>(null);
+
+  Rx<Package?> selectedPackage = Rx<Package?>(null);
+
+  RxList<Package> packagesList = <Package>[].obs;
   RxList<Student> selectedStudents = <Student>[].obs;
   RxList<Teacher> selectedTeachers = <Teacher>[].obs;
   RxList<Mentor> selectedMentors = <Mentor>[].obs;
   RxList<Coordinator> selectedCoordinators = <Coordinator>[].obs;
   RxList<Advisor> selectedAdvisors = <Advisor>[].obs;
-  RxList<String> selectedOtherUsers = <String>[].obs;
+  RxList<OtherUsers> selectedOtherUsers = <OtherUsers>[].obs;
   final RxBool showStudentMenu = false.obs;
   var selectedTeacherEdit = RxnString();
   final formKey = GlobalKey<FormState>();
   var selectedDuration = Rxn<int>();
-  var selectedPackage = RxnString();
   var selectedDate = Rxn<DateTime>();
   var selectedTime = Rxn<TimeOfDay>();
   RxString selectedType = "session".obs;
@@ -58,7 +64,7 @@ class SessionController extends GetxController {
   RxList<String> categoryList = <String>[].obs;
   RxList<Coordinator> coordinatorsList = <Coordinator>[].obs;
   RxList<Advisor> advisorsList = <Advisor>[].obs;
-  RxList<String> otherUsersList = <String>[].obs;
+  RxList<OtherUsers> otherUsersList = <OtherUsers>[].obs;
 
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
@@ -73,8 +79,6 @@ class SessionController extends GetxController {
   TextEditingController userTypeController = TextEditingController();
 
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
-
-  final packageOptions = ['Package A', 'Package B', 'Package C'];
 
   RxBool isLoading = true.obs;
   RxBool isDeleteButtonLoading = false.obs;
@@ -121,19 +125,37 @@ class SessionController extends GetxController {
               .toLowerCase()
               .contains(searchQuery.value.toLowerCase()) ||
           s.id.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          s.package.subjectName. toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          s.package.subjectName
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase()) ||
           s.className.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
           s.date.toString().contains(searchQuery.value.toLowerCase());
 
       return matchesStatus && matchesSearch;
     }).toList();
-    if (selectedTeacher.value != null && selectedTeacher.value!.isNotEmpty) {
+
+    // ✅ Step 2: Teacher filter
+    if (selectedTeacher.value != null && selectedTeacher.value != null) {
       filtered = filtered
           .where((s) => s.teacher?.name == selectedTeacher.value)
           .toList();
     }
 
-    // 🔥 Step 2: ADD SORTING HERE (THIS IS WHAT YOU ASKED)
+    // ✅ ⭐ Step 3: FilterType (ADD THIS BLOCK)
+    switch (filterType.value) {
+      case FilterType.all:
+        break;
+
+      case FilterType.classSession:
+        filtered = filtered.where((s) => s.status != "meet_done").toList();
+        break;
+
+      case FilterType.meetSession:
+        filtered = filtered.where((s) => s.status == "meet_done").toList();
+        break;
+    }
+
+    // 🔥 Step 4: Sorting
     switch (sortType.value) {
       case SortType.newest:
         filtered.sort((a, b) => b.date.compareTo(a.date));
@@ -149,7 +171,7 @@ class SessionController extends GetxController {
         break;
     }
 
-    // ✅ Step 3: Return final list
+    // ✅ Step 5: Return
     return filtered;
   }
 
@@ -178,6 +200,10 @@ class SessionController extends GetxController {
   void onInit() {
     super.onInit();
     fetchData();
+    _mockUsers("student");
+    _mockUsers("teacher");
+    _mockUsers("mentor");
+    _mockUsers("coordinator");
   }
 
   Future<void> fetchData() async {
@@ -186,10 +212,10 @@ class SessionController extends GetxController {
 
       final user = auth.activeUser;
 
-      await Future.delayed(const Duration(seconds: 2));
+      final allSessions =
+          useMock ? await _mockSessions() : await _apiSessions();
 
-      final allSessions = _getDummySessions();
-      final allMeets = _getDummyMeets();
+      final allMeets = useMock ? await _mockMeets() : await _apiMeets();
 
       List<Session> result = [];
       List<Meet> meetResult = [];
@@ -216,22 +242,24 @@ class SessionController extends GetxController {
         meetResult = allMeets
             .where((m) => m.members.any((u) => u.id == user?.id))
             .toList();
-      } else {
-        result = [];
-        meetResult = [];
       }
 
-      // ✅ Assign safely
       sessions.assignAll(result);
       meets.assignAll(meetResult);
-
-      filteredSessions.assignAll(result);
-      filteredMeets.assignAll(meetResult);
     } catch (e) {
       print("Error: $e");
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<List<Session>> _mockSessions() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return _getDummySessions();
+  }
+
+  Future<List<Session>> _apiSessions() async {
+    throw UnimplementedError();
   }
 
   List<Session> _getDummySessions() {
@@ -536,6 +564,18 @@ class SessionController extends GetxController {
     ];
   }
 
+  Future<List<Meet>> _mockMeets() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return _getDummyMeets();
+  }
+
+  Future<List<Meet>> _apiMeets() async {
+    // final res = await ApiService.getMeets();
+    // return res.map((e) => Meet.fromJson(e)).toList();
+
+    throw UnimplementedError();
+  }
+
   List<Meet> _getDummyMeets() {
     return [
       Meet(
@@ -697,194 +737,182 @@ class SessionController extends GetxController {
     ];
   }
 
-  Future<void> fetchStudentDetail() async {
+  void onStudentSelected(Student student) {
+    selectedStudent.value = student;
+
+    // reset previous selection
+    selectedPackage.value = null;
+
+    // build packages list from student
+    if (student.package != null) {
+      packagesList.value = [student.package!];
+    } else {
+      packagesList.clear();
+    }
+  }
+
+  Future<void> fetchUsers(String type) async {
     try {
       isLoading.value = true;
 
-      await Future.delayed(const Duration(seconds: 2));
+      if (useMock) {
+        _mockUsers(type);
+      } else {
+        await _apiUsers(type);
+      }
+    } catch (e) {
+      print("$type fetch error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
-      studentsList.assignAll([
-        Student(
+  Future<void> _mockUsers(String type) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    switch (type) {
+      case "student":
+        studentsList.assignAll([
+          Student(
             studentId: "STU001",
             name: "Aisha",
             email: "aisha@mail.com",
-            joinedAt: DateTime.now()),
-        Student(
-            studentId: "STU002",
-            name: "Rahul",
-            email: "rahul@mail.com",
-            joinedAt: DateTime.now())
-      ]);
-    } catch (e) {
-      print("Error: $e");
-    } finally {
-      isLoading.value = false;
+            joinedAt: DateTime.now(),
+          ),
+          Student(
+              studentId: "STU002",
+              name: "Rahul",
+              email: "rahul@mail.com",
+              joinedAt: DateTime.now(),
+              package: Package(
+                  teacherId: '',
+                  teacherName: '',
+                  teacherImage: '',
+                  subjectId: '',
+                  subjectName: 'Maths',
+                  standard: '',
+                  syllabus: '',
+                  status: '',
+                  packageFee: 0,
+                  takenFee: 0,
+                  balance: 0,
+                  withdrawals: [],
+                  time: '',
+                  duration: '',
+                  note: '')),
+          Student(
+            studentId: "STU003",
+            name: "Fatima",
+            email: "fatima@mail.com",
+            joinedAt: DateTime.now(),
+          ),
+        ]);
+        break;
+      case "teacher":
+        teacherList.assignAll([
+          Teacher(
+            id: "T001",
+            name: "Ameen Rahman",
+            email: "ameen@gmail.com",
+            status: "Active",
+            gender: "Male",
+            type: "Batch",
+            joinedAt: DateTime(2023, 5, 10),
+            totalStudents: 45,
+            totalSessions: 120,
+            salary: 40000,
+          ),
+          Teacher(
+            id: "T002",
+            name: "Fathima Noor",
+            email: "fathima@gmail.com",
+            status: "Active",
+            gender: "Female",
+            joinedAt: DateTime(2024, 1, 15),
+            salary: 35000,
+          ),
+        ]);
+        break;
+
+      case "mentor":
+        mentorsList.assignAll([
+          Mentor(
+            id: "MTR001",
+            name: "Saeeda KP",
+            email: "saeeda@gmail.com",
+            status: "Active",
+            gender: "Female",
+            joinedAt: DateTime(2023, 3, 12),
+            salary: 30000,
+          ),
+          Mentor(
+            id: "MTR002",
+            name: "David Mathew",
+            email: "david@gmail.com",
+            status: "Active",
+            gender: "Male",
+            joinedAt: DateTime(2022, 11, 5),
+            salary: 32000,
+          ),
+        ]);
+        break;
+
+      case "coordinator":
+        coordinatorsList.assignAll([
+          Coordinator(
+            id: "COO001",
+            name: "Najeeb Rahman",
+            email: "najeeb.rahman@example.com",
+            status: "Active",
+            joinedAt: DateTime(2025, 1, 15),
+            salary: 25000,
+          ),
+        ]);
+        break;
+
+      case "advisor":
+        advisorsList.assignAll([
+          Advisor(
+            id: "ADV001",
+            name: "Fathima",
+            joinedAt: DateTime.now(),
+          ),
+        ]);
+        break;
     }
   }
 
-  Future<void> fetchTeacherDetail() async {
-    try {
-      isLoading.value = true;
+  Future<void> _apiUsers(String type) async {
+    // final res = await ApiService.getUsers(type: type);
 
-      await Future.delayed(const Duration(seconds: 2));
+    // switch (type) {
+    //   case "student":
+    //     studentsList.assignAll(res);
+    //     break;
+    //   case "teacher":
+    //     teacherList.assignAll(res);
+    //     break;
 
-      teacherList.assignAll([
-        Teacher(
-          id: "T001",
-          name: "Ameen Rahman",
-          email: "ameen@gmail.com",
-          status: "Active",
-          gender: "Male",
-          type: "Batch",
-          joinedAt: DateTime(2023, 5, 10),
-          phone: "9876543210",
-          whatsapp: "9876543210",
-          qualification: "MSc Mathematics",
-          place: "Malappuram",
-          pincode: "676505",
-          totalStudents: 45,
-          totalPackages: 6,
-          totalSessions: 120,
-          totalHours: 180,
-          salary: 40000,
-          paid: 30000,
-          balance: 10000,
-          bankName: "SBI",
-          accountNumber: "1234567890",
-          accountHolder: "Ameen Rahman",
-          accountType: "Savings",
-          upiId: "ameen@upi",
-        ),
-        Teacher(
-          id: "T002",
-          name: "Fathima Noor",
-          email: "fathima@gmail.com",
-          status: "Active",
-          gender: "Female",
-          type: "TBA",
-          joinedAt: DateTime(2024, 1, 15),
-          phone: "9123456780",
-          qualification: "BEd English",
-          place: "Kozhikode",
-          totalStudents: 30,
-          totalPackages: 4,
-          totalSessions: 90,
-          totalHours: 140,
-          salary: 35000,
-          paid: 20000,
-          balance: 15000,
-        ),
-      ]);
-    } catch (e) {
-      print("Error: $e");
-    } finally {
-      isLoading.value = false;
-    }
+    //   case "mentor":
+    //     mentorsList.assignAll(res);
+    //     break;
+
+    //   case "coordinator":
+    //     coordinatorsList.assignAll(res);
+    //     break;
+
+    //   case "advisor":
+    //     advisorsList.assignAll(res);
+    //     break;
+    // }
+
+    throw UnimplementedError();
   }
 
-  Future<void> fetchMentorDetail() async {
-    try {
-      isLoading.value = true;
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      mentorsList.assignAll([
-        Mentor(
-          id: "MTR001",
-          name: "Saeeda KP",
-          email: "saeeda@gmail.com",
-          status: "Active",
-          gender: "Female",
-          joinedAt: DateTime(2023, 3, 12),
-          phone: "9876543211",
-          whatsapp: "9876543211",
-          qualification: "MA English",
-          place: "Malappuram",
-          pincode: "676505",
-          address: "Kottakkal, Malappuram",
-          timezone: "IST",
-          prefLanguage: "English",
-          salary: 30000,
-          bankName: "SBI",
-          accountNumber: "111122223333",
-          accountHolder: "Saeeda KP",
-          accountType: "Savings",
-          upiId: "saeeda@upi",
-        ),
-        Mentor(
-          id: "MTR002",
-          name: "David Mathew",
-          email: "david@gmail.com",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime(2022, 11, 5),
-          phone: "9123456789",
-          qualification: "MSc Physics",
-          place: "Kozhikode",
-          address: "Koyilandy, Kozhikode",
-          prefLanguage: "English",
-          salary: 32000,
-          bankName: "HDFC",
-          accountNumber: "444455556666",
-          accountHolder: "David Mathew",
-          accountType: "Savings",
-          upiId: "david@upi",
-        ),
-      ]);
-    } catch (e) {
-      print("Error: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> fetchCoordinatorDetail() async {
-    try {
-      isLoading.value = true;
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      coordinatorsList.assignAll([
-        Coordinator(
-          id: "COO001",
-          name: "Najeeb Rahman",
-          joinedAt: DateTime(2025, 1, 15),
-          email: "najeeb.rahman@example.com",
-          imageUrl: "https://example.com/profile/najeeb.jpg",
-          status: "Active",
-          gender: "Male",
-          phone: "+919876543210",
-          whatsapp: "+919876543210",
-          dob: "1995-06-12",
-          qualification: "MBA",
-          place: "Malappuram",
-          pincode: "679322",
-          address: "Green Villa, Perintalmanna, Kerala",
-          prefLanguage: "English",
-          accountNumber: "123456789012",
-          accountHolder: "Najeeb Rahman",
-          upiId: "najeeb@upi",
-          accountType: "Savings",
-          bankName: "State Bank of India",
-          bankBranch: "Perintalmanna Branch",
-          salary: 25000,
-        ),
-      ]);
-    } catch (e) {
-      print("Error: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  // void setStudents(List<Student> list) {
-  //   studentsList.assignAll(list);
-
-  //   _studentMap.clear();
-  //   for (var s in list) {
-  //     _studentMap[s.studentId!] = s;
-  //   }
-  // }
+  Future<void> fetchStudentDetail() => fetchUsers("student");
+  Future<void> fetchTeacherDetail() => fetchUsers("teacher");
+  Future<void> fetchMentorDetail() => fetchUsers("mentor");
+  Future<void> fetchCoordinatorDetail() => fetchUsers("coordinator");
+  Future<void> fetchAdvisorDetail() => fetchUsers("advisor");
 
   Student? getStudentById(String id) {
     try {
@@ -955,12 +983,14 @@ class SessionController extends GetxController {
     }
 
     /// ↕️ Sort (keep if needed)
-    if (sortType.value == "new") {
+    if (sortType.value == SortType.newest) {
       temp.sort((a, b) => b.date.compareTo(a.date));
-    } else if (sortType.value == "old") {
+    } else if (sortType.value == SortType.oldest) {
       temp.sort((a, b) => a.date.compareTo(b.date));
-    } else if (sortType.value == "name") {
+    } else if (sortType.value == SortType.student) {
       temp.sort((a, b) => a.student!.name.compareTo(b.student!.name));
+    } else if (sortType.value == SortType.teacher) {
+      temp.sort((a, b) => a.teacher!.name.compareTo(b.teacher!.name));
     }
 
     /// ✅ Final update
@@ -998,8 +1028,8 @@ class SessionController extends GetxController {
     selectedDuration.value =
         durationOptions.contains(data.duration) ? data.duration : null;
 
-    selectedTeacher.value =
-        teacherList.contains(data.teacher?.name) ? data.teacher?.name : null;
+    // selectedTeacher.value =
+    //     teacherList.contains(data.teacher?.name) ? data.teacher?.name : null;
 
     // Controllers
     dateController = TextEditingController(
@@ -1037,7 +1067,7 @@ class SessionController extends GetxController {
     timeController.text = session.time.toString();
 
     selectedDuration.value = session.duration;
-    selectedTeacher.value = session.teacher?.name;
+    selectedTeacher.value = session.teacher;
 
     salaryController.text = session.teacherSalary?.toString() ?? '';
   }
@@ -1083,4 +1113,60 @@ class SessionController extends GetxController {
       ],
     );
   }
+
+  bool validateSession(BuildContext context) {
+    String error = "";
+
+    // 🧑 Student
+    if (selectedType.value == "session") {
+      if (selectedStudent.value == null) {
+        error = "Please select a student";
+      } else if (selectedPackage.value == null) {
+        error = "Please select a package";
+      } else if (selectedTeacher.value == null) {
+        error = "Please select a teacher";
+      } else if (salaryController.text.trim().isEmpty) {
+        error = "Teacher salary is required";
+      } else if (dateController.text.trim().isEmpty) {
+        error = "Session date is required";
+      } else if (timeController.text.trim().isEmpty) {
+        error = "Session time is required";
+      } else if (selectedDuration.value == null) {
+        error = "Please select duration";
+      }
+    } else {
+      // MEET VALIDATION
+      if (meetTitleController.text.trim().isEmpty) {
+        error = "Meet title is required";
+      } else if (selectedMentors.isEmpty &&
+          selectedTeachers.isEmpty &&
+          selectedStudent.value == null &&
+          selectedCoordinators.isEmpty &&
+          selectedAdvisors.isEmpty &&
+          selectedOtherUsers.isEmpty) {
+        error = "Select at least one participant";
+      } else if (dateController.text.trim().isEmpty) {
+        error = "Session date is required";
+      } else if (timeController.text.trim().isEmpty) {
+        error = "Session time is required";
+      } else if (selectedDuration.value == null) {
+        error = "Please select duration";
+      } else if (descriptionController.text.trim().isEmpty) {
+        error = "Description is required";
+      }
+    }
+
+    if (error.isNotEmpty) {
+      Get.snackbar(
+        "Error",
+        error,
+        snackPosition: SnackPosition.TOP,
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  void addSession() {}
 }
