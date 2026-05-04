@@ -1,4 +1,4 @@
-import 'package:albedo_app/common_views/login_page.dart';
+import 'package:albedo_app/login_page.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/database/local_storage.dart';
 import 'package:albedo_app/model/users/user_model.dart';

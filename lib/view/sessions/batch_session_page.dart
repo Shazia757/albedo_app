@@ -22,9 +22,8 @@ class BatchesListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-            backgroundColor: Theme.of(context).colorScheme.surface,
-
-      floatingActionButton: AddBatchSessionFAB(c: c),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      floatingActionButton: addSessionBtn(context),
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -414,6 +413,24 @@ class BatchesListPage extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+
+  FloatingActionButton addSessionBtn(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () => CustomWidgets().showCustomDialog(
+        context: context,
+        title: Text("Add Session"),
+        formKey: GlobalKey<FormState>(),
+        onSubmit: () {},
+        sections: [],
+      ),
+      mini: true,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: Icon(
+        Icons.add,
+        color: context.theme.colorScheme.onPrimary,
+      ),
     );
   }
 

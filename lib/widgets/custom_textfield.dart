@@ -3,18 +3,32 @@ import 'package:get/get.dart';
 
 class CustomTextField extends StatelessWidget {
   final String hint;
+  final String? errorText;
+  final String? helperText;
+
   final TextEditingController controller;
+
   final bool isPassword;
-  final RxBool obscure; // 👈 reactive
+  final RxBool obscure;
+
   final IconData prefixIcon;
+
+  final TextInputType keyboardType;
+  final TextInputAction textInputAction;
+  final Iterable<String>? autofillHints;
 
   CustomTextField({
     super.key,
     required this.hint,
     required this.controller,
+    required this.prefixIcon,
+    this.errorText,
+    this.helperText,
     this.isPassword = false,
     RxBool? obscure,
-    required this.prefixIcon,
+    this.keyboardType = TextInputType.text,
+    this.textInputAction = TextInputAction.next,
+    this.autofillHints,
   }) : obscure = obscure ?? false.obs;
 
   final RxBool isFocused = false.obs;
@@ -22,85 +36,103 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Focus(
       onFocusChange: (value) => isFocused.value = value,
       child: Obx(
-        () => AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
+        () {
+          final hasError = errorText != null && errorText!.isNotEmpty;
 
-            /// 🔥 BACKGROUND
-            color: cs.secondaryContainer.withOpacity(0),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+           
 
-            /// 🔥 BORDER
-            border: Border.all(
-              color: isFocused.value
-                  ? cs.secondary.withOpacity(0.5)
-                  : cs.outline.withOpacity(0.5),
-              width: 1.2,
-            ),
+              /// 🧊 INPUT FIELD
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: hasError
+                        ? cs.error
+                        : isFocused.value
+                            ? cs.primary
+                            : cs.outline.withOpacity(0.6),
+                    width: 1.2,
+                  ),
+                ),
+                child: TextField(
+                  controller: controller,
+                  obscureText: isPassword ? obscure.value : false,
+                  keyboardType: keyboardType,
+                  textInputAction: textInputAction,
+                  autofillHints: autofillHints,
+                  cursorColor: cs.primary,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: Colors.white,
+                  ),
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                      prefixIcon,
+                      color: isFocused.value
+                          ? cs.primary
+                          : cs.onPrimary.withOpacity(0.6),
+                    ),
+                    hintText: hint,
+                    hintStyle: textTheme.bodyMedium?.copyWith(
+                      color: cs.onPrimary.withOpacity(0.5),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
 
-            /// 🔥 SHADOW
-            boxShadow: [
-              if (isFocused.value)
-                BoxShadow(
-                  color: cs.secondary.withOpacity(0.2),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                    /// 🔐 PASSWORD TOGGLE
+                    suffixIcon: isPassword
+                        ? IconButton(
+                            tooltip: obscure.value
+                                ? "Show password"
+                                : "Hide password",
+                            icon: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: Icon(
+                                obscure.value
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                key: ValueKey(obscure.value),
+                                color: cs.onPrimary.withOpacity(0.6),
+                              ),
+                            ),
+                            onPressed: () => obscure.value = !obscure.value,
+                          )
+                        : null,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              /// ❌ ERROR TEXT
+              if (hasError)
+                Text(
+                  errorText!,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: cs.error,
+                  ),
                 )
-              else
-                BoxShadow(
-                  color: cs.shadow.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
+              else if (helperText != null)
+                Text(
+                  helperText!,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: cs.onSurface.withOpacity(0.6),
+                  ),
                 ),
             ],
-          ),
-          child: TextField(
-            cursorColor:
-                Theme.of(context).colorScheme.secondary.withOpacity(0.8),
-            controller: controller,
-            obscureText: isPassword ? obscure.value : false,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
-            decoration: InputDecoration(
-              prefixIcon: Icon(
-                prefixIcon,
-                color: isFocused.value
-                    ? cs.secondary
-                    : Colors.white.withOpacity(0.6),
-              ),
-              hintText: hint,
-              hintStyle: TextStyle(
-                color: cs.onSurface.withOpacity(0.5),
-                fontSize: 14,
-              ),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 16,
-              ),
-
-              /// 🔥 PASSWORD TOGGLE
-              suffixIcon: isPassword
-                  ? IconButton(
-                      icon: Icon(
-                        obscure.value
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: Colors.white.withOpacity(0.6),
-                      ),
-                      onPressed: () => obscure.value = !obscure.value,
-                    )
-                  : null,
-            ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

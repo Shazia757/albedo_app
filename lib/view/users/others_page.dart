@@ -425,12 +425,9 @@ class OthersPage extends StatelessWidget {
         ));
   }
 
-  Widget addOtherUsers(BuildContext context) {
-    return AppFAB(
-      label: "Add User",
-      icon: Icons.add_rounded,
+  FloatingActionButton addOtherUsers(BuildContext context) {
+    return FloatingActionButton(
       onPressed: () => CustomWidgets().showCustomDialog(
-        submitText: 'Add',
         context: context,
         title: const Text('Add New User'),
         formKey: GlobalKey<FormState>(),
@@ -441,17 +438,16 @@ class OthersPage extends StatelessWidget {
                 /// 🔹 Profile
                 const Text('Profile Photo (Max: 50 MB)'),
                 const SizedBox(height: 10),
-
                 InkWell(
                   onTap: () {},
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                     radius: 35,
                     child: ClipOval(
                       child: SizedBox(
                         width: 60,
                         height: 60,
-                        child: Image(
-                          image: AssetImage('assets/images/logo.png'),
+                        child: Image.asset(
+                          'assets/images/logo.png',
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -463,6 +459,7 @@ class OthersPage extends StatelessWidget {
 
                 /// 🔹 Basic Info
                 CustomWidgets().labelWithAsterisk('Name', required: true),
+                const SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter name',
@@ -472,6 +469,7 @@ class OthersPage extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 CustomWidgets().labelWithAsterisk('Email', required: true),
+                const SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter email',
@@ -482,6 +480,7 @@ class OthersPage extends StatelessWidget {
 
                 CustomWidgets()
                     .labelWithAsterisk('Phone Number', required: true),
+                const SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter phone number',
@@ -492,45 +491,13 @@ class OthersPage extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 CustomWidgets().labelWithAsterisk('Position', required: true),
-                CustomWidgets().customDropdownField(
+                const SizedBox(height: 8),
+                CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Select Position',
-                  items: const [
-                    'Admin',
-                    'HR',
-                    'Finance',
-                    'Sales Head',
-                    'Others'
-                  ],
-                  value: c.selectedPosition.value.isEmpty
-                      ? null
-                      : c.selectedPosition.value,
-                  onChanged: (p0) => c.selectedPosition.value = p0,
+                  controller: c.positionController,
+                  isNumber: true,
                 ),
-
-                /// 🔹 Conditional Custom Position
-                Obx(
-                  () => c.selectedPosition.value != "Others"
-                      ? const SizedBox()
-                      : Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomWidgets()
-                                  .labelWithAsterisk('Custom Position'),
-                              const SizedBox(height: 10),
-                              CustomWidgets().dropdownStyledTextField(
-                                context: context,
-                                hint: 'Enter Custom Position',
-                                controller: c.customPositionController,
-                              ),
-                            ],
-                          ),
-                        ),
-                ),
-
-                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -538,6 +505,12 @@ class OthersPage extends StatelessWidget {
         onSubmit: () {
           // TODO: implement submit
         },
+      ),
+      mini: true,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: Icon(
+        Icons.add,
+        color: context.theme.colorScheme.onPrimary,
       ),
     );
   }

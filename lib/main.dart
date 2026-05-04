@@ -4,7 +4,7 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/home_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/user_controller.dart';
-import 'package:albedo_app/common_views/login_page.dart';
+import 'package:albedo_app/login_page.dart';
 import 'package:albedo_app/view/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

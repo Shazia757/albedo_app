@@ -261,61 +261,58 @@ class BatchesPage extends StatelessWidget {
     );
   }
 
-  Widget addBatch(BuildContext context) {
-    return AppFAB(
-      label: "Add Batch",
-      icon: Icons.add_rounded,
+  FloatingActionButton addBatch(BuildContext context) {
+    return FloatingActionButton(
       onPressed: () => CustomWidgets().showCustomDialog(
         context: context,
-        title: const Text('Add New Batch'),
+        title: Text('Add New Batch'),
         formKey: GlobalKey<FormState>(),
         sections: [
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  CustomWidgets()
-                      .labelWithAsterisk('Batch Name', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Enter batch name',
-                    controller: c.batchNameController,
-                  ),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Mode', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Select mode',
-                    controller: c.batchModeController,
-                  ),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Course', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Select course',
-                    controller: c.courseController,
-                  ),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Mentor', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Select mentor',
-                    controller: c.mentorController,
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ),
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    CustomWidgets()
+                        .labelWithAsterisk('Batch Name', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter batch name',
+                        controller: c.batchNameController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Mode', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select modes',
+                        controller: c.batchModeController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Course', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select Course',
+                        controller: c.courseController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Mentor', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select Mentor',
+                        controller: c.mentorController),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ))
         ],
-        onSubmit: () {
-          // TODO: implement submit
-        },
+        onSubmit: () {},
+      ),
+      mini: true,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: Icon(
+        Icons.add,
+        color: context.theme.colorScheme.onPrimary,
       ),
     );
   }

@@ -25,7 +25,6 @@ class AdvisorsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-
       appBar: const CustomAppBar(),
       drawer: isDesktop ? null : const DrawerMenu(),
       floatingActionButton: addAdvisor(context),
@@ -205,185 +204,193 @@ class AdvisorsPage extends StatelessWidget {
     );
   }
 
-  Widget addAdvisor(BuildContext context) {
-    return AppFAB(
-      label: "Add Advisor",
-      icon: Icons.add_rounded,
+  FloatingActionButton addAdvisor(BuildContext context) {
+    return FloatingActionButton(
       onPressed: () => CustomWidgets().showCustomDialog(
         context: context,
-        title: const Text('Add Advisor'),
+        title: Text('Add Advisor'),
         formKey: GlobalKey<FormState>(),
         sections: [
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const Text('Profile Photo (Max: 50 MB)'),
-                  const SizedBox(height: 10),
-
-                  InkWell(
-                    onTap: () {},
-                    child: const CircleAvatar(
-                      radius: 35,
-                      child: ClipOval(
-                        child: SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: Image(
-                            image: AssetImage('assets/images/logo.png'),
-                            fit: BoxFit.contain,
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Text('Profile Photo (Max: 50 MB)'),
+                    const SizedBox(height: 10),
+                    InkWell(
+                      onTap: () {},
+                      child: CircleAvatar(
+                        radius: 35,
+                        child: ClipOval(
+                          child: SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  CustomWidgets().labelWithAsterisk('Name', required: true),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Enter advisor name',
-                    controller: c.nameController,
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  CustomWidgets().labelWithAsterisk('Email', required: true),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Enter email',
-                    controller: c.emailController,
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  CustomWidgets()
-                      .labelWithAsterisk('Phone Number', required: true),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Enter phone number',
-                    controller: c.phoneController,
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  CustomWidgets().labelWithAsterisk('Joining Date'),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Select Date',
-                    controller: c.dobController,
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  CustomWidgets().labelWithAsterisk('Qualification'),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Qualification',
-                    controller: c.qualificationController,
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  CustomWidgets().labelWithAsterisk('Address'),
-                  CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Address',
-                    controller: c.addressController,
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  /// 🔹 Experience Section
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Experience',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Name', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter advisor name',
+                        controller: c.nameController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Email', required: true),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter email',
+                        controller: c.emailController),
+                    const SizedBox(height: 10),
+                    CustomWidgets()
+                        .labelWithAsterisk('Phone Number', required: true),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter phone number',
+                        controller: c.phoneController),
+                    // const SizedBox(height: 10),
+                    // CustomWidgets().labelWithAsterisk('WhatsApp Number'),
+                    // const SizedBox(height: 10),
+                    // CustomWidgets().dropdownStyledTextField(
+                    //     context: context,
+                    //     hint: 'Enter WhatsApp Number',
+                    //     controller: c.whatsappController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Joining Date'),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select Date',
+                        controller: c.dobController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Qualification'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Qualification',
+                        controller: c.qualificationController),
+                    const SizedBox(height: 10),
+                    CustomWidgets().labelWithAsterisk('Address'),
+                    const SizedBox(height: 10),
+                    CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Address',
+                        controller: c.addressController),
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Experience',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 10),
+                    Obx(() => Column(
+                          children: [
+                            Column(
+                              children: List.generate(
+                                c.experiences.length,
+                                (index) {
+                                  final exp = c.experiences[index];
 
-                  const SizedBox(height: 10),
+                                  return Card(
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    elevation: 2,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Title
+                                          Text(
+                                            "Experience ${index + 1}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
 
-                  Obx(
-                    () => Column(
-                      children: [
-                        Column(
-                          children: List.generate(
-                            c.experiences.length,
-                            (index) {
-                              final exp = c.experiences[index];
+                                          const SizedBox(height: 10),
 
-                              return Card(
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                elevation: 2,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Experience ${index + 1}",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
+                                          // Company
+                                          CustomWidgets().labelWithAsterisk(
+                                              'Company Name'),
+                                          const SizedBox(height: 8),
+                                          CustomWidgets()
+                                              .dropdownStyledTextField(
+                                            context: context,
+                                            hint: 'Enter company name',
+                                            controller: exp.companyController,
+                                          ),
+
+                                          const SizedBox(height: 10),
+
+                                          // Years
+                                          CustomWidgets()
+                                              .labelWithAsterisk('Years'),
+                                          const SizedBox(height: 8),
+                                          CustomWidgets()
+                                              .dropdownStyledTextField(
+                                            context: context,
+                                            hint: 'Years',
+                                            controller: exp.yearController,
+                                          ),
+
+                                          const SizedBox(height: 10),
+
+                                          // Months
+                                          CustomWidgets()
+                                              .labelWithAsterisk('Months'),
+                                          const SizedBox(height: 8),
+                                          CustomWidgets()
+                                              .dropdownStyledTextField(
+                                            context: context,
+                                            hint: 'Months',
+                                            controller: exp.monthController,
+                                          ),
+
+                                          const SizedBox(height: 10),
+                                        ],
                                       ),
-                                      const SizedBox(height: 10),
-                                      CustomWidgets()
-                                          .labelWithAsterisk('Company Name'),
-                                      CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: 'Enter company name',
-                                        controller: exp.companyController,
-                                      ),
-                                      const SizedBox(height: 10),
-                                      CustomWidgets()
-                                          .labelWithAsterisk('Years'),
-                                      CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: 'Years',
-                                        controller: exp.yearController,
-                                      ),
-                                      const SizedBox(height: 10),
-                                      CustomWidgets()
-                                          .labelWithAsterisk('Months'),
-                                      CustomWidgets().dropdownStyledTextField(
-                                        context: context,
-                                        hint: 'Months',
-                                        controller: exp.monthController,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: c.addExperience,
-                            icon: const Icon(Icons.add),
-                            label: const Text("Add Experience"),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // ➕ Add Button at Bottom
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: c.addExperience,
+                                // c.addExperience,
+                                icon: Icon(Icons.add),
+                                label: Text("Add Experience"),
+                              ),
+                            ),
+                          ],
+                        )),
+                  ],
+                ),
+              ))
         ],
-        onSubmit: () {
-          // TODO: submit advisor
-        },
+        onSubmit: () {},
+      ),
+      mini: true,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: Icon(
+        Icons.add,
+        color: context.theme.colorScheme.onPrimary,
       ),
     );
   }
