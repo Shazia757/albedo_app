@@ -12,7 +12,7 @@ class DownloadsController extends GetxController {
     assessments.addAll([
       Assessment(
         id: "A-101",
-        title: "Mid Term Exam",
+        type: "Mid Term Exam",
         testType: ["Written", "Objective"],
         date: "2026-04-10",
         attentionQuestions: [
@@ -22,7 +22,7 @@ class DownloadsController extends GetxController {
       ),
       Assessment(
         id: "A-102",
-        title: "Unit Test",
+        type: "Unit Test",
         testType: ["MCQ"],
         date: "2026-04-15",
         attentionQuestions: [

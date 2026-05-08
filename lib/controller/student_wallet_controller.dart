@@ -1,4 +1,5 @@
 import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/wallet_model.dart';
 import 'package:get/get.dart';
 
@@ -28,9 +29,8 @@ class StudentWalletController extends GetxController {
   // Dummy Packages
   var packages = <Package>[
     Package(
-      teacherId: '',
-      teacherName: '',
-      teacherImage: '',
+           teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
       subjectId: '',
       status: '',
       time: '',
@@ -57,18 +57,27 @@ class StudentWalletController extends GetxController {
   }
 
   double get totalDeposited {
-    return packages.fold(0.0, (sum, p) => sum + p.packageFee);
+    return packages.fold(0.0, (sum, p) {
+      final packageFee=p.packageFee??0;
+      return sum +packageFee;
+    });
   }
 
   double get totalUsed {
+   
     return packages.fold(
-        0.0, (sum, p) => sum + p.withdrawals.fold(0.0, (s, w) => s + w.amount));
+        0.0, (sum, p) {
+           final withdrawals=p.withdrawals??[];
+          return sum + withdrawals.fold(0.0, (s, w) => s + w.amount);
+        });
   }
 
   double getPackageBalance(Package p) {
-    final totalWithdrawals =
-        p.withdrawals.fold(0.0, (sum, w) => sum + w.amount);
+           final withdrawals=p.withdrawals??[];
 
-    return p.packageFee - totalWithdrawals;
+    final totalWithdrawals =
+        withdrawals.fold(0.0, (sum, w) => sum + w.amount);
+
+    return p.packageFee??0 - totalWithdrawals;
   }
 }

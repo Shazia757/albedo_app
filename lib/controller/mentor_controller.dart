@@ -30,7 +30,7 @@ class MentorController extends GetxController {
   ];
   var selectedRating = 0.obs; // 0 = All
 
-  var experiences = <ExperienceModel>[].obs;
+  var experiences = <Experience>[].obs;
 
   // --------------------------
   // Counts for tabs
@@ -130,7 +130,7 @@ class MentorController extends GetxController {
   List<Mentor> _getDummyMentors() {
     return [
       Mentor(
-        id: "MTR1001",
+        empId: "MTR1001",
         name: "Maria",
         status: "Active",
         phone: "123456",
@@ -142,7 +142,7 @@ class MentorController extends GetxController {
         ),
       ),
       Mentor(
-        id: "MTR1002",
+        empId: "MTR1002",
         name: "Nick",
         status: "Inactive",
         phone: "+9876543210",
@@ -154,7 +154,7 @@ class MentorController extends GetxController {
         ),
       ),
       Mentor(
-        id: "MTR1003",
+        empId: "MTR1003",
         name: "Sara",
         status: "Active",
         phone: "55555",
@@ -195,9 +195,17 @@ class MentorController extends GetxController {
 
     // 🔃 Sort
     if (sortType.value == SortType.newest) {
-      temp.sort((a, b) => b.joinedAt.compareTo(a.joinedAt));
+      temp.sort((a, b) {
+        final aDate = a.joinedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bDate = b.joinedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bDate.compareTo(aDate);
+      });
     } else if (sortType.value == SortType.oldest) {
-      temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
+      temp.sort((a, b) {
+        final aDate = a.joinedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bDate = b.joinedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return aDate.compareTo(bDate);
+      });
     } else if (sortType.value == SortType.name) {
       temp.sort((a, b) => a.name.compareTo(b.name));
     }
@@ -226,15 +234,15 @@ class MentorController extends GetxController {
     bankBranchController.text = c.bankBranch.toString();
   }
 
-  void addExperience() {
-    experiences.add(
-      ExperienceModel(
-        companyController: TextEditingController(),
-        yearController: TextEditingController(),
-        monthController: TextEditingController(),
-      ),
-    );
-  }
+  // void addExperience() {
+  //   experiences.add(
+  //     Experience(
+  //       companyController: TextEditingController(),
+  //       yearController: TextEditingController(),
+  //       monthController: TextEditingController(),
+  //     ),
+  //   );
+  // }
 
   void handleDelete(BuildContext context, Mentor mentor) {
     final user = auth.activeUser;

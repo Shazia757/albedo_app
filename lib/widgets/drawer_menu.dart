@@ -1,7 +1,7 @@
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
-import 'package:albedo_app/view/batch_page.dart';
+import 'package:albedo_app/view/batch/batch_page.dart';
 import 'package:albedo_app/view/batch_payment_page.dart';
 import 'package:albedo_app/view/feedback_page.dart';
 import 'package:albedo_app/view/home_page.dart';
@@ -159,15 +159,7 @@ class DrawerMenu extends StatelessWidget {
           DrawerSubItem(
             title: 'Sessions',
             index: 10,
-            onTap: () {
-              c.selectedParentIndex.value = -1;
-              c.selectedSubIndex.value = -1;
-
-              c.setIndex(10);
-
-              Get.back();
-              Get.offAll(SessionPage());
-            },
+            onTap: () => Get.offAll(SessionPage()),
           ),
           DrawerSubItem(
             title: 'Batches',
@@ -256,13 +248,13 @@ class DrawerMenu extends StatelessWidget {
       ],
     );
 
-    Widget reports = _menuItem(
-      context,
-      Icons.analytics_outlined,
-      "Reports",
-      index: 4,
-      onPressed: () => Get.offAll(() => ReportsPage()),
-    );
+    // Widget reports = _menuItem(
+    //   context,
+    //   Icons.analytics_outlined,
+    //   "Reports",
+    //   index: 4,
+    //   onPressed: () => Get.offAll(() => ReportsPage()),
+    // );
 
     Widget supports = _menuItem(
       context,
@@ -345,7 +337,7 @@ class DrawerMenu extends StatelessWidget {
         _menuItem(context, Icons.person, "Teachers",
             index: 21, onPressed: () => Get.offAll(TeachersPage())),
         batch,
-        reports,
+        // reports,
         supports,
         feedback,
       ];
@@ -355,7 +347,7 @@ class DrawerMenu extends StatelessWidget {
         sessions,
         users,
         batch,
-        reports,
+        // reports,
         supports,
       ];
     } else if (isAdvisor) {
@@ -363,7 +355,7 @@ class DrawerMenu extends StatelessWidget {
         home,
         _menuItem(context, Icons.school, "Students",
             index: 20, onPressed: () => Get.offAll(StudentsPage())),
-        reports,
+        // reports,
         supports,
       ];
     } else if (isAdmin) {
@@ -373,7 +365,7 @@ class DrawerMenu extends StatelessWidget {
         users,
         batch,
         payments,
-        reports,
+        // reports,
         supports,
         settings,
       ];
@@ -381,7 +373,7 @@ class DrawerMenu extends StatelessWidget {
       items = [
         home,
         payments,
-        reports,
+        // reports,
       ];
     } else if (isSales) {
       items = [
@@ -400,7 +392,7 @@ class DrawerMenu extends StatelessWidget {
           index: 24,
           onPressed: () => Get.offAll(AdvisorsPage()),
         ),
-        reports,
+        // reports,
         supports,
       ];
     } else if (isHr) {
@@ -414,7 +406,7 @@ class DrawerMenu extends StatelessWidget {
           index: 24,
           onPressed: () => Get.offAll(TeachersPage()),
         ),
-        reports,
+        // reports,
         feedback,
       ];
     } else if (isCustom) {
@@ -461,16 +453,16 @@ class DrawerMenu extends StatelessWidget {
             PermissionService.can("hiring_reports") ||
             PermissionService.can("package_reports") ||
             PermissionService.can("student_reports") ||
-            PermissionService.can("teacher_reports")||
+            PermissionService.can("teacher_reports") ||
             PermissionService.can("advisor_reports"))
+          // _withPermission(
+          //   permission: "show_reports", // dummy or primary
+          //   child: reports,
+          // ),
           _withPermission(
-            permission: "show_reports", // dummy or primary
-            child: reports,
+            permission: "show_tickets",
+            child: supports,
           ),
-        _withPermission(
-          permission: "show_tickets",
-          child: supports,
-        ),
         if (!isCustom || canShowSettings())
           _withPermission(
             permission: "general_settings", // dummy
@@ -555,7 +547,7 @@ class DrawerMenu extends StatelessWidget {
     BuildContext context,
     IconData icon,
     String title, {
-    required int index, // 🔥 ADD THIS
+    required int index,
     required VoidCallback onPressed,
   }) {
     final cs = Theme.of(context).colorScheme;
@@ -588,21 +580,8 @@ class DrawerMenu extends StatelessWidget {
                 ),
               ),
             ),
-          ListTile(
-            dense: true,
-            leading: Icon(
-              icon,
-              size: isActive ? 22 : 20,
-              color: isActive ? cs.primary : cs.onSurface.withOpacity(0.5),
-            ),
-            title: Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: isActive ? cs.primary : cs.onSurface,
-              ),
-            ),
+          InkWell(
+            borderRadius: BorderRadius.circular(10),
             onTap: () {
               /// 🔥 CENTRALIZED STATE FIX
               c.selectedParentIndex.value = -1;
@@ -612,6 +591,42 @@ class DrawerMenu extends StatelessWidget {
               Get.back();
               onPressed();
             },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  Container(
+                    height: 34,
+                    width: 34,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? cs.primary.withOpacity(0.15)
+                          : cs.onSurface.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 18,
+                      color:
+                          isActive ? cs.primary : cs.onSurface.withOpacity(0.5),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight:
+                            isActive ? FontWeight.w600 : FontWeight.w400,
+                        color: isActive ? cs.primary : cs.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -732,11 +747,22 @@ class DrawerExpansionMenu extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    icon,
-                    size: 20,
-                    color:
-                        isActive ? cs.primary : cs.onSurface.withOpacity(0.6),
+                  Container(
+                    height: 34,
+                    width: 34,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? cs.primary.withOpacity(0.12)
+                          : cs.onSurface.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 18,
+                      color:
+                          isActive ? cs.primary : cs.onSurface.withOpacity(0.5),
+                    ),
                   ),
                   const SizedBox(width: 10),
 

@@ -1,5 +1,8 @@
+import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/wallet_model.dart';
 import 'package:flutter/material.dart';
 
 class Teacher {
@@ -7,6 +10,7 @@ class Teacher {
   final String name;
   String? email;
   String? imageUrl;
+  List<Student>? student;
 
   final String status;
   final String gender;
@@ -25,26 +29,35 @@ class Teacher {
   String? accountNumber;
   String? accountHolder;
   String? upiId;
+  String? ifscCode;
   String? accountType;
   String? bankName;
   String? bankBranch;
   int? totalStudents;
   int? totalPackages;
   int? salary;
+    Wallet? wallet;
   int? paid;
   double? balance;
   double? totalSessions;
   double? totalHours;
   Coordinator? coordinator;
   Mentor? mentor;
+  List<Batch>? batch;
+  List<Experience>? experience;
 
   Teacher(
       {required this.id,
       required this.name,
       this.email,
+      this.ifscCode,
       required this.status,
       this.imageUrl,
+      this.student,
       this.type,
+      this.wallet,
+      this.batch,
+      this.experience,
       required this.joinedAt,
       this.phone,
       required this.gender,
@@ -74,11 +87,14 @@ class Teacher {
       this.upiId});
 }
 
-class ExperienceModel {
-  TextEditingController? companyController = TextEditingController();
-  TextEditingController? yearController = TextEditingController();
-  TextEditingController? monthController = TextEditingController();
+class Experience {
+  String? companyName;
+  int? months;
+  int? years;
 
-  ExperienceModel(
-      {this.companyController, this.monthController, this.yearController});
+  Experience({
+    this.companyName,
+    this.months,
+    this.years,
+  });
 }

@@ -31,16 +31,15 @@ class StudentTeachersController extends GetxController {
           coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
           mentor: Mentor(
             name: '',
-            id: '',
+            empId: '',
             joinedAt: DateTime.now(),
           )),
     ];
 
     packages.value = [
       Package(
-        teacherId: "T1",
-        teacherName: "John Doe",
-        teacherImage: "",
+                  teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
         subjectId: "S1",
         subjectName: "Maths",
         standard: "10",
@@ -58,6 +57,6 @@ class StudentTeachersController extends GetxController {
   }
 
   List<Package> getPackagesByTeacher(String teacherId) {
-    return packages.where((p) => p.teacherId == teacherId).toList();
+    return packages.where((p) => p.teacher?.id == teacherId).toList();
   }
 }

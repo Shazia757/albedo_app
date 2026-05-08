@@ -4,6 +4,7 @@ import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/view/students/refund_request_page.dart';
+import 'package:albedo_app/view/students/student_detail_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -18,7 +19,7 @@ import 'package:get/get.dart';
 class StudentsPage extends StatelessWidget {
   StudentsPage({super.key});
 
-  final c = Get.put(StudentController());
+  final c = Get.put(StudentController(), permanent: true);
 
   @override
   Widget build(BuildContext context) {
@@ -58,20 +59,21 @@ class StudentsPage extends StatelessWidget {
                   isSearching: c.isSearching,
                   searchQuery: c.searchQuery,
                   onSearchChanged: () => c.applyFilters(),
-                  onSortTap: () => CustomWidgets().showSortSheet<SortType>(
+                  onSortTap: () =>
+                      CustomWidgets().showSortSheet<StudentSortType>(
                     title: "Sort Students",
                     options: [
                       SortOption(
                           label: "Newest",
-                          value: SortType.newest,
+                          value: StudentSortType.newest,
                           icon: Icons.schedule),
                       SortOption(
                           label: "Oldest",
-                          value: SortType.oldest,
+                          value: StudentSortType.oldest,
                           icon: Icons.history),
                       SortOption(
                           label: "Name A-Z",
-                          value: SortType.name,
+                          value: StudentSortType.name,
                           icon: Icons.sort_by_alpha),
                     ],
                     selectedValue: c.sortType.value,
@@ -147,63 +149,62 @@ class StudentsPage extends StatelessWidget {
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 12),
-                              child: InkWell(
-                                onTap: (!isCustom ||
+                              child: PremiumInfoCard(
+                                extraInfo: '',
+                                id: student.studentId ?? "NULL",
+                                title: student.name ?? "NULL",
+                                subtitle: student.email ?? "NULL",
+                                status: student.status,
+                                statusColor: isActive ? cs.primary : cs.error,
+                                onTap: () => (!isCustom ||
                                         PermissionService.can("view_students"))
-                                    ? () => openStudentProfile(context, student)
+                                    ? Get.to(() => StudentDetailsPage(
+                                        student: student, initialIndex: index))
                                     : null,
-                                child: PremiumInfoCard(
-                                  extraInfo: '',
-                                  id: student.studentId ?? "NULL",
-                                  title: student.name ?? "NULL",
-                                  subtitle: student.email ?? "NULL",
-                                  status: student.status,
-                                  statusColor: isActive ? cs.primary : cs.error,
-                                  footerText:
-                                      "Joined • ${student.joinedAt.toString().substring(0, 16)}",
-                                  actions: [
-                                    InfoAction(
-                                      icon: Icons.dashboard,
-                                      color: cs.primary,
-                                      onTap: () {
-                                        final auth = Get.find<AuthController>();
-                                        final user = studentToUser(student);
+                                footerText:
+                                    "Joined • ${student.joinedAt.toString().substring(0, 16)}",
+                                actions: [
+                                  InfoAction(
+                                    icon: Icons.dashboard,
+                                    color: cs.primary,
+                                    onTap: () {
+                                      final auth = Get.find<AuthController>();
+                                      final user = studentToUser(student);
 
-                                        auth.startImpersonation(user);
-                                        Get.offAll(() => const Root());
+                                      auth.startImpersonation(user);
+                                      Get.offAll(() => const Root());
+                                    },
+                                  ),
+                                  if ((!isCustom ||
+                                          PermissionService.can(
+                                              "edit_students")) &&
+                                      student?.status != 'Inactive')
+                                    InfoAction(
+                                      icon: Icons.edit,
+                                      color: cs.secondary,
+                                      onTap: () {
+                                        c.loadStudents(student!);
+                                        editStudent(context);
                                       },
                                     ),
-                                    if ((!isCustom ||
-                                            PermissionService.can(
-                                                "edit_students")) &&
-                                        student?.status != 'Inactive')
-                                      InfoAction(
-                                        icon: Icons.edit,
-                                        color: cs.secondary,
-                                        onTap: () {
-                                          c.loadStudents(student!);
-                                          editStudent(context);
-                                        },
-                                      ),
-                                    if (!isCustom ||
-                                        PermissionService.can(
-                                            "deactivate_students"))
-                                      InfoAction(
-                                        icon: Icons.block,
+                                  if (!isCustom ||
+                                      PermissionService.can(
+                                          "deactivate_students"))
+                                    InfoAction(
+                                      icon: Icons.block,
+                                      color: cs.error,
+                                      onTap: () =>
+                                          c.handleDeactivate(context, student),
+                                    ),
+                                  if (!isCustom ||
+                                      (PermissionService.can(
+                                          "delete_students")))
+                                    InfoAction(
+                                        icon: Icons.delete,
                                         color: cs.error,
-                                        onTap: () => c.handleDeactivate(
-                                            context, student),
-                                      ),
-                                    if (!isCustom ||
-                                        (PermissionService.can(
-                                            "delete_students")))
-                                      InfoAction(
-                                          icon: Icons.delete,
-                                          color: cs.error,
-                                          onTap: () =>
-                                              c.handleDelete(context, student)),
-                                  ],
-                                ),
+                                        onTap: () =>
+                                            c.handleDelete(context, student)),
+                                ],
                               ),
                             );
                           });

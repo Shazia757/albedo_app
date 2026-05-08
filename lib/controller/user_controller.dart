@@ -99,7 +99,7 @@ class UserController extends GetxController {
 
       mentorsList.assignAll([
         Mentor(
-          id: "MTR001",
+          empId: "MTR001",
           name: "Saeeda KP",
           email: "saeeda@gmail.com",
           status: "Active",
@@ -121,7 +121,7 @@ class UserController extends GetxController {
           upiId: "saeeda@upi",
         ),
         Mentor(
-          id: "MTR002",
+          empId: "MTR002",
           name: "David Mathew",
           email: "david@gmail.com",
           status: "Active",

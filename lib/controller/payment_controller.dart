@@ -1,5 +1,6 @@
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/payment_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:get/get.dart';
 
 class PaymentController extends GetxController {
@@ -82,7 +83,7 @@ class PaymentController extends GetxController {
         batch: Batch(
           batchName: "ATTC",
           batchID: "ALB/BAT/01234",
-          mentorName: "John Mentor",
+          mentor:Mentor(name: 'John', empId: 'id'),
         ),
         status: "pending",
         payments: [
@@ -119,7 +120,7 @@ class PaymentController extends GetxController {
         batch: Batch(
           batchName: "10th CBSE",
           batchID: "ALB/BAT/05678",
-          mentorName: "Mary Teacher",
+          mentor:Mentor(name: 'Mary Teacher', empId: 'empId')
         ),
         status: "approved",
         payments: [

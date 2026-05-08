@@ -57,10 +57,10 @@ class ReportsController extends GetxController {
   };
 
   void initTab(List<String> tabs) {
-  if (tabs.isNotEmpty && !tabs.contains(selectedTab.value)) {
-    selectedTab.value = tabs.first;
+    if (tabs.isNotEmpty && !tabs.contains(selectedTab.value)) {
+      selectedTab.value = tabs.first;
+    }
   }
-}
 
   Future<void> loadDummyData() async {
     try {
@@ -85,7 +85,7 @@ class ReportsController extends GetxController {
         advisorResult = allAdvisors;
       } else if (user?.role == "coordinator") {
         studentResult =
-            allStudents.where((s) => s.coordinatorId == user!.id).toList();
+            allStudents.where((s) => s.coordinator?.id == user!.id).toList();
         teacherResult =
             allTeachers.where((s) => s.coordinator?.id == user!.id).toList();
         advisorResult =
@@ -97,7 +97,7 @@ class ReportsController extends GetxController {
         advisorResult = [];
       } else if (user?.role == "mentor") {
         studentResult =
-            allStudents.where((s) => s.mentorId == user!.id).toList();
+            allStudents.where((s) => s.mentor?.id == user!.id).toList();
         teacherResult =
             allTeachers.where((s) => s.mentor?.id == user!.id).toList();
         advisorResult =
@@ -153,8 +153,8 @@ class ReportsController extends GetxController {
         joinedAt: DateTime.now(),
         admissionDate: DateTime.parse('2023-01-15 12:00:00'),
         teacherId: "T001",
-        mentorId: "MTR001",
-        coordinatorId: "COO1001",
+        mentor: Mentor(name: '', empId: '', joinedAt: DateTime.now()),
+        coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
       ),
       Student(
         studentId: "STU1002",
@@ -165,8 +165,8 @@ class ReportsController extends GetxController {
         joinedAt: DateTime.now(),
         admissionDate: DateTime.parse('2023-01-15 12:00:00'),
         teacherId: "T002",
-        mentorId: "MTR002",
-        coordinatorId: "COO1002",
+        mentor: Mentor(name: '', empId: '', joinedAt: DateTime.now()),
+        coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
       ),
     ];
   }
@@ -185,7 +185,7 @@ class ReportsController extends GetxController {
           coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
           mentor: Mentor(
             name: '',
-            id: '',
+            empId: '',
             joinedAt: DateTime.now(),
           )),
       Teacher(
@@ -200,7 +200,7 @@ class ReportsController extends GetxController {
           coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
           mentor: Mentor(
             name: '',
-            id: '',
+            empId: '',
             joinedAt: DateTime.now(),
           )),
     ];

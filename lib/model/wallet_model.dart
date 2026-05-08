@@ -1,26 +1,45 @@
+import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+
 class Wallet {
-  final String month;
-  final String year;
-  final int transactions;
-  final int net;
-  final Earnings earnings;
-  final Withdrawals withdrawals;
+String? month;
+String? year;
+ List<Transactions>? transactions;
+int? net;
+int? availableCredit;
+int? creditLimit;
+int? creditUsed;
+ Earnings? earnings;
+ Withdrawals? withdrawals;
 
   Wallet({
-    required this.month,
-    required this.year,
-    required this.transactions,
-    required this.net,
-    required this.earnings,
-    required this.withdrawals,
+this.month,
+this.year,
+this.availableCredit,
+this.transactions,
+this.net,
+this.earnings,
+ this.withdrawals,
   });
 }
 
-class Earnings {
-  final int amount;
-  final int count;
+class Transactions {
+  int? amount;
+  DateTime? date;
+  String? description;
+  Package? package;
+  Student? student;
+  String? transactionType;
+  
+}
 
-  Earnings({required this.amount, required this.count});
+class Earnings {
+  int? amount; //total
+ int? count;
+ 
+
+
+  Earnings({ this.amount,  this.count});
 }
 
 class Withdrawals {

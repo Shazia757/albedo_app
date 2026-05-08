@@ -1,5 +1,6 @@
 import 'package:albedo_app/controller/batch_list_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/view/sessions/add_batch_session_page.dart';
 import 'package:albedo_app/widgets/batch_widgets.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
@@ -11,7 +12,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class BatchesListPage extends StatelessWidget {
-  final c = Get.put(BatchListController());
+  final c = Get.put(BatchListController(), permanent: true);
 
   BatchesListPage({super.key});
 
@@ -23,7 +24,17 @@ class BatchesListPage extends StatelessWidget {
     return Scaffold(
       appBar: const CustomAppBar(),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      floatingActionButton: addSessionBtn(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(() => const AddBatchSessionPage());
+        },
+        mini: true,
+        backgroundColor: context.theme.colorScheme.primary,
+        child: Icon(
+          Icons.add,
+          color: context.theme.colorScheme.onPrimary,
+        ),
+      ),
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -675,21 +686,20 @@ class BatchesListPage extends StatelessWidget {
                       hint: 'Select Duration',
                       value: c.selectedDuration.value,
                       items: [],
-          itemLabel: (item) => "$item mins",
-
+                      itemLabel: (item) => "$item mins",
                       onChanged: (p0) => c.selectedDuration.value = p0),
                   const SizedBox(height: 12),
                   CustomWidgets().labelWithAsterisk('Teacher', required: true),
                   const SizedBox(height: 10),
-          //         CustomWidgets().customDropdownField(
+                  //         CustomWidgets().customDropdownField(
 
-          //             context: context,
-          //             hint: 'Select Teacher',
-          //             items: c.teacherList,
-          //             value: c.selectedTeacher.value,
-          //             onChanged: (p0) => c.selectedTeacher.value = p0,
-          // itemLabel: (item) => item.toString()
-          //             ),
+                  //             context: context,
+                  //             hint: 'Select Teacher',
+                  //             items: c.teacherList,
+                  //             value: c.selectedTeacher.value,
+                  //             onChanged: (p0) => c.selectedTeacher.value = p0,
+                  // itemLabel: (item) => item.toString()
+                  //             ),
                 ],
               ),
             ),

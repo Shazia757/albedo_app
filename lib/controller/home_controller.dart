@@ -145,9 +145,8 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+                   teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -170,7 +169,7 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR001",
+          empId: "MTR001",
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
@@ -185,7 +184,6 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         date: DateTime(2026, 4, 28),
-        time: const TimeOfDay(hour: 13, minute: 0),
         status: "started",
       ),
       Session(
@@ -196,9 +194,8 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+                    teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -221,12 +218,11 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR002",
+          empId: "MTR002",
           name: "David",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().add(const Duration(days: 1)),
-        time: const TimeOfDay(hour: 13, minute: 0),
         status: "upcoming",
       ),
       Session(
@@ -237,9 +233,8 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+                  teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -262,12 +257,11 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR001",
+          empId: "MTR001",
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now(),
-        time: const TimeOfDay(hour: 13, minute: 0),
         status: "pending",
       ),
       Session(
@@ -278,9 +272,8 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+                  teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -303,12 +296,11 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR002",
+          empId: "MTR002",
           name: "David",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().subtract(const Duration(days: 3)),
-        time: const TimeOfDay(hour: 13, minute: 0),
         status: "completed",
       ),
       Session(
@@ -319,9 +311,8 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+                    teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -344,12 +335,11 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR001",
+          empId: "MTR001",
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now(),
-        time: const TimeOfDay(hour: 13, minute: 0),
         status: "no_balance",
       ),
       Session(
@@ -360,9 +350,8 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+                     teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -385,25 +374,38 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR002",
+          empId: "MTR002",
           name: "David",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().subtract(const Duration(hours: 5)),
-        time: const TimeOfDay(hour: 13, minute: 0),
         status: "meet_done",
       ),
       Session(
         id: "S007",
         student: Student(
-          studentId: "ST07",
-          name: "Sneha",
-          joinedAt: DateTime.now(),
-        ),
+            studentId: "ST07",
+            name: "Sneha",
+            joinedAt: DateTime.now(),
+            packages: [
+              Package(
+                           teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
+                  subjectId: 'subjectId',
+                  subjectName: 'subjectName',
+                  standard: 'standard',
+                  syllabus: 'syllabus',
+                  status: 'status',
+                  packageFee: 0,
+                  takenFee: 0,
+                  balance: 0,
+                  withdrawals: [],
+                  time: 'time',
+                  duration: 'duration',
+                  note: 'no')
+            ]),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+          teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -426,12 +428,11 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR001",
+          empId: "MTR001",
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().add(const Duration(hours: 3)),
-        time: const TimeOfDay(hour: 13, minute: 0),
         status: "started",
       ),
     ];

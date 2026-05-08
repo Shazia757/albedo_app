@@ -412,7 +412,7 @@ class CustomWidgets {
     required List<String> tabs,
     required int selectedIndex,
     required Function(int) onTap,
-    required int Function(int index) getCount,
+    int Function(int index)? getCount,
   }) {
     final cs = Theme.of(context).colorScheme;
 
@@ -423,18 +423,24 @@ class CustomWidgets {
         child: Row(
           children: List.generate(tabs.length, (index) {
             final isActive = selectedIndex == index;
-            final count = getCount(index);
+
+            final count = getCount?.call(index);
+
+            final label =
+                count != null ? "${tabs[index]} ($count)" : tabs[index];
 
             return GestureDetector(
               onTap: () => onTap(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 margin: const EdgeInsets.only(right: 8),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: isActive ? cs.primary : cs.surface,
-                  borderRadius: BorderRadius.circular(20),
+                  color: isActive ? cs.primary : cs.onPrimary,
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isActive ? cs.primary : cs.outline.withOpacity(0.4),
                   ),
@@ -448,7 +454,7 @@ class CustomWidgets {
                   ],
                 ),
                 child: Text(
-                  "${tabs[index]} ($count)",
+                  label,
                   style: TextStyle(
                     color: isActive ? cs.onPrimary : cs.onSurface,
                     fontSize: 12,
@@ -493,7 +499,6 @@ class CustomWidgets {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              /// 🔥 ICON (danger cue)
               Container(
                 width: 56,
                 height: 56,
@@ -572,6 +577,137 @@ class CustomWidgets {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: cs.error,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        "Yes",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showHideDialog({
+    required BuildContext context,
+    required String text,
+    required String title,
+    required VoidCallback onConfirm,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+          decoration: BoxDecoration(
+            color: cs.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: cs.error.withOpacity(0.2),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: cs.primary.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.visibility_off_outlined,
+                  color: cs.primary,
+                  size: 28,
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              /// 🔹 TITLE
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              /// 🔹 MESSAGE
+              Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  height: 1.5,
+                  color: cs.onSurface.withOpacity(0.6),
+                ),
+              ),
+
+              const SizedBox(height: 22),
+
+              /// 🔹 ACTIONS
+              Row(
+                children: [
+                  /// CANCEL
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(
+                          color: cs.outline.withOpacity(0.4),
+                        ),
+                      ),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: cs.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  /// DELETE
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        onConfirm();
+                        Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -789,11 +925,19 @@ class CustomWidgets {
     T? value,
     required Function(T) onChanged,
     required String Function(T item) itemLabel,
+    T? initialValue,
+    bool autoSelectFirst = false,
   }) {
     final cs = Theme.of(context).colorScheme;
 
     final TextEditingController textController = TextEditingController(
-      text: value != null ? itemLabel(value) : "",
+      text: value != null
+          ? itemLabel(value)
+          : (initialValue != null
+              ? itemLabel(initialValue)
+              : (autoSelectFirst && items.isNotEmpty
+                  ? itemLabel(items.first)
+                  : "")),
     );
 
     final LayerLink layerLink = LayerLink();
@@ -916,6 +1060,18 @@ class CustomWidgets {
           setState(() {});
         }
 
+        if (value == null) {
+          if (initialValue != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              onChanged(initialValue);
+            });
+          } else if (autoSelectFirst && items.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              onChanged(items.first);
+            });
+          }
+        }
+
         return Builder(
           builder: (fieldContext) {
             return CompositedTransformTarget(
@@ -996,6 +1152,26 @@ class CustomWidgets {
         void openDropdown(BuildContext fieldContext) {
           final renderBox = fieldContext.findRenderObject() as RenderBox;
           final size = renderBox.size;
+          final offset = renderBox.localToGlobal(Offset.zero);
+
+          final screenHeight = MediaQuery.of(fieldContext).size.height;
+
+          final spaceBelow = screenHeight - (offset.dy + size.height);
+          final spaceAbove = offset.dy;
+
+          final shouldOpenUp = spaceBelow < 250 && spaceAbove > spaceBelow;
+
+          final itemHeight = 48.0;
+          final isEmpty = items.isEmpty;
+
+          final listHeight = isEmpty ? 60.0 : items.length * itemHeight;
+
+          final availableHeight =
+              shouldOpenUp ? spaceAbove - 20 : spaceBelow - 20;
+
+          final finalHeight = listHeight.clamp(0, availableHeight).toDouble();
+
+          final maxHeight = shouldOpenUp ? spaceAbove - 20 : spaceBelow - 20;
 
           refreshOverlay = () {
             overlayEntry?.markNeedsBuild();
@@ -1014,17 +1190,15 @@ class CustomWidgets {
                       width: size.width,
                       child: CompositedTransformFollower(
                         link: layerLink,
-                        offset: Offset(0, size.height + 4),
+                        offset: shouldOpenUp
+                            ? Offset(0, -finalHeight - 4)
+                            : Offset(0, size.height + 4),
                         child: Material(
                           elevation: 4,
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
                             constraints: BoxConstraints(
-                              maxHeight: list.isEmpty
-                                  ? 60
-                                  : list.length > 5
-                                      ? 240
-                                      : list.length * 48.0,
+                              maxHeight: finalHeight.clamp(0, 300),
                             ),
                             decoration: appBoxDecoration(context),
                             child: list.isEmpty
@@ -1168,12 +1342,7 @@ class CustomWidgets {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        cs.primary,
-                        cs.secondary.withOpacity(0.4),
-                      ],
-                    ),
+                    color: cs.secondary.withOpacity(0.8),
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(28),
                     ),
@@ -1416,6 +1585,9 @@ class CustomWidgets {
     int? minlines,
     bool isMultiline = false,
     bool isNumber = false,
+    bool isPassword = false,
+    bool obscureText = false,
+    VoidCallback? onTogglePassword,
     bool readOnly = false,
     VoidCallback? onTap,
   }) {
@@ -1425,6 +1597,7 @@ class CustomWidgets {
 
     return TextFormField(
       controller: controller,
+      obscureText: isPassword ? obscureText : false,
       style: textTheme.bodyMedium?.copyWith(
         color: cs.onSurface,
       ),
@@ -1434,7 +1607,11 @@ class CustomWidgets {
       readOnly: readOnly,
       onTap: onTap,
       minLines: isMultiline ? 3 : 1,
-      maxLines: isMultiline ? null : 1,
+      maxLines: isPassword
+          ? 1
+          : isMultiline
+              ? null
+              : 1,
       keyboardType: isMultiline
           ? TextInputType.multiline
           : isNumber
@@ -1445,9 +1622,24 @@ class CustomWidgets {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
+
         hintStyle: textTheme.bodySmall?.copyWith(
           color: cs.outline.withOpacity(0.6),
         ),
+
+        suffixIcon: isPassword
+            ? IconButton(
+                splashRadius: 20,
+                onPressed: onTogglePassword,
+                icon: Icon(
+                  obscureText
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  size: 20,
+                  color: cs.outline,
+                ),
+              )
+            : null,
 
         /// BACKGROUND
         filled: true,
@@ -1458,7 +1650,7 @@ class CustomWidgets {
           vertical: 12,
         ),
 
-        /// SUBTLE BORDER
+        /// BORDER
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
@@ -1476,7 +1668,7 @@ class CustomWidgets {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: cs.outline.withOpacity(0.5),
+            color: cs.primary,
             width: 1.2,
           ),
         ),

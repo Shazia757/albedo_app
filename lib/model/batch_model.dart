@@ -1,5 +1,6 @@
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 
@@ -18,37 +19,39 @@ class Batch {
   int? balance;
   int? expenseRatio;
   final int? duration;
-  String? mentorName;
- String? mentorId;
+  Mentor? mentor;
   Coordinator? coordinator;
   final String? coordinatorId;
-  final Package? package;
+ List<Package>? packages;
   final String? syllabus;
   final DateTime? date;
   final String? startTime;
   final String? endTime;
   final String? status;
+  String? amountPaid;
+  DateTime? paidDate;
 
   Batch({
     this.id,
     this.batchID,
     this.batchName,
+    this.paidDate,
     this.teacher,
     this.mode,
+    this.amountPaid,
+    this.balance,
     this.student,
     this.totalFee,
     this.totalPaid,
-    this.balance,
     this.expenseRatio,
     this.students,
     this.coordinatorId,
     this.coordinator,
     this.imageUrl,
-    this.mentorId,
-    this.mentorName,
+    this.mentor,
     this.course,
     this.duration,
-    this.package,
+    this.packages,
     this.syllabus,
     this.date,
     this.startTime,
@@ -63,7 +66,7 @@ class Batch {
       batchID: json['batchID'],
       batchName: json['batchName'],
       duration: json['duration'],
-      package: json['package'],
+      packages: json['package'],
       syllabus: json['syllabus'],
       date: json['date'] != null ? DateTime.tryParse(json['date']) : null,
       startTime: json['startTime'],
@@ -79,7 +82,7 @@ class Batch {
       'batchID': batchID,
       'batchName': batchName,
       'duration': duration,
-      'package': package,
+      'package': packages,
       'syllabus': syllabus,
       'date': date?.toIso8601String(),
       'startTime': startTime,

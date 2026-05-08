@@ -18,7 +18,7 @@ class AdvisorController extends GetxController {
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
 
-  var experiences = <ExperienceModel>[].obs;
+  var experiences = <Experience>[].obs;
 
   // --------------------------
   // Counts for tabs
@@ -134,15 +134,16 @@ class AdvisorController extends GetxController {
     addressController.text = a.address.toString();
   }
 
-  void addExperience() {
-    experiences.add(
-      ExperienceModel(
-        companyController: TextEditingController(),
-        yearController: TextEditingController(),
-        monthController: TextEditingController(),
-      ),
-    );
-  }
+  // void addExperience() {
+  //   experiences.add(
+      
+  //     // Experience(
+  //     //   companyName: TextEditingController(),
+  //     //   yearController: TextEditingController(),
+  //     //   monthController: TextEditingController(),
+  //     // ),
+  //   );
+  // }
 
   delete(id) {
     isDeleteButtonLoading.value = true;

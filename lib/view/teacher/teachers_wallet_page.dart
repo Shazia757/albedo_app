@@ -38,23 +38,7 @@ class TeacherWalletPage extends StatelessWidget {
   }
 
   Widget _filters(BuildContext context) {
-    final months = const [
-      "All",
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ];
 
-    final years = ["All", ...List.generate(6, (i) => (2021 + i).toString())];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -185,8 +169,8 @@ class TeacherWalletPage extends StatelessWidget {
                 Expanded(
                   child: _miniCard(
                     "Earnings",
-                    data.earnings.amount,
-                    data.earnings.count,
+                    data.earnings?.amount??0,
+                    data.earnings?.count??0,
                     Colors.green,
                   ),
                 ),
@@ -194,8 +178,8 @@ class TeacherWalletPage extends StatelessWidget {
                 Expanded(
                   child: _miniCard(
                     "Withdrawals",
-                    data.withdrawals.amount,
-                    data.withdrawals.count,
+                    data.withdrawals?.amount??0,
+                    data.withdrawals?.count??0,
                     Colors.red,
                   ),
                 ),
@@ -417,7 +401,7 @@ class TeacherWalletPage extends StatelessWidget {
                   Expanded(
                     child: _summaryCard(
                       "Earnings",
-                      data.earnings.amount,
+                      data.earnings?.amount??0,
                       _totalEarningTx(), // ✅ dynamic
                       Colors.green,
                     ),
@@ -426,7 +410,7 @@ class TeacherWalletPage extends StatelessWidget {
                   Expanded(
                     child: _summaryCard(
                       "Withdrawals",
-                      data.withdrawals.amount,
+                      data.withdrawals?.amount??0,
                       _totalWithdrawalTx(),
                       Colors.red,
                     ),
@@ -435,7 +419,7 @@ class TeacherWalletPage extends StatelessWidget {
                   Expanded(
                     child: _summaryCard(
                       "Net",
-                      data.net,
+                      data.net??0,
                       null,
                       Colors.blue,
                     ),
@@ -446,7 +430,7 @@ class TeacherWalletPage extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            if (data.earnings.amount != 0) _earningsBreakdown(),
+            if (data.earnings?.amount != 0) _earningsBreakdown(),
           ],
         ],
       );
@@ -610,8 +594,8 @@ class TeacherWalletPage extends StatelessWidget {
           TabBar(
             labelColor: Colors.black,
             tabs: [
-              Tab(text: "Earnings (${data.earnings.count})"),
-              Tab(text: "Withdrawals (${data.withdrawals.count})"),
+              Tab(text: "Earnings (${data.earnings?.count})"),
+              Tab(text: "Withdrawals (${data.withdrawals?.count})"),
             ],
           ),
           SizedBox(
@@ -714,4 +698,5 @@ class TeacherWalletPage extends StatelessWidget {
       ),
     );
   }
+
 }

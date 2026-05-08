@@ -1,6 +1,7 @@
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -43,7 +44,7 @@ class SessionReportController extends GetxController {
     report = SessionReport(
       studentName: session.student?.name ?? "",
       studentId: session.student?.studentId ?? "",
-      package: session.package,
+      package: session.package??Package(status: 'false'),
       sessionDate: session.date.toString(),
       duration: session.duration?.toString() ?? "",
       isCompleted: false,
@@ -59,11 +60,10 @@ class SessionReportController extends GetxController {
     report = SessionReport(
       studentName: session.student?.name ?? "",
       studentId: session.student?.studentId ?? "",
-      package: session.package ??
+      package: session.packages?.first ??
           Package(
-              teacherId: '',
-              teacherName: '',
-              teacherImage: '',
+                    teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
               subjectId: '',
               subjectName: '',
               standard: '',

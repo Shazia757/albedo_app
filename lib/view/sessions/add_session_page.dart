@@ -230,7 +230,7 @@ class AddSessionPage extends StatelessWidget {
           hint: 'Select Package',
           items: c.packagesList,
           value: c.selectedPackage.value,
-          itemLabel: (p) => p.subjectName,
+          itemLabel: (p) => p.subjectName??'',
           onChanged: (p0) => c.selectedPackage.value = p0,
         ),
         const SizedBox(height: 10),
@@ -284,7 +284,7 @@ class AddSessionPage extends StatelessWidget {
   }
 
   /// ---------------- MEET FORM ----------------
-  Widget _buildMeetForm(BuildContext context, dynamic c) {
+  Widget _buildMeetForm(BuildContext context, SessionController c) {
     final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -447,6 +447,7 @@ class AddSessionPage extends StatelessWidget {
       ],
     );
   }
+
 }
 
 class DropdownItem<T> {

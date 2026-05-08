@@ -514,27 +514,27 @@ class MentorsPage extends StatelessWidget {
                                 CustomWidgets()
                                     .labelWithAsterisk('Company Name'),
                                 const SizedBox(height: 6),
-                                CustomWidgets().dropdownStyledTextField(
-                                  context: context,
-                                  hint: 'Enter company',
-                                  controller: exp.companyController,
-                                ),
+                                // CustomWidgets().dropdownStyledTextField(
+                                //   context: context,
+                                //   hint: 'Enter company',
+                                //   controller: exp.companyController,
+                                // ),
                                 const SizedBox(height: 10),
                                 CustomWidgets().labelWithAsterisk('Years'),
                                 const SizedBox(height: 6),
-                                CustomWidgets().dropdownStyledTextField(
-                                  context: context,
-                                  hint: 'Years',
-                                  controller: exp.yearController,
-                                ),
+                                // CustomWidgets().dropdownStyledTextField(
+                                //   context: context,
+                                //   hint: 'Years',
+                                //   controller: exp.yearController,
+                                // ),
                                 const SizedBox(height: 10),
                                 CustomWidgets().labelWithAsterisk('Months'),
                                 const SizedBox(height: 6),
-                                CustomWidgets().dropdownStyledTextField(
-                                  context: context,
-                                  hint: 'Months',
-                                  controller: exp.monthController,
-                                ),
+                                // CustomWidgets().dropdownStyledTextField(
+                                //   context: context,
+                                //   hint: 'Months',
+                                //   controller: exp.monthController,
+                                // ),
                               ],
                             ),
                           ),
@@ -546,7 +546,10 @@ class MentorsPage extends StatelessWidget {
 
                 /// ➕ Add Experience Button
                 ElevatedButton.icon(
-                  onPressed: c.addExperience,
+                  onPressed: () {
+                    
+                  },
+                  // c.addExperience,
                   icon: const Icon(Icons.add),
                   label: const Text("Add Experience"),
                 ),
@@ -761,27 +764,27 @@ class MentorsPage extends StatelessWidget {
                                 CustomWidgets()
                                     .labelWithAsterisk('Company Name'),
                                 const SizedBox(height: 6),
-                                CustomWidgets().dropdownStyledTextField(
-                                  context: context,
-                                  hint: 'Enter company',
-                                  controller: exp.companyController,
-                                ),
+                                // CustomWidgets().dropdownStyledTextField(
+                                //   context: context,
+                                //   hint: 'Enter company',
+                                //   controller: exp.companyController,
+                                // ),
                                 const SizedBox(height: 10),
                                 CustomWidgets().labelWithAsterisk('Years'),
                                 const SizedBox(height: 6),
-                                CustomWidgets().dropdownStyledTextField(
-                                  context: context,
-                                  hint: 'Years',
-                                  controller: exp.yearController,
-                                ),
+                                // CustomWidgets().dropdownStyledTextField(
+                                //   context: context,
+                                //   hint: 'Years',
+                                //   controller: exp.yearController,
+                                // ),
                                 const SizedBox(height: 10),
                                 CustomWidgets().labelWithAsterisk('Months'),
                                 const SizedBox(height: 6),
-                                CustomWidgets().dropdownStyledTextField(
-                                  context: context,
-                                  hint: 'Months',
-                                  controller: exp.monthController,
-                                ),
+                                // CustomWidgets().dropdownStyledTextField(
+                                //   context: context,
+                                //   hint: 'Months',
+                                //   controller: exp.monthController,
+                                // ),
                               ],
                             ),
                           ),
@@ -793,7 +796,10 @@ class MentorsPage extends StatelessWidget {
 
                 /// ➕ Add Experience
                 ElevatedButton.icon(
-                  onPressed: c.addExperience,
+                  onPressed: () {
+                    
+                  },
+                  // c.addExperience,
                   icon: const Icon(Icons.add),
                   label: const Text("Add Experience"),
                 ),

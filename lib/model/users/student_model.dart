@@ -1,21 +1,32 @@
+import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/settings/assessment_model.dart';
+import 'package:albedo_app/model/stu_wallet_model.dart';
+import 'package:albedo_app/model/users/advisor_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 
 class Student {
   String? studentId;
   String? phone;
   String? imageUrl;
   String? whatsapp;
+  String? createdBy;
   String? parentName;
   String? parentOccupation;
   String? gender;
-  String? mentor;
   String? timezone;
   String? address;
   String? place;
   String? referredBy;
-  bool? isFeePaid;
-  Package? package;
+  bool isFeePaid;
+  List<Package>? packages;
+  List<Assessment>? assessment;
+  List<Certificate>? certificate;
+  List<Batch>? batch;
   
+
+
 
   int? classHours;
   int? pincode;
@@ -30,6 +41,7 @@ class Student {
   double? regFee;
   double? totalPaid;
   double? balance;
+  StudentWallet? wallet;
 
   String? course;
   String? subjects;
@@ -38,11 +50,10 @@ class Student {
 
   String? advisorName;
   String? advisorId;
-  String? coordinatorName;
-  String? coordinatorId;
-  String? mentorName;
-  String? mentorId;
-    final String? teacherId;
+  Coordinator? coordinator;
+  Mentor? mentor;
+  Advisor? advisor;
+  final String? teacherId;
 
   String? referralName;
   String? referralRole;
@@ -54,24 +65,29 @@ class Student {
   DateTime? admissionDate;
   String? type;
 
-  DateTime joinedAt;
+  DateTime? joinedAt;
 
   Student({
     required this.name,
-    required this.joinedAt,
+this.joinedAt,
     this.email,
+    this.batch,
     this.admissionDate,
+    this.assessment,
+    this.certificate,
     this.parentName,
     this.parentOccupation,
     this.status,
-    this.package,
+    this.packages,
     this.mentor,
+    this.wallet,
     this.teacherId,
     this.imageUrl,
     this.type,
+    this.createdBy,
     this.address,
     this.gender,
-    this.isFeePaid,
+    this.isFeePaid=false,
     this.timezone,
     this.place,
     this.studentId,
@@ -80,6 +96,8 @@ class Student {
     this.classHours,
     this.classesTaken,
     this.standard,
+    this.advisor,
+    this.coordinator,
     this.amount,
     this.totalAmount,
     this.referredBy,
@@ -88,10 +106,6 @@ class Student {
     this.course,
     this.advisorName,
     this.advisorId,
-    this.mentorName,
-    this.mentorId,
-    this.coordinatorName,
-    this.coordinatorId,
     this.referralName,
     this.referralRole,
     this.subjects,
@@ -111,6 +125,7 @@ class Student {
       joinedAt: DateTime.parse(json['joinedAt']),
       studentId: json['studentId'],
       email: json['email'],
+      
       phone: json['phone'],
       whatsapp: json['whatsapp'],
       parentName: json['parentName'],
@@ -136,10 +151,6 @@ class Student {
       syllabus: json['syllabus'],
       advisorName: json['advisorName'],
       advisorId: json['advisorId'],
-      coordinatorName: json['coordinatorName'],
-      coordinatorId: json['coordinatorId'],
-      mentorName: json['mentorName'],
-      mentorId: json['mentorId'],
       referralName: json['referralName'],
       referralRole: json['referralRole'],
       status: json['status'],
@@ -156,7 +167,7 @@ class Student {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'joinedAt': joinedAt.toIso8601String(),
+      'joinedAt': joinedAt?.toIso8601String(),
       'studentId': studentId,
       'email': email,
       'phone': phone,
@@ -184,10 +195,6 @@ class Student {
       'syllabus': syllabus,
       'advisorName': advisorName,
       'advisorId': advisorId,
-      'coordinatorName': coordinatorName,
-      'coordinatorId': coordinatorId,
-      'mentorName': mentorName,
-      'mentorId': mentorId,
       'referralName': referralName,
       'referralRole': referralRole,
       'status': status,
@@ -214,4 +221,7 @@ class Student {
       studentId: studentId,
     );
   }
+}
+
+class Certificate {
 }

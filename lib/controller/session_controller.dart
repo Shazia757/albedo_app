@@ -3,6 +3,7 @@ import 'package:albedo_app/controller/session_report_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/settings/assessment_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
@@ -15,7 +16,7 @@ import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-enum SortType { newest, oldest, student, teacher }
+enum SessionSortType { newest, oldest, student, teacher }
 
 enum FilterType { all, classSession, meetSession }
 
@@ -33,7 +34,7 @@ class SessionController extends GetxController {
   var selectAllCoordinators = false.obs;
   var selectAllAdvisors = false.obs;
   var selectAllOtherUsers = false.obs;
-  var sortType = SortType.newest.obs;
+  var sortType = SessionSortType.newest.obs;
   var filterType = FilterType.all.obs;
   var sessions = <Session>[].obs;
   var meets = <Meet>[].obs;
@@ -111,6 +112,8 @@ class SessionController extends GetxController {
     // ✅ Step 1: Filter first
     List<Session> filtered = sessions.where((s) {
       final matchesStatus = s.status == status;
+      final subjectName = s.package?.subjectName ?? '';
+      final className = s.className ?? '';
 
       final matchesSearch = s.student!.name
               .toLowerCase()
@@ -125,10 +128,8 @@ class SessionController extends GetxController {
               .toLowerCase()
               .contains(searchQuery.value.toLowerCase()) ||
           s.id.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          s.package.subjectName
-              .toLowerCase()
-              .contains(searchQuery.value.toLowerCase()) ||
-          s.className.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          subjectName.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          className.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
           s.date.toString().contains(searchQuery.value.toLowerCase());
 
       return matchesStatus && matchesSearch;
@@ -157,16 +158,35 @@ class SessionController extends GetxController {
 
     // 🔥 Step 4: Sorting
     switch (sortType.value) {
-      case SortType.newest:
-        filtered.sort((a, b) => b.date.compareTo(a.date));
+      case SessionSortType.newest:
+        filtered.sort((a, b) {
+          final ad = a.date;
+          final bd = b.date;
+
+          if (ad == null && bd == null) return 0;
+          if (ad == null) return 1; // a goes after b
+          if (bd == null) return -1; // a goes before b
+
+          return bd.compareTo(ad); // newest first
+        });
         break;
-      case SortType.oldest:
-        filtered.sort((a, b) => a.date.compareTo(b.date));
+
+      case SessionSortType.oldest:
+        filtered.sort((a, b) {
+          final ad = a.date;
+          final bd = b.date;
+
+          if (ad == null && bd == null) return 0;
+          if (ad == null) return 1;
+          if (bd == null) return -1;
+
+          return ad.compareTo(bd); // oldest first
+        });
         break;
-      case SortType.student:
+      case SessionSortType.student:
         filtered.sort((a, b) => a.student!.name.compareTo(b.student!.name));
         break;
-      case SortType.teacher:
+      case SessionSortType.teacher:
         filtered.sort((a, b) => a.teacher!.name.compareTo(b.teacher!.name));
         break;
     }
@@ -272,9 +292,12 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -297,7 +320,7 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR001",
+          empId: "MTR001",
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
@@ -312,7 +335,6 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         date: DateTime(2026, 4, 23),
-        time: const TimeOfDay(hour: 10, minute: 30),
         status: "started",
       ),
       Session(
@@ -323,9 +345,12 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -348,12 +373,11 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR002",
+          empId: "MTR002",
           name: "David",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().add(const Duration(days: 1)),
-        time: const TimeOfDay(hour: 9, minute: 0),
         status: "upcoming",
       ),
       Session(
@@ -364,9 +388,12 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -389,12 +416,11 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR001",
+          empId: "MTR001",
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now(),
-        time: const TimeOfDay(hour: 11, minute: 15),
         status: "pending",
       ),
       Session(
@@ -405,9 +431,12 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -430,12 +459,11 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR002",
+          empId: "MTR002",
           name: "David",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().subtract(const Duration(days: 3)),
-        time: const TimeOfDay(hour: 14, minute: 0),
         status: "completed",
       ),
       Session(
@@ -446,9 +474,12 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -471,12 +502,11 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR001",
+          empId: "MTR001",
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now(),
-        time: const TimeOfDay(hour: 16, minute: 30),
         status: "no_balance",
       ),
       Session(
@@ -487,9 +517,12 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -512,25 +545,58 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR002",
+          empId: "MTR002",
           name: "David",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().subtract(const Duration(hours: 5)),
-        time: const TimeOfDay(hour: 8, minute: 45),
         status: "meet_done",
       ),
       Session(
         id: "S007",
         student: Student(
-          studentId: "ST07",
-          name: "Sneha",
-          joinedAt: DateTime.now(),
-        ),
+            studentId: "ST07",
+            name: "Sneha",
+            assessment: [
+              Assessment(
+                  id: "A001",
+                  type: "Monthly Academic Assessment",
+                  testType: ["academic", "maths", "basics"],
+                  date: "06 May 2026",
+                  attentionQuestions: ["Focus", "Listening", "Participation"],
+                  attentionData: [
+                    AttentionItem(mark: '10', question: 'Focus', rating: 2)
+                  ]),
+            ],
+            joinedAt: DateTime.now(),
+            packages: [
+              Package(
+                  teacher: Teacher(
+                      id: '',
+                      name: '',
+                      status: '',
+                      joinedAt: DateTime.now(),
+                      gender: ''),
+                  subjectId: '',
+                  subjectName: '',
+                  standard: '',
+                  syllabus: '',
+                  status: '',
+                  packageFee: 0,
+                  takenFee: 0,
+                  balance: 0,
+                  withdrawals: [],
+                  time: '',
+                  duration: '',
+                  note: ''),
+            ]),
         package: Package(
-            teacherId: '',
-            teacherName: '',
-            teacherImage: '',
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -553,12 +619,11 @@ class SessionController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         mentor: Mentor(
-          id: "MTR001",
+          empId: "MTR001",
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
         date: DateTime.now().add(const Duration(hours: 3)),
-        time: const TimeOfDay(hour: 13, minute: 0),
         status: "started",
       ),
     ];
@@ -744,8 +809,8 @@ class SessionController extends GetxController {
     selectedPackage.value = null;
 
     // build packages list from student
-    if (student.package != null) {
-      packagesList.value = [student.package!];
+    if (student.packages != null) {
+      packagesList.value = student.packages ?? [];
     } else {
       packagesList.clear();
     }
@@ -783,22 +848,27 @@ class SessionController extends GetxController {
               name: "Rahul",
               email: "rahul@mail.com",
               joinedAt: DateTime.now(),
-              package: Package(
-                  teacherId: '',
-                  teacherName: '',
-                  teacherImage: '',
-                  subjectId: '',
-                  subjectName: 'Maths',
-                  standard: '',
-                  syllabus: '',
-                  status: '',
-                  packageFee: 0,
-                  takenFee: 0,
-                  balance: 0,
-                  withdrawals: [],
-                  time: '',
-                  duration: '',
-                  note: '')),
+              packages: [
+                Package(
+                    teacher: Teacher(
+                        id: '',
+                        name: '',
+                        status: '',
+                        joinedAt: DateTime.now(),
+                        gender: ''),
+                    subjectId: '',
+                    subjectName: 'Maths',
+                    standard: '',
+                    syllabus: '',
+                    status: '',
+                    packageFee: 0,
+                    takenFee: 0,
+                    balance: 0,
+                    withdrawals: [],
+                    time: '',
+                    duration: '',
+                    note: '')
+              ]),
           Student(
             studentId: "STU003",
             name: "Fatima",
@@ -836,7 +906,7 @@ class SessionController extends GetxController {
       case "mentor":
         mentorsList.assignAll([
           Mentor(
-            id: "MTR001",
+            empId: "MTR001",
             name: "Saeeda KP",
             email: "saeeda@gmail.com",
             status: "Active",
@@ -845,7 +915,7 @@ class SessionController extends GetxController {
             salary: 30000,
           ),
           Mentor(
-            id: "MTR002",
+            empId: "MTR002",
             name: "David Mathew",
             email: "david@gmail.com",
             status: "Active",
@@ -983,13 +1053,31 @@ class SessionController extends GetxController {
     }
 
     /// ↕️ Sort (keep if needed)
-    if (sortType.value == SortType.newest) {
-      temp.sort((a, b) => b.date.compareTo(a.date));
-    } else if (sortType.value == SortType.oldest) {
-      temp.sort((a, b) => a.date.compareTo(b.date));
-    } else if (sortType.value == SortType.student) {
+    if (sortType.value == SessionSortType.newest) {
+      temp.sort((a, b) {
+        final ad = a.date;
+        final bd = b.date;
+
+        if (ad == null && bd == null) return 0;
+        if (ad == null) return 1;
+        if (bd == null) return -1;
+
+        return bd.compareTo(ad); // newest first
+      });
+    } else if (sortType.value == SessionSortType.oldest) {
+      temp.sort((a, b) {
+        final ad = a.date;
+        final bd = b.date;
+
+        if (ad == null && bd == null) return 0;
+        if (ad == null) return 1;
+        if (bd == null) return -1;
+
+        return ad.compareTo(bd); // oldest first
+      });
+    } else if (sortType.value == SessionSortType.student) {
       temp.sort((a, b) => a.student!.name.compareTo(b.student!.name));
-    } else if (sortType.value == SortType.teacher) {
+    } else if (sortType.value == SessionSortType.teacher) {
       temp.sort((a, b) => a.teacher!.name.compareTo(b.teacher!.name));
     }
 
@@ -1033,11 +1121,11 @@ class SessionController extends GetxController {
 
     // Controllers
     dateController = TextEditingController(
-      text: "${data.date.day}/${data.date.month}/${data.date.year}",
+      text: "${data.date?.day}/${data.date?.month}/${data.date?.year}",
     );
 
     timeController = TextEditingController(
-      text: "${data.date.hour}:${data.date.minute}",
+      text: "${data.date?.hour}:${data.date?.minute}",
     );
 
     salaryController =
@@ -1064,7 +1152,6 @@ class SessionController extends GetxController {
 
   void loadSession(Session session) {
     dateController.text = session.date.toString();
-    timeController.text = session.time.toString();
 
     selectedDuration.value = session.duration;
     selectedTeacher.value = session.teacher;

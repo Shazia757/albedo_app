@@ -1,11 +1,12 @@
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/session_controller.dart';
-import 'package:albedo_app/controller/session_report_controller.dart';
+import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/view/sessions/add_session_page.dart';
-import 'package:albedo_app/view/sessions/session_report_dialog.dart';
+import 'package:albedo_app/view/sessions/session_details_page.dart';
+import 'package:albedo_app/view/students/student_detail_page.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -22,7 +23,7 @@ extension TextThemeExt on BuildContext {
 }
 
 class SessionPage extends StatelessWidget {
-  final c = Get.put(SessionController());
+  final c = Get.put(SessionController(), permanent: true);
 
   SessionPage({super.key});
 
@@ -183,12 +184,14 @@ class SessionPage extends StatelessWidget {
                               final session = sessions[i];
 
                               return _SessionCard(
-                                session: session,
-                                statusColor:
-                                    getStatusColor(context, session.status),
-                                onTap: () =>
-                                    _openSessionDetails(context, sessions, i),
-                              );
+                                  session: session,
+                                  statusColor:
+                                      getStatusColor(context, session.status),
+                                  onTap: () => 
+                                  // Get.to(() => SessionDetailsPage(
+                                  //     sessions: sessions, initialIndex: i))
+                                   _openSessionDetails(context, sessions, i),
+                                  );
                             },
                           );
                         },
@@ -355,11 +358,14 @@ class SessionPage extends StatelessWidget {
                           title: "Student",
                           name: data.student?.name ?? '',
                           id: data.student?.studentId ?? '',
-                          onTap: () => _onUserTap(
-                            context,
-                            "student",
-                            data.student?.studentId,
-                          ),
+                          onTap: () => Get.to(
+                                            () => StudentDetailsPage(
+                                                student: data.student!,
+                                                initialIndex: initialIndex),
+                                            binding: BindingsBuilder(() {
+                                              Get.put(StudentController());
+                                            }),
+                                          )
                         ),
 
                         detailCard(
@@ -397,7 +403,7 @@ class SessionPage extends StatelessWidget {
 
                         const SizedBox(height: 16),
 
-                        _DetailSectionLabel(
+                        DetailSectionLabel(
                           label: "Schedule & Info",
                           icon: Icons.event_outlined,
                         ),
@@ -408,8 +414,8 @@ class SessionPage extends StatelessWidget {
                           type: "schedule",
                           icon: Icons.schedule_outlined,
                           title: "Schedule",
-                          date: formatDate(data.date),
-                          time: formatTime(data.time),
+                          date: formatDate(data.date??DateTime.now()),
+                          time: formatTime(data.date??DateTime.now()),
                           duration: data.duration?.toString() ?? "-",
                           onSave: (date, time) {},
                         ),
@@ -422,7 +428,7 @@ class SessionPage extends StatelessWidget {
                           children: [
                             infoRow(
                               label: "Subject",
-                              value: data.package.subjectName ?? "-",
+                              value: data.package?.subjectName ?? "-",
                             ),
                             infoRow(
                               label: "Syllabus",
@@ -433,7 +439,7 @@ class SessionPage extends StatelessWidget {
 
                         const SizedBox(height: 16),
 
-                        _DetailSectionLabel(
+                        DetailSectionLabel(
                           label: "Status",
                           icon: Icons.flag_outlined,
                         ),
@@ -604,7 +610,7 @@ class SessionPage extends StatelessWidget {
                         if ((!isCustom ||
                             PermissionService.can("edit_sessions")))
                           Expanded(
-                            child: _DetailActionButton(
+                            child: DetailActionButton(
                               label: "Edit",
                               icon: Icons.edit_outlined,
                               color: cs.secondary,
@@ -616,7 +622,7 @@ class SessionPage extends StatelessWidget {
                           ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: _DetailActionButton(
+                          child: DetailActionButton(
                             label: "Support",
                             icon: Icons.support_agent_outlined,
                             color: cs.tertiary,
@@ -626,13 +632,13 @@ class SessionPage extends StatelessWidget {
                         if (data.status == 'pending') ...[
                           const SizedBox(width: 8),
                           Expanded(
-                            child: _DetailActionButton(
+                            child: DetailActionButton(
                               label: "Complete",
                               icon: Icons.check_outlined,
                               color: cs.primary,
                               onTap: () => _markSessionCompleted(
                                 context,
-                                data.date,
+                                data.date??DateTime.now(),
                               ),
                             ),
                           ),
@@ -640,7 +646,7 @@ class SessionPage extends StatelessWidget {
                         if (!isCoordinator) ...[
                           const SizedBox(width: 8),
                           Expanded(
-                            child: _DetailActionButton(
+                            child: DetailActionButton(
                               label: "Delete",
                               icon: Icons.delete_outline,
                               color: cs.error,
@@ -663,7 +669,7 @@ class SessionPage extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _DetailActionButton(
+                        child: DetailActionButton(
                           onTap: () {},
                           icon: Icons.arrow_forward_rounded,
                           label: "Join",
@@ -672,7 +678,7 @@ class SessionPage extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: _DetailActionButton(
+                        child: DetailActionButton(
                           color: cs.secondary,
                           onTap: () {},
                           icon: Icons.share,
@@ -1342,7 +1348,7 @@ class _SessionCard extends StatelessWidget {
                               children: [
                                 MetaItem(
                                     label: "Subject",
-                                    value: session.package.subjectName ?? "—",
+                                    value: session.package?.subjectName ?? "—",
                                     textSecondary: textSecondary),
                                 const SizedBox(height: 4),
                                 MetaItem(
@@ -1359,12 +1365,12 @@ class _SessionCard extends StatelessWidget {
                               children: [
                                 MetaItem(
                                     label: "Date",
-                                    value: formatDate(session.date),
+                                    value: formatDate(session.date??DateTime.now()),
                                     textSecondary: textSecondary),
                                 const SizedBox(height: 4),
                                 MetaItem(
                                     label: "Time",
-                                    value: formatTime(session.time),
+                                    value: formatTime(session.date??DateTime.now()),
                                     textSecondary: textSecondary),
                               ],
                             ),
@@ -1488,27 +1494,27 @@ class _TopBar extends StatelessWidget {
       isSearching: c.isSearching,
       searchQuery: c.searchQuery,
       onSearchChanged: () => c.applyFilters(),
-      onSortTap: () => CustomWidgets().showSortSheet<SortType>(
+      onSortTap: () => CustomWidgets().showSortSheet<SessionSortType>(
         title: "Sort Sessions",
         options: [
           SortOption(
             label: "Latest First",
-            value: SortType.newest,
+            value: SessionSortType.newest,
             icon: Icons.schedule,
           ),
           SortOption(
             label: "Oldest First",
-            value: SortType.oldest,
+            value: SessionSortType.oldest,
             icon: Icons.history,
           ),
           SortOption(
             label: "Student Name",
-            value: SortType.student,
+            value: SessionSortType.student,
             icon: Icons.person_outline,
           ),
           SortOption(
             label: "Teacher Name",
-            value: SortType.teacher,
+            value: SessionSortType.teacher,
             icon: Icons.school_outlined,
           ),
         ],
@@ -1572,66 +1578,6 @@ class _DialogSectionCard extends StatelessWidget {
           const SizedBox(height: 12),
           child,
         ],
-      ),
-    );
-  }
-}
-
-/// Section label used inside the detail dialog scroll
-class _DetailSectionLabel extends StatelessWidget {
-  final String label;
-  final IconData icon;
-
-  const _DetailSectionLabel({required this.label, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: cs.primary.withOpacity(0.7)),
-        const SizedBox(width: 6),
-        Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: cs.onSurface.withOpacity(0.45),
-            letterSpacing: 0.8,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Action button row inside the detail dialog
-class _DetailActionButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _DetailActionButton({
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon, size: 15, color: Colors.white),
-      label: Text(label,
-          style: const TextStyle(color: Colors.white, fontSize: 13)),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

@@ -78,7 +78,7 @@ class AssessmentsPage extends StatelessWidget {
                                       .withOpacity(0.7),
                                 ),
                               ),
-                              Text(item.title ?? ''),
+                              Text(item.type ?? ''),
                             ],
                           ),
                           actions: [

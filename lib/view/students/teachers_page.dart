@@ -204,7 +204,7 @@ class StuTeachersPage extends StatelessWidget {
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               title: Text(
-                p.subjectName,
+                p.subjectName??'',
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               subtitle: Text("${p.duration} classes"),

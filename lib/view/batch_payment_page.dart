@@ -152,7 +152,7 @@ class BatchPaymentCard extends StatelessWidget {
             Text(model.batch.batchID ?? "",
                 style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
             const SizedBox(height: 8),
-            Text(model.batch.mentorName ?? "No mentor",
+            Text(model.batch.mentor?.name ?? "No mentor",
                 style: TextStyle(fontSize: 12)),
           ],
         ),

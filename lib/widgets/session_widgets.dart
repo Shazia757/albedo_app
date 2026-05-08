@@ -942,8 +942,9 @@ void openBatchProfile(BuildContext context, Batch data) {
                   Expanded(
                     child: infoRow(
                         label: "Packages",
-                        value:
-                            data.package?.subjectName.length.toString() ?? ''),
+                        value: data.packages?.first.subjectName?.length
+                                .toString() ??
+                            ''), //TODO
                   ),
                 ],
               ),
@@ -1009,13 +1010,13 @@ void openBatchProfile(BuildContext context, Batch data) {
               EditableDetailCard(
                 type: "mentor",
                 title: "Mentor",
-                name: data.mentorName ?? "",
-                id: data.mentorId ?? "",
+                name: data.mentor?.name ?? "",
+                id: data.mentor?.empId ?? "",
                 field1Label: "Name",
                 field2Label: "ID",
                 onSave: (name, id) {
-                  data.mentorName = name;
-                  data.mentorId = id;
+                  data.mentor?.name = name;
+                  data.mentor?.empId = id;
                 },
               ),
             ],
@@ -1443,10 +1444,12 @@ String formatDate(DateTime date) {
   return DateFormat('dd MMM yyyy').format(date);
 }
 
-String formatTime(TimeOfDay time) {
-  final now = DateTime.now();
-  final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-  return DateFormat('hh:mm a').format(dt);
+String formatTime(DateTime time) {
+  return DateFormat('hh:mm a').format(time);
+}
+
+String getMonthName(int month) {
+  return DateFormat.MMM().format(DateTime(0, month));
 }
 
 // ── Status badge ──────────────────────────────────────────────────────
@@ -1521,6 +1524,118 @@ class NameCell extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
       ],
+    );
+  }
+}
+
+/// Section label used inside the detail dialog scroll
+class DetailSectionLabel extends StatelessWidget {
+  final String label;
+  final IconData icon;
+
+  const DetailSectionLabel({required this.label, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: cs.primary.withOpacity(0.7)),
+        const SizedBox(width: 6),
+        Text(
+          label.toUpperCase(),
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: cs.onSurface.withOpacity(0.45),
+            letterSpacing: 0.8,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DIALOG HELPERS
+// ═══════════════════════════════════════════════════════════════════════
+
+/// Styled section card used inside dialogs
+class DialogSectionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final Widget child;
+
+  const DialogSectionCard({
+    required this.icon,
+    required this.title,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.4), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: cs.primary),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: cs.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+/// Action button row inside the detail dialog
+class DetailActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const DetailActionButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 15, color: Colors.white),
+      label: Text(label,
+          style: const TextStyle(color: Colors.white, fontSize: 13)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
     );
   }
 }

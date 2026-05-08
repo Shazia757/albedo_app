@@ -138,7 +138,7 @@ class BatchController extends GetxController {
     batchNameController.text = batch.batchName.toString();
     batchModeController.text = batch.mode.toString();
     batchNameController.text = batch.batchName.toString();
-    mentorController.text = batch.mentorName.toString();
+    mentorController.text = batch.mentor?.name??'';
   }
 
   void handleDelete(BuildContext context, Batch batch) {

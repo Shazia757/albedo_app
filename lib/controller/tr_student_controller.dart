@@ -1,5 +1,7 @@
 import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:get/get.dart';
 
 class TrStudentsController extends GetxController {
@@ -26,8 +28,7 @@ class TrStudentsController extends GetxController {
         joinedAt: DateTime.now(),
         studentId: "STU-1001",
         email: "aisha@gmail.com",
-        mentorName: "John",
-        mentorId: "MEN-01",
+      mentor: Mentor(name: '', empId: '', joinedAt: DateTime.now()),
         teacherId: "T1",
       ),
       Student(
@@ -35,8 +36,8 @@ class TrStudentsController extends GetxController {
         joinedAt: DateTime.now(),
         studentId: "STU-1002",
         email: "rahul@gmail.com",
-        mentorName: "Anu",
-        mentorId: "MEN-02",
+           mentor: Mentor(name: '', empId: '', joinedAt: DateTime.now()),
+
         teacherId: "T1",
       ),
     ];
@@ -44,9 +45,8 @@ class TrStudentsController extends GetxController {
     /// 🔸 Dummy Packages
     packages.value = [
       Package(
-        teacherId: "T1",
-        teacherName: "Teacher",
-        teacherImage: "",
+          teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+
         subjectId: "SUB1",
         subjectName: "Mathematics",
         standard: "10",
@@ -67,7 +67,7 @@ class TrStudentsController extends GetxController {
 
   /// 🔹 Get packages for a student
   List<Package> getPackagesByStudent(String? teacherId) {
-    return packages.where((p) => p.teacherId == teacherId).toList();
+    return packages.where((p) => p.teacher?.id == teacherId).toList();
   }
 
   var searchQuery = ''.obs;

@@ -8,6 +8,9 @@ import 'package:albedo_app/login_page.dart';
 import 'package:albedo_app/view/home_page.dart';
 import 'package:albedo_app/view/sessions/add_session_page.dart';
 import 'package:albedo_app/view/sessions/session_page.dart';
+import 'package:albedo_app/view/students/add_assessment_page.dart';
+import 'package:albedo_app/view/users/students_page.dart';
+import 'package:albedo_app/view/users/teachers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -61,7 +64,7 @@ class MyApp extends StatelessWidget {
 
       themeMode: ThemeMode.light,
 
-      home: isLoggedIn ? SessionPage() : LoginView(),
+      home: isLoggedIn ? TeachersPage() : LoginView(),
     );
   }
 }

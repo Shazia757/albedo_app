@@ -19,7 +19,7 @@ class CoordinatorController extends GetxController {
   var selectedDate = Rxn<DateTime>();
 
 
-  var experiences = <ExperienceModel>[].obs;
+  var experiences = <Experience>[].obs;
 
   // --------------------------
   // Counts for tabs
@@ -143,15 +143,15 @@ class CoordinatorController extends GetxController {
     bankBranchController.text = c.bankBranch.toString();
   }
 
-  void addExperience() {
-    experiences.add(
-      ExperienceModel(
-        companyController: TextEditingController(),
-        yearController: TextEditingController(),
-        monthController: TextEditingController(),
-      ),
-    );
-  }
+  // void addExperience() {
+  //   experiences.add(
+  //     Experience(
+  //       companyController: TextEditingController(),
+  //       yearController: TextEditingController(),
+  //       monthController: TextEditingController(),
+  //     ),
+  //   );
+  // }
 
   delete(id) {
     isDeleteButtonLoading.value = true;

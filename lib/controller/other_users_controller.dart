@@ -20,7 +20,7 @@ class OtherUsersController extends GetxController {
   var selectedRole = "all".obs;
   var customPositionController = TextEditingController();
 
-  var experiences = <ExperienceModel>[].obs;
+  var experiences = <Experience>[].obs;
 
   TextEditingController nameController = TextEditingController();
   TextEditingController empIdController = TextEditingController();

@@ -25,12 +25,14 @@ class BatchListController extends GetxController {
 
   var selectedTab = 0.obs;
   var searchQuery = ''.obs;
+  Rx<Package?> selectedPackage = Rx<Package?>(null);
 
   /// 📦 Data
   RxList<Batch> batchList = <Batch>[].obs;
   RxList<String> categoryList = <String>[].obs;
   RxList<Student> studentsList = <Student>[].obs;
   RxList<Teacher> teacherList = <Teacher>[].obs;
+  RxList<Package> packagesList = <Package>[].obs;
 
   var batches = <String>[].obs;
   final teachersList = ["Teacher A", "Teacher B", "Teacher C"];
@@ -42,8 +44,9 @@ class BatchListController extends GetxController {
   Rxn<SessionReport> reportRx = Rxn<SessionReport>();
 
   /// 🎯 Filters
-  var selectedTeacher = RxnString();
-  var selectedBatch = RxnString();
+  Rx<Teacher?> selectedTeacher = Rx<Teacher?>(null);
+
+  Rx<Batch?> selectedBatch = Rx<Batch?>(null);
 
   /// 🧾 Controllers
   TextEditingController descriptionController = TextEditingController();
@@ -170,7 +173,7 @@ class BatchListController extends GetxController {
     }).toList();
 
     /// 🎯 Teacher filter
-    if (selectedTeacher.value != null && selectedTeacher.value!.isNotEmpty) {
+    if (selectedTeacher.value != null && selectedTeacher.value != '') {
       filtered = filtered
           .where((b) => b.teacher?.name == selectedTeacher.value)
           .toList();
@@ -240,7 +243,7 @@ class BatchListController extends GetxController {
     timeController.text = batch.startTime ?? "";
 
     selectedDuration.value = batch.duration;
-    selectedTeacher.value = batch.teacher?.name;
+    selectedTeacher.value = batch.teacher;
 
     salaryController.text = batch.teacher?.salary?.toString() ?? '';
   }
@@ -356,4 +359,49 @@ class BatchListController extends GetxController {
       ),
     ];
   }
+
+  void onBatchSelected(Batch batch) {
+    selectedBatch.value = batch;
+
+    // reset previous selection
+    selectedPackage.value = null;
+
+    // build packages list from student
+    if (batch.packages != null) {
+      packagesList.value = batch.packages ?? [];
+    } else {
+      packagesList.clear();
+    }
+  }
+
+  bool validateSession(BuildContext context) {
+    String error = "";
+
+    if (selectedPackage.value == null) {
+      error = "Please select a package";
+    } else if (selectedTeacher.value == null) {
+      error = "Please select a teacher";
+    } else if (salaryController.text.trim().isEmpty) {
+      error = "Teacher salary is required";
+    } else if (dateController.text.trim().isEmpty) {
+      error = "Session date is required";
+    } else if (timeController.text.trim().isEmpty) {
+      error = "Session time is required";
+    } else if (selectedDuration.value == null) {
+      error = "Please select duration";
+    }
+
+    if (error.isNotEmpty) {
+      Get.snackbar(
+        "Error",
+        error,
+        snackPosition: SnackPosition.TOP,
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  void addSession() {}
 }

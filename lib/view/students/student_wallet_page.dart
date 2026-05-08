@@ -2,6 +2,7 @@ import 'package:albedo_app/controller/student_wallet_controller.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/wallet_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
+import 'package:albedo_app/widgets/dialog.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,27 +22,22 @@ class StudentWalletPage extends StatelessWidget {
       child: Builder(builder: (context) {
         final tabController = DefaultTabController.of(context);
         return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-
+          backgroundColor: Theme.of(context).colorScheme.surface,
           appBar: CustomAppBar(),
           floatingActionButton: AnimatedBuilder(
             animation: tabController,
             builder: (_, __) {
-              // ✅ Show FAB only on Transactions tab (index 0)
               if (tabController.index != 0) return const SizedBox();
 
-              return FloatingActionButton.extended(
+              return FloatingActionButton(
                 elevation: 3,
                 backgroundColor: cs.primary,
                 foregroundColor: cs.onPrimary,
-                onPressed: () => _showDepositDialog(context),
-                icon: const Icon(Icons.add_rounded, size: 20),
-                label: const Text(
-                  "Deposit",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
+                onPressed: () => DialogUtils.showDepositDialog(
+                  context,
+                  onSubmit: (txn) {
+                    c.transactions.add(txn);
+                  },
                 ),
               );
             },
@@ -111,68 +107,66 @@ class StudentWalletPage extends StatelessWidget {
     );
   }
 
-  void _showDepositDialog(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
+  // void showDepositDialog(BuildContext context) {
+  //   final formKey = GlobalKey<FormState>();
 
-    final amountController = TextEditingController();
-    final descController = TextEditingController();
-    final dateController = TextEditingController();
+  //   final amountController = TextEditingController();
+  //   final descController = TextEditingController();
+  //   final dateController = TextEditingController();
 
-    RxString attachmentName = "".obs;
+  //   CustomWidgets().showCustomDialog(
+  //     context: context,
+  //     formKey: formKey,
+  //     icon: Icons.account_balance_wallet,
+  //     title: const Text("Deposit Funds"),
+  //     sections: [
+  //       // 🔷 Amount
 
-    CustomWidgets().showCustomDialog(
-      context: context,
-      formKey: formKey,
-      icon: Icons.account_balance_wallet,
-      title: const Text("Deposit Funds"),
-      sections: [
-        // 🔷 Amount
+  //       CustomWidgets().labelWithAsterisk('Amount(₹)', required: true),
+  //       const SizedBox(height: 10),
+  //       CustomWidgets().dropdownStyledTextField(
+  //           context: context,
+  //           hint: 'Enter deposit amount',
+  //           controller: amountController),
+  //       const SizedBox(height: 10),
+  //       CustomWidgets().labelWithAsterisk('Description (Optional)'),
+  //       const SizedBox(height: 10),
+  //       CustomWidgets().dropdownStyledTextField(
+  //           context: context,
+  //           hint: 'Bank transfer, cash deposit, etc.',
+  //           controller: descController),
+  //       const SizedBox(height: 10),
+  //       CustomWidgets().labelWithAsterisk('Deposit Date', required: true),
+  //       const SizedBox(height: 10),
+  //       CustomWidgets().dropdownStyledTextField(
+  //           context: context,
+  //           hint: 'Bank transfer, cash deposit, etc.',
+  //           controller: dateController),
+  //       const SizedBox(height: 10),
+  //       CustomWidgets().labelWithAsterisk('Attatchment (Proof of payment)'),
+  //       const SizedBox(height: 10),
+  //       CustomWidgets().dropdownStyledTextField(
+  //         context: context,
+  //         hint: 'Select Screenshots',
+  //       ),
+  //       const SizedBox(height: 10),
+  //     ],
+  //     onSubmit: () {
+  //       final amount = double.tryParse(amountController.text) ?? 0;
 
-        CustomWidgets().labelWithAsterisk('Amount(₹)', required: true),
-        const SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Enter deposit amount',
-            controller: amountController),
-        const SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Description (Optional)'),
-        const SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Bank transfer, cash deposit, etc.',
-            controller: descController),
-        const SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Deposit Date', required: true),
-        const SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Bank transfer, cash deposit, etc.',
-            controller: dateController),
-        const SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Attatchment (Proof of payment)'),
-        const SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-          context: context,
-          hint: 'Select Screenshots',
-        ),
-        const SizedBox(height: 10),
-      ],
-      onSubmit: () {
-        final amount = double.tryParse(amountController.text) ?? 0;
-
-        c.transactions.add(
-          TransactionModel(
-            status: "Success",
-            type: "Credit",
-            title: "Wallet Deposit",
-            description: descController.text,
-            amount: amount,
-            dateTime: DateTime.now(),
-          ),
-        );
-      },
-    );
-  }
+  //       c.transactions.add(
+  //         TransactionModel(
+  //           status: "Success",
+  //           type: "Credit",
+  //           title: "Wallet Deposit",
+  //           description: descController.text,
+  //           amount: amount,
+  //           dateTime: DateTime.now(),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   // ---------------- TRANSACTIONS ----------------
 
@@ -631,7 +625,7 @@ class StudentWalletPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            p.subjectName,
+                            p.subjectName??'',
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
@@ -700,8 +694,9 @@ class StudentWalletPage extends StatelessWidget {
 
   void _showPackageDialog(BuildContext context, Package p) {
     final formKey = GlobalKey<FormState>();
+    final withdrawals=p.withdrawals??[];
 
-    double totalWithdrawals = p.withdrawals.fold(0, (sum, w) => sum + w.amount);
+    double totalWithdrawals = withdrawals.fold(0, (sum, w) => sum + w.amount);
 
     CustomWidgets().showCustomDialog(
       context: context,
@@ -719,7 +714,7 @@ class StudentWalletPage extends StatelessWidget {
             _infoTile("Class Taken", totalWithdrawals),
             _infoTile(
               "Balance",
-              p.packageFee - totalWithdrawals,
+              p.packageFee??0 - totalWithdrawals,
               highlight: true,
             ),
           ],
@@ -730,7 +725,7 @@ class StudentWalletPage extends StatelessWidget {
         // 🔷 WITHDRAWAL HISTORY
         _sectionTitle(context, "Withdrawals"),
 
-        ...p.withdrawals.map((w) {
+        ...withdrawals.map((w) {
           return Container(
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(12),

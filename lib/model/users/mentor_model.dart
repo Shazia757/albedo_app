@@ -1,14 +1,15 @@
 import 'package:albedo_app/model/users/coordinator_model.dart';
 
 class Mentor {
-  final String id;
-  final String name;
+String? id;
+String? empId;
+String name;
   String? email;
   String? imageUrl;
   String? status;
   String? gender;
   double? rating;
-  final DateTime joinedAt;
+DateTime? joinedAt;
   String? phone;
   String? whatsapp;
   String? dob;
@@ -29,8 +30,9 @@ final Coordinator? coordinator;
 
   Mentor({
     required this.name,
-    required this.id,
-    required this.joinedAt,
+this.id,
+required this.empId,
+    this.joinedAt,
     this.email,
     this.gender,
     this.status,

@@ -212,8 +212,8 @@ class _StudentCard extends StatelessWidget {
 
           /// 🔥 MENTOR SUB-CARD
           _MentorCard(
-            name: student.mentorName ?? "-",
-            id: student.mentorId ?? "-",
+            name: student.mentor?.name ?? "-",
+            id: student.mentor?.id ?? "-",
             cs: cs,
           ),
         ],

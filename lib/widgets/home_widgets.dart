@@ -1110,7 +1110,7 @@ Widget nextSessionCard(BuildContext context) {
             spacing: 20,
             runSpacing: 8,
             children: [
-              infoCard(context, "Subject", session.package.subjectName ?? "-"),
+              infoCard(context, "Subject", session.package?.subjectName ?? "-"),
               infoCard(context, "Syllabus", session.syllabus ?? "-"),
               infoCard(context, "Standard", session.className ?? "-"),
             ],
@@ -1272,7 +1272,7 @@ Widget sessionMainCard(
 
               /// Time
               Text(
-                formatTime(session.time),
+                formatTime(session.date ?? DateTime.now()),
                 style: context.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -1304,10 +1304,8 @@ String formatDate(DateTime? date) {
   return "${date.day}/${date.month}/${date.year}";
 }
 
-String formatTime(TimeOfDay time) {
-  final now = DateTime.now();
-  final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-  return DateFormat('hh:mm a').format(dt);
+String formatTime(DateTime time) {
+  return DateFormat('hh:mm a').format(time);
 }
 
 Widget infoCard(
@@ -1821,10 +1819,10 @@ BoxDecoration cardDecoration(BuildContext context) {
   final cs = context.theme.colorScheme;
 
   return BoxDecoration(
-    color: cs.surface,
-    borderRadius: BorderRadius.circular(14), // 🔥 reduced
+    color: cs.onPrimary,
+    borderRadius: BorderRadius.circular(14),
     border: Border.all(
-      color: cs.outline.withOpacity(0.12),
+      color: cs.outline.withOpacity(0.5),
     ),
     boxShadow: [
       BoxShadow(

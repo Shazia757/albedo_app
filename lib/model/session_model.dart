@@ -9,29 +9,36 @@ import 'package:flutter/material.dart';
 class Session {
   final String id;
   Student? student;
-  final Package package;
-  final String syllabus;
-  final String className;
+Package? package;
+  String? syllabus;
+ String? className;
   Teacher? teacher;
   Mentor? mentor;
   Coordinator? coordinator;
   Advisor? advisor;
+  String? startTime;
+  String? endTIme;
+  bool? isCompleted;
+  bool? needsAction;
+  String? remainingTime;
+  String? remainingTimeToEnd;
+  String? scheduleType;
+  String? topic;
+  String? googleMeetLink;
 
-  final DateTime date;
-  final TimeOfDay time;
-  final String status;
+   DateTime? date;
+   String status;
   int? duration;
   double? teacherSalary;
 
   Session({
     required this.id,
     this.student,
-    required this.package,
-    required this.syllabus,
-    required this.className,
+     this.package,
+     this.syllabus,
+     this.className,
     this.teacher,
-    required this.date,
-    required this.time,
+     this.date,
     required this.status,
     this.advisor,
     this.coordinator,
@@ -40,13 +47,14 @@ class Session {
     this.teacherSalary,
   });
 }
+
 class SessionReport {
   final String studentName;
   final String studentId;
   final Package package;
   final String sessionDate;
-   String? duration;
-   String? batchId;
+  String? duration;
+  String? batchId;
 
   bool isCompleted;
 

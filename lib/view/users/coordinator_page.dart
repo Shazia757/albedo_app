@@ -394,11 +394,11 @@ class CoordinatorPage extends StatelessWidget {
                                         CustomWidgets()
                                             .labelWithAsterisk('Company Name'),
                                         const SizedBox(height: 8),
-                                        CustomWidgets().dropdownStyledTextField(
-                                          context: context,
-                                          hint: 'Enter company name',
-                                          controller: exp.companyController,
-                                        ),
+                                        // CustomWidgets().dropdownStyledTextField(
+                                        //   context: context,
+                                        //   hint: 'Enter company name',
+                                        //   controller: exp.companyController,
+                                        // ),
 
                                         const SizedBox(height: 10),
 
@@ -406,11 +406,11 @@ class CoordinatorPage extends StatelessWidget {
                                         CustomWidgets()
                                             .labelWithAsterisk('Years'),
                                         const SizedBox(height: 8),
-                                        CustomWidgets().dropdownStyledTextField(
-                                          context: context,
-                                          hint: 'Years',
-                                          controller: exp.yearController,
-                                        ),
+                                        // CustomWidgets().dropdownStyledTextField(
+                                        //   context: context,
+                                        //   hint: 'Years',
+                                        //   controller: exp.yearController,
+                                        // ),
 
                                         const SizedBox(height: 10),
 
@@ -418,11 +418,11 @@ class CoordinatorPage extends StatelessWidget {
                                         CustomWidgets()
                                             .labelWithAsterisk('Months'),
                                         const SizedBox(height: 8),
-                                        CustomWidgets().dropdownStyledTextField(
-                                          context: context,
-                                          hint: 'Months',
-                                          controller: exp.monthController,
-                                        ),
+                                        // CustomWidgets().dropdownStyledTextField(
+                                        //   context: context,
+                                        //   hint: 'Months',
+                                        //   controller: exp.monthController,
+                                        // ),
 
                                         const SizedBox(height: 10),
                                       ],
@@ -439,7 +439,9 @@ class CoordinatorPage extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
-                              onPressed: c.addExperience,
+                              onPressed: () {
+                                
+                              },
                               // c.addExperience,
                               icon: Icon(Icons.add),
                               label: Text("Add Experience"),
@@ -678,12 +680,12 @@ class CoordinatorPage extends StatelessWidget {
                                           CustomWidgets().labelWithAsterisk(
                                               'Company Name'),
                                           const SizedBox(height: 8),
-                                          CustomWidgets()
-                                              .dropdownStyledTextField(
-                                            context: context,
-                                            hint: 'Enter company name',
-                                            controller: exp.companyController,
-                                          ),
+                                          // CustomWidgets()
+                                          //     .dropdownStyledTextField(
+                                          //   context: context,
+                                          //   hint: 'Enter company name',
+                                          //   controller: exp.companyController,
+                                          // ),
 
                                           const SizedBox(height: 10),
 
@@ -691,12 +693,12 @@ class CoordinatorPage extends StatelessWidget {
                                           CustomWidgets()
                                               .labelWithAsterisk('Years'),
                                           const SizedBox(height: 8),
-                                          CustomWidgets()
-                                              .dropdownStyledTextField(
-                                            context: context,
-                                            hint: 'Years',
-                                            controller: exp.yearController,
-                                          ),
+                                          // CustomWidgets()
+                                          //     .dropdownStyledTextField(
+                                          //   context: context,
+                                          //   hint: 'Years',
+                                          //   controller: exp.yearController,
+                                          // ),
 
                                           const SizedBox(height: 10),
 
@@ -704,12 +706,12 @@ class CoordinatorPage extends StatelessWidget {
                                           CustomWidgets()
                                               .labelWithAsterisk('Months'),
                                           const SizedBox(height: 8),
-                                          CustomWidgets()
-                                              .dropdownStyledTextField(
-                                            context: context,
-                                            hint: 'Months',
-                                            controller: exp.monthController,
-                                          ),
+                                          // CustomWidgets()
+                                          //     .dropdownStyledTextField(
+                                          //   context: context,
+                                          //   hint: 'Months',
+                                          //   controller: exp.monthController,
+                                          // ),
 
                                           const SizedBox(height: 10),
                                         ],
@@ -726,7 +728,9 @@ class CoordinatorPage extends StatelessWidget {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton.icon(
-                                onPressed: c.addExperience,
+                                onPressed: () {
+                                  
+                                },
                                 // c.addExperience,
                                 icon: Icon(Icons.add),
                                 label: Text("Add Experience"),

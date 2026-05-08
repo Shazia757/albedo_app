@@ -3,8 +3,8 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/view/feedback_page.dart';
 import 'package:albedo_app/view/mentor_feedback_page.dart';
+import 'package:albedo_app/view/teacher/tr_detailed_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -19,7 +19,7 @@ import 'package:get/get.dart';
 class TeachersPage extends StatelessWidget {
   TeachersPage({super.key});
 
-  final c = Get.put(TeacherController());
+  final c = Get.put(TeacherController(), permanent: true);
 
   @override
   Widget build(BuildContext context) {
@@ -169,12 +169,9 @@ class TeachersPage extends StatelessWidget {
                                         (!isCustom ||
                                                 PermissionService.can(
                                                     "view_teachers"))
-                                            ? openTeacherProfile(
-                                                context,
-                                                teacher,
-                                                toUser: (p0) =>
-                                                    teacherToUser(teacher),
-                                              )
+                                            ? Get.to(() => TeacherDetailsPage(
+                                                teacher: teacher,
+                                                initialIndex: index))
                                             : null;
                                       }
                                     },
@@ -401,11 +398,11 @@ class TeachersPage extends StatelessWidget {
                                         CustomWidgets()
                                             .labelWithAsterisk('Company Name'),
                                         const SizedBox(height: 8),
-                                        CustomWidgets().dropdownStyledTextField(
-                                          context: context,
-                                          hint: 'Enter company name',
-                                          controller: exp.companyController,
-                                        ),
+                                        // CustomWidgets().dropdownStyledTextField(
+                                        //   context: context,
+                                        //   hint: 'Enter company name',
+                                        //   controller: exp.companyController,
+                                        // ),
 
                                         const SizedBox(height: 10),
 
@@ -413,11 +410,11 @@ class TeachersPage extends StatelessWidget {
                                         CustomWidgets()
                                             .labelWithAsterisk('Years'),
                                         const SizedBox(height: 8),
-                                        CustomWidgets().dropdownStyledTextField(
-                                          context: context,
-                                          hint: 'Years',
-                                          controller: exp.yearController,
-                                        ),
+                                        // CustomWidgets().dropdownStyledTextField(
+                                        //   context: context,
+                                        //   hint: 'Years',
+                                        //   controller: exp.yearController,
+                                        // ),
 
                                         const SizedBox(height: 10),
 
@@ -425,11 +422,11 @@ class TeachersPage extends StatelessWidget {
                                         CustomWidgets()
                                             .labelWithAsterisk('Months'),
                                         const SizedBox(height: 8),
-                                        CustomWidgets().dropdownStyledTextField(
-                                          context: context,
-                                          hint: 'Months',
-                                          controller: exp.monthController,
-                                        ),
+                                        // CustomWidgets().dropdownStyledTextField(
+                                        //   context: context,
+                                        //   hint: 'Months',
+                                        //   controller: exp.monthController,
+                                        // ),
 
                                         const SizedBox(height: 10),
                                       ],
@@ -446,7 +443,7 @@ class TeachersPage extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
-                              onPressed: c.addExperience,
+                              onPressed: () {},
                               // c.addExperience,
                               icon: Icon(Icons.add),
                               label: Text("Add Experience"),
@@ -741,12 +738,12 @@ class TeachersPage extends StatelessWidget {
                                           CustomWidgets().labelWithAsterisk(
                                               'Company Name'),
                                           const SizedBox(height: 8),
-                                          CustomWidgets()
-                                              .dropdownStyledTextField(
-                                            context: context,
-                                            hint: 'Enter company name',
-                                            controller: exp.companyController,
-                                          ),
+                                          // CustomWidgets()
+                                          //     .dropdownStyledTextField(
+                                          //   context: context,
+                                          //   hint: 'Enter company name',
+                                          //   controller: exp.companyController,
+                                          // ),
 
                                           const SizedBox(height: 10),
 
@@ -754,12 +751,12 @@ class TeachersPage extends StatelessWidget {
                                           CustomWidgets()
                                               .labelWithAsterisk('Years'),
                                           const SizedBox(height: 8),
-                                          CustomWidgets()
-                                              .dropdownStyledTextField(
-                                            context: context,
-                                            hint: 'Years',
-                                            controller: exp.yearController,
-                                          ),
+                                          // CustomWidgets()
+                                          //     .dropdownStyledTextField(
+                                          //   context: context,
+                                          //   hint: 'Years',
+                                          //   controller: exp.yearController,
+                                          // ),
 
                                           const SizedBox(height: 10),
 
@@ -767,12 +764,12 @@ class TeachersPage extends StatelessWidget {
                                           CustomWidgets()
                                               .labelWithAsterisk('Months'),
                                           const SizedBox(height: 8),
-                                          CustomWidgets()
-                                              .dropdownStyledTextField(
-                                            context: context,
-                                            hint: 'Months',
-                                            controller: exp.monthController,
-                                          ),
+                                          // CustomWidgets()
+                                          //     .dropdownStyledTextField(
+                                          //   context: context,
+                                          //   hint: 'Months',
+                                          //   controller: exp.monthController,
+                                          // ),
 
                                           const SizedBox(height: 10),
                                         ],
@@ -789,7 +786,7 @@ class TeachersPage extends StatelessWidget {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton.icon(
-                                onPressed: c.addExperience,
+                                onPressed: () {},
                                 // c.addExperience,
                                 icon: Icon(Icons.add),
                                 label: Text("Add Experience"),

@@ -1,6 +1,12 @@
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/model/feedback_model.dart';
+import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -16,7 +22,9 @@ class TeacherController extends GetxController {
   var filteredTeachers = <Teacher>[].obs;
   final tabs = ["All", "Active", "Batch", "Inactive"];
   var selectedTab = 0.obs;
-    var selectedDate = Rxn<DateTime>();
+  var selectedDate = Rxn<DateTime>();
+  var selectedFromDate = Rxn<DateTime>();
+  var selectedUntilDate = Rxn<DateTime>();
 
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
@@ -24,6 +32,23 @@ class TeacherController extends GetxController {
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
+  RxBool isActive = false.obs;
+  RxString status = "Demo Pending".obs;
+  var selectedIndex = 0.obs;
+  RxString selectedFilter = "All".obs;
+  final RxBool obscurePassword = true.obs;
+  final RxBool obscureNewPassword = true.obs;
+  final RxBool obscureConfirmPassword = true.obs;
+  final RxBool showUnlockForm = false.obs;
+  final RxBool selectAllStudents = false.obs;
+
+  final RxString unlockFrom = ''.obs;
+  final RxString unlockTo = ''.obs;
+  final RxString reLockAfter = ''.obs;
+
+  final RxString targetType = 'All Students'.obs;
+
+  RxInt feedbackTabIndex = 0.obs;
 
   // --------------------------
   // Counts for tabs
@@ -42,6 +67,18 @@ class TeacherController extends GetxController {
         {"label": "Batch", "count": batchCount},
         {"label": "Inactive", "count": inactiveCount},
       ];
+
+  List<String> detailedTabs = [
+    "Profile",
+    "Professional",
+    "Students",
+    "Batches",
+    "Wallet",
+    "Feedback",
+    "Access"
+  ];
+
+  List<String> feedbackTabs = ['Student', 'Mentor'];
 
   // 🎯 Teacher-specific fields
   TextEditingController nameController = TextEditingController();
@@ -65,13 +102,35 @@ class TeacherController extends GetxController {
   TextEditingController bankNameController = TextEditingController();
   TextEditingController branchNameController = TextEditingController();
   TextEditingController bankBranchController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController currentPasswordController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
+  TextEditingController confirmNewPasswordController = TextEditingController();
+  TextEditingController startDateController = TextEditingController();
+  TextEditingController endDateController = TextEditingController();
+  TextEditingController relockController = TextEditingController();
 
-  var experiences = <ExperienceModel>[].obs;
+  var experiences = <Experience>[].obs;
+
+  final RxList<Map<String, dynamic>> students = [
+    {"id": "STU001", "name": "Amina"},
+    {"id": "STU002", "name": "Rayan"},
+    {"id": "STU003", "name": "Sara"},
+  ].obs;
+
+
+
+final RxList<Map<String, dynamic>> selectedStudents =
+    <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchTeachers();
+    selectedStudents.add({
+    "id": "all",
+    "name": "All Students",
+  });
   }
 
   Future<void> fetchTeachers() async {
@@ -110,19 +169,175 @@ class TeacherController extends GetxController {
     return [
       Teacher(
           id: "TEA1001",
-          name: "John",
+          name: "John Doe",
           email: "john@email.com",
+          imageUrl: "https://randomuser.me/api/portraits/men/1.jpg",
           status: "Active",
+          gender: "Male",
           type: "Batch",
-          phone: "123456",
           joinedAt: DateTime.now(),
-          gender: 'Male',
-          coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
-          mentor: Mentor(
-            name: '',
-            id: '',
+          phone: "9876543210",
+          whatsapp: "9876543210",
+          dob: "1995-08-15",
+          qualification: "MSc Mathematics",
+          place: "Kozhikode",
+          pincode: "673001",
+          address: "Green Villa, Kozhikode, Kerala",
+          timezone: "Asia/Kolkata",
+          prefLanguage: "English",
+          tuitionMode: "Online",
+          accountNumber: "123456789012",
+          accountHolder: "John Doe",
+          upiId: "john@upi",
+          ifscCode: "SBIN0001234",
+          accountType: "Savings",
+          bankName: "State Bank of India",
+          bankBranch: "Kozhikode Main",
+          totalStudents: 45,
+          totalPackages: 18,
+          salary: 85000,
+          paid: 60000,
+          balance: 25000,
+          totalSessions: 120,
+          totalHours: 240,
+          student: [
+            Student(
+              studentId: "STU1001",
+              name: "Riya Shah",
+              email: "riya.shah@email.com",
+              phone: "9876543210",
+              whatsapp: "9876543210",
+              imageUrl: "https://randomuser.me/api/portraits/women/45.jpg",
+
+              status: "Active",
+              type: "Batch",
+              category: "Regular",
+              batch: [
+                Batch(
+                    batchID: 'BAT101',
+                    batchName: '10th CBSE',
+                    status: 'Active',
+                    amountPaid: '12000',
+                    paidDate: DateTime.now())
+              ],
+
+              joinedAt: DateTime.now(),
+              admissionDate: DateTime.parse('2023-01-15 12:00:00'),
+
+              gender: "Female",
+              timezone: "Asia/Kolkata",
+              address: "12, MG Road",
+              place: "Mumbai",
+
+              parentName: "Rajesh Shah",
+              parentOccupation: "Businessman",
+
+              createdBy: "Admin",
+              referredBy: "Google",
+              referralName: "Anita",
+              referralRole: "Parent",
+
+              isFeePaid: true,
+
+              /// 🔷 Academic Info
+              course: "CBSE",
+              subjects: "Maths, Science, English",
+              syllabus: "CBSE 2023",
+              syllabusId: "SYL001",
+              standard: 8,
+
+              /// 🔷 Class Tracking
+              classHours: 40,
+              classesTaken: 32,
+              totalHour: 100,
+              totalSession: 50,
+
+              /// 🔷 Fees
+              amount: 20000,
+              amountPerHour: 500,
+              totalAmount: 25000,
+              regFee: 2000,
+              totalPaid: 18000,
+              balance: 7000,
+
+              /// 🔷 Teacher / Staff
+              teacherId: "T001",
+              advisorName: "Mr. Joseph",
+              advisorId: "A101",
+
+              mentor: Mentor(
+                name: "Sarah Williams",
+                empId: "MNT-441",
+                joinedAt: DateTime.now(),
+              ),
+
+              coordinator: Coordinator(
+                name: "John Mathew",
+                id: "CRD-782",
+                joinedAt: DateTime.now(),
+              ),
+
+              advisor: Advisor(
+                name: "Joseph Sir",
+                id: "ADV-12",
+                joinedAt: DateTime.now(),
+              ),
+
+              /// 🔷 Packages
+              packages: [
+                Package(
+                    status: 'active',
+                    subjectId: "PKG001",
+                    name: "Maths Advanced",
+                    standard: '10',
+                    duration: '50',
+                    packageFee: 15000,
+                    sessions: [
+                      Session(
+                          id: '1',
+                          status: 'completed',
+                          date: DateTime.now().subtract(Duration(hours: 100))),
+                      Session(id: '2', status: 'upcoming'),
+                    ]),
+                Package(
+                  status: 'Inactive',
+                  subjectId: "PKG002",
+                  name: "Science Foundation",
+                  duration: '40',
+                  packageFee: 12000,
+                ),
+              ],
+            ),
+          ],
+          coordinator: Coordinator(
+            id: "CRD1001",
+            name: "Sarah Williams",
+            imageUrl: "https://randomuser.me/api/portraits/women/2.jpg",
             joinedAt: DateTime.now(),
-          )),
+          ),
+          mentor: Mentor(
+            id: "MNT1001",
+            empId: "EMP4521",
+            name: "Michael Chen",
+            imageUrl: "https://randomuser.me/api/portraits/men/3.jpg",
+            joinedAt: DateTime.now(),
+          ),
+          batch: [
+            Batch(
+              id: "BAT1001",
+              batchName: "NEET Crash Batch",
+              status: "Active",
+            ),
+            Batch(
+              id: "BAT1002",
+              batchName: "JEE Advanced Batch",
+              status: "Completed",
+            ),
+          ],
+          experience: [
+            Experience(companyName: 'Albedo', months: 2, years: 1),
+            Experience(companyName: 'Star', months: 7)
+          ]),
       Teacher(
         id: "TEA1002",
         name: "Ms. Smith",
@@ -135,7 +350,7 @@ class TeacherController extends GetxController {
         coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
         mentor: Mentor(
           name: '',
-          id: '',
+          empId: '',
           joinedAt: DateTime.now(),
         ),
       )
@@ -184,15 +399,44 @@ class TeacherController extends GetxController {
     filteredTeachers.assignAll(temp);
   }
 
-  void addExperience() {
-    experiences.add(
-      ExperienceModel(
-        companyController: TextEditingController(),
-        yearController: TextEditingController(),
-        monthController: TextEditingController(),
-      ),
-    );
-  }
+  final RxList<Map<String, dynamic>> studentFeedbacks = <Map<String, dynamic>>[
+    {
+      "id": "FDB001",
+      "student_name": "Amina",
+      "rating": 4.8,
+      "message":
+          "Very supportive teacher. The sessions were easy to understand.",
+      "date": "2026-05-01",
+    },
+    {
+      "id": "FDB002",
+      "student_name": "Rayan",
+      "rating": 5.0,
+      "message": "Excellent teaching style and good communication throughout.",
+      "date": "2026-05-03",
+    },
+  ].obs;
+
+  final RxList<Map<String, dynamic>> mentorFeedbacks = <Map<String, dynamic>>[
+    {
+      "id": "MFB001",
+      "mentor_name": "Shahid",
+      "rating": 4.5,
+      "message": "Teacher manages students well and maintains consistency.",
+      "date": "2026-05-02",
+    },
+    {
+      "id": "MFB002",
+      "mentor_name": "Nihal",
+      "rating": 4.9,
+      "message":
+          "Very professional and active in handling batch responsibilities.",
+      "date": "2026-05-05",
+    },
+  ].obs;
+
+  final RxList<Map<String, dynamic>> accessOverrides =
+      <Map<String, dynamic>>[].obs;
 
   void loadTeachers(Teacher teacher) {
     nameController.text = teacher.name.toString();

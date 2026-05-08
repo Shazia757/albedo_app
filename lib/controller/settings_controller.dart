@@ -452,12 +452,12 @@ class SettingsController extends GetxController {
       final data = [
         Assessment(
             id: '1',
-            title: 'Academic & Basics',
+            type: 'Academic & Basics',
             testType: ['Academic', 'Maths'],
             attentionQuestions: ['Consistency', 'Participation']),
         Assessment(
             id: '1',
-            title: 'Maths',
+            type: 'Maths',
             testType: ['Academic', 'Language'],
             attentionQuestions: ['Consistency', 'Participation']),
       ];
@@ -469,9 +469,9 @@ class SettingsController extends GetxController {
   }
 
   void loadAssessments(Assessment assessment) {
-    titleController.text = assessment.title ?? '';
+    titleController.text = assessment.type ?? '';
     dateController.text = assessment.date ?? '';
-    selectedTestType.assignAll(assessment.testType);
+    selectedTestType.assignAll(assessment.testType??[]);
     selectedAttentionQns.assignAll(assessment.attentionQuestions ?? []);
   }
 
