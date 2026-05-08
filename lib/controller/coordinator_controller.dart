@@ -1,5 +1,6 @@
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/view/users/add_teacher_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,9 +18,11 @@ class CoordinatorController extends GetxController {
   var isDeactivateButtonLoading = true.obs;
   var isSearching = false.obs;
   var selectedDate = Rxn<DateTime>();
+  final RxString selectedBranch = ''.obs;
+  final RxString selectedBank = ''.obs;
+  final RxString selectedTimezone = ''.obs;
 
-
-  var experiences = <Experience>[].obs;
+  final RxList<ExperienceFormData> experiences = <ExperienceFormData>[].obs;
 
   // --------------------------
   // Counts for tabs
@@ -53,11 +56,35 @@ class CoordinatorController extends GetxController {
   TextEditingController bankNameController = TextEditingController();
   TextEditingController branchNameController = TextEditingController();
   TextEditingController bankBranchController = TextEditingController();
+  TextEditingController ifscController = TextEditingController();
+  TextEditingController resumeController = TextEditingController();
+
+  final Map<String, List<String>> bankBranches = {
+    'State Bank of India': [
+      'Kayamkulam',
+      'Mavelikkara',
+      'Haripad',
+    ],
+    'HDFC Bank': [
+      'Kayamkulam',
+      'Alappuzha',
+      'Kollam',
+    ],
+    'ICICI Bank': [
+      'Kayamkulam',
+      'Karunagappally',
+    ],
+    'Federal Bank': [
+      'Kayamkulam',
+      'Cherthala',
+    ],
+  };
 
   @override
   void onInit() {
     super.onInit();
     fetchCoordinators();
+    addExperience();
   }
 
   void fetchCoordinators() async {
@@ -171,7 +198,7 @@ class CoordinatorController extends GetxController {
     // );
   }
 
-    resign(String id) {
+  resign(String id) {
     isDeactivateButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {
@@ -189,4 +216,88 @@ class CoordinatorController extends GetxController {
     // );
   }
 
+  void addCoordinator() {}
+
+  bool validateCoordinator(BuildContext context) {
+    String error = "";
+
+    /// BASIC DETAILS
+    if (nameController.text.trim().isEmpty) {
+      error = "Coordinator name is required";
+    } else if (emailController.text.trim().isEmpty) {
+      error = "Email is required";
+    } else if (!GetUtils.isEmail(emailController.text.trim())) {
+      error = "Enter a valid email address";
+    } else if (phoneController.text.trim().isEmpty) {
+      error = "Phone number is required";
+    } else if (phoneController.text.trim().length < 10) {
+      error = "Enter a valid phone number";
+    } else if (placeController.text.trim().isEmpty) {
+      error = "Place is required";
+    } else if (pincodeController.text.trim().isEmpty) {
+      error = "Pincode is required";
+    } else if (pincodeController.text.trim().length < 5) {
+      error = "Enter a valid pincode";
+    } else if (addressController.text.trim().isEmpty) {
+      error = "Address is required";
+    } else if (dobController.text.trim().isEmpty) {
+      error = "Date of birth is required";
+    } else if (qualificationController.text.trim().isEmpty) {
+      error = "Qualification is required";
+    }
+
+    /// EXPERIENCE VALIDATION
+    else if (experiences.isEmpty) {
+      error = "At least one experience is required";
+    } else {
+      for (int i = 0; i < experiences.length; i++) {
+        final exp = experiences[i];
+
+        if (exp.companyController.text.trim().isEmpty) {
+          error = "Company name is required in Experience ${i + 1}";
+          break;
+        } else if (exp.yearController.text.trim().isEmpty) {
+          error = "Years is required in Experience ${i + 1}";
+          break;
+        } else if (exp.monthController.text.trim().isEmpty) {
+          error = "Months is required in Experience ${i + 1}";
+          break;
+        }
+      }
+    }
+
+    /// BANK DETAILS
+    if (error.isEmpty && accountNumberController.text.trim().isEmpty) {
+      error = "Account number is required";
+    } else if (error.isEmpty &&
+        accountHolderNameController.text.trim().isEmpty) {
+      error = "Account holder name is required";
+    } else if (error.isEmpty && ifscController.text.trim().isEmpty) {
+      error = "IFSC code is required";
+    } else if (error.isEmpty && resumeController.text.trim().isEmpty) {
+      error = "Resume URL is required";
+    }
+
+    if (error.isNotEmpty) {
+      Get.snackbar(
+        "Error",
+        error,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(12),
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
+  void addExperience() {
+    experiences.add(ExperienceFormData());
+  }
+
+  void removeExperience(int index) {
+    experiences[index].dispose();
+    experiences.removeAt(index);
+  }
 }

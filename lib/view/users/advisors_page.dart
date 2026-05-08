@@ -2,6 +2,7 @@ import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/advisor_controller.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/users/add_advisor_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/custom_tab.dart';
@@ -17,7 +18,7 @@ import 'package:get/get.dart';
 class AdvisorsPage extends StatelessWidget {
   AdvisorsPage({super.key});
 
-  final c = Get.put(AdvisorController());
+  final c = Get.put(AdvisorController(), permanent: true);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,17 @@ class AdvisorsPage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(),
       drawer: isDesktop ? null : const DrawerMenu(),
-      floatingActionButton: addAdvisor(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(() => const AddAdvisorPage());
+        },
+        mini: true,
+        backgroundColor: context.theme.colorScheme.primary,
+        child: Icon(
+          Icons.add,
+          color: context.theme.colorScheme.onPrimary,
+        ),
+      ),
       body: Row(
         children: [
           if (isDesktop) DrawerMenu(),
@@ -372,9 +383,7 @@ class AdvisorsPage extends StatelessWidget {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton.icon(
-                                onPressed: () {
-                                  
-                                },
+                                onPressed: () {},
                                 // c.addExperience,
                                 icon: Icon(Icons.add),
                                 label: Text("Add Experience"),
@@ -570,9 +579,7 @@ class AdvisorsPage extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
-                              onPressed: () {
-                                
-                              },
+                              onPressed: () {},
                               // c.addExperience,
                               icon: Icon(Icons.add),
                               label: Text("Add Experience"),

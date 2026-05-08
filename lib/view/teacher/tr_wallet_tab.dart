@@ -1,50 +1,88 @@
+import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/controller/teacher_wallet_controller.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/wallet_model.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-Widget teacherWalletTab(
-  BuildContext context,
-  Teacher teacher,
-  TeacherController c,
-  TeacherWalletController wallet,
-) {
+Widget walletTab(
+  BuildContext context, {
+  Teacher? teacher,
+  Mentor? mentor,
+  TeacherController? teacherController,
+  MentorController? mentorController,
+  required TeacherWalletController wallet,
+}) {
   final cs = Theme.of(context).colorScheme;
+
+  final bool isTeacher = teacher != null;
+
+  final walletData = teacher?.wallet ?? mentor?.wallet ?? Wallet();
+
   return SizedBox(
     height: MediaQuery.of(context).size.height,
     child: Column(
       children: [
+        /// TOTAL BALANCE
         _totalBalance(cs),
+
+        /// FILTERS
         _filters(context, wallet),
+
+        /// SUMMARY BUTTON
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: () => _showWalletSummary(
-                context, teacher, teacher.wallet ?? Wallet()),
+            onPressed: () {
+              _showWalletSummary(
+                context,
+                mentor: mentor,
+                teacher: teacher,
+                wallet: walletData,
+              );
+            },
             iconAlignment: IconAlignment.end,
-            icon: const Icon(Icons.bar_chart_outlined,
-                size: 18, color: Colors.white),
-            label: const Text('Wallet Summary',
-                style: TextStyle(color: Colors.white, fontSize: 13)),
+            icon: const Icon(
+              Icons.bar_chart_outlined,
+              size: 18,
+              color: Colors.white,
+            ),
+            label: const Text(
+              'Wallet Summary',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+              ),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: cs.primary,
               elevation: 0,
               padding: const EdgeInsets.symmetric(vertical: 13),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ),
+
+        /// LIST
         Expanded(
           child: Obx(() {
             final data = wallet.filteredWallets;
+
             return ListView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: data.length,
-              itemBuilder: (_, i) => _monthCard(context, data[i], cs),
+              itemBuilder: (_, i) {
+                return _monthCard(
+                  context,
+                  data[i],
+                  cs,
+                );
+              },
             );
           }),
         ),
@@ -53,16 +91,26 @@ Widget teacherWalletTab(
   );
 }
 
-void _showWalletSummary(BuildContext context, Teacher teacher, Wallet wallet) {
+void _showWalletSummary(
+  BuildContext context, {
+  Teacher? teacher,
+  Mentor? mentor,
+  required Wallet wallet,
+}) {
   final transactions =
       wallet.transactions is List ? wallet.transactions as List : [];
 
   final totalTransactions = transactions.length;
 
+  /// reusable balance
+  final balance = teacher?.balance ?? mentor?.balance ?? 0;
+
+  final isTeacher = teacher != null;
+
   CustomWidgets().showCustomDialog(
     context: context,
     title: Text(
-      'Wallet Summary ($totalTransactions transactions)',
+      'Wallet Summary (0 transactions)',
     ),
     formKey: GlobalKey(),
     isViewOnly: true,
@@ -71,13 +119,14 @@ void _showWalletSummary(BuildContext context, Teacher teacher, Wallet wallet) {
       ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: 6,
+        itemCount: isTeacher ? 6 : 3,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
-          final items = [
+          /// Teacher cards
+          final teacherItems = [
             {
               "title": "Current Balance",
-              "amount": teacher.balance ?? 0,
+              "amount": balance,
               "color": Colors.blue,
               "icon": Icons.account_balance_wallet,
             },
@@ -113,7 +162,29 @@ void _showWalletSummary(BuildContext context, Teacher teacher, Wallet wallet) {
             },
           ];
 
-          final item = items[index];
+          /// Mentor cards
+          final mentorItems = [
+            {
+              "title": "Current Balance",
+              "amount": balance,
+              "color": Colors.blue,
+              "icon": Icons.account_balance_wallet,
+            },
+            {
+              "title": "Total Earnings",
+              "amount": 1250,
+              "color": Colors.green,
+              "icon": Icons.trending_up,
+            },
+            {
+              "title": "Total Withdraw",
+              "amount": 0,
+              "color": Colors.red,
+              "icon": Icons.arrow_downward,
+            },
+          ];
+
+          final item = isTeacher ? teacherItems[index] : mentorItems[index];
 
           return _summaryInfoCard(
             title: item['title'] as String,
@@ -122,7 +193,7 @@ void _showWalletSummary(BuildContext context, Teacher teacher, Wallet wallet) {
             icon: item['icon'] as IconData,
           );
         },
-      )
+      ),
     ],
   );
 }

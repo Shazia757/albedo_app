@@ -1,9 +1,11 @@
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/controller/teacher_wallet_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/teacher/add_wallet_page.dart';
 import 'package:albedo_app/view/teacher/tr_package_session_page.dart';
@@ -41,17 +43,17 @@ extension PackageCalculations on Package {
 // ============================================================
 //  PAGE
 // ============================================================
-class TeacherDetailsPage extends StatelessWidget {
-  final Teacher teacher;
+class MentorDetailsPage extends StatelessWidget {
+  final Mentor mentor;
   final int initialIndex;
 
-  TeacherDetailsPage({
+  MentorDetailsPage({
     super.key,
-    required this.teacher,
+    required this.mentor,
     required this.initialIndex,
   });
 
-  final c = Get.find<TeacherController>();
+  final c = Get.find<MentorController>();
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +61,7 @@ class TeacherDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(),
-      // ── FAB is untouched ────────────────────────────────────
+      // ── FAB ────────────────────────────────────
       floatingActionButton: Obx(() {
         final index = c.selectedIndex.value;
 
@@ -67,7 +69,7 @@ class TeacherDetailsPage extends StatelessWidget {
           return FloatingActionButton(
             mini: true,
             onPressed: () => Get.to(() => AddWalletPage(
-                  teacher: teacher,
+                  mentor: mentor,
                 )),
             child: const Icon(Icons.add),
           );
@@ -108,30 +110,178 @@ class TeacherDetailsPage extends StatelessWidget {
                 return _studentsTab(context, cs);
               }
 
-              // ─── BATCHES ───────────────────────────────────
-              if (c.detailedTabs[index] == 'Batches') {
-                final batches = teacher.batch ?? [];
-
-                if (batches.isEmpty) {
-                  return EmptyState(
-                      cs: cs,
-                      subtitle: '',
-                      icon: Icons.groups_outlined,
-                      title: 'No batches assigned');
-                }
-                return _batchesTab(context, cs, batches);
-              }
-
               // ─── WALLET ────────────────────────────────────
               if (c.detailedTabs[index] == 'Wallet') {
                 return walletTab(context,
-                    teacher: teacher,
-                    teacherController: c,
+                    mentor: mentor,
+                    mentorController: c,
                     wallet: walletController);
+              }
+              // ─── WALLET ────────────────────────────────────
+              if (c.detailedTabs[index] == 'Star of Month') {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// LAST UPDATED
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: cs.primary.withOpacity(.06),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: cs.primary.withOpacity(.15),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.update_rounded,
+                              color: cs.primary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Last Updated: 08 May 2026 • 11:45 AM',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: cs.onSurface.withOpacity(.7),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      /// M1
+                      CustomWidgets().labelWithAsterisk('M1'),
+                      const SizedBox(height: 8),
+                      CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter M1 value',
+                        controller: c.m1Controller,
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      /// M2
+                      CustomWidgets().labelWithAsterisk('M2'),
+                      const SizedBox(height: 8),
+                      CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter M2 value',
+                        controller: c.m2Controller,
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      /// M3
+                      CustomWidgets().labelWithAsterisk('M3'),
+                      const SizedBox(height: 8),
+                      CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter M3 value',
+                        controller: c.m3Controller,
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      /// M4
+                      CustomWidgets().labelWithAsterisk('M4'),
+                      const SizedBox(height: 8),
+                      CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter M4 value',
+                        controller: c.m4Controller,
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      /// M5
+                      CustomWidgets().labelWithAsterisk('M5'),
+                      const SizedBox(height: 8),
+                      CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter M5 value',
+                        controller: c.m5Controller,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      /// BUTTONS
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                /// set default values
+                              },
+                              icon: const Icon(
+                                Icons.restart_alt_rounded,
+                                size: 15,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                'Default Value',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: cs.secondary,
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                /// update action
+                              },
+                              icon: const Icon(
+                                Icons.save_rounded,
+                                size: 15,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                'Update',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: cs.primary,
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
               }
 
               // ─── FEEDBACKS ─────────────────────────────────
-              if (c.detailedTabs[index] == 'Feedback') {
+              if (c.detailedTabs[index] == 'Feedbacks') {
                 return _feedbacksTab(context, cs);
               }
               // ─── ACCESS ─────────────────────────────────
@@ -193,10 +343,10 @@ class TeacherDetailsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _contactRow(context, Icons.phone_outlined, 'Mobile',
-                      teacher.phone ?? '-'),
+                      mentor.phone ?? '-'),
                   const SizedBox(height: 10),
                   _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
-                      teacher.whatsapp ?? '-'),
+                      mentor.whatsapp ?? '-'),
                 ],
               ),
               _divider(cs),
@@ -204,10 +354,10 @@ class TeacherDetailsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _contactRow(
-                      context, Icons.place, 'Place', teacher.place ?? "-"),
+                      context, Icons.place, 'Place', mentor.place ?? "-"),
                   const SizedBox(height: 10),
                   _contactRow(context, Icons.calendar_today_outlined,
-                      'Date Of Birth', teacher.dob ?? "-"),
+                      'Date Of Birth', mentor.dob ?? "-"),
                 ],
               ),
             ],
@@ -233,7 +383,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           color: cs.outline,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text(teacher.upiId ?? '-',
+                  Text(mentor.upiId ?? '-',
                       style: const TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 8),
@@ -243,7 +393,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           color: cs.outline,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text(teacher.accountNumber ?? '-',
+                  Text(mentor.accountNumber ?? '-',
                       style: const TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 8),
@@ -253,7 +403,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           color: cs.outline,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text(teacher.ifscCode ?? '-',
+                  Text(mentor.ifscCode ?? '-',
                       style: const TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w700)),
                 ],
@@ -269,7 +419,7 @@ class TeacherDetailsPage extends StatelessWidget {
   //  PROFESSIONAL TAB
   // ══════════════════════════════════════════════════════════
   Widget _professionalTab(BuildContext context, ColorScheme cs) {
-    final experiences = teacher.experience ?? [];
+    final experiences = mentor.experience ?? [];
 
     int totalYears = 0;
     int totalMonths = 0;
@@ -313,7 +463,7 @@ class TeacherDetailsPage extends StatelessWidget {
                     child: _infoTile(
                       context,
                       title: 'Qualification',
-                      value: teacher.qualification ?? '-',
+                      value: mentor.qualification ?? '-',
                       icon: Icons.school_outlined,
                     ),
                   ),
@@ -335,7 +485,7 @@ class TeacherDetailsPage extends StatelessWidget {
               _infoTile(
                 context,
                 title: 'Preferred Language',
-                value: teacher.prefLanguage ?? '-',
+                value: mentor.prefLanguage ?? '-',
                 icon: Icons.language_outlined,
               ),
 
@@ -366,7 +516,7 @@ class TeacherDetailsPage extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if ((teacher.experience ?? []).isEmpty)
+                        if ((mentor.experience ?? []).isEmpty)
                           Text(
                             'No work experience added',
                             style: TextStyle(
@@ -376,7 +526,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           )
                         else
                           Column(
-                            children: (teacher.experience ?? []).map((exp) {
+                            children: (mentor.experience ?? []).map((exp) {
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 10),
                                 child: Row(
@@ -449,79 +599,26 @@ class TeacherDetailsPage extends StatelessWidget {
                 'Documents & Security',
                 icon: Icons.folder_outlined,
               ),
-
               _divider(cs),
-
               const SizedBox(height: 14),
-
-              /// 🔹 Documents
-              Text(
-                'Documents',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: cs.outline,
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.perm_identity_rounded,
+                      size: 15, color: Colors.white),
+                  label: const Text('ID Card',
+                      style: TextStyle(color: Colors.white, fontSize: 13)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: cs.primary,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
                 ),
               ),
-
               const SizedBox(height: 10),
-
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'ID Card',
-                    icon: Icons.badge_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Resume',
-                    icon: Icons.description_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Educational Certificate',
-                    icon: Icons.school_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Aadhar Front',
-                    icon: Icons.credit_card_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Aadhar Back',
-                    icon: Icons.credit_card,
-                    onTap: () {},
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 18),
-
-              /// 🔹 Security
-              Text(
-                'Security',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: cs.outline,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
               Row(
                 children: [
                   Expanded(
@@ -843,8 +940,8 @@ class TeacherDetailsPage extends StatelessWidget {
         const SizedBox(height: 12),
         Obx(() {
           final isStudent = c.feedbackTabIndex.value == 0;
-          final feedbacks = isStudent ? c.studentFeedbacks : c.mentorFeedbacks;
-          final label = isStudent ? 'Student' : 'Mentor';
+          final feedbacks = isStudent ? c.studentFeedbacks : c.teacherFeedbacks;
+          final label = isStudent ? 'Student' : 'Teacher';
 
           if (feedbacks.isEmpty) {
             return EmptyState(
@@ -913,7 +1010,7 @@ class TeacherDetailsPage extends StatelessWidget {
                             color: cs.shadow.withOpacity(0.1), blurRadius: 8)
                       ],
                     ),
-                    child: _squareAvatar(teacher.imageUrl, 64, radius: 12),
+                    child: _squareAvatar(mentor.imageUrl, 64, radius: 12),
                   ),
                 ),
 
@@ -921,11 +1018,11 @@ class TeacherDetailsPage extends StatelessWidget {
                   offset: const Offset(0, -20),
                   child: Column(
                     children: [
-                      Text(teacher.name,
+                      Text(mentor.name,
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w800)),
                       const SizedBox(height: 4),
-                      Text(teacher.email ?? '-',
+                      Text(mentor.email ?? '-',
                           style: TextStyle(fontSize: 13, color: cs.outline)),
                       const SizedBox(height: 10),
 
@@ -937,7 +1034,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(color: _blue.withOpacity(0.3)),
                         ),
-                        child: Text('ID: ${teacher.id}',
+                        child: Text('ID: ${mentor.id}',
                             style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
@@ -950,11 +1047,13 @@ class TeacherDetailsPage extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: () {    final auth = Get.find<AuthController>();
-                            final user = teacherToUser(teacher);
+                          onPressed: () {
+                            final auth = Get.find<AuthController>();
+                            final user = mentorToUser(mentor);
 
                             auth.startImpersonation(user);
-                            Get.offAll(() => const Root());},
+                            Get.offAll(() => const Root());
+                          },
                           icon: const Icon(Icons.arrow_right_alt,
                               size: 15, color: Colors.white),
                           iconAlignment: IconAlignment.end,
@@ -1187,18 +1286,14 @@ class TeacherDetailsPage extends StatelessWidget {
   }
 
   Widget _studentsTab(BuildContext context, ColorScheme cs) {
-    final students = teacher.student ?? [];
+    final students = mentor.student ?? [];
 
     if (students.isEmpty) {
-      return Center(
-        child: Text(
-          'No students assigned',
-          style: TextStyle(
-            fontSize: 14,
-            color: cs.outline,
-          ),
-        ),
-      );
+      return EmptyState(
+          cs: cs,
+          title: 'No students assigned',
+          subtitle: '',
+          icon: Icons.group);
     }
 
     return Column(
@@ -1489,7 +1584,7 @@ class TeacherDetailsPage extends StatelessWidget {
 
   Widget _unlockButton(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final c = Get.find<TeacherController>();
+    final c = Get.find<MentorController>();
 
     return SizedBox(
       width: double.infinity,
@@ -1516,11 +1611,7 @@ class TeacherDetailsPage extends StatelessWidget {
 
   Widget _unlockForm(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final c = Get.find<TeacherController>();
-    final items = [
-      {"id": "all", "name": "All Students"},
-      ...c.students,
-    ];
+    final c = Get.find<MentorController>();
     final RxList<Map<String, dynamic>> selectedItems =
         <Map<String, dynamic>>[].obs;
     selectedItems.add({"id": "all", "name": "All Students"});
@@ -1607,7 +1698,7 @@ class TeacherDetailsPage extends StatelessWidget {
   }
 
   Widget _studentMultiSelect(BuildContext context) {
-    final c = Get.find<TeacherController>();
+    final c = Get.find<MentorController>();
     final cs = Theme.of(context).colorScheme;
 
     final students = [

@@ -1,4 +1,7 @@
 import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/model/wallet_model.dart';
 
 class Mentor {
 String? id;
@@ -16,17 +19,22 @@ DateTime? joinedAt;
   String? qualification;
   String? place;
   String? pincode;
+    List<Experience>? experience;
   String? address;
   String? timezone;
 final Coordinator? coordinator;
   String? prefLanguage;
   String? accountNumber;
+  String? ifscCode;
   String? accountHolder;
   String? upiId;
   String? accountType;
   String? bankName;
   String? bankBranch;
   int? salary;
+  double? balance;
+  Wallet? wallet;
+  List<Student>? student;
 
   Mentor({
     required this.name,
@@ -37,11 +45,16 @@ required this.empId,
     this.gender,
     this.status,
     this.rating,
+    this.ifscCode,
     this.phone,
+    this.student,
     this.imageUrl,
     this.coordinator,
     this.whatsapp,
+    this.experience,
     this.timezone,
+    this.balance,
+    this.wallet,
     this.salary,
     this.accountHolder,
     this.accountNumber,

@@ -5,6 +5,7 @@ import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/view/students/refund_request_page.dart';
 import 'package:albedo_app/view/students/student_detail_page.dart';
+import 'package:albedo_app/view/users/add_student_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -44,7 +45,17 @@ class StudentsPage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(),
       floatingActionButton: (!isCustom || PermissionService.can("add_students"))
-          ? addStudent(context)
+          ? FloatingActionButton(
+              onPressed: () {
+                Get.to(() => const AddStudentPage());
+              },
+              mini: true,
+              backgroundColor: context.theme.colorScheme.primary,
+              child: Icon(
+                Icons.add,
+                color: context.theme.colorScheme.onPrimary,
+              ),
+            )
           : null,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(

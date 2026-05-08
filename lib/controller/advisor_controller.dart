@@ -1,6 +1,7 @@
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
+import 'package:albedo_app/view/users/add_teacher_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +19,10 @@ class AdvisorController extends GetxController {
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
 
-  var experiences = <Experience>[].obs;
+  final RxString selectedBranch = ''.obs;
+  final RxString selectedBank = ''.obs;
+
+  final RxList<ExperienceFormData> experiences = <ExperienceFormData>[].obs;
 
   // --------------------------
   // Counts for tabs
@@ -56,6 +60,7 @@ class AdvisorController extends GetxController {
   void onInit() {
     super.onInit();
     fetchAdvisors();
+    addExperience();
   }
 
   void fetchAdvisors() async {
@@ -136,7 +141,7 @@ class AdvisorController extends GetxController {
 
   // void addExperience() {
   //   experiences.add(
-      
+
   //     // Experience(
   //     //   companyName: TextEditingController(),
   //     //   yearController: TextEditingController(),
@@ -163,7 +168,7 @@ class AdvisorController extends GetxController {
     // );
   }
 
-     deactivate(String id) {
+  deactivate(String id) {
     isDeactivateButtonLoading.value = true;
     // Api().deleteProgram(id).then(
     //   (value) {
@@ -181,11 +186,78 @@ class AdvisorController extends GetxController {
     // );
   }
 
-Users advisorToUser(Advisor a) {
-  return Users(
-    id: a.id,
-    name: a.name,
-    role: "advisor",
-  );
-}
+  Users advisorToUser(Advisor a) {
+    return Users(
+      id: a.id,
+      name: a.name,
+      role: "advisor",
+    );
+  }
+
+  void addAdvisor() {}
+
+  bool validateAdvisor(BuildContext context) {
+    String error = "";
+
+    /// BASIC DETAILS
+    if (nameController.text.trim().isEmpty) {
+      error = "Advisor name is required";
+    } else if (emailController.text.trim().isEmpty) {
+      error = "Email is required";
+    } else if (!GetUtils.isEmail(emailController.text.trim())) {
+      error = "Enter a valid email address";
+    } else if (phoneController.text.trim().isEmpty) {
+      error = "Phone number is required";
+    } else if (phoneController.text.trim().length < 10) {
+      error = "Enter a valid phone number";
+    } else if (dobController.text.trim().isEmpty) {
+      error = "Joining date is required";
+    } else if (qualificationController.text.trim().isEmpty) {
+      error = "Qualification is required";
+    } else if (addressController.text.trim().isEmpty) {
+      error = "Address is required";
+    }
+
+    /// EXPERIENCE VALIDATION
+    else if (experiences.isEmpty) {
+      error = "At least one experience is required";
+    } else {
+      for (int i = 0; i < experiences.length; i++) {
+        final exp = experiences[i];
+
+        if (exp.companyController.text.trim().isEmpty) {
+          error = "Company name is required in Experience ${i + 1}";
+          break;
+        } else if (exp.yearController.text.trim().isEmpty) {
+          error = "Years is required in Experience ${i + 1}";
+          break;
+        } else if (exp.monthController.text.trim().isEmpty) {
+          error = "Months is required in Experience ${i + 1}";
+          break;
+        }
+      }
+    }
+
+    if (error.isNotEmpty) {
+      Get.snackbar(
+        "Error",
+        error,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(12),
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
+    void addExperience() {
+    experiences.add(ExperienceFormData());
+  }
+
+  void removeExperience(int index) {
+    experiences[index].dispose();
+    experiences.removeAt(index);
+  }
 }

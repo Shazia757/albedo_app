@@ -3,7 +3,9 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/mentor_detailed_page.dart';
 import 'package:albedo_app/view/mentor_feedback_page.dart';
+import 'package:albedo_app/view/users/add_mentor_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -15,7 +17,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class MentorsPage extends StatelessWidget {
-  final c = Get.put(MentorController());
+  final c = Get.put(MentorController(), permanent: true);
 
   MentorsPage({super.key});
 
@@ -42,7 +44,17 @@ class MentorsPage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       floatingActionButton: (!isCustom || PermissionService.can("add_mentors"))
-          ? addMentor(context)
+          ? FloatingActionButton(
+              onPressed: () {
+                Get.to(() => const AddMentorPage());
+              },
+              mini: true,
+              backgroundColor: context.theme.colorScheme.primary,
+              child: Icon(
+                Icons.add,
+                color: context.theme.colorScheme.onPrimary,
+              ),
+            )
           : null,
       body: Row(
         children: [
@@ -122,11 +134,8 @@ class MentorsPage extends StatelessWidget {
                                       : null,
                                   onTap: (!isCustom ||
                                           PermissionService.can("view_mentors"))
-                                      ? () => openMentorProfile(
-                                            context,
-                                            mentor,
-                                            (p0) => mentorToUser(mentor),
-                                          )
+                                      ? () => Get.to(() => MentorDetailsPage(
+                                          mentor: mentor, initialIndex: index))
                                       : null,
                                   actions: [
                                     InfoAction(
@@ -316,6 +325,7 @@ class MentorsPage extends StatelessWidget {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
@@ -338,6 +348,7 @@ class MentorsPage extends StatelessWidget {
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
             color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
@@ -546,9 +557,7 @@ class MentorsPage extends StatelessWidget {
 
                 /// ➕ Add Experience Button
                 ElevatedButton.icon(
-                  onPressed: () {
-                    
-                  },
+                  onPressed: () {},
                   // c.addExperience,
                   icon: const Icon(Icons.add),
                   label: const Text("Add Experience"),
@@ -796,9 +805,7 @@ class MentorsPage extends StatelessWidget {
 
                 /// ➕ Add Experience
                 ElevatedButton.icon(
-                  onPressed: () {
-                    
-                  },
+                  onPressed: () {},
                   // c.addExperience,
                   icon: const Icon(Icons.add),
                   label: const Text("Add Experience"),

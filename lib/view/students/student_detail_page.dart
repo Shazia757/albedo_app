@@ -1,3 +1,5 @@
+import 'package:albedo_app/config/root.dart';
+import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/feedback_model.dart';
 import 'package:albedo_app/model/package_model.dart';
@@ -14,7 +16,6 @@ import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 // ─── Color tokens (from your theme) ─────────────────────────
 const _blue = Color(0xFF058DCE);
 const _purple = Color(0xFF793078);
@@ -25,7 +26,7 @@ Color _statusColor(String? status) => status?.toLowerCase() == 'active'
     : const Color(0xFFF59E0B);
 
 // ============================================================
-//  EXTENSION 
+//  EXTENSION
 // ============================================================
 extension PackageCalculations on Package {
   double get totalTeacherSalary {
@@ -200,8 +201,9 @@ class StudentDetailsPage extends StatelessWidget {
               }
 
               // ─── WALLET ────────────────────────────────────
-              if (c.tabs[index] == 'Wallet')
-               { return studentWalletTab(context, student, c);}
+              if (c.tabs[index] == 'Wallet') {
+                return studentWalletTab(context, student, c);
+              }
 
               // ─── BATCH PAYMENTS ────────────────────────────
               if (c.tabs[index] == 'Batch Payments') {
@@ -253,8 +255,9 @@ class StudentDetailsPage extends StatelessWidget {
               }
 
               // ─── FEEDBACKS ─────────────────────────────────
-              if (c.tabs[index] == 'Feedbacks')
-               { return _feedbacksTab(context, cs);}
+              if (c.tabs[index] == 'Feedbacks') {
+                return _feedbacksTab(context, cs);
+              }
 
               // ─── CERTIFICATES ──────────────────────────────
               if (c.tabs[index] == 'Certificates') {
@@ -899,7 +902,13 @@ class StudentDetailsPage extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: () {
+                            final auth = Get.find<AuthController>();
+                            final user = studentToUser(student);
+
+                            auth.startImpersonation(user);
+                            Get.offAll(() => const Root());
+                          },
                           icon: const Icon(Icons.arrow_right_alt,
                               size: 15, color: Colors.white),
                           iconAlignment: IconAlignment.end,
@@ -1169,7 +1178,7 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   // ══════════════════════════════════════════════════════════
-  //  SESSION CARD  
+  //  SESSION CARD
   // ══════════════════════════════════════════════════════════
   Widget studentPackageSessionCard(BuildContext context, Package package) {
     if ((package.name ?? '').trim().isEmpty) return const SizedBox();
@@ -1225,7 +1234,7 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   // ══════════════════════════════════════════════════════════
-  //  ASSESSMENT CARD 
+  //  ASSESSMENT CARD
   // ══════════════════════════════════════════════════════════
   Widget studentAssessmentCard(BuildContext context, Assessment assessment) {
     final cs = Theme.of(context).colorScheme;

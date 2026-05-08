@@ -3,6 +3,7 @@ import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/view/users/add_teacher_page.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,6 +23,65 @@ class MentorController extends GetxController {
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
+  var selectedIndex = 0.obs;
+    final RxBool obscurePassword = true.obs;
+  final RxBool obscureNewPassword = true.obs;
+  final RxBool obscureConfirmPassword = true.obs;
+  final RxBool showUnlockForm = false.obs;
+  final RxBool selectAllStudents = false.obs;
+    var selectedFromDate = Rxn<DateTime>();
+  var selectedUntilDate = Rxn<DateTime>();
+    final RxList<Map<String, dynamic>> selectedStudents =
+      <Map<String, dynamic>>[].obs;
+
+  final RxString unlockFrom = ''.obs;
+  final RxString unlockTo = ''.obs;
+  final RxString reLockAfter = ''.obs;
+
+  final RxString targetType = 'All Students'.obs;
+
+    RxInt feedbackTabIndex = 0.obs;
+
+  List<String> feedbackTabs = ['Student', 'Teacher'];
+
+    final RxList<Map<String, dynamic>> studentFeedbacks = <Map<String, dynamic>>[
+    {
+      "id": "FDB001",
+      "student_name": "Amina",
+      "rating": 4.8,
+      "message":
+          "Very supportive teacher. The sessions were easy to understand.",
+      "date": "2026-05-01",
+    },
+    {
+      "id": "FDB002",
+      "student_name": "Rayan",
+      "rating": 5.0,
+      "message": "Excellent teaching style and good communication throughout.",
+      "date": "2026-05-03",
+    },
+  ].obs;
+
+  final RxList<Map<String, dynamic>> teacherFeedbacks = <Map<String, dynamic>>[
+    {
+      "id": "MFB001",
+      "mentor_name": "Shahid",
+      "rating": 4.5,
+      "message": "Teacher manages students well and maintains consistency.",
+      "date": "2026-05-02",
+    },
+    {
+      "id": "MFB002",
+      "mentor_name": "Nihal",
+      "rating": 4.9,
+      "message":
+          "Very professional and active in handling batch responsibilities.",
+      "date": "2026-05-05",
+    },
+  ].obs;
+
+
+
   final ratingFilters = [
     FilterOption<int>(label: "All", value: 0, icon: Icons.filter_alt),
     FilterOption<int>(label: "2 & Up", value: 2, icon: Icons.star),
@@ -29,9 +89,23 @@ class MentorController extends GetxController {
     FilterOption<int>(label: "4 & Up", value: 4, icon: Icons.star),
   ];
   var selectedRating = 0.obs; // 0 = All
+  final RxString selectedAccountType = ''.obs;
 
-  var experiences = <Experience>[].obs;
+  final RxList<ExperienceFormData> experiences = <ExperienceFormData>[].obs;
 
+    final RxList<Map<String, dynamic>> accessOverrides =
+      <Map<String, dynamic>>[].obs;
+
+
+  List<String> detailedTabs = [
+    "Profile",
+    "Professional",
+    "Students",
+    "Wallet",
+    "Star of Month",
+    "Feedbacks",
+    "Access"
+  ];
   // --------------------------
   // Counts for tabs
   // --------------------------
@@ -50,6 +124,8 @@ class MentorController extends GetxController {
     return mentors.where((m) => m.coordinator?.name == tab).length;
   }
 
+  
+
   TextEditingController nameController = TextEditingController();
   TextEditingController empIdController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -65,15 +141,41 @@ class MentorController extends GetxController {
   TextEditingController accountNumberController = TextEditingController();
   TextEditingController accountHolderNameController = TextEditingController();
   TextEditingController upiIdController = TextEditingController();
+  TextEditingController ifscController = TextEditingController();
+  TextEditingController resumeController = TextEditingController();
   TextEditingController accountTypeController = TextEditingController();
   TextEditingController bankNameController = TextEditingController();
   TextEditingController branchNameController = TextEditingController();
   TextEditingController bankBranchController = TextEditingController();
+    TextEditingController usernameController = TextEditingController();
+  TextEditingController currentPasswordController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
+  TextEditingController confirmNewPasswordController = TextEditingController();
+  TextEditingController m1Controller = TextEditingController();
+  TextEditingController m2Controller = TextEditingController();
+  TextEditingController m3Controller = TextEditingController();
+  TextEditingController m4Controller = TextEditingController();
+  TextEditingController m5Controller = TextEditingController();
+    TextEditingController startDateController = TextEditingController();
+  TextEditingController endDateController = TextEditingController();
+  TextEditingController relockController = TextEditingController();
+
+
+  final RxList<Map<String, dynamic>> students = [
+    {"id": "STU001", "name": "Amina"},
+    {"id": "STU002", "name": "Rayan"},
+    {"id": "STU003", "name": "Sara"},
+  ].obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchMentors();
+    addExperience();
+     selectedStudents.add({
+      "id": "all",
+      "name": "All Students",
+    });
   }
 
   Future<void> fetchMentors() async {
@@ -329,5 +431,84 @@ class MentorController extends GetxController {
     //     }
     //   },
     // );
+  }
+
+  void addMentor() {}
+
+  bool validateMentor(BuildContext context) {
+    String error = "";
+
+    /// BASIC DETAILS
+    if (nameController.text.trim().isEmpty) {
+      error = "Mentor name is required";
+    } else if (emailController.text.trim().isEmpty) {
+      error = "Email is required";
+    } else if (!GetUtils.isEmail(emailController.text.trim())) {
+      error = "Enter a valid email address";
+    } else if (phoneController.text.trim().isEmpty) {
+      error = "Phone number is required";
+    } else if (phoneController.text.trim().length < 10) {
+      error = "Enter a valid phone number";
+    } else if (placeController.text.trim().isEmpty) {
+      error = "Place is required";
+    } else if (pincodeController.text.trim().isEmpty) {
+      error = "Pincode is required";
+    } else if (pincodeController.text.trim().length < 5) {
+      error = "Enter a valid pincode";
+    } else if (addressController.text.trim().isEmpty) {
+      error = "Address is required";
+    } else if (qualificationController.text.trim().isEmpty) {
+      error = "Qualification is required";
+    }
+
+    /// EXPERIENCE VALIDATION
+    else if (experiences.isEmpty) {
+      error = "At least one experience is required";
+    } else {
+      for (int i = 0; i < experiences.length; i++) {
+        final exp = experiences[i];
+
+        if (exp.companyController.text.trim().isEmpty) {
+          error = "Company name is required in Experience ${i + 1}";
+          break;
+        } else if (exp.yearController.text.trim().isEmpty) {
+          error = "Years is required in Experience ${i + 1}";
+          break;
+        } else if (exp.monthController.text.trim().isEmpty) {
+          error = "Months is required in Experience ${i + 1}";
+          break;
+        }
+      }
+    }
+
+    /// BANK DETAILS
+    if (error.isEmpty && accountNumberController.text.trim().isEmpty) {
+      error = "Account number is required";
+    } else if (error.isEmpty &&
+        accountHolderNameController.text.trim().isEmpty) {
+      error = "Account holder name is required";
+    }
+
+    if (error.isNotEmpty) {
+      Get.snackbar(
+        "Error",
+        error,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(12),
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
+  void addExperience() {
+    experiences.add(ExperienceFormData());
+  }
+
+  void removeExperience(int index) {
+    experiences[index].dispose();
+    experiences.removeAt(index);
   }
 }

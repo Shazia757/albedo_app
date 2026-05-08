@@ -37,6 +37,10 @@ class StudentController extends GetxController {
   var selectedIndex = 0.obs;
   RxString selectedFilter = "All".obs;
   Rx<Package?> selectedPackage = Rx<Package?>(null);
+  final RxString selectedTimezone = ''.obs;
+final RxString selectedMentor = ''.obs;
+final RxString selectedAdvisor = ''.obs;
+final RxString selectedReferralSource = ''.obs;
 
   RxInt feedbackTabIndex = 0.obs;
 
@@ -120,6 +124,7 @@ class StudentController extends GetxController {
   var transactions = <TransactionModel>[].obs;
 
   List<String> feedbackTabs = ['Teacher', 'Mentor'];
+
 
   Future<void> fetchStudents() async {
     try {
@@ -512,4 +517,55 @@ class StudentController extends GetxController {
 
     return true;
   }
+
+bool validateStudent(BuildContext context) {
+  String error = "";
+
+  if (nameController.text.trim().isEmpty) {
+    error = "Student name is required";
+  } else if (emailController.text.trim().isEmpty) {
+    error = "Email is required";
+  } else if (!GetUtils.isEmail(emailController.text.trim())) {
+    error = "Enter a valid email address";
+  } else if (phoneController.text.trim().isEmpty) {
+    error = "Phone number is required";
+  } else if (phoneController.text.trim().length < 10) {
+    error = "Enter a valid phone number";
+  } else if (whatsappController.text.trim().isNotEmpty &&
+      whatsappController.text.trim().length < 10) {
+    error = "Enter a valid WhatsApp number";
+  } else if (placeController.text.trim().isEmpty) {
+    error = "Place is required";
+  } else if (pincodeController.text.trim().isEmpty) {
+    error = "Pincode is required";
+  } else if (pincodeController.text.trim().length < 5) {
+    error = "Enter a valid pincode";
+  } else if (addressController.text.trim().isEmpty) {
+    error = "Address is required";
+  } else if (selectedTimezone.value.trim().isEmpty) {
+    error = "Please select a time zone";
+  } else if (selectedMentor.value.trim().isEmpty) {
+    error = "Please select a mentor";
+  } else if (selectedAdvisor.value.trim().isEmpty) {
+    error = "Please select an advisor";
+  } else if (selectedRole.value.isEmpty) {
+    error = "Please select referred by type";
+  } else if (selectedReferralSource.value.trim().isEmpty) {
+    error = "Please select referral source";
+  }
+
+  if (error.isNotEmpty) {
+    Get.snackbar(
+      "Error",
+      error,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(12),
+    );
+
+    return false;
+  }
+
+  return true;
+}
+  void addStudent() {}
 }

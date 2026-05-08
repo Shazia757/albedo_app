@@ -5,6 +5,7 @@ import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/view/mentor_feedback_page.dart';
 import 'package:albedo_app/view/teacher/tr_detailed_page.dart';
+import 'package:albedo_app/view/users/add_teacher_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -44,7 +45,17 @@ class TeachersPage extends StatelessWidget {
       appBar: const CustomAppBar(),
       drawer: isDesktop ? null : const DrawerMenu(),
       floatingActionButton: (!isCustom || PermissionService.can("add_teachers"))
-          ? addTeacher(context)
+          ?  FloatingActionButton(
+              onPressed: () {
+                Get.to(() => const AddTeacherPage());
+              },
+              mini: true,
+              backgroundColor: context.theme.colorScheme.primary,
+              child: Icon(
+                Icons.add,
+                color: context.theme.colorScheme.onPrimary,
+              ),
+            )
           : null,
       body: Row(
         children: [

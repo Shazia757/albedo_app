@@ -1,12 +1,16 @@
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
+import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/mentor_detailed_page.dart';
 import 'package:albedo_app/view/sessions/add_session_page.dart';
 import 'package:albedo_app/view/sessions/session_details_page.dart';
 import 'package:albedo_app/view/students/student_detail_page.dart';
+import 'package:albedo_app/view/teacher/tr_detailed_page.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -184,14 +188,14 @@ class SessionPage extends StatelessWidget {
                               final session = sessions[i];
 
                               return _SessionCard(
-                                  session: session,
-                                  statusColor:
-                                      getStatusColor(context, session.status),
-                                  onTap: () => 
-                                  // Get.to(() => SessionDetailsPage(
-                                  //     sessions: sessions, initialIndex: i))
-                                   _openSessionDetails(context, sessions, i),
-                                  );
+                                session: session,
+                                statusColor:
+                                    getStatusColor(context, session.status),
+                                onTap: () =>
+                                    // Get.to(() => SessionDetailsPage(
+                                    //     sessions: sessions, initialIndex: i))
+                                    _openSessionDetails(context, sessions, i),
+                              );
                             },
                           );
                         },
@@ -353,38 +357,44 @@ class SessionPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        detailCard(
-                          context,
-                          title: "Student",
-                          name: data.student?.name ?? '',
-                          id: data.student?.studentId ?? '',
-                          onTap: () => Get.to(
-                                            () => StudentDetailsPage(
-                                                student: data.student!,
-                                                initialIndex: initialIndex),
-                                            binding: BindingsBuilder(() {
-                                              Get.put(StudentController());
-                                            }),
-                                          )
-                        ),
+                        detailCard(context,
+                            title: "Student",
+                            name: data.student?.name ?? '',
+                            id: data.student?.studentId ?? '',
+                            onTap: () => Get.to(
+                                  () => StudentDetailsPage(
+                                      student: data.student!,
+                                      initialIndex: initialIndex),
+                                  binding: BindingsBuilder(() {
+                                    Get.put(StudentController());
+                                  }),
+                                )),
 
-                        detailCard(
-                          context,
-                          title: "Teacher",
-                          name: data.teacher?.name ?? '',
-                          id: data.teacher?.id ?? '',
-                          onTap: () => _onUserTap(
-                            context,
-                            "teacher",
-                            data.teacher?.id,
-                          ),
-                        ),
+                        detailCard(context,
+                            title: "Teacher",
+                            name: data.teacher?.name ?? '',
+                            id: data.teacher?.id ?? '',
+                            onTap: () => Get.to(
+                                  () => TeacherDetailsPage(
+                                      teacher: data.teacher!,
+                                      initialIndex: initialIndex),
+                                  binding: BindingsBuilder(() {
+                                    Get.put(TeacherController());
+                                  }),
+                                )),
 
                         buildRoleCard(
                           context: context,
                           title: "Mentor",
                           user: data.mentor,
-                          onTap: (id) => _onUserTap(context, "mentor", id),
+                          onTap: (id) => Get.to(
+                            () => MentorDetailsPage(
+                                mentor: data.mentor!,
+                                initialIndex: initialIndex),
+                            binding: BindingsBuilder(() {
+                              Get.put(MentorController());
+                            }),
+                          ),
                         ),
 
                         buildRoleCard(
@@ -414,8 +424,8 @@ class SessionPage extends StatelessWidget {
                           type: "schedule",
                           icon: Icons.schedule_outlined,
                           title: "Schedule",
-                          date: formatDate(data.date??DateTime.now()),
-                          time: formatTime(data.date??DateTime.now()),
+                          date: formatDate(data.date ?? DateTime.now()),
+                          time: formatTime(data.date ?? DateTime.now()),
                           duration: data.duration?.toString() ?? "-",
                           onSave: (date, time) {},
                         ),
@@ -638,7 +648,7 @@ class SessionPage extends StatelessWidget {
                               color: cs.primary,
                               onTap: () => _markSessionCompleted(
                                 context,
-                                data.date??DateTime.now(),
+                                data.date ?? DateTime.now(),
                               ),
                             ),
                           ),
@@ -1365,12 +1375,14 @@ class _SessionCard extends StatelessWidget {
                               children: [
                                 MetaItem(
                                     label: "Date",
-                                    value: formatDate(session.date??DateTime.now()),
+                                    value: formatDate(
+                                        session.date ?? DateTime.now()),
                                     textSecondary: textSecondary),
                                 const SizedBox(height: 4),
                                 MetaItem(
                                     label: "Time",
-                                    value: formatTime(session.date??DateTime.now()),
+                                    value: formatTime(
+                                        session.date ?? DateTime.now()),
                                     textSecondary: textSecondary),
                               ],
                             ),

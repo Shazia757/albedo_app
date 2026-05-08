@@ -3,6 +3,7 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/coordinator_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/users/add_coordinator_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/custom_tab.dart';
@@ -18,7 +19,7 @@ import 'package:get/get.dart';
 class CoordinatorPage extends StatelessWidget {
   CoordinatorPage({super.key});
 
-  final c = Get.put(CoordinatorController());
+  final c = Get.put(CoordinatorController(), permanent: true);
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,17 @@ class CoordinatorPage extends StatelessWidget {
         drawer: isDesktop ? null : const DrawerMenu(),
         floatingActionButton:
             (!isCustom || PermissionService.can("add_coordinators"))
-                ? addCoordinator(context)
+                ? FloatingActionButton(
+                    onPressed: () {
+                      Get.to(() => const AddCoordinatorPage());
+                    },
+                    mini: true,
+                    backgroundColor: context.theme.colorScheme.primary,
+                    child: Icon(
+                      Icons.add,
+                      color: context.theme.colorScheme.onPrimary,
+                    ),
+                  )
                 : null,
         body: Row(
           children: [
@@ -439,9 +450,7 @@ class CoordinatorPage extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
-                              onPressed: () {
-                                
-                              },
+                              onPressed: () {},
                               // c.addExperience,
                               icon: Icon(Icons.add),
                               label: Text("Add Experience"),
@@ -728,9 +737,7 @@ class CoordinatorPage extends StatelessWidget {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton.icon(
-                                onPressed: () {
-                                  
-                                },
+                                onPressed: () {},
                                 // c.addExperience,
                                 icon: Icon(Icons.add),
                                 label: Text("Add Experience"),
