@@ -12,10 +12,10 @@ class Teacher {
   String? imageUrl;
   List<Student>? student;
 
-  final String status;
-  final String gender;
+   String? status;
+   String? gender;
   String? type;
-  final DateTime joinedAt;
+   DateTime? joinedAt;
   String? phone;
   String? whatsapp;
   String? dob;
@@ -51,16 +51,16 @@ class Teacher {
       required this.name,
       this.email,
       this.ifscCode,
-      required this.status,
+   this.status,
       this.imageUrl,
       this.student,
       this.type,
       this.wallet,
       this.batch,
       this.experience,
-      required this.joinedAt,
+       this.joinedAt,
       this.phone,
-      required this.gender,
+  this.gender,
       this.whatsapp,
       this.totalStudents,
       this.totalPackages,

@@ -6,7 +6,7 @@ import 'package:albedo_app/widgets/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'dart:ui'; // ✅ for blur
+import 'dart:ui';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
@@ -101,7 +101,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               _actionButton(
                 icon: Icons.notifications_none,
                 color: cs,
-                onTap: () => Get.offAll(NotificationsPage()),
+                onTap: () => Get.to(() => NotificationsPage()),
               ),
               SizedBox(width: isDesktop ? 10 : 6),
               if (isTeacher || isStudent) ...[

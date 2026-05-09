@@ -29,8 +29,8 @@ class StudentWalletController extends GetxController {
   // Dummy Packages
   var packages = <Package>[
     Package(
-           teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+      teacher: Teacher(
+          id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
       subjectId: '',
       status: '',
       time: '',
@@ -58,26 +58,32 @@ class StudentWalletController extends GetxController {
 
   double get totalDeposited {
     return packages.fold(0.0, (sum, p) {
-      final packageFee=p.packageFee??0;
-      return sum +packageFee;
+      final packageFee = p.packageFee ?? 0;
+      return sum + packageFee;
     });
   }
 
   double get totalUsed {
-   
-    return packages.fold(
-        0.0, (sum, p) {
-           final withdrawals=p.withdrawals??[];
-          return sum + withdrawals.fold(0.0, (s, w) => s + w.amount);
-        });
+    return packages.fold(0.0, (sum, p) {
+      final withdrawals = p.withdrawals ?? [];
+      return sum + withdrawals.fold(0.0, (s, w) => s + w.amount);
+    });
   }
 
   double getPackageBalance(Package p) {
-           final withdrawals=p.withdrawals??[];
+    final withdrawals = p.withdrawals ?? [];
 
-    final totalWithdrawals =
-        withdrawals.fold(0.0, (sum, w) => sum + w.amount);
+    final totalWithdrawals = withdrawals.fold(0.0, (sum, w) => sum + w.amount);
 
-    return p.packageFee??0 - totalWithdrawals;
+    return p.packageFee ?? 0 - totalWithdrawals;
+  }
+
+  void updateStatus(String id, String status) {
+    final index = transactions.indexWhere((e) => e.id == id);
+
+    if (index != -1) {
+      transactions[index] = transactions[index].copyWith(status: status);
+      transactions.refresh();
+    }
   }
 }

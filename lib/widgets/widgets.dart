@@ -127,7 +127,7 @@ class CustomWidgets {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cs.onPrimary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: cs.outline.withOpacity(0.4),
@@ -471,6 +471,7 @@ class CustomWidgets {
 
   void showDeleteDialog({
     required BuildContext context,
+    required String title,
     required String text,
     required VoidCallback onConfirm,
   }) {
@@ -517,7 +518,7 @@ class CustomWidgets {
 
               /// 🔹 TITLE
               Text(
-                "Delete Session?",
+                title,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -1342,7 +1343,7 @@ class CustomWidgets {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
                   decoration: BoxDecoration(
-                    color: cs.secondary.withOpacity(0.8),
+                    color: cs.primary,
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(28),
                     ),

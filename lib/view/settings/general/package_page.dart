@@ -25,6 +25,8 @@ class PackagePage extends StatelessWidget {
           },
           onDelete: () {
             CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
               context: context,
               text: 'Delete this package permanently?',
               onConfirm: () {

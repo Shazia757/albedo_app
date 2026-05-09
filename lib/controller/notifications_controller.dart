@@ -6,6 +6,7 @@ class NotificationsController extends GetxController {
   var msgs = <Notifications>[].obs;
   var isLoading = true.obs;
   var filteredMessages = <Notifications>[].obs;
+  final tabs = ["All", "Important", "Updates"];
 
   @override
   void onInit() {
@@ -19,6 +20,7 @@ class NotificationsController extends GetxController {
         message: "Your session starts in 1 hour",
         visibleTo: [],
         isImportant: true,
+        date: DateTime.now(),
       ),
       Notifications(
         id: "2",
@@ -26,11 +28,28 @@ class NotificationsController extends GetxController {
         message: "Your payment has been received",
         visibleTo: [],
         isImportant: false,
+        date: DateTime.now(),
       ),
     ];
 
     applyFilters();
     isLoading.value = false;
+  }
+
+  int getCount(int index) {
+    switch (index) {
+      case 0:
+        return msgs.length;
+
+      case 1:
+        return msgs.where((e) => e.isImportant == true).length;
+
+      case 2:
+        return msgs.where((e) => e.isImportant == false).length;
+
+      default:
+        return 0;
+    }
   }
 
   void applyFilters() {

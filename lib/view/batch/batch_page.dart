@@ -2,9 +2,9 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/batch_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/batch/batch_detailed_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
-import 'package:albedo_app/widgets/custom_tab.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -81,15 +81,16 @@ class BatchesPage extends StatelessWidget {
                 ),
 
                 /// 🧭 Tabs
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: Tabs(
-                    selectedIndex: c.selectedTab,
-                    labels: ['Active', 'Inactive'],
-                    onTap: (p0) {
-                      c.selectedTab.value = p0;
+                Obx(
+                  () => CustomWidgets().customTabs(
+                    context,
+                    tabs: c.tabs,
+                    selectedIndex: c.selectedTab.value,
+                    onTap: (index) {
+                      c.selectedTab.value = index;
                       c.applyFilters();
                     },
+                    getCount: (index) => c.tabData[index]['count'],
                   ),
                 ),
 
@@ -138,9 +139,13 @@ class BatchesPage extends StatelessWidget {
                                     footerText: "",
                                     onTap: (!isCustom ||
                                             PermissionService.can("view_batch"))
-                                        ? () => openBatchProfile(
-                                              context,
-                                              batch,
+                                        ? () => Get.to(
+                                              () => BatchDetailedPage(
+                                                  batch: batch,
+                                                  initialIndex: index),
+                                              binding: BindingsBuilder(() {
+                                                Get.put(BatchController());
+                                              }),
                                             )
                                         : null,
                                     actions: [

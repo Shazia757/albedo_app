@@ -546,7 +546,7 @@ class _WalletUsageCard extends StatelessWidget {
                             color: statusColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: Text(p.status,
+                          child: Text(p.status??'-',
                               style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w500,
@@ -774,7 +774,7 @@ class _PackagesCard extends StatelessWidget {
                                     color: statusColor,
                                     shape: BoxShape.circle)),
                             const SizedBox(width: 5),
-                            Text(p.status,
+                            Text(p.status??'-',
                                 style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w500,

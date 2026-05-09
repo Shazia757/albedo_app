@@ -175,6 +175,8 @@ class TeacherWalletController extends GetxController {
 
   void finalizeMentorWithdrawal() {}
 
+  void finalizeCoordinatorWithdrawal() {}
+
 // List<TransactionItem> transactions = [
 //   TransactionItem(
 //     subject: "Mathematics",

@@ -11,7 +11,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class BatchPaymentPage extends StatelessWidget {
-  final PaymentController c = Get.put(PaymentController());
+  final PaymentController c = Get.put(PaymentController(isStudent: false));
 
   BatchPaymentPage({super.key});
 
@@ -22,15 +22,13 @@ class BatchPaymentPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-       backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ── Search ────────────────────────────────────────────
                 Padding(
@@ -41,11 +39,19 @@ class BatchPaymentPage extends StatelessWidget {
                     onChanged: (v) => c.searchQuery.value = v,
                   ),
                 ),
+                const SizedBox(height: 10),
 
                 // ── Tabs ──────────────────────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: _Tabs(c: c),
+                Obx(
+                  () => CustomWidgets().customTabs(
+                    context,
+                    tabs: c.tabs,
+                    selectedIndex: c.selectedTab.value,
+                    onTap: (index) {
+                      c.selectedTab.value = index;
+                    },
+                    getCount: (index) => c.tabData[index]['count'],
+                  ),
                 ),
 
                 const SizedBox(height: 12),
@@ -139,7 +145,7 @@ class BatchPaymentCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: cs.surface,
+          color: cs.onPrimary,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
         ),
@@ -158,82 +164,5 @@ class BatchPaymentCard extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// TABS — full width, underline style
-// ═══════════════════════════════════════════════════════════════════════
-class _Tabs extends StatelessWidget {
-  final PaymentController c;
-  const _Tabs({required this.c});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            _TabItem(label: "Pending", index: 0, c: c, cs: cs),
-            _TabItem(label: "Approved", index: 1, c: c, cs: cs),
-          ],
-        ),
-        Divider(
-            height: 1,
-            thickness: 0.5,
-            color: cs.outlineVariant.withOpacity(0.4)),
-      ],
-    );
-  }
-}
-
-class _TabItem extends StatelessWidget {
-  final String label;
-  final int index;
-  final PaymentController c;
-  final ColorScheme cs;
-
-  const _TabItem({
-    required this.label,
-    required this.index,
-    required this.c,
-    required this.cs,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      final isOn = c.selectedTab.value == index;
-
-      return Expanded(
-        child: GestureDetector(
-          onTap: () => c.selectedTab.value = index,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: isOn ? cs.primary : Colors.transparent,
-                  width: 2,
-                ),
-              ),
-            ),
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isOn ? FontWeight.w500 : FontWeight.w400,
-                color: isOn ? cs.primary : cs.onSurface.withOpacity(0.45),
-              ),
-            ),
-          ),
-        ),
-      );
-    });
   }
 }

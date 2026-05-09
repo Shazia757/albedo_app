@@ -1,5 +1,6 @@
 import 'package:albedo_app/controller/batch_list_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
@@ -73,7 +74,7 @@ class BatchTopBar extends StatelessWidget {
 }
 
 class BatchCard extends StatelessWidget {
-  final Batch batch;
+  final Session batch;
   final Color statusColor;
   final VoidCallback onTap;
 
@@ -90,6 +91,8 @@ class BatchCard extends StatelessWidget {
     final textPrimary = cs.onSurface;
     final textSecondary = cs.onSurface.withOpacity(0.5);
     final dividerColor = cs.outline.withOpacity(0.12);
+final teacher = batch.package?.teacher;
+ 
 
     return Material(
       color: cs.onPrimary,
@@ -166,7 +169,7 @@ class BatchCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  batch.batchName ?? "—",
+                                  batch.batch?.batchName ?? "—",
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
@@ -212,7 +215,7 @@ class BatchCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  batch.teacher?.name ?? "—",
+                                teacher?.name ?? "—",
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
@@ -222,7 +225,7 @@ class BatchCard extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  "ID: ${batch.teacher?.id ?? '—'}",
+                                  "ID: ${teacher?.id ?? '—'}",
                                   style: TextStyle(
                                     fontSize: 10,
                                     color: textSecondary,

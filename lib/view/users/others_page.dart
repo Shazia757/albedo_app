@@ -231,6 +231,8 @@ class OthersPage extends StatelessWidget {
                                                             onTap: () =>
                                                                 CustomWidgets()
                                                                     .showDeleteDialog(
+        title: 'Are you sure?',
+
                                                               text:
                                                                   'Are you sure you want to delete this user permanently?',
                                                               context: context,
@@ -381,6 +383,7 @@ class OthersPage extends StatelessWidget {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
@@ -403,6 +406,7 @@ class OthersPage extends StatelessWidget {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
               color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),

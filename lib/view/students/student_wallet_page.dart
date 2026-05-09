@@ -266,7 +266,7 @@ class StudentWalletPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          t.title,
+                          t.title ?? '',
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
@@ -274,7 +274,7 @@ class StudentWalletPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          t.description,
+                          t.description ?? '',
                           style: TextStyle(
                             fontSize: 13,
                             color: cs.onSurfaceVariant,
@@ -292,7 +292,7 @@ class StudentWalletPage extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              _formatDateTime(t.dateTime),
+                              _formatDateTime(t.dateTime ?? DateTime.now()),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: cs.outline,
@@ -311,7 +311,7 @@ class StudentWalletPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        "${isCredit ? '+' : '-'}₹${t.amount.toStringAsFixed(2)}",
+                        "${isCredit ? '+' : '-'}₹${t.amount?.toStringAsFixed(2)}",
                         style: TextStyle(
                           color: isCredit
                               ? const Color(0xFF10B981)
@@ -327,15 +327,16 @@ class StudentWalletPage extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(t.status).withOpacity(0.12),
+                          color:
+                              _getStatusColor(t.status ?? '').withOpacity(0.12),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          t.status,
+                          t.status ?? '',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: _getStatusColor(t.status),
+                            color: _getStatusColor(t.status ?? ''),
                           ),
                         ),
                       ),
@@ -625,7 +626,7 @@ class StudentWalletPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            p.subjectName??'',
+                            p.subjectName ?? '',
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
@@ -694,7 +695,7 @@ class StudentWalletPage extends StatelessWidget {
 
   void _showPackageDialog(BuildContext context, Package p) {
     final formKey = GlobalKey<FormState>();
-    final withdrawals=p.withdrawals??[];
+    final withdrawals = p.withdrawals ?? [];
 
     double totalWithdrawals = withdrawals.fold(0, (sum, w) => sum + w.amount);
 
@@ -714,7 +715,7 @@ class StudentWalletPage extends StatelessWidget {
             _infoTile("Class Taken", totalWithdrawals),
             _infoTile(
               "Balance",
-              p.packageFee??0 - totalWithdrawals,
+              p.packageFee ?? 0 - totalWithdrawals,
               highlight: true,
             ),
           ],

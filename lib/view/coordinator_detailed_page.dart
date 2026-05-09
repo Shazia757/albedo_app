@@ -1,10 +1,15 @@
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/coordinator_controller.dart';
+import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/controller/teacher_wallet_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/view/mentor_detailed_page.dart';
 import 'package:albedo_app/view/teacher/add_wallet_page.dart';
 import 'package:albedo_app/view/teacher/tr_package_session_page.dart';
 import 'package:albedo_app/view/teacher/tr_wallet_tab.dart';
@@ -14,20 +19,19 @@ import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 const _blue = Color(0xFF058DCE);
 
-class TeacherDetailsPage extends StatelessWidget {
-  final Teacher teacher;
+class CoordinatorDetailedPage extends StatelessWidget {
+  final Coordinator coordinator;
   final int initialIndex;
 
-  TeacherDetailsPage({
+  CoordinatorDetailedPage({
     super.key,
-    required this.teacher,
+    required this.coordinator,
     required this.initialIndex,
   });
 
-  final c = Get.find<TeacherController>();
+  final c = Get.find<CoordinatorController>();
 
   @override
   Widget build(BuildContext context) {
@@ -35,21 +39,33 @@ class TeacherDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(),
-      // ── FAB is untouched ────────────────────────────────────
+      // ── FAB ────────────────────────────────────
       floatingActionButton: Obx(() {
         final index = c.selectedIndex.value;
 
+        if (c.detailedTabs[index] == 'Mentors') {
+          return FloatingActionButton(
+            mini: true,
+            onPressed: () {},
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
+          );
+        }
         if (c.detailedTabs[index] == 'Wallet') {
           return FloatingActionButton(
             mini: true,
             onPressed: () => Get.to(() => AddWalletPage(
-                  teacher: teacher,
+                  coordinator: coordinator,
+                  showAdjustment: false,
                 )),
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
 
@@ -61,7 +77,7 @@ class TeacherDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Tabs  ───────────────────────────────
+            // ── Tabs ───────────────────────────────
             Obx(() => CustomWidgets().customTabs(
                   context,
                   tabs: c.detailedTabs,
@@ -70,7 +86,7 @@ class TeacherDetailsPage extends StatelessWidget {
                 )),
             const SizedBox(height: 16),
 
-            // ── Tab bodies ──────────────────────────
+            // ── Tab bodies  ──────────────────────────
             Obx(() {
               final index = c.selectedIndex.value;
               final walletController = Get.put(TeacherWalletController());
@@ -83,37 +99,19 @@ class TeacherDetailsPage extends StatelessWidget {
               if (c.detailedTabs[index] == 'Professional') {
                 return _professionalTab(context, cs);
               }
-              // ─── STUDENTS  ───────────────────────────────────
-              if (c.detailedTabs[index] == 'Students') {
-                return _studentsTab(context, cs);
-              }
-
-              // ─── BATCHES ───────────────────────────────────
-              if (c.detailedTabs[index] == 'Batches') {
-                final batches = teacher.batch ?? [];
-
-                if (batches.isEmpty) {
-                  return EmptyState(
-                      cs: cs,
-                      subtitle: '',
-                      icon: Icons.groups_outlined,
-                      title: 'No batches assigned');
-                }
-                return _batchesTab(context, cs, batches);
+              // ─── MENTORS  ───────────────────────────────────
+              if (c.detailedTabs[index] == 'Mentors') {
+                return _mentorsTab(context, cs);
               }
 
               // ─── WALLET ────────────────────────────────────
               if (c.detailedTabs[index] == 'Wallet') {
                 return walletTab(context,
-                    teacher: teacher,
-                    teacherController: c,
+                    coordinator: coordinator,
+                    coordinatorController: c,
                     wallet: walletController);
               }
 
-              // ─── FEEDBACKS ─────────────────────────────────
-              if (c.detailedTabs[index] == 'Feedback') {
-                return _feedbacksTab(context, cs);
-              }
               // ─── ACCESS ─────────────────────────────────
               if (c.detailedTabs[index] == 'Access') {
                 final overrides = c.accessOverrides;
@@ -173,10 +171,10 @@ class TeacherDetailsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _contactRow(context, Icons.phone_outlined, 'Mobile',
-                      teacher.phone ?? '-'),
+                      coordinator.phone ?? '-'),
                   const SizedBox(height: 10),
                   _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
-                      teacher.whatsapp ?? '-'),
+                      coordinator.whatsapp ?? '-'),
                 ],
               ),
               _divider(cs),
@@ -184,10 +182,10 @@ class TeacherDetailsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _contactRow(
-                      context, Icons.place, 'Place', teacher.place ?? "-"),
+                      context, Icons.place, 'Place', coordinator.place ?? "-"),
                   const SizedBox(height: 10),
                   _contactRow(context, Icons.calendar_today_outlined,
-                      'Date Of Birth', teacher.dob ?? "-"),
+                      'Date Of Birth', coordinator.dob ?? "-"),
                 ],
               ),
             ],
@@ -213,7 +211,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           color: cs.outline,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text(teacher.upiId ?? '-',
+                  Text(coordinator.upiId ?? '-',
                       style: const TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 8),
@@ -223,7 +221,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           color: cs.outline,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text(teacher.accountNumber ?? '-',
+                  Text(coordinator.accountNumber ?? '-',
                       style: const TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 8),
@@ -233,7 +231,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           color: cs.outline,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text(teacher.ifscCode ?? '-',
+                  Text(coordinator.ifscCode ?? '-',
                       style: const TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w700)),
                 ],
@@ -249,7 +247,7 @@ class TeacherDetailsPage extends StatelessWidget {
   //  PROFESSIONAL TAB
   // ══════════════════════════════════════════════════════════
   Widget _professionalTab(BuildContext context, ColorScheme cs) {
-    final experiences = teacher.experience ?? [];
+    final experiences = coordinator.experience ?? [];
 
     int totalYears = 0;
     int totalMonths = 0;
@@ -293,7 +291,7 @@ class TeacherDetailsPage extends StatelessWidget {
                     child: _infoTile(
                       context,
                       title: 'Qualification',
-                      value: teacher.qualification ?? '-',
+                      value: coordinator.qualification ?? '-',
                       icon: Icons.school_outlined,
                     ),
                   ),
@@ -315,7 +313,7 @@ class TeacherDetailsPage extends StatelessWidget {
               _infoTile(
                 context,
                 title: 'Preferred Language',
-                value: teacher.prefLanguage ?? '-',
+                value: coordinator.prefLanguage ?? '-',
                 icon: Icons.language_outlined,
               ),
 
@@ -346,7 +344,7 @@ class TeacherDetailsPage extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if ((teacher.experience ?? []).isEmpty)
+                        if ((coordinator.experience ?? []).isEmpty)
                           Text(
                             'No work experience added',
                             style: TextStyle(
@@ -356,7 +354,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           )
                         else
                           Column(
-                            children: (teacher.experience ?? []).map((exp) {
+                            children: (coordinator.experience ?? []).map((exp) {
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 10),
                                 child: Row(
@@ -415,191 +413,24 @@ class TeacherDetailsPage extends StatelessWidget {
             ],
           ),
         ),
-
-        const SizedBox(height: 16),
-
-        /// 🔹 Documents & Security
-        _glassCard(
-          context: context,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _cardHeader(
-                context,
-                'Documents & Security',
-                icon: Icons.folder_outlined,
-              ),
-
-              _divider(cs),
-
-              const SizedBox(height: 14),
-
-              /// 🔹 Documents
-              Text(
-                'Documents',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: cs.outline,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'ID Card',
-                    icon: Icons.badge_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Resume',
-                    icon: Icons.description_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Educational Certificate',
-                    icon: Icons.school_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Aadhar Front',
-                    icon: Icons.credit_card_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Aadhar Back',
-                    icon: Icons.credit_card,
-                    onTap: () {},
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 18),
-
-              /// 🔹 Security
-              Text(
-                'Security',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: cs.outline,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: _docButton(
-                      context,
-                      cs,
-                      title: 'Change Username',
-                      icon: Icons.person_outline,
-                      onTap: () => CustomWidgets().showCustomDialog(
-                        context: context,
-                        title: Text('Change Username'),
-                        formKey: GlobalKey(),
-                        sections: [
-                          CustomWidgets().labelWithAsterisk('New Username',
-                              required: true),
-                          const SizedBox(height: 10),
-                          CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Enter new username',
-                              controller: c.usernameController),
-                        ],
-                        submitText: 'Change',
-                        onSubmit: () {},
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _docButton(
-                      context,
-                      cs,
-                      title: 'Change Password',
-                      icon: Icons.lock_outline,
-                      onTap: () => CustomWidgets().showCustomDialog(
-                        context: context,
-                        title: Text('Change Password'),
-                        formKey: GlobalKey(),
-                        sections: [
-                          CustomWidgets().labelWithAsterisk('Current Password',
-                              required: true),
-                          const SizedBox(height: 10),
-                          Obx(
-                            () => CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              isPassword: true,
-                              hint: 'Enter current password',
-                              controller: c.currentPasswordController,
-                              obscureText: c.obscurePassword.value,
-                              onTogglePassword: () {
-                                c.obscurePassword.value =
-                                    !c.obscurePassword.value;
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('New Password',
-                              required: true),
-                          const SizedBox(height: 10),
-                          Obx(
-                            () => CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Enter new password',
-                              isPassword: true,
-                              controller: c.newPasswordController,
-                              obscureText: c.obscureNewPassword.value,
-                              onTogglePassword: () {
-                                c.obscureNewPassword.value =
-                                    !c.obscureNewPassword.value;
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Confirm Password',
-                              required: true),
-                          const SizedBox(height: 10),
-                          Obx(
-                            () => CustomWidgets().dropdownStyledTextField(
-                                context: context,
-                                isPassword: true,
-                                obscureText: c.obscureConfirmPassword.value,
-                                onTogglePassword: () {
-                                  c.obscureConfirmPassword.value =
-                                      !c.obscureConfirmPassword.value;
-                                },
-                                hint: 'Confirm new password',
-                                controller: c.confirmNewPasswordController),
-                          ),
-                        ],
-                        submitText: 'Change',
-                        onSubmit: () {},
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () {},
+            icon: const Icon(Icons.perm_identity_rounded,
+                size: 15, color: Colors.white),
+            label: const Text('ID Card',
+                style: TextStyle(color: Colors.white, fontSize: 13)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: cs.primary,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -665,187 +496,6 @@ class TeacherDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _docButton(
-    BuildContext context,
-    ColorScheme cs, {
-    required String title,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: cs.primary.withOpacity(0.06),
-          border: Border.all(
-            color: cs.primary.withOpacity(0.15),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: cs.primary,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: cs.onSurface,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════
-  //  BATCHES TAB
-  // ══════════════════════════════════════════════════════════
-  Widget _batchesTab(
-      BuildContext context, ColorScheme cs, List<Batch> batches) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: batches.length,
-      itemBuilder: (context, i) {
-        final batch = batches[i];
-        final status = batch.status ?? 'Unknown';
-        final isActive = status == 'Active';
-        final statusColor =
-            isActive ? const Color(0xFF22C55E) : const Color(0xFFF59E0B);
-
-        return Container(
-          margin: const EdgeInsets.only(bottom: 14),
-          decoration: BoxDecoration(
-            color: cs.onPrimary,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: cs.outline.withOpacity(0.5)),
-            boxShadow: [
-              BoxShadow(
-                  color: cs.shadow.withOpacity(0.04),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4)),
-            ],
-          ),
-          child: Column(
-            children: [
-              // ── colored top stripe
-              Container(
-                height: 4,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            batch.batchName ?? 'No Name',
-                            style: const TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        _statusBadge(status, statusColor),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text('ID: ${batch.id ?? '-'}',
-                        style: TextStyle(fontSize: 11, color: cs.outline)),
-                    const SizedBox(height: 14),
-                    Divider(height: 1, color: cs.outline.withOpacity(0.15)),
-                    const SizedBox(height: 14),
-
-                    // Mentor row
-                    Row(
-                      children: [
-                        _squareAvatar(batch.mentor?.imageUrl, 44),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Assigned Mentor',
-                                style:
-                                    TextStyle(fontSize: 11, color: cs.outline)),
-                            const SizedBox(height: 2),
-                            Text(batch.mentor?.name ?? '-',
-                                style: const TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight.w600)),
-                            Text('ID: ${batch.mentor?.id ?? '-'}',
-                                style:
-                                    TextStyle(fontSize: 11, color: cs.outline)),
-                          ],
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════
-  //  FEEDBACKS TAB
-  // ══════════════════════════════════════════════════════════
-  Widget _feedbacksTab(BuildContext context, ColorScheme cs) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Obx(() => CustomWidgets().customTabs(
-              context,
-              tabs: c.feedbackTabs,
-              selectedIndex: c.feedbackTabIndex.value,
-              onTap: (i) => c.feedbackTabIndex.value = i,
-            )),
-        const SizedBox(height: 12),
-        Obx(() {
-          final isStudent = c.feedbackTabIndex.value == 0;
-          final feedbacks = isStudent ?   (c.studentFeedbacks[teacher.id] ?? [])   : (c.mentorFeedbacks[teacher.id] ?? []);
-          final label = isStudent ? 'Student' : 'Mentor';
-
-          if (feedbacks.isEmpty) {
-            return EmptyState(
-              cs: cs,
-              icon: Icons.feedback_outlined,
-              title: 'No feedback from $label yet',
-              subtitle: 'Feedback added by $label will appear here',
-            );
-          }
-          return ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: feedbacks.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (_, i) => feedbackCard(feedbacks[i], context),
-          );
-        }),
-      ],
-    );
-  }
-
   // ══════════════════════════════════════════════════════════
   //  PROFILE CARD
   // ══════════════════════════════════════════════════════════
@@ -893,7 +543,7 @@ class TeacherDetailsPage extends StatelessWidget {
                             color: cs.shadow.withOpacity(0.1), blurRadius: 8)
                       ],
                     ),
-                    child: _squareAvatar(teacher.imageUrl, 64, radius: 12),
+                    child: _squareAvatar(coordinator.imageUrl, 64, radius: 12),
                   ),
                 ),
 
@@ -901,11 +551,11 @@ class TeacherDetailsPage extends StatelessWidget {
                   offset: const Offset(0, -20),
                   child: Column(
                     children: [
-                      Text(teacher.name,
+                      Text(coordinator.name,
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w800)),
                       const SizedBox(height: 4),
-                      Text(teacher.email ?? '-',
+                      Text(coordinator.email ?? '-',
                           style: TextStyle(fontSize: 13, color: cs.outline)),
                       const SizedBox(height: 10),
 
@@ -917,7 +567,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(color: _blue.withOpacity(0.3)),
                         ),
-                        child: Text('ID: ${teacher.id}',
+                        child: Text('ID: ${coordinator.id}',
                             style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
@@ -930,11 +580,13 @@ class TeacherDetailsPage extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: () {    final auth = Get.find<AuthController>();
-                            final user = teacherToUser(teacher);
+                          onPressed: () {
+                            final auth = Get.find<AuthController>();
+                            final user = coordinatorToUser(coordinator);
 
                             auth.startImpersonation(user);
-                            Get.offAll(() => const Root());},
+                            Get.offAll(() => const Root());
+                          },
                           icon: const Icon(Icons.arrow_right_alt,
                               size: 15, color: Colors.white),
                           iconAlignment: IconAlignment.end,
@@ -1166,206 +818,35 @@ class TeacherDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _studentsTab(BuildContext context, ColorScheme cs) {
-    final students = teacher.student ?? [];
+  Widget _mentorsTab(BuildContext context, ColorScheme cs) {
+    final mentors = coordinator.mentor ?? [];
 
-    if (students.isEmpty) {
-      return Center(
-        child: Text(
-          'No students assigned',
-          style: TextStyle(
-            fontSize: 14,
-            color: cs.outline,
-          ),
-        ),
-      );
+    if (mentors.isEmpty) {
+      return EmptyState(
+          cs: cs,
+          title: 'No mentors assigned',
+          subtitle: '',
+          icon: Icons.group);
     }
 
     return Column(
       children: [
         CustomWidgets().premiumSearch(
           context,
-          hint: 'Search students...',
+          hint: 'Search mentors...',
           onChanged: (p0) {},
         ),
         const SizedBox(height: 10),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: students.length,
+          itemCount: mentors.length,
           itemBuilder: (context, index) {
-            final student = students[index];
-
-            final packageCount = student.packages?.length ?? 0;
+            final mentor = mentors[index];
 
             return InkWell(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (_) {
-                    final packages = student.packages ?? [];
-
-                    return Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: cs.surface,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(24),
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          /// Handle
-                          Center(
-                            child: Container(
-                              width: 50,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                color: cs.outline.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 18),
-
-                          /// Title
-                          Text(
-                            student.name,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: cs.onSurface,
-                            ),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          /// Package List
-                          packages.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    'No packages available',
-                                    style: TextStyle(
-                                      color: cs.outline,
-                                    ),
-                                  ),
-                                )
-                              : ListView.separated(
-                                  shrinkWrap: true,
-                                  itemCount: packages.length,
-                                  separatorBuilder: (_, __) =>
-                                      const SizedBox(height: 12),
-                                  itemBuilder: (context, i) {
-                                    final package = packages[i];
-
-                                    return InkWell(
-                                      onTap: () =>
-                                          Get.to(() => TrPackageSessionPage(
-                                                package: package,
-                                              )),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(14),
-                                        decoration: BoxDecoration(
-                                          color: cs.onPrimary,
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          border: Border.all(
-                                            color: cs.outline.withOpacity(0.25),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              width: 48,
-                                              height: 48,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color:
-                                                    cs.primary.withOpacity(0.1),
-                                              ),
-                                              child: Icon(
-                                                Icons.menu_book_rounded,
-                                                color: cs.primary,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 14),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    package.name ?? '-',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: cs.onSurface,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 6),
-                                                  Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.school_outlined,
-                                                        size: 16,
-                                                        color: cs.outline,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        package.standard ?? '-',
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                          color: cs.outline,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 12),
-                                                      Icon(
-                                                        Icons.language_outlined,
-                                                        size: 16,
-                                                        color: cs.outline,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Expanded(
-                                                        child: Text(
-                                                          package.syllabus ??
-                                                              '-',
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: cs.outline,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Icon(
-                                              Icons.arrow_forward_ios_rounded,
-                                              size: 16,
-                                              color: cs.outline,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
+              onTap: () => Get.to(
+                  () => MentorDetailsPage(mentor: mentor, initialIndex: index)),
               borderRadius: BorderRadius.circular(14),
               child: Container(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -1393,22 +874,22 @@ class TeacherDetailsPage extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         color: cs.primary.withOpacity(0.08),
-                        image: student.imageUrl != null &&
-                                student.imageUrl!.isNotEmpty
+                        image: mentor.imageUrl != null &&
+                                mentor.imageUrl!.isNotEmpty
                             ? DecorationImage(
-                                image: NetworkImage(student.imageUrl!),
+                                image: NetworkImage(mentor.imageUrl!),
                                 fit: BoxFit.cover,
                               )
                             : null,
                       ),
-                      child: (student.imageUrl == null ||
-                              student.imageUrl!.isEmpty)
-                          ? Icon(
-                              Icons.person_outline,
-                              color: cs.primary,
-                              size: 24,
-                            )
-                          : null,
+                      child:
+                          (mentor.imageUrl == null || mentor.imageUrl!.isEmpty)
+                              ? Icon(
+                                  Icons.person_outline,
+                                  color: cs.primary,
+                                  size: 24,
+                                )
+                              : null,
                     ),
 
                     const SizedBox(width: 12),
@@ -1419,7 +900,7 @@ class TeacherDetailsPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            student.name,
+                            mentor.name,
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
@@ -1428,7 +909,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            student.studentId ?? '-',
+                            mentor.empId ?? '-',
                             style: TextStyle(
                               fontSize: 12,
                               color: cs.outline,
@@ -1437,23 +918,19 @@ class TeacherDetailsPage extends StatelessWidget {
                         ],
                       ),
                     ),
-
-                    /// 🔹 Package Count
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: cs.primary.withOpacity(0.12),
-                      ),
-                      child: Text(
-                        '$packageCount Packages',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: cs.primary,
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        onPressed: () => CustomWidgets().showDeleteDialog(
+                          title: 'Confirm Action',
+                          context: context,
+                          text:
+                              'Are you sure you want to unassign this mentor?',
+                          onConfirm: () {},
+                        ),
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
                         ),
                       ),
                     ),
@@ -1469,7 +946,7 @@ class TeacherDetailsPage extends StatelessWidget {
 
   Widget _unlockButton(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final c = Get.find<TeacherController>();
+    final c = Get.find<MentorController>();
 
     return SizedBox(
       width: double.infinity,
@@ -1496,11 +973,7 @@ class TeacherDetailsPage extends StatelessWidget {
 
   Widget _unlockForm(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final c = Get.find<TeacherController>();
-    final items = [
-      {"id": "all", "name": "All Students"},
-      ...c.students,
-    ];
+    final c = Get.find<MentorController>();
     final RxList<Map<String, dynamic>> selectedItems =
         <Map<String, dynamic>>[].obs;
     selectedItems.add({"id": "all", "name": "All Students"});
@@ -1587,7 +1060,7 @@ class TeacherDetailsPage extends StatelessWidget {
   }
 
   Widget _studentMultiSelect(BuildContext context) {
-    final c = Get.find<TeacherController>();
+    final c = Get.find<MentorController>();
     final cs = Theme.of(context).colorScheme;
 
     final students = [
@@ -1726,71 +1199,6 @@ Widget summaryCard({
                 style: TextStyle(
                     fontSize: 18, fontWeight: FontWeight.w800, color: color)),
           ],
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _supportTile(
-  BuildContext context,
-  String role,
-  String name,
-  String id,
-  String date, {
-  String? imageUrl,
-}) {
-  final cs = Theme.of(context).colorScheme;
-  return Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: cs.onPrimary,
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: cs.outline.withOpacity(0.5)),
-      boxShadow: [
-        BoxShadow(
-            color: cs.shadow.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 3))
-      ],
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // avatar
-        Container(
-          width: 52,
-          height: 52,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            image: imageUrl != null
-                ? DecorationImage(
-                    image: NetworkImage(imageUrl), fit: BoxFit.cover)
-                : null,
-          ),
-          child: imageUrl == null
-              ? Icon(Icons.person, size: 24, color: _blue.withOpacity(0.6))
-              : null,
-        ),
-
-        const SizedBox(width: 14),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(role,
-                  style: TextStyle(
-                      fontSize: 11, fontWeight: FontWeight.w600, color: _blue)),
-              const SizedBox(height: 2),
-              Text(name,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 3),
-              Text('$id  •  $date',
-                  style: TextStyle(fontSize: 11, color: cs.outline)),
-            ],
-          ),
         ),
       ],
     ),

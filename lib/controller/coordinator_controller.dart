@@ -1,4 +1,5 @@
 import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/users/add_teacher_page.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +22,18 @@ class CoordinatorController extends GetxController {
   final RxString selectedBranch = ''.obs;
   final RxString selectedBank = ''.obs;
   final RxString selectedTimezone = ''.obs;
+  var selectedIndex = 0.obs;
+  final RxList<Map<String, dynamic>> accessOverrides =
+      <Map<String, dynamic>>[].obs;
 
   final RxList<ExperienceFormData> experiences = <ExperienceFormData>[].obs;
 
+  List<String> detailedTabs = [
+    "Profile",
+    "Professional",
+    "Mentors",
+    "Wallet",
+  ];
   // --------------------------
   // Counts for tabs
   // --------------------------
@@ -95,13 +105,16 @@ class CoordinatorController extends GetxController {
 
       coordinators.assignAll([
         Coordinator(
-          id: "COO1001",
-          name: "Maria",
-          email: "maria@email.com",
-          status: "Active",
-          phone: "123456",
-          joinedAt: DateTime.now(),
-        ),
+            id: "COO1001",
+            name: "Maria",
+            email: "maria@email.com",
+            status: "Active",
+            phone: "123456",
+            joinedAt: DateTime.now(),
+            mentor: [
+              Mentor(name: 'Joy', empId: 'MEN001'),
+              Mentor(name: 'Naila', empId: 'MEN002')
+            ]),
         Coordinator(
           id: "COO1002",
           name: "Nick",

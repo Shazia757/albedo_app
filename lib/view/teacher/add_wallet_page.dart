@@ -1,4 +1,5 @@
 import 'package:albedo_app/controller/teacher_wallet_controller.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
@@ -13,13 +14,14 @@ class AddWalletPage extends StatelessWidget {
     super.key,
     this.teacher,
     this.mentor,
+    this.coordinator,
     this.showAdjustment = true,
   });
 
   final Teacher? teacher;
   final Mentor? mentor;
+  final Coordinator? coordinator;
 
-  /// false for mentors
   final bool showAdjustment;
 
   final c = Get.put(TeacherWalletController());
@@ -30,16 +32,16 @@ class AddWalletPage extends StatelessWidget {
 
     /// reusable balance
     final double currentBalance =
-        teacher?.balance ?? mentor?.balance ?? 0;
+        teacher?.balance ?? mentor?.balance ?? coordinator?.balance ?? 0;
 
     final bool isMentor = mentor != null;
+    final bool isCoordinator = coordinator != null;
 
     return Scaffold(
       appBar: CustomAppBar(),
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
-
           Expanded(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
@@ -49,18 +51,20 @@ class AddWalletPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       /// TITLE
-                      Obx(
-                        () => Text(
-                          showAdjustment
-                              ? (c.selectedType.value == 'adjustment'
-                                  ? 'Salary Adjustment'
-                                  : 'Withdraw Funds')
-                              : 'Withdraw Funds',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
+                      showAdjustment
+                          ? Obx(
+                              () => Text(
+                                c.selectedType.value == 'adjustment'
+                                    ? 'Salary Adjustment'
+                                    : 'Withdraw Funds',
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            )
+                          : Text(
+                              'Withdraw Funds',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
 
                       const SizedBox(height: 20),
 
@@ -81,9 +85,7 @@ class AddWalletPage extends StatelessWidget {
                                   },
                                 ),
                               ),
-
                               const SizedBox(width: 12),
-
                               Expanded(
                                 child: _buildTypeCard(
                                   context: context,
@@ -100,37 +102,34 @@ class AddWalletPage extends StatelessWidget {
                           ),
                         ),
 
-                      if (showAdjustment)
-                        const SizedBox(height: 16),
+                      if (showAdjustment) const SizedBox(height: 16),
 
                       /// CONTENT
-                      Obx(() {
-                        /// Mentor → always withdraw
-                        if (!showAdjustment) {
-                          return _buildWithdrawForm(
-                            context,
-                            c,
-                            currentBalance,
-                            isMentor,
-                          );
-                        }
+                      showAdjustment
+                          ? Obx(() {
+                              if (c.selectedType.value == 'adjustment') {
+                                return _buildSalaryAdjustmentForm(
+                                  context,
+                                  c,
+                                  isMentor,
+                                );
+                              }
 
-                        /// Teacher
-                        if (c.selectedType.value == 'adjustment') {
-                          return _buildSalaryAdjustmentForm(
-                            context,
-                            c,
-                            isMentor,
-                          );
-                        }
-
-                        return _buildWithdrawForm(
-                          context,
-                          c,
-                          currentBalance,
-                          isMentor,
-                        );
-                      }),
+                              return _buildWithdrawForm(
+                                context,
+                                c,
+                                currentBalance,
+                                isMentor,
+                                isCoordinator,
+                              );
+                            })
+                          : _buildWithdrawForm(
+                              context,
+                              c,
+                              currentBalance,
+                              isMentor,
+                              isCoordinator,
+                            ),
                     ],
                   ),
                 ),
@@ -152,32 +151,106 @@ class AddWalletPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        /// your existing adjustment form
-
+        CustomWidgets().labelWithAsterisk('Component Type', required: true),
+        const SizedBox(height: 10),
+        CustomWidgets().customDropdownField(
+          context: context,
+          hint: 'Select Type',
+          items: c.componentType,
+          value: c.selectedComponent.value,
+          itemLabel: (s) => s,
+          onChanged: (student) {},
+        ),
+        const SizedBox(height: 10),
+        CustomWidgets().labelWithAsterisk('Month', required: true),
+        const SizedBox(height: 10),
+        CustomWidgets().customDropdownField<String>(
+          context: context,
+          hint: 'Select Month',
+          items: TeacherWalletController.months,
+          value: c.adjSelectedMonth.value,
+          initialValue: c.initialMonth.value,
+          itemLabel: (month) => month,
+          onChanged: (value) {
+            if (value != null) {
+              c.adjSelectedMonth.value = value;
+            }
+          },
+        ),
+        const SizedBox(height: 10),
+        CustomWidgets().labelWithAsterisk('Year', required: true),
+        const SizedBox(height: 10),
+        CustomWidgets().customDropdownField<String>(
+          context: context,
+          hint: 'Select Year',
+          items: c.years,
+          value: c.adjSelectedYear.value,
+          initialValue: c.initialYear.value,
+          itemLabel: (year) => year,
+          onChanged: (value) {
+            if (value != null) {
+              c.adjSelectedYear.value = value;
+            }
+          },
+        ),
+        const SizedBox(height: 10),
+        CustomWidgets().labelWithAsterisk('Amount (₹)', required: true),
+        const SizedBox(height: 10),
+        CustomWidgets().dropdownStyledTextField(
+            context: context,
+            hint: 'Enter adjustment amount',
+            controller: c.salaryController,
+            isNumber: true),
+        const SizedBox(height: 10),
+        CustomWidgets().labelWithAsterisk('Description (optional)'),
+        const SizedBox(height: 10),
+        CustomWidgets().dropdownStyledTextField(
+          context: context,
+          hint: 'Performance bonus, commission, etc.',
+          controller: c.descriptionController,
+        ),
+        const SizedBox(height: 10),
         Row(
           children: [
             Expanded(
-              child: OutlinedButton(
+              child: OutlinedButton.icon(
                 onPressed: () => Get.back(),
-                child: const Text('Cancel'),
+                icon: const SizedBox.shrink(),
+                label: Text(
+                  'Cancel',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 13),
+                ),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ),
-
             const SizedBox(width: 10),
-
             Expanded(
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                 onPressed: () {
                   if (c.validateAdjustment(context)) {
-
-                    /// TEACHER
-                    if (!isMentor) {
-                      c.adjustSalary();
-                    }
+                    c.adjustSalary();
                   }
                 },
-                child: const Text('Adjust Salary'),
+                label: const Text(
+                  'Adjust Salary',
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ),
           ],
@@ -193,13 +266,13 @@ class AddWalletPage extends StatelessWidget {
     TeacherWalletController c,
     double currentBalance,
     bool isMentor,
+    bool isCoordinator,
   ) {
     final cs = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         /// BALANCE CARD
         Container(
           width: double.infinity,
@@ -217,9 +290,7 @@ class AddWalletPage extends StatelessWidget {
                   color: cs.onSurface.withOpacity(.7),
                 ),
               ),
-
               const SizedBox(height: 6),
-
               Text(
                 '₹${currentBalance.toStringAsFixed(0)}',
                 style: const TextStyle(
@@ -241,11 +312,54 @@ class AddWalletPage extends StatelessWidget {
 
         const SizedBox(height: 10),
 
+        const SizedBox(height: 10),
+
         CustomWidgets().dropdownStyledTextField(
           context: context,
-          hint: 'Enter amount',
+          hint: 'Enter amount (max. ₹${currentBalance.toStringAsFixed(0)})',
           controller: c.salaryController,
           isNumber: true,
+          onTap: () {
+            final enteredAmount = double.tryParse(c.salaryController.text) ?? 0;
+
+            if (enteredAmount > currentBalance) {
+              c.salaryController.text = currentBalance.toStringAsFixed(0);
+
+              c.salaryController.selection = TextSelection.fromPosition(
+                TextPosition(
+                  offset: c.salaryController.text.length,
+                ),
+              );
+            }
+          },
+        ),
+        const SizedBox(height: 10),
+
+        CustomWidgets().labelWithAsterisk(
+          'Description (optional)',
+        ),
+
+        const SizedBox(height: 10),
+
+        CustomWidgets().dropdownStyledTextField(
+          context: context,
+          hint: 'Need cash, personal expense, etc.',
+          controller: c.descriptionController,
+        ),
+
+        const SizedBox(height: 10),
+
+        CustomWidgets().labelWithAsterisk('Attachment'),
+
+        const SizedBox(height: 8),
+
+        CustomWidgets().attachmentStyledField(
+          context: context,
+          label: "Attachment",
+          hint: "Choose a file",
+          fileName: c.selectedFile,
+          onTap: () {},
+          onClear: () {},
         ),
 
         const SizedBox(height: 20),
@@ -253,40 +367,54 @@ class AddWalletPage extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: OutlinedButton(
+              child: OutlinedButton.icon(
                 onPressed: () => Get.back(),
-                child: const Text('Cancel'),
+                icon: const SizedBox.shrink(),
+                label: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 13,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: cs.surface,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ),
-
             const SizedBox(width: 10),
-
             Expanded(
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                 onPressed: () {
-
                   if (c.validateWithdrawal(context)) {
-
-                    /// mentor api
-                    if (isMentor) {
-                      c.finalizeMentorWithdrawal();
-                    }
-
-                    /// teacher api
-                    else {
-                      c.finalizeWithdrawal();
-                    }
+                    c.finalizeWithdrawal();
                   }
                 },
-                child: Text(
-                  isMentor
-                      ? 'Withdraw'
-                      : 'Finalize Withdrawal',
+                label: const Text(
+                  'Finalize Withdrawal',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: cs.primary,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
           ],
-        ),
+        )
       ],
     );
   }

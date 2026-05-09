@@ -18,6 +18,8 @@ class Package {
   int? numberOfClasses;
   int? sessionsTotal;
   int? sessionsCompleted;
+  double? timeCompleted;
+  double? timeTotal;
 
   String? couponCode;
 
@@ -26,8 +28,9 @@ class Package {
   String? standard;
   String? syllabus;
 
-  final String status; // Active / Completed / Pending
+String? status; // Active / Completed / Pending
 
+  double? teacherSalaryPerHour;
   double? studentFeePerHour;
   double? packageFee;
   double? takenFee;
@@ -54,13 +57,18 @@ class Package {
     this.expenseRatio,
     this.durationDays,
     this.studentFeePerHour,
+    this.teacherSalaryPerHour,
     this.numberOfClasses,
     this.teacher,
+    this.sessionsCompleted,
+    this.sessionsTotal,
     this.subjectId,
+    this.timeCompleted,
+    this.timeTotal,
     this.subjectName,
     this.standard,
     this.syllabus,
-    required this.status,
+  this.status,
     this.packageFee,
     this.takenFee,
     this.balance,

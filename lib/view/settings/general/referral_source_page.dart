@@ -26,6 +26,8 @@ class ReferralSourcePage extends StatelessWidget {
           },
           onDelete: () {
            CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
               context: context,
               text: 'Delete this referral source permanently?',
               onConfirm: () {

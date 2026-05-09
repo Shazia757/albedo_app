@@ -5,9 +5,11 @@ import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_tab.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class NotificationsPage extends StatelessWidget {
   final c = Get.put(NotificationsController());
@@ -15,20 +17,6 @@ class NotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
-    final auth = Get.find<AuthController>();
-    final role = auth.activeUser?.role;
-
-    final isCustom = ![
-      "admin",
-      "mentor",
-      "advisor",
-      "teacher",
-      "student",
-      "coordinator",
-      "finance",
-      "sales",
-      "hr"
-    ].contains(role);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -40,16 +28,30 @@ class NotificationsPage extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10.0, left: 15),
+                    child: Text(
+                      'Notifications',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
                 /// 🧭 Tabs
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: Tabs(
-                    selectedIndex: c.selectedTab,
-                    labels: ['All', 'Important', 'Updates'],
-                    onTap: (p0) {
-                      c.selectedTab.value = p0;
+                Obx(
+                  () => CustomWidgets().customTabs(
+                    context,
+                    tabs: c.tabs,
+                    selectedIndex: c.selectedTab.value,
+                    onTap: (index) {
+                      c.selectedTab.value = index;
                       c.applyFilters();
                     },
+                    getCount: c.getCount,
                   ),
                 ),
 
@@ -114,62 +116,168 @@ class NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: cs.onPrimary,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// 🔹 TITLE + BADGE
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  data.title ?? "No Title",
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        CustomWidgets().showCustomDialog(
+          context: context,
+          title: Text(data.title ?? "Notification"),
+          formKey: GlobalKey(),
+          isViewOnly: true,
+          onSubmit: () {},
+          sections: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// IMPORTANT BADGE
+                if (data.isImportant)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: cs.error.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      "IMPORTANT",
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: cs.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+
+                /// MESSAGE
+                Text(
+                  data.message ?? "",
                   style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                    color: cs.onSurface,
+                    fontSize: 13,
+                    color: cs.onSurface.withOpacity(0.8),
+                    height: 1.5,
                   ),
                 ),
-              ),
-              if (data.isImportant)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: cs.error.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
+
+                const SizedBox(height: 16),
+
+                /// DATE
+                Row(
+                  children: [
+                    Icon(
+                      Icons.schedule,
+                      size: 16,
+                      color: cs.onSurface.withOpacity(0.5),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      data.date != null
+                          ? DateFormat(
+                              "dd MMM yyyy • hh:mm a",
+                            ).format(data.date ?? DateTime.now())
+                          : "No Date",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: cs.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: cs.onPrimary,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: cs.outline.withOpacity(0.4),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// 🔹 TITLE + BADGE
+            Row(
+              children: [
+                Expanded(
                   child: Text(
-                    "Important",
+                    data.title ?? "No Title",
                     style: TextStyle(
-                      fontSize: 10,
-                      color: cs.error,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: cs.onSurface,
                     ),
                   ),
                 ),
-            ],
-          ),
-
-          const SizedBox(height: 8),
-
-          /// 🔹 MESSAGE
-          Text(
-            data.message ?? "",
-            style: TextStyle(
-              fontSize: 12,
-              color: cs.onSurface.withOpacity(0.7),
-              height: 1.4,
+                if (data.isImportant)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: cs.error.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      "Important",
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: cs.error,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          ),
-        ],
+
+            const SizedBox(height: 8),
+
+            /// 🔹 MESSAGE
+            Text(
+              data.message ?? "",
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                color: cs.onSurface.withOpacity(0.7),
+                height: 1.4,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            /// 🔹 DATE
+            Row(
+              children: [
+                Icon(
+                  Icons.schedule,
+                  size: 14,
+                  color: cs.onSurface.withOpacity(0.5),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  data.date != null
+                      ? DateFormat(
+                          "dd MMM yyyy • hh:mm a",
+                        ).format(data.date ?? DateTime.now())
+                      : "No Date",
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: cs.onSurface.withOpacity(0.55),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

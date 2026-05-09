@@ -108,6 +108,8 @@ class MacroPage extends StatelessWidget {
                               icon: Icons.delete,
                               color: Theme.of(context).colorScheme.error,
                               onTap: () => CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
                                 context: context,
                                 text:
                                     'Are you sure you want to delete this hiring ad?',

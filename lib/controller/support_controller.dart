@@ -13,15 +13,25 @@ class SupportController extends GetxController {
 
   var selectedTab = 0.obs; // 0 = open, 1 = closed
   var searchQuery = ''.obs;
+  final tabs = ["Open", "Closed"];
+
+  int get openCount => allTickets.where((e) => e.status == "Open").length;
+
+  int get closedCount =>
+      allTickets.where((e) => e.status == "Closed").length;
+
+  List<Map<String, dynamic>> get tabData => [
+        {"label": "Open", "count": openCount},
+        {"label": "Closed", "count": closedCount},
+      ];
+
   var sortType = SortType.newest.obs;
   var selectedPriority = PriorityFilter.all.obs;
-  
 
   var allTickets = <Ticket>[].obs;
   var filteredTickets = <Ticket>[].obs;
   RxString selectedType = "student".obs;
   RxList<String> categoryList = <String>[].obs;
-
 
   RxBool isSearching = false.obs;
   RxBool isLoading = true.obs;

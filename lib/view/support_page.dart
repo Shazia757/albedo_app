@@ -52,15 +52,16 @@ class SupportsPage extends StatelessWidget {
           children: [
             _topBar(context, c),
             const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: Tabs(
-                selectedIndex: c.selectedTab,
-                labels: ['Open', 'Closed'],
-                onTap: (p0) {
-                  c.selectedTab.value = p0;
+            Obx(
+              () => CustomWidgets().customTabs(
+                context,
+                tabs: c.tabs,
+                selectedIndex: c.selectedTab.value,
+                onTap: (index) {
+                  c.selectedTab.value = index;
                   c.applyFilters();
                 },
+                getCount: c.getCount,
               ),
             ),
             const SizedBox(height: 10),
@@ -150,6 +151,8 @@ class SupportsPage extends StatelessWidget {
                         icon: Icons.delete,
                         color: Theme.of(context).colorScheme.error,
                         onTap: () => CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
                           text:
                               'Are you sure you want to delete this ticket permanently?',
                           context: context,
@@ -233,6 +236,7 @@ class SupportsPage extends StatelessWidget {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
@@ -255,6 +259,7 @@ class SupportsPage extends StatelessWidget {
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withOpacity(0.5),

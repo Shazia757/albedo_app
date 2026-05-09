@@ -85,27 +85,26 @@ class TeacherController extends GetxController {
 
   List<String> feedbackTabs = ['Student', 'Mentor'];
 
-
-final Map<String, List<String>> bankBranches = {
-  'State Bank of India': [
-    'Kayamkulam',
-    'Mavelikkara',
-    'Haripad',
-  ],
-  'HDFC Bank': [
-    'Kayamkulam',
-    'Alappuzha',
-    'Kollam',
-  ],
-  'ICICI Bank': [
-    'Kayamkulam',
-    'Karunagappally',
-  ],
-  'Federal Bank': [
-    'Kayamkulam',
-    'Cherthala',
-  ],
-};
+  final Map<String, List<String>> bankBranches = {
+    'State Bank of India': [
+      'Kayamkulam',
+      'Mavelikkara',
+      'Haripad',
+    ],
+    'HDFC Bank': [
+      'Kayamkulam',
+      'Alappuzha',
+      'Kollam',
+    ],
+    'ICICI Bank': [
+      'Kayamkulam',
+      'Karunagappally',
+    ],
+    'Federal Bank': [
+      'Kayamkulam',
+      'Cherthala',
+    ],
+  };
 
   // 🎯 Teacher-specific fields
   TextEditingController nameController = TextEditingController();
@@ -137,9 +136,8 @@ final Map<String, List<String>> bankBranches = {
   TextEditingController endDateController = TextEditingController();
   TextEditingController relockController = TextEditingController();
   final ifscController = TextEditingController();
-final resumeController = TextEditingController();
-final demoController = TextEditingController();
-
+  final resumeController = TextEditingController();
+  final demoController = TextEditingController();
 
   final RxList<Map<String, dynamic>> students = [
     {"id": "STU001", "name": "Amina"},
@@ -416,53 +414,61 @@ final demoController = TextEditingController();
     }
 
     // Sort
-    if (sortType.value == SortType.newest) {
-      temp.sort((a, b) => b.joinedAt.compareTo(a.joinedAt));
+   if (sortType.value == SortType.newest) {
+      temp.sort(
+        (a, b) => (b.joinedAt ?? DateTime(1900))
+            .compareTo(a.joinedAt ?? DateTime(1900)),
+      );
     } else if (sortType.value == SortType.oldest) {
-      temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
+      temp.sort(
+        (a, b) => (a.joinedAt ?? DateTime(1900))
+            .compareTo(b.joinedAt ?? DateTime(1900)),
+      );
     } else if (sortType.value == SortType.name) {
-      temp.sort((a, b) => a.name.compareTo(b.name));
+      temp.sort(
+        (a, b) => a.name.toLowerCase().compareTo(
+              b.name.toLowerCase(),
+            ),
+      );
     }
 
     filteredTeachers.assignAll(temp);
   }
 
-  final RxList<Map<String, dynamic>> studentFeedbacks = <Map<String, dynamic>>[
-    {
-      "id": "FDB001",
-      "student_name": "Amina",
-      "rating": 4.8,
-      "message":
-          "Very supportive teacher. The sessions were easy to understand.",
-      "date": "2026-05-01",
-    },
-    {
-      "id": "FDB002",
-      "student_name": "Rayan",
-      "rating": 5.0,
-      "message": "Excellent teaching style and good communication throughout.",
-      "date": "2026-05-03",
-    },
-  ].obs;
-
-  final RxList<Map<String, dynamic>> mentorFeedbacks = <Map<String, dynamic>>[
-    {
-      "id": "MFB001",
-      "mentor_name": "Shahid",
-      "rating": 4.5,
-      "message": "Teacher manages students well and maintains consistency.",
-      "date": "2026-05-02",
-    },
-    {
-      "id": "MFB002",
-      "mentor_name": "Nihal",
-      "rating": 4.9,
-      "message":
-          "Very professional and active in handling batch responsibilities.",
-      "date": "2026-05-05",
-    },
-  ].obs;
-
+  final RxMap<String, List<Map<String, dynamic>>> studentFeedbacks =
+      <String, List<Map<String, dynamic>>>{
+    'T001': [
+      {
+        "id": "FDB001",
+        "student_name": "Amina",
+        "rating": 4.8,
+        "message":
+            "Very supportive teacher. The sessions were easy to understand.",
+        "date": "2026-05-01",
+      },
+    ],
+    'TEA002': [
+      {
+        "id": "FDB010",
+        "student_name": "Hiba",
+        "rating": 5.0,
+        "message": "Very interactive classes.",
+        "date": "2026-05-04",
+      },
+    ],
+  }.obs;
+  final RxMap<String, List<Map<String, dynamic>>> mentorFeedbacks =
+      <String, List<Map<String, dynamic>>>{
+    'TEA001': [
+      {
+        "id": "MFB001",
+        "mentor_name": "Shahid",
+        "rating": 4.5,
+        "message": "Teacher manages students well and maintains consistency.",
+        "date": "2026-05-02",
+      },
+    ],
+  }.obs;
   final RxList<Map<String, dynamic>> accessOverrides =
       <Map<String, dynamic>>[].obs;
 
@@ -490,12 +496,14 @@ final demoController = TextEditingController();
 
     if (user?.role == "coordinator") {
       CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
         context: context,
         text: "Do you want to request deletion of this teacher?",
         onConfirm: () => requestDelete(teacher.id!),
       );
     } else {
       CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
         context: context,
         text: "Are you sure you want to delete this teacher permanently?",
         onConfirm: () => delete(teacher.id!),
@@ -577,99 +585,94 @@ final demoController = TextEditingController();
   }
 
   void removeExperience(int index) {
-  experiences[index].dispose();
-  experiences.removeAt(index);
-}
+    experiences[index].dispose();
+    experiences.removeAt(index);
+  }
 
   void addTeacher() {}
 
-bool validateTeacher(BuildContext context) {
-  String error = "";
+  bool validateTeacher(BuildContext context) {
+    String error = "";
 
-  if (nameController.text.trim().isEmpty) {
-    error = "Teacher name is required";
-  } else if (emailController.text.trim().isEmpty) {
-    error = "Email is required";
-  } else if (!GetUtils.isEmail(emailController.text.trim())) {
-    error = "Enter a valid email address";
-  } else if (phoneController.text.trim().isEmpty) {
-    error = "Phone number is required";
-  } else if (phoneController.text.trim().length < 10) {
-    error = "Enter a valid phone number";
-  } else if (genderController.text.trim().isEmpty) {
-    error = "Gender is required";
-  } else if (dobController.text.trim().isEmpty) {
-    error = "Date of birth is required";
-  } else if (qualificationController.text.trim().isEmpty) {
-    error = "Qualification is required";
-  } else if (placeController.text.trim().isEmpty) {
-    error = "Place is required";
-  } else if (pincodeController.text.trim().isEmpty) {
-    error = "Pincode is required";
-  } else if (pincodeController.text.trim().length < 5) {
-    error = "Enter a valid pincode";
-  } else if (addressController.text.trim().isEmpty) {
-    error = "Address is required";
-  } else if (selectedTimezone.value.trim().isEmpty) {
-    error = "Please select a time zone";
-  } else if (prefLangController.text.trim().isEmpty) {
-    error = "Preferred language is required";
-  } else if (tutionModeController.text.trim().isEmpty) {
-    error = "Tuition mode is required";
-  }
+    if (nameController.text.trim().isEmpty) {
+      error = "Teacher name is required";
+    } else if (emailController.text.trim().isEmpty) {
+      error = "Email is required";
+    } else if (!GetUtils.isEmail(emailController.text.trim())) {
+      error = "Enter a valid email address";
+    } else if (phoneController.text.trim().isEmpty) {
+      error = "Phone number is required";
+    } else if (phoneController.text.trim().length < 10) {
+      error = "Enter a valid phone number";
+    } else if (genderController.text.trim().isEmpty) {
+      error = "Gender is required";
+    } else if (dobController.text.trim().isEmpty) {
+      error = "Date of birth is required";
+    } else if (qualificationController.text.trim().isEmpty) {
+      error = "Qualification is required";
+    } else if (placeController.text.trim().isEmpty) {
+      error = "Place is required";
+    } else if (pincodeController.text.trim().isEmpty) {
+      error = "Pincode is required";
+    } else if (pincodeController.text.trim().length < 5) {
+      error = "Enter a valid pincode";
+    } else if (addressController.text.trim().isEmpty) {
+      error = "Address is required";
+    } else if (selectedTimezone.value.trim().isEmpty) {
+      error = "Please select a time zone";
+    } else if (prefLangController.text.trim().isEmpty) {
+      error = "Preferred language is required";
+    } else if (tutionModeController.text.trim().isEmpty) {
+      error = "Tuition mode is required";
+    }
 
-  /// Experience Validation
-  else if (experiences.isEmpty) {
-    error = "At least one experience is required";
-  } else {
-    for (int i = 0; i < experiences.length; i++) {
-      final exp = experiences[i];
+    /// Experience Validation
+    else if (experiences.isEmpty) {
+      error = "At least one experience is required";
+    } else {
+      for (int i = 0; i < experiences.length; i++) {
+        final exp = experiences[i];
 
-      if (exp.companyController.text.trim().isEmpty) {
-        error = "Company name is required in Experience ${i + 1}";
-        break;
-      } else if (exp.yearController.text.trim().isEmpty) {
-        error = "Years is required in Experience ${i + 1}";
-        break;
-      } else if (exp.monthController.text.trim().isEmpty) {
-        error = "Months is required in Experience ${i + 1}";
-        break;
+        if (exp.companyController.text.trim().isEmpty) {
+          error = "Company name is required in Experience ${i + 1}";
+          break;
+        } else if (exp.yearController.text.trim().isEmpty) {
+          error = "Years is required in Experience ${i + 1}";
+          break;
+        } else if (exp.monthController.text.trim().isEmpty) {
+          error = "Months is required in Experience ${i + 1}";
+          break;
+        }
       }
     }
+
+    /// Bank Details
+    if (error.isEmpty && accountNumberController.text.trim().isEmpty) {
+      error = "Account number is required";
+    } else if (error.isEmpty &&
+        accountHolderNameController.text.trim().isEmpty) {
+      error = "Account holder name is required";
+    } else if (error.isEmpty && selectedBank.value.trim().isEmpty) {
+      error = "Please select a bank";
+    } else if (error.isEmpty && selectedBranch.value.trim().isEmpty) {
+      error = "Please select a branch";
+    } else if (error.isEmpty && ifscController.text.trim().isEmpty) {
+      error = "IFSC code is required";
+    } else if (error.isEmpty && resumeController.text.trim().isEmpty) {
+      error = "Resume URL is required";
+    }
+
+    if (error.isNotEmpty) {
+      Get.snackbar(
+        "Error",
+        error,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(12),
+      );
+
+      return false;
+    }
+
+    return true;
   }
-
-  /// Bank Details
-  if (error.isEmpty &&
-      accountNumberController.text.trim().isEmpty) {
-    error = "Account number is required";
-  } else if (error.isEmpty &&
-      accountHolderNameController.text.trim().isEmpty) {
-    error = "Account holder name is required";
-  } else if (error.isEmpty &&
-      selectedBank.value.trim().isEmpty) {
-    error = "Please select a bank";
-  } else if (error.isEmpty &&
-      selectedBranch.value.trim().isEmpty) {
-    error = "Please select a branch";
-  } else if (error.isEmpty &&
-      ifscController.text.trim().isEmpty) {
-    error = "IFSC code is required";
-  } else if (error.isEmpty &&
-      resumeController.text.trim().isEmpty) {
-    error = "Resume URL is required";
-  }
-
-  if (error.isNotEmpty) {
-    Get.snackbar(
-      "Error",
-      error,
-      snackPosition: SnackPosition.TOP,
-      margin: const EdgeInsets.all(12),
-    );
-
-    return false;
-  }
-
-  return true;
-}
 }

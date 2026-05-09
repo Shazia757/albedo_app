@@ -1,3 +1,4 @@
+import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 class Session {
   final String id;
   Student? student;
+  Batch? batch;
 Package? package;
   String? syllabus;
  String? className;
@@ -17,7 +19,7 @@ Package? package;
   Coordinator? coordinator;
   Advisor? advisor;
   String? startTime;
-  String? endTIme;
+  String? endTime;
   bool? isCompleted;
   bool? needsAction;
   String? remainingTime;
@@ -35,6 +37,9 @@ Package? package;
     required this.id,
     this.student,
      this.package,
+     this.batch,
+     this.startTime,
+     this.endTime,
      this.syllabus,
      this.className,
     this.teacher,
@@ -78,6 +83,21 @@ class SessionReport {
     this.teacherNotes,
     this.startTime,
     this.reason,
+  });
+}
+class BatchSessionReport {
+ final List<Student> students;
+  final Package package;
+  final String sessionDate;
+  final String duration;
+  final bool isCompleted;
+
+  BatchSessionReport({
+    required this.students,
+    required this.package,
+    required this.sessionDate,
+    required this.duration,
+    required this.isCompleted,
   });
 }
 

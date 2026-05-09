@@ -94,6 +94,8 @@ class NotificationsPage extends StatelessWidget {
                               icon: Icons.delete,
                               color: Theme.of(context).colorScheme.error,
                               onTap: () => CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
                                 context: context,
                                 text: 'Delete this notification?',
                                 onConfirm: () => c.delete(item.id),

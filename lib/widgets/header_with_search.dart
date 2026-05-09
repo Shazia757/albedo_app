@@ -77,7 +77,7 @@ class HeaderWithSearch extends StatelessWidget {
 
             if (onRequestTap != null)
               IconButton(
-                icon: const Icon(Icons.inbox_outlined), // you can change icon
+                icon: const Icon(Icons.inbox_outlined), 
                 tooltip: "Requests",
                 onPressed: onRequestTap,
               ),

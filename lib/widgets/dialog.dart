@@ -150,6 +150,7 @@ class DialogUtils {
                             icon: Icon(Icons.delete_outline,
                                 color: Theme.of(context).colorScheme.error),
                             onPressed: () => CustomWidgets().showDeleteDialog(
+                              title: 'Are you sure?',
                               context: context,
                               text:
                                   'Are you sure you want to delete this assessment? This action cannot be undone. ',
@@ -636,5 +637,4 @@ class DialogUtils {
       ),
     );
   }
-
 }

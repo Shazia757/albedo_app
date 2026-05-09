@@ -16,33 +16,8 @@ import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-// ─── Color tokens (from your theme) ─────────────────────────
 const _blue = Color(0xFF058DCE);
 
-// ============================================================
-//  EXTENSION
-// ============================================================
-extension PackageCalculations on Package {
-  double get totalTeacherSalary {
-    final rate = hourlyRate ?? 0;
-    final sessions = sessionsCompleted ?? 0;
-    return rate * sessions;
-  }
-
-  double get totalStudentPaid => takenFee ?? 0;
-  double get totalStudentBalance => balance ?? 0;
-
-  double get progressPercent {
-    final total = sessionsTotal ?? 0;
-    final done = sessionsCompleted ?? 0;
-    if (total == 0) return 0;
-    return done / total;
-  }
-}
-
-// ============================================================
-//  PAGE
-// ============================================================
 class MentorDetailsPage extends StatelessWidget {
   final Mentor mentor;
   final int initialIndex;
@@ -71,7 +46,11 @@ class MentorDetailsPage extends StatelessWidget {
             onPressed: () => Get.to(() => AddWalletPage(
                   mentor: mentor,
                 )),
-            child: const Icon(Icons.add),
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
 

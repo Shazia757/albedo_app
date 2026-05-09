@@ -5,9 +5,8 @@ import 'package:albedo_app/view/batch/batch_page.dart';
 import 'package:albedo_app/view/batch_payment_page.dart';
 import 'package:albedo_app/view/feedback_page.dart';
 import 'package:albedo_app/view/home_page.dart';
-import 'package:albedo_app/view/payment_page.dart';
+import 'package:albedo_app/view/payment/payment_page.dart';
 import 'package:albedo_app/view/profile_page.dart';
-import 'package:albedo_app/view/report/report_page.dart';
 import 'package:albedo_app/view/sessions/batch_session_page.dart';
 import 'package:albedo_app/view/sessions/session_page.dart';
 import 'package:albedo_app/view/settings/settings_page.dart';
@@ -37,7 +36,7 @@ class DrawerMenu extends StatelessWidget {
     final isDesktop = MediaQuery.of(context).size.width > 800;
 
     final sidebar = Container(
-      width: 260,
+      width: isDesktop ? 260 : MediaQuery.of(context).size.width * 0.5,
       decoration: BoxDecoration(
         color: cs.onPrimary,
         border: Border(
@@ -110,7 +109,15 @@ class DrawerMenu extends StatelessWidget {
       ),
     );
 
-    return isDesktop ? sidebar : Drawer(child: sidebar);
+    return isDesktop
+        ? sidebar
+        : SizedBox(
+            width: MediaQuery.of(context).size.width * 0.5,
+            child: Drawer(
+              width: MediaQuery.of(context).size.width * 0.5,
+              child: sidebar,
+            ),
+          );
   }
 
   List<Widget> _buildMenuByRole(
@@ -596,8 +603,8 @@ class DrawerMenu extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    height: 34,
-                    width: 34,
+                    height: 32,
+                    width: 32,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: isActive
@@ -607,7 +614,7 @@ class DrawerMenu extends StatelessWidget {
                     ),
                     child: Icon(
                       icon,
-                      size: 18,
+                      size: 16,
                       color:
                           isActive ? cs.primary : cs.onSurface.withOpacity(0.5),
                     ),
@@ -748,8 +755,8 @@ class DrawerExpansionMenu extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    height: 34,
-                    width: 34,
+                    height: 32,
+                    width: 32,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: isActive

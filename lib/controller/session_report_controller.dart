@@ -18,6 +18,7 @@ class SessionReportController extends GetxController {
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
 
   SessionReport? report;
+  BatchSessionReport? batchreport;
 
   Function(SessionReport)? onSave;
 
@@ -44,7 +45,7 @@ class SessionReportController extends GetxController {
     report = SessionReport(
       studentName: session.student?.name ?? "",
       studentId: session.student?.studentId ?? "",
-      package: session.package??Package(status: 'false'),
+      package: session.package ?? Package(status: 'false'),
       sessionDate: session.date.toString(),
       duration: session.duration?.toString() ?? "",
       isCompleted: false,
@@ -57,25 +58,30 @@ class SessionReportController extends GetxController {
   }
 
   void initFromBatchSession(Batch session) {
-    report = SessionReport(
-      studentName: session.student?.name ?? "",
-      studentId: session.student?.studentId ?? "",
+    batchreport = BatchSessionReport(
+      students: session.student ?? [],
       package: session.packages?.first ??
           Package(
-                    teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
-              subjectId: '',
-              subjectName: '',
-              standard: '',
-              syllabus: '',
+            teacher: Teacher(
+              id: '',
+              name: '',
               status: '',
-              packageFee: 0,
-              takenFee: 0,
-              balance: 0,
-              withdrawals: [],
-              time: '',
-              duration: '',
-              note: ''),
+              joinedAt: DateTime.now(),
+              gender: '',
+            ),
+            subjectId: '',
+            subjectName: '',
+            standard: '',
+            syllabus: '',
+            status: '',
+            packageFee: 0,
+            takenFee: 0,
+            balance: 0,
+            withdrawals: [],
+            time: '',
+            duration: '',
+            note: '',
+          ),
       sessionDate: session.date.toString(),
       duration: session.duration?.toString() ?? "",
       isCompleted: false,
@@ -83,7 +89,6 @@ class SessionReportController extends GetxController {
 
     isCompleted.value = report!.isCompleted;
 
-    // optional reset
     _clearFields();
   }
 

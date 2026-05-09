@@ -433,12 +433,16 @@ final RxString selectedReferralSource = ''.obs;
 
     if (user?.role == "coordinator") {
       CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
         context: context,
         text: "Do you want to request deletion of this student?",
         onConfirm: () => requestDelete(student.studentId!),
       );
     } else {
       CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
         context: context,
         text: "Are you sure you want to delete this student permanently?",
         onConfirm: () => delete(student.studentId!),

@@ -17,7 +17,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class MentorsPage extends StatelessWidget {
-  final c = Get.put(MentorController(), permanent: true);
+  final c = Get.put(MentorController());
 
   MentorsPage({super.key});
 

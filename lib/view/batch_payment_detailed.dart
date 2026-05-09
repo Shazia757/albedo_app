@@ -18,7 +18,6 @@ class BatchPaymentDetailPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-
       appBar: CustomAppBar(),
       body: Column(
         children: [
@@ -57,18 +56,6 @@ class BatchPaymentDetailPage extends StatelessWidget {
       ),
     );
   }
-
-  Widget _summary(String title, int count, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child:
-          Text("$title: $count", style: TextStyle(color: color, fontSize: 12)),
-    );
-  }
 }
 
 class PaymentCard extends StatelessWidget {
@@ -83,7 +70,7 @@ class PaymentCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cs.onPrimary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: cs.outlineVariant.withOpacity(0.3)),
       ),

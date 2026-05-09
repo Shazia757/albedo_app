@@ -1,24 +1,25 @@
 import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
-import 'package:albedo_app/model/users/teacher_model.dart';
 
 class Batch {
   String? id;
   String? batchID;
   String? batchName;
   String? mode;
-  Student? student;
+ List< Student>? student;
+ List< PaymentItem>? payment;
   String? course;
+  List? materials;
   String? imageUrl;
-  Teacher? teacher;
   int? students;
   int? totalFee;
   int? totalPaid;
   int? balance;
   int? expenseRatio;
-  final int? duration;
+ int? duration;
   Mentor? mentor;
   Coordinator? coordinator;
   final String? coordinatorId;
@@ -35,8 +36,8 @@ class Batch {
     this.id,
     this.batchID,
     this.batchName,
+    this.materials,
     this.paidDate,
-    this.teacher,
     this.mode,
     this.amountPaid,
     this.balance,
@@ -45,6 +46,7 @@ class Batch {
     this.totalPaid,
     this.expenseRatio,
     this.students,
+    this.payment,
     this.coordinatorId,
     this.coordinator,
     this.imageUrl,

@@ -2,13 +2,21 @@ import 'package:albedo_app/config/color_schemes.dart';
 import 'package:albedo_app/config/text_theme.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/home_controller.dart';
+import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
+import 'package:albedo_app/controller/student_wallet_controller.dart';
 import 'package:albedo_app/controller/user_controller.dart';
 import 'package:albedo_app/login_page.dart';
+import 'package:albedo_app/model/payment_model.dart';
+import 'package:albedo_app/view/batch/batch_page.dart';
 import 'package:albedo_app/view/home_page.dart';
+import 'package:albedo_app/view/payment/payment_page.dart';
 import 'package:albedo_app/view/sessions/add_session_page.dart';
+import 'package:albedo_app/view/sessions/batch_session_page.dart';
 import 'package:albedo_app/view/sessions/session_page.dart';
 import 'package:albedo_app/view/students/add_assessment_page.dart';
+import 'package:albedo_app/view/users/advisors_page.dart';
+import 'package:albedo_app/view/users/coordinator_page.dart';
 import 'package:albedo_app/view/users/mentors_page.dart';
 import 'package:albedo_app/view/users/students_page.dart';
 import 'package:albedo_app/view/users/teachers_page.dart';
@@ -24,6 +32,8 @@ Future<void> main() async {
   Get.put(UserController(), permanent: true);
   Get.put(HomeController(), permanent: true);
   Get.put(PermissionsController(), permanent: true);
+  Get.put(MentorController(), permanent: true);
+  Get.put(StudentWalletController(), permanent: true);
   runApp(MyApp());
 }
 
@@ -65,7 +75,8 @@ class MyApp extends StatelessWidget {
 
       themeMode: ThemeMode.light,
 
-      home: isLoggedIn ? MentorsPage() : LoginView(),
+      home:
+          isLoggedIn ? PaymentPage(type: PaymentUserType.student) : LoginView(),
     );
   }
 }

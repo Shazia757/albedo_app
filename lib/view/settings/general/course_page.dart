@@ -27,6 +27,8 @@ class CoursePage extends StatelessWidget {
 
           onDelete: () {
             CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
               context: context,
               text: 'Delete this course permanently?',
               onConfirm: () {

@@ -58,7 +58,11 @@ class BatchDetailsPage extends StatelessWidget {
           return FloatingActionButton(
             mini: true,
             onPressed: () => Get.to(() => AddPackagePage()),
-            child: const Icon(Icons.add),
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
         if (c.tabs[index] == 'Wallet') {
@@ -70,14 +74,22 @@ class BatchDetailsPage extends StatelessWidget {
                 c.transactions.add(txn);
               },
             ),
-            child: const Icon(Icons.add),
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
         if (c.tabs[index] == 'Assessments') {
           return FloatingActionButton(
             mini: true,
             onPressed: () => Get.to(() => AddAssessmentPage()),
-            child: const Icon(Icons.add),
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
         if (c.tabs[index] == 'Certificates') {
@@ -143,7 +155,11 @@ class BatchDetailsPage extends StatelessWidget {
                 },
               );
             },
-            child: const Icon(Icons.add),
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
 

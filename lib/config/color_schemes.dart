@@ -36,7 +36,7 @@ const darkColorScheme = ColorScheme(
 
   // 🔵 Keep brand color but slightly toned for dark UI
   primary: Color(0xFF3EA6FF),
-  onPrimary: Colors.black,
+  onPrimary: Color.fromARGB(255, 24, 24, 24),
   primaryContainer: Color(0xFF1E3A5F),
   onPrimaryContainer: Color(0xFFD6E9FF),
 
@@ -55,7 +55,7 @@ const darkColorScheme = ColorScheme(
   onError: Colors.black,
 
   // 🔘 Borders / dividers
-  outline: Color(0xFF2C2C2C),
+  outline: Color(0xFFB0B0B0),
 
   shadow: Colors.black,
   scrim: Colors.black,

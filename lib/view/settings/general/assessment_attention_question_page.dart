@@ -26,6 +26,8 @@ class AssessmentAttentionQuestionPage extends StatelessWidget {
           },
           onDelete: () {
             CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
               context: context,
               text: 'Delete this question permanently?',
               onConfirm: () {

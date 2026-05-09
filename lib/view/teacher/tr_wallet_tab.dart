@@ -1,6 +1,9 @@
+import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/coordinator_controller.dart';
 import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/controller/teacher_wallet_controller.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/wallet_model.dart';
@@ -12,15 +15,19 @@ Widget walletTab(
   BuildContext context, {
   Teacher? teacher,
   Mentor? mentor,
+  Coordinator? coordinator,
   TeacherController? teacherController,
   MentorController? mentorController,
+  CoordinatorController? coordinatorController,
   required TeacherWalletController wallet,
 }) {
   final cs = Theme.of(context).colorScheme;
+  final auth = Get.find<AuthController>();
+  final user = auth.activeUser;
+  final isCoordinator = user?.role == 'coordinator';
 
-  final bool isTeacher = teacher != null;
-
-  final walletData = teacher?.wallet ?? mentor?.wallet ?? Wallet();
+  final walletData =
+      teacher?.wallet ?? mentor?.wallet ?? coordinator?.wallet ?? Wallet();
 
   return SizedBox(
     height: MediaQuery.of(context).size.height,
@@ -37,12 +44,14 @@ Widget walletTab(
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () {
-              _showWalletSummary(
-                context,
-                mentor: mentor,
-                teacher: teacher,
-                wallet: walletData,
-              );
+              (!isCoordinator)
+                  ? _showWalletSummary(
+                      context,
+                      mentor: mentor,
+                      teacher: teacher,
+                      wallet: walletData,
+                    )
+                  : null;
             },
             iconAlignment: IconAlignment.end,
             icon: const Icon(

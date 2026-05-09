@@ -1,5 +1,8 @@
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/payment_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +14,7 @@ class BatchController extends GetxController {
   final AuthController auth = Get.find();
 
   RxBool isSearching = false.obs;
+  var selectedIndex = 0.obs;
 
   var batches = <Batch>[].obs;
   var filteredBatches = <Batch>[].obs;
@@ -20,6 +24,14 @@ class BatchController extends GetxController {
   var sortType = SortType.newest.obs;
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
+
+  List<String> detailedTabs = [
+    "Batch",
+    "Packages",
+    "Students",
+    "Payments",
+    "Materials",
+  ];
 
   // --------------------------
   // Counts for tabs
@@ -60,25 +72,58 @@ class BatchController extends GetxController {
 
       batches.assignAll([
         Batch(
-          teacher: Teacher(
-            id: "T01",
-            name: "John",
-            status: "active",
-            joinedAt: DateTime(2023, 1, 1),
-            gender: "male",
-          ),
+          student: [
+            Student(
+                name: 'Nivina',
+                spotFee: 1000,
+                totalAmount: 2000,
+                status: 'completed')
+          ],
+          payment: [
+            PaymentItem(
+                id: '1',
+                studentName: 'Nivina',
+                studentId: '',
+                paymentDate: DateTime.now(),
+                amount: 1000,
+                balance: 2000,
+                status: 'pending')
+          ],
+          packages: [
+            Package(
+              name: "NEET Biology Foundation",
+              standard: "Plus One",
+              syllabus: "CBSE",
+              timeCompleted: 1620,
+              timeTotal: 2700,
+              teacherSalaryPerHour: 850,
+              teacher: Teacher(
+                id: "TCH102",
+                name: "Afsal Rahman",
+                imageUrl: "https://i.pravatar.cc/300?img=12",
+              ),
+            ),
+            Package(
+              name: "JEE Advanced Physics",
+              standard: "Plus Two",
+              syllabus: "NCERT",
+              sessionsCompleted: 25,
+              sessionsTotal: 40,
+              timeCompleted: 2250,
+              timeTotal: 3600,
+              teacherSalaryPerHour: 1200,
+              teacher: Teacher(
+                id: "TCH204",
+                name: "Nihal Basheer",
+                imageUrl: "https://i.pravatar.cc/300?img=15",
+              ),
+            ),
+          ],
           batchName: 'ATTC PROGRAME COURSE BATCH 1',
           batchID: 'B-ATTAP2601',
           status: "Active",
         ),
         Batch(
-          teacher: Teacher(
-            id: "T02",
-            name: "David",
-            status: "active",
-            joinedAt: DateTime(2023, 2, 1),
-            gender: "male",
-          ),
           batchName: '10 TH CBSE BATCH 1 2026-2027',
           batchID: 'B-10 MA2601',
           status: "Active",
@@ -138,20 +183,70 @@ class BatchController extends GetxController {
     batchNameController.text = batch.batchName.toString();
     batchModeController.text = batch.mode.toString();
     batchNameController.text = batch.batchName.toString();
-    mentorController.text = batch.mentor?.name??'';
+    mentorController.text = batch.mentor?.name ?? '';
   }
+
+  final batch = Batch(
+    id: "BTH001",
+    batchName: "NEET Evening Batch",
+  );
+
+  final payments = [
+    PaymentItem(
+      id: "PAY001",
+      studentName: "Amina Rashid",
+      studentId: "STU1023",
+      paymentType: "UPI",
+      amount: 4500,
+      status: "Paid",
+      paymentDate: DateTime.now(),
+      balance: 2000,
+    ),
+    PaymentItem(
+      id: "PAY002",
+      studentName: "Rayan Kareem",
+      studentId: "STU1041",
+      paymentType: "Bank Transfer",
+      amount: 6000,
+      status: "Pending",
+      paymentDate: DateTime.now(),
+      balance: 2000,
+    ),
+    PaymentItem(
+      id: "PAY003",
+      studentName: "Hiba Fathima",
+      studentId: "STU1099",
+      paymentType: "Cash",
+      amount: 3500,
+      status: "Paid",
+      paymentDate: DateTime.now(),
+      balance: 2000,
+    ),
+    PaymentItem(
+      id: "PAY004",
+      studentName: "Nihal Basheer",
+      studentId: "STU1107",
+      paymentType: "Card",
+      amount: 8000,
+      status: "Failed",
+      paymentDate: DateTime.now(),
+      balance: 2000,
+    ),
+  ];
 
   void handleDelete(BuildContext context, Batch batch) {
     final user = auth.activeUser;
 
     if ((user?.role == "coordinator") || (user?.role == "mentor")) {
       CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
         context: context,
         text: "Do you want to request deletion of this batch?",
         onConfirm: () => requestDelete(batch.id!),
       );
     } else {
       CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
         context: context,
         text: "Are you sure you want to delete this batch permanently?",
         onConfirm: () => delete(batch.id!),

@@ -19,8 +19,7 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: const CustomAppBar(),
       drawer: isWide ? null : const DrawerMenu(),
-           backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Obx(() {
         final AuthController auth = Get.find<AuthController>();
         final user = auth.activeUser;
@@ -93,7 +92,7 @@ class ProfilePage extends StatelessWidget {
                       ),
                       _Divider(cs: cs),
                       _QuickAccessTile(
-                        label: "Calculator",
+                        label: "Calc | Albedo",
                         icon: Icons.calculate_rounded,
                         iconColor: const Color(0xFF5856D6),
                         onTap: () {},

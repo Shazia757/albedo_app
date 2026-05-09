@@ -203,7 +203,8 @@ class GeneralPage extends StatelessWidget {
       title: "System Rules",
       icon: Icons.rule,
       items: [
-        _Item("Completion Deadline", Icons.timer, (ctx) => Get.to(() => DeadlinePage())),
+        _Item("Completion Deadline", Icons.timer,
+            (ctx) => Get.to(() => DeadlinePage())),
         _Item("Assessment Questions", Icons.help_outline,
             (ctx) => Get.to(() => AssessmentAttentionQuestionPage())),
       ],
@@ -228,8 +229,7 @@ class GeneralPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(),
-           backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Row(
         children: [
           /// 🧭 Desktop Drawer
@@ -271,9 +271,9 @@ class GeneralPage extends StatelessWidget {
   Widget _sectionCard(BuildContext context, _Section section) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).colorScheme.onPrimary,
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
+          color: Theme.of(context).colorScheme.outline.withOpacity(.5),
         ),
         borderRadius: BorderRadius.circular(20),
       ),
@@ -305,7 +305,9 @@ class GeneralPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            const Divider(),
+            Divider(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+            ),
             const SizedBox(height: 8),
             Column(
               children: section.items
@@ -328,6 +330,7 @@ class GeneralPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.grey.shade200),
         ),

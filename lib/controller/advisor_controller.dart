@@ -1,4 +1,5 @@
 import 'package:albedo_app/model/users/advisor_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/view/users/add_teacher_page.dart';
@@ -18,6 +19,9 @@ class AdvisorController extends GetxController {
   var isSearching = false.obs;
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
+  var selectedIndex = 0.obs;
+  final RxList<Map<String, dynamic>> accessOverrides =
+      <Map<String, dynamic>>[].obs;
 
   final RxString selectedBranch = ''.obs;
   final RxString selectedBank = ''.obs;
@@ -28,6 +32,12 @@ class AdvisorController extends GetxController {
   // Counts for tabs
   // --------------------------
 
+  List<String> detailedTabs = [
+    "Profile",
+    "Professional",
+    "Students",
+    "Access",
+  ];
   int get activeCount => advisors.where((e) => e.status == "Active").length;
 
   int get inactiveCount => advisors.where((e) => e.status == "Inactive").length;
@@ -71,13 +81,13 @@ class AdvisorController extends GetxController {
 
       advisors.assignAll([
         Advisor(
-          id: "ADV1001",
-          name: "Anjana",
-          email: "anjana@email.com",
-          status: "Active",
-          phone: "123456",
-          joinedAt: DateTime.now(),
-        ),
+            id: "ADV1001",
+            name: "Anjana",
+            email: "anjana@email.com",
+            status: "Active",
+            phone: "123456",
+            joinedAt: DateTime.now(),
+            student: [Student(name: 'Riya', studentId: 'STU001')]),
         Advisor(
           id: "ADV1002",
           name: "Ardra",
@@ -252,7 +262,7 @@ class AdvisorController extends GetxController {
     return true;
   }
 
-    void addExperience() {
+  void addExperience() {
     experiences.add(ExperienceFormData());
   }
 

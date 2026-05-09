@@ -1,9 +1,13 @@
 import 'package:albedo_app/config/root.dart';
+import 'package:albedo_app/controller/advisor_controller.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/controller/teacher_wallet_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/users/advisor_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/teacher/add_wallet_page.dart';
 import 'package:albedo_app/view/teacher/tr_package_session_page.dart';
@@ -14,20 +18,19 @@ import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 const _blue = Color(0xFF058DCE);
 
-class TeacherDetailsPage extends StatelessWidget {
-  final Teacher teacher;
+class AdvisorDetailedPage extends StatelessWidget {
+  final Advisor advisor;
   final int initialIndex;
 
-  TeacherDetailsPage({
+  AdvisorDetailedPage({
     super.key,
-    required this.teacher,
+    required this.advisor,
     required this.initialIndex,
   });
 
-  final c = Get.find<TeacherController>();
+  final c = Get.find<AdvisorController>();
 
   @override
   Widget build(BuildContext context) {
@@ -35,21 +38,19 @@ class TeacherDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(),
-      // ── FAB is untouched ────────────────────────────────────
+      // ── FAB ────────────────────────────────────
       floatingActionButton: Obx(() {
         final index = c.selectedIndex.value;
 
-        if (c.detailedTabs[index] == 'Wallet') {
+        if (c.detailedTabs[index] == 'Students') {
           return FloatingActionButton(
             mini: true,
-            onPressed: () => Get.to(() => AddWalletPage(
-                  teacher: teacher,
-                )),
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
+            onPressed: () {},
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
 
@@ -61,7 +62,7 @@ class TeacherDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Tabs  ───────────────────────────────
+            // ── Tabs (untouched) ───────────────────────────────
             Obx(() => CustomWidgets().customTabs(
                   context,
                   tabs: c.detailedTabs,
@@ -70,7 +71,7 @@ class TeacherDetailsPage extends StatelessWidget {
                 )),
             const SizedBox(height: 16),
 
-            // ── Tab bodies ──────────────────────────
+            // ── Tab bodies (upgraded) ──────────────────────────
             Obx(() {
               final index = c.selectedIndex.value;
               final walletController = Get.put(TeacherWalletController());
@@ -88,32 +89,6 @@ class TeacherDetailsPage extends StatelessWidget {
                 return _studentsTab(context, cs);
               }
 
-              // ─── BATCHES ───────────────────────────────────
-              if (c.detailedTabs[index] == 'Batches') {
-                final batches = teacher.batch ?? [];
-
-                if (batches.isEmpty) {
-                  return EmptyState(
-                      cs: cs,
-                      subtitle: '',
-                      icon: Icons.groups_outlined,
-                      title: 'No batches assigned');
-                }
-                return _batchesTab(context, cs, batches);
-              }
-
-              // ─── WALLET ────────────────────────────────────
-              if (c.detailedTabs[index] == 'Wallet') {
-                return walletTab(context,
-                    teacher: teacher,
-                    teacherController: c,
-                    wallet: walletController);
-              }
-
-              // ─── FEEDBACKS ─────────────────────────────────
-              if (c.detailedTabs[index] == 'Feedback') {
-                return _feedbacksTab(context, cs);
-              }
               // ─── ACCESS ─────────────────────────────────
               if (c.detailedTabs[index] == 'Access') {
                 final overrides = c.accessOverrides;
@@ -160,84 +135,52 @@ class TeacherDetailsPage extends StatelessWidget {
         _profileCard(context),
         const SizedBox(height: 16),
 
-        // Personal Information card
+        /// Personal Information card
         _glassCard(
           context: context,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _cardHeader(context, 'Personal Information',
-                  icon: Icons.person_outline),
+              _cardHeader(
+                context,
+                'Personal Information',
+                icon: Icons.person_outline,
+              ),
+
               _divider(cs),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _contactRow(context, Icons.phone_outlined, 'Mobile',
-                      teacher.phone ?? '-'),
-                  const SizedBox(height: 10),
-                  _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
-                      teacher.whatsapp ?? '-'),
+                  Expanded(
+                    child: _contactRow(
+                      context,
+                      Icons.phone_outlined,
+                      'Mobile',
+                      advisor.phone ?? '-',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _contactRow(
+                      context,
+                      Icons.chat_bubble_outline,
+                      'WhatsApp',
+                      advisor.whatsapp ?? '-',
+                    ),
+                  ),
                 ],
               ),
+
               _divider(cs),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _contactRow(
-                      context, Icons.place, 'Place', teacher.place ?? "-"),
-                  const SizedBox(height: 10),
-                  _contactRow(context, Icons.calendar_today_outlined,
-                      'Date Of Birth', teacher.dob ?? "-"),
-                ],
+
+              /// Converted Students Count
+              _infoTile(
+                context,
+                icon: Icons.people_alt_outlined,
+                title: 'Converted Students',
+                value: '${advisor.convertedStudents ?? 0}',
               ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // Academic Details card
-        _glassCard(
-          context: context,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _cardHeader(context, 'Payment Details', icon: Icons.payment),
-              _divider(cs),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('UPI ID',
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: cs.outline,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(teacher.upiId ?? '-',
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 8),
-                  Text('Account No.',
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: cs.outline,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(teacher.accountNumber ?? '-',
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 8),
-                  Text('IFSC Code',
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: cs.outline,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(teacher.ifscCode ?? '-',
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w700)),
-                ],
-              )
             ],
           ),
         ),
@@ -249,7 +192,7 @@ class TeacherDetailsPage extends StatelessWidget {
   //  PROFESSIONAL TAB
   // ══════════════════════════════════════════════════════════
   Widget _professionalTab(BuildContext context, ColorScheme cs) {
-    final experiences = teacher.experience ?? [];
+    final experiences = advisor.experience ?? [];
 
     int totalYears = 0;
     int totalMonths = 0;
@@ -293,7 +236,7 @@ class TeacherDetailsPage extends StatelessWidget {
                     child: _infoTile(
                       context,
                       title: 'Qualification',
-                      value: teacher.qualification ?? '-',
+                      value: advisor.qualification ?? '-',
                       icon: Icons.school_outlined,
                     ),
                   ),
@@ -307,16 +250,6 @@ class TeacherDetailsPage extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-
-              const SizedBox(height: 14),
-
-              /// Preferred Language
-              _infoTile(
-                context,
-                title: 'Preferred Language',
-                value: teacher.prefLanguage ?? '-',
-                icon: Icons.language_outlined,
               ),
 
               const SizedBox(height: 14),
@@ -346,7 +279,7 @@ class TeacherDetailsPage extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if ((teacher.experience ?? []).isEmpty)
+                        if ((advisor.experience ?? []).isEmpty)
                           Text(
                             'No work experience added',
                             style: TextStyle(
@@ -356,7 +289,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           )
                         else
                           Column(
-                            children: (teacher.experience ?? []).map((exp) {
+                            children: (advisor.experience ?? []).map((exp) {
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 10),
                                 child: Row(
@@ -415,191 +348,6 @@ class TeacherDetailsPage extends StatelessWidget {
             ],
           ),
         ),
-
-        const SizedBox(height: 16),
-
-        /// 🔹 Documents & Security
-        _glassCard(
-          context: context,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _cardHeader(
-                context,
-                'Documents & Security',
-                icon: Icons.folder_outlined,
-              ),
-
-              _divider(cs),
-
-              const SizedBox(height: 14),
-
-              /// 🔹 Documents
-              Text(
-                'Documents',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: cs.outline,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'ID Card',
-                    icon: Icons.badge_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Resume',
-                    icon: Icons.description_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Educational Certificate',
-                    icon: Icons.school_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Aadhar Front',
-                    icon: Icons.credit_card_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Aadhar Back',
-                    icon: Icons.credit_card,
-                    onTap: () {},
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 18),
-
-              /// 🔹 Security
-              Text(
-                'Security',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: cs.outline,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: _docButton(
-                      context,
-                      cs,
-                      title: 'Change Username',
-                      icon: Icons.person_outline,
-                      onTap: () => CustomWidgets().showCustomDialog(
-                        context: context,
-                        title: Text('Change Username'),
-                        formKey: GlobalKey(),
-                        sections: [
-                          CustomWidgets().labelWithAsterisk('New Username',
-                              required: true),
-                          const SizedBox(height: 10),
-                          CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Enter new username',
-                              controller: c.usernameController),
-                        ],
-                        submitText: 'Change',
-                        onSubmit: () {},
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _docButton(
-                      context,
-                      cs,
-                      title: 'Change Password',
-                      icon: Icons.lock_outline,
-                      onTap: () => CustomWidgets().showCustomDialog(
-                        context: context,
-                        title: Text('Change Password'),
-                        formKey: GlobalKey(),
-                        sections: [
-                          CustomWidgets().labelWithAsterisk('Current Password',
-                              required: true),
-                          const SizedBox(height: 10),
-                          Obx(
-                            () => CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              isPassword: true,
-                              hint: 'Enter current password',
-                              controller: c.currentPasswordController,
-                              obscureText: c.obscurePassword.value,
-                              onTogglePassword: () {
-                                c.obscurePassword.value =
-                                    !c.obscurePassword.value;
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('New Password',
-                              required: true),
-                          const SizedBox(height: 10),
-                          Obx(
-                            () => CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Enter new password',
-                              isPassword: true,
-                              controller: c.newPasswordController,
-                              obscureText: c.obscureNewPassword.value,
-                              onTogglePassword: () {
-                                c.obscureNewPassword.value =
-                                    !c.obscureNewPassword.value;
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Confirm Password',
-                              required: true),
-                          const SizedBox(height: 10),
-                          Obx(
-                            () => CustomWidgets().dropdownStyledTextField(
-                                context: context,
-                                isPassword: true,
-                                obscureText: c.obscureConfirmPassword.value,
-                                onTogglePassword: () {
-                                  c.obscureConfirmPassword.value =
-                                      !c.obscureConfirmPassword.value;
-                                },
-                                hint: 'Confirm new password',
-                                controller: c.confirmNewPasswordController),
-                          ),
-                        ],
-                        submitText: 'Change',
-                        onSubmit: () {},
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )
       ],
     );
   }
@@ -665,187 +413,6 @@ class TeacherDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _docButton(
-    BuildContext context,
-    ColorScheme cs, {
-    required String title,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: cs.primary.withOpacity(0.06),
-          border: Border.all(
-            color: cs.primary.withOpacity(0.15),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: cs.primary,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: cs.onSurface,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════
-  //  BATCHES TAB
-  // ══════════════════════════════════════════════════════════
-  Widget _batchesTab(
-      BuildContext context, ColorScheme cs, List<Batch> batches) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: batches.length,
-      itemBuilder: (context, i) {
-        final batch = batches[i];
-        final status = batch.status ?? 'Unknown';
-        final isActive = status == 'Active';
-        final statusColor =
-            isActive ? const Color(0xFF22C55E) : const Color(0xFFF59E0B);
-
-        return Container(
-          margin: const EdgeInsets.only(bottom: 14),
-          decoration: BoxDecoration(
-            color: cs.onPrimary,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: cs.outline.withOpacity(0.5)),
-            boxShadow: [
-              BoxShadow(
-                  color: cs.shadow.withOpacity(0.04),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4)),
-            ],
-          ),
-          child: Column(
-            children: [
-              // ── colored top stripe
-              Container(
-                height: 4,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            batch.batchName ?? 'No Name',
-                            style: const TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        _statusBadge(status, statusColor),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text('ID: ${batch.id ?? '-'}',
-                        style: TextStyle(fontSize: 11, color: cs.outline)),
-                    const SizedBox(height: 14),
-                    Divider(height: 1, color: cs.outline.withOpacity(0.15)),
-                    const SizedBox(height: 14),
-
-                    // Mentor row
-                    Row(
-                      children: [
-                        _squareAvatar(batch.mentor?.imageUrl, 44),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Assigned Mentor',
-                                style:
-                                    TextStyle(fontSize: 11, color: cs.outline)),
-                            const SizedBox(height: 2),
-                            Text(batch.mentor?.name ?? '-',
-                                style: const TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight.w600)),
-                            Text('ID: ${batch.mentor?.id ?? '-'}',
-                                style:
-                                    TextStyle(fontSize: 11, color: cs.outline)),
-                          ],
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════
-  //  FEEDBACKS TAB
-  // ══════════════════════════════════════════════════════════
-  Widget _feedbacksTab(BuildContext context, ColorScheme cs) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Obx(() => CustomWidgets().customTabs(
-              context,
-              tabs: c.feedbackTabs,
-              selectedIndex: c.feedbackTabIndex.value,
-              onTap: (i) => c.feedbackTabIndex.value = i,
-            )),
-        const SizedBox(height: 12),
-        Obx(() {
-          final isStudent = c.feedbackTabIndex.value == 0;
-          final feedbacks = isStudent ?   (c.studentFeedbacks[teacher.id] ?? [])   : (c.mentorFeedbacks[teacher.id] ?? []);
-          final label = isStudent ? 'Student' : 'Mentor';
-
-          if (feedbacks.isEmpty) {
-            return EmptyState(
-              cs: cs,
-              icon: Icons.feedback_outlined,
-              title: 'No feedback from $label yet',
-              subtitle: 'Feedback added by $label will appear here',
-            );
-          }
-          return ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: feedbacks.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (_, i) => feedbackCard(feedbacks[i], context),
-          );
-        }),
-      ],
-    );
-  }
-
   // ══════════════════════════════════════════════════════════
   //  PROFILE CARD
   // ══════════════════════════════════════════════════════════
@@ -860,27 +427,29 @@ class TeacherDetailsPage extends StatelessWidget {
         border: Border.all(color: cs.outline.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-              color: cs.shadow.withOpacity(0.06),
-              blurRadius: 16,
-              offset: const Offset(0, 6))
+            color: cs.shadow.withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
         ],
       ),
       child: Column(
         children: [
-          // gradient banner
+          /// Top banner
           Container(
             height: 72,
             decoration: BoxDecoration(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
             ),
           ),
 
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
             child: Column(
               children: [
-                // avatar overlapping banner
+                /// Avatar
                 Transform.translate(
                   offset: const Offset(0, -32),
                   child: Container(
@@ -890,69 +459,137 @@ class TeacherDetailsPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                            color: cs.shadow.withOpacity(0.1), blurRadius: 8)
+                          color: cs.shadow.withOpacity(0.1),
+                          blurRadius: 8,
+                        ),
                       ],
                     ),
-                    child: _squareAvatar(teacher.imageUrl, 64, radius: 12),
+                    child: _squareAvatar(
+                      advisor.imageUrl,
+                      64,
+                      radius: 12,
+                    ),
                   ),
                 ),
 
-                Transform.translate(
-                  offset: const Offset(0, -20),
-                  child: Column(
-                    children: [
-                      Text(teacher.name,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 4),
-                      Text(teacher.email ?? '-',
-                          style: TextStyle(fontSize: 13, color: cs.outline)),
-                      const SizedBox(height: 10),
+                /// Reduced gap after avatar
+                const SizedBox(height: 0),
 
-                      // ID badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: _blue.withOpacity(0.3)),
-                        ),
-                        child: Text('ID: ${teacher.id}',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: _blue)),
-                      ),
+                Text(
+                  advisor.name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
 
-                      const SizedBox(height: 12),
+                const SizedBox(height: 4),
 
-                      // Dashboard button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {    final auth = Get.find<AuthController>();
-                            final user = teacherToUser(teacher);
+                Text(
+                  advisor.email ?? '-',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: cs.outline,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
 
-                            auth.startImpersonation(user);
-                            Get.offAll(() => const Root());},
-                          icon: const Icon(Icons.arrow_right_alt,
-                              size: 15, color: Colors.white),
-                          iconAlignment: IconAlignment.end,
-                          label: const Text('Go to Dashboard',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 13)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: cs.primary,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 10),
+
+                /// ID badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: _blue.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Text(
+                    'ID: ${advisor.id}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: _blue,
+                    ),
                   ),
                 ),
+
+                const SizedBox(height: 14),
+
+                /// Generate ID Card button
+                Align(
+                  alignment: Alignment.center,
+                  child: ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.perm_identity_rounded,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      'Generate ID Card',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: cs.primary.withOpacity(0.8),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                /// Dashboard button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      final auth = Get.find<AuthController>();
+                      final user = advisorToUser(advisor);
+
+                      auth.startImpersonation(user);
+
+                      Get.offAll(() => const Root());
+                    },
+                    icon: const Icon(
+                      Icons.arrow_right_alt,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    iconAlignment: IconAlignment.end,
+                    label: const Text(
+                      'Go to Dashboard',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: cs.primary,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10)
               ],
             ),
           ),
@@ -1167,18 +804,14 @@ class TeacherDetailsPage extends StatelessWidget {
   }
 
   Widget _studentsTab(BuildContext context, ColorScheme cs) {
-    final students = teacher.student ?? [];
+    final students = advisor.student ?? [];
 
     if (students.isEmpty) {
-      return Center(
-        child: Text(
-          'No students assigned',
-          style: TextStyle(
-            fontSize: 14,
-            color: cs.outline,
-          ),
-        ),
-      );
+      return EmptyState(
+          cs: cs,
+          title: 'No students assigned',
+          subtitle: '',
+          icon: Icons.group);
     }
 
     return Column(
@@ -1199,125 +832,112 @@ class TeacherDetailsPage extends StatelessWidget {
             final packageCount = student.packages?.length ?? 0;
 
             return InkWell(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (_) {
-                    final packages = student.packages ?? [];
+              onTap: packageCount == 0
+                  ? null
+                  : () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) {
+                          final packages = student.packages ?? [];
 
-                    return Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: cs.surface,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(24),
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          /// Handle
-                          Center(
-                            child: Container(
-                              width: 50,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                color: cs.outline.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(20),
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: cs.surface,
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(24),
                               ),
                             ),
-                          ),
-
-                          const SizedBox(height: 18),
-
-                          /// Title
-                          Text(
-                            student.name,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: cs.onSurface,
-                            ),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          /// Package List
-                          packages.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    'No packages available',
-                                    style: TextStyle(
-                                      color: cs.outline,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                /// Handle
+                                Center(
+                                  child: Container(
+                                    width: 50,
+                                    height: 5,
+                                    decoration: BoxDecoration(
+                                      color: cs.outline.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
-                                )
-                              : ListView.separated(
-                                  shrinkWrap: true,
-                                  itemCount: packages.length,
-                                  separatorBuilder: (_, __) =>
-                                      const SizedBox(height: 12),
-                                  itemBuilder: (context, i) {
-                                    final package = packages[i];
+                                ),
 
-                                    return InkWell(
-                                      onTap: () =>
-                                          Get.to(() => TrPackageSessionPage(
-                                                package: package,
-                                              )),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(14),
-                                        decoration: BoxDecoration(
-                                          color: cs.onPrimary,
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          border: Border.all(
-                                            color: cs.outline.withOpacity(0.25),
-                                          ),
+                                const SizedBox(height: 18),
+
+                                Text(
+                                  student.name,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: cs.onSurface,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 16),
+
+                                packages.isEmpty
+                                    ? Center(
+                                        child: Text(
+                                          'No packages available',
+                                          style: TextStyle(color: cs.outline),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              width: 48,
-                                              height: 48,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color:
-                                                    cs.primary.withOpacity(0.1),
-                                              ),
-                                              child: Icon(
-                                                Icons.menu_book_rounded,
-                                                color: cs.primary,
+                                      )
+                                    : ListView.separated(
+                                        shrinkWrap: true,
+                                        itemCount: packages.length,
+                                        separatorBuilder: (_, __) =>
+                                            const SizedBox(height: 12),
+                                        itemBuilder: (context, i) {
+                                          final package = packages[i];
+
+                                          return Container(
+                                            padding: const EdgeInsets.all(14),
+                                            decoration: BoxDecoration(
+                                              color: cs.onPrimary,
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              border: Border.all(
+                                                color: cs.outline
+                                                    .withOpacity(0.25),
                                               ),
                                             ),
-                                            const SizedBox(width: 14),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    package.name ?? '-',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: cs.onSurface,
-                                                    ),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 48,
+                                                  height: 48,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    color: cs.primary
+                                                        .withOpacity(0.1),
                                                   ),
-                                                  const SizedBox(height: 6),
-                                                  Row(
+                                                  child: Icon(
+                                                    Icons.menu_book_rounded,
+                                                    color: cs.primary,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 14),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
-                                                      Icon(
-                                                        Icons.school_outlined,
-                                                        size: 16,
-                                                        color: cs.outline,
+                                                      Text(
+                                                        package.name ?? '-',
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
                                                       ),
-                                                      const SizedBox(width: 4),
+                                                      const SizedBox(height: 6),
                                                       Text(
                                                         package.standard ?? '-',
                                                         style: TextStyle(
@@ -1325,47 +945,20 @@ class TeacherDetailsPage extends StatelessWidget {
                                                           color: cs.outline,
                                                         ),
                                                       ),
-                                                      const SizedBox(width: 12),
-                                                      Icon(
-                                                        Icons.language_outlined,
-                                                        size: 16,
-                                                        color: cs.outline,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Expanded(
-                                                        child: Text(
-                                                          package.syllabus ??
-                                                              '-',
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: cs.outline,
-                                                          ),
-                                                        ),
-                                                      ),
                                                     ],
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
-                                            Icon(
-                                              Icons.arrow_forward_ios_rounded,
-                                              size: 16,
-                                              color: cs.outline,
-                                            ),
-                                          ],
-                                        ),
+                                          );
+                                        },
                                       ),
-                                    );
-                                  },
-                                ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
               borderRadius: BorderRadius.circular(14),
               child: Container(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -1469,7 +1062,7 @@ class TeacherDetailsPage extends StatelessWidget {
 
   Widget _unlockButton(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final c = Get.find<TeacherController>();
+    final c = Get.find<MentorController>();
 
     return SizedBox(
       width: double.infinity,
@@ -1496,11 +1089,7 @@ class TeacherDetailsPage extends StatelessWidget {
 
   Widget _unlockForm(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final c = Get.find<TeacherController>();
-    final items = [
-      {"id": "all", "name": "All Students"},
-      ...c.students,
-    ];
+    final c = Get.find<MentorController>();
     final RxList<Map<String, dynamic>> selectedItems =
         <Map<String, dynamic>>[].obs;
     selectedItems.add({"id": "all", "name": "All Students"});
@@ -1587,7 +1176,7 @@ class TeacherDetailsPage extends StatelessWidget {
   }
 
   Widget _studentMultiSelect(BuildContext context) {
-    final c = Get.find<TeacherController>();
+    final c = Get.find<MentorController>();
     final cs = Theme.of(context).colorScheme;
 
     final students = [

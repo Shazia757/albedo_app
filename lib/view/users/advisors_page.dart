@@ -2,6 +2,7 @@ import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/advisor_controller.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/advisor_detailed_page.dart';
 import 'package:albedo_app/view/users/add_advisor_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
@@ -80,15 +81,16 @@ class AdvisorsPage extends StatelessWidget {
                 ),
 
                 /// 🧭 Tabs
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: Tabs(
-                    selectedIndex: c.selectedTab,
-                    labels: ['Active', 'Inactive'],
-                    onTap: (p0) {
-                      c.selectedTab.value = p0;
+                Obx(
+                  () => CustomWidgets().customTabs(
+                    context,
+                    tabs: c.tabs,
+                    selectedIndex: c.selectedTab.value,
+                    onTap: (index) {
+                      c.selectedTab.value = index;
                       c.applyFilters();
                     },
+                    getCount: (index) => c.tabData[index]['count'],
                   ),
                 ),
 
@@ -144,11 +146,9 @@ class AdvisorsPage extends StatelessWidget {
                                     onTap: () {
                                       if (advisor != null) {
                                         {
-                                          openAdvisorProfile(
-                                            context,
-                                            advisor,
-                                            (p0) => advisorToUser(advisor),
-                                          );
+                                          Get.to(() => AdvisorDetailedPage(
+                                              advisor: advisor,
+                                              initialIndex: index));
                                         }
                                       }
                                     },
@@ -191,6 +191,8 @@ class AdvisorsPage extends StatelessWidget {
                                         color: cs.error,
                                         onTap: () =>
                                             CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
                                           text:
                                               'Are you sure you want to delete this advisor permanently?',
                                           context: context,

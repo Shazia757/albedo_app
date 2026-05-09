@@ -24,14 +24,14 @@ class MentorController extends GetxController {
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
   var selectedIndex = 0.obs;
-    final RxBool obscurePassword = true.obs;
+  final RxBool obscurePassword = true.obs;
   final RxBool obscureNewPassword = true.obs;
   final RxBool obscureConfirmPassword = true.obs;
   final RxBool showUnlockForm = false.obs;
   final RxBool selectAllStudents = false.obs;
-    var selectedFromDate = Rxn<DateTime>();
+  var selectedFromDate = Rxn<DateTime>();
   var selectedUntilDate = Rxn<DateTime>();
-    final RxList<Map<String, dynamic>> selectedStudents =
+  final RxList<Map<String, dynamic>> selectedStudents =
       <Map<String, dynamic>>[].obs;
 
   final RxString unlockFrom = ''.obs;
@@ -40,11 +40,11 @@ class MentorController extends GetxController {
 
   final RxString targetType = 'All Students'.obs;
 
-    RxInt feedbackTabIndex = 0.obs;
+  RxInt feedbackTabIndex = 0.obs;
 
   List<String> feedbackTabs = ['Student', 'Teacher'];
 
-    final RxList<Map<String, dynamic>> studentFeedbacks = <Map<String, dynamic>>[
+  final RxList<Map<String, dynamic>> studentFeedbacks = <Map<String, dynamic>>[
     {
       "id": "FDB001",
       "student_name": "Amina",
@@ -80,8 +80,6 @@ class MentorController extends GetxController {
     },
   ].obs;
 
-
-
   final ratingFilters = [
     FilterOption<int>(label: "All", value: 0, icon: Icons.filter_alt),
     FilterOption<int>(label: "2 & Up", value: 2, icon: Icons.star),
@@ -93,9 +91,8 @@ class MentorController extends GetxController {
 
   final RxList<ExperienceFormData> experiences = <ExperienceFormData>[].obs;
 
-    final RxList<Map<String, dynamic>> accessOverrides =
+  final RxList<Map<String, dynamic>> accessOverrides =
       <Map<String, dynamic>>[].obs;
-
 
   List<String> detailedTabs = [
     "Profile",
@@ -124,8 +121,6 @@ class MentorController extends GetxController {
     return mentors.where((m) => m.coordinator?.name == tab).length;
   }
 
-  
-
   TextEditingController nameController = TextEditingController();
   TextEditingController empIdController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -147,7 +142,7 @@ class MentorController extends GetxController {
   TextEditingController bankNameController = TextEditingController();
   TextEditingController branchNameController = TextEditingController();
   TextEditingController bankBranchController = TextEditingController();
-    TextEditingController usernameController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
   TextEditingController currentPasswordController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController confirmNewPasswordController = TextEditingController();
@@ -156,10 +151,9 @@ class MentorController extends GetxController {
   TextEditingController m3Controller = TextEditingController();
   TextEditingController m4Controller = TextEditingController();
   TextEditingController m5Controller = TextEditingController();
-    TextEditingController startDateController = TextEditingController();
+  TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
   TextEditingController relockController = TextEditingController();
-
 
   final RxList<Map<String, dynamic>> students = [
     {"id": "STU001", "name": "Amina"},
@@ -172,7 +166,7 @@ class MentorController extends GetxController {
     super.onInit();
     fetchMentors();
     addExperience();
-     selectedStudents.add({
+    selectedStudents.add({
       "id": "all",
       "name": "All Students",
     });
@@ -351,12 +345,16 @@ class MentorController extends GetxController {
 
     if (user?.role == "coordinator") {
       CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
         context: context,
         text: "Do you want to request deletion of this mentor?",
         onConfirm: () => requestDelete(mentor.id!),
       );
     } else {
       CustomWidgets().showDeleteDialog(
+        title: 'Are you sure?',
+
         context: context,
         text: "Are you sure you want to delete this mentor permanently?",
         onConfirm: () => delete(mentor.id!),

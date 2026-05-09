@@ -25,121 +25,346 @@ class SettingsPage extends StatelessWidget {
 
   SettingsPage({super.key});
 
-  final List<_SettingsItem> items = [
-    _SettingsItem("General", Icons.settings, GeneralPage()),
-    _SettingsItem("Notifications", Icons.notifications, NotificationsPage()),
-    _SettingsItem("Banner Ads", Icons.campaign, BannerAdsPage()),
-    _SettingsItem("Coupons", Icons.confirmation_number, CouponsPage()),
-    _SettingsItem("Recommendation", Icons.thumb_up, RecommendationPage()),
-    _SettingsItem("Hiring", Icons.work, HiringPage()),
-    _SettingsItem("Star of Month", Icons.star, StarOfMonthPage()),
-    _SettingsItem("Automation", Icons.auto_mode, MacroPage()),
-    _SettingsItem("Assessments", Icons.assignment, AssessmentsPage()),
-    _SettingsItem("Materials", Icons.menu_book, MaterialsPage()),
-    _SettingsItem("Bulk Upload", Icons.upload_file, BulkUploadPage()),
-    _SettingsItem("Backup", Icons.backup, BackupPage()),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
-
-    int crossAxisCount = isDesktop ? 4 : 2;
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: cs.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Obx(
-                () {
-                  final auth = Get.find<AuthController>();
-                  final role = auth.activeUser?.role;
+            child: Obx(
+              () {
+                final auth = Get.find<AuthController>();
+                final role = auth.activeUser?.role;
 
-                  final isCustom = ![
-                    "admin",
-                    "mentor",
-                    "advisor",
-                    "teacher",
-                    "student",
-                    "coordinator",
-                    "finance",
-                    "sales",
-                    "hr"
-                  ].contains(role);
+                final isCustom = ![
+                  "admin",
+                  "mentor",
+                  "advisor",
+                  "teacher",
+                  "student",
+                  "coordinator",
+                  "finance",
+                  "sales",
+                  "hr"
+                ].contains(role);
 
-                  final visibleItems = !isCustom
-                      ? items
-                      : items.where((item) {
-                          final perm = c.settingsPermissions[item.title];
-                          return perm != null && PermissionService.can(perm);
-                        }).toList();
-                  return GridView.builder(
-                    itemCount: visibleItems.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 1, // makes it square
-                    ),
-                    itemBuilder: (context, index) {
-                      final item = visibleItems[index];
+                bool canShow(String title) {
+                  if (!isCustom) return true;
 
-                      return InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          Get.to(() => item.page);
-                        },
-                        child: Card(
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                item.icon,
-                                size: 32,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              const SizedBox(height: 10),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  item.title,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+                  final perm = c.settingsPermissions[title];
+                  return perm != null && PermissionService.can(perm);
+                }
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Settings",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      /// CORE SETTINGS
+                      _sectionTitle(context, "CORE SETTINGS"),
+
+                      const SizedBox(height: 12),
+
+                      _groupCard(
+                        context,
+                        cs: cs,
+                        items: [
+                          if (canShow("General"))
+                            _TileData(
+                              title: "General",
+                              subtitle: "Manage application preferences",
+                              icon: Icons.settings,
+                              page: GeneralPage(),
+                            ),
+                          if (canShow("Notifications"))
+                            _TileData(
+                              title: "Notifications",
+                              subtitle: "Configure alerts & notifications",
+                              icon: Icons.notifications,
+                              page: NotificationsPage(),
+                            ),
+                          if (canShow("Backup"))
+                            _TileData(
+                              title: "Backup",
+                              subtitle: "Backup and restore system data",
+                              icon: Icons.backup,
+                              page: BackupPage(),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+
+                      /// MARKETING & ENGAGEMENT
+                      _sectionTitle(
+                        context,
+                        "MARKETING & ENGAGEMENT",
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      _groupCard(
+                        cs: cs,
+                        context,
+                        items: [
+                          if (canShow("Banner Ads"))
+                            _TileData(
+                              title: "Banner Ads",
+                              subtitle: "Manage promotional banners",
+                              icon: Icons.campaign,
+                              page: BannerAdsPage(),
+                            ),
+                          if (canShow("Coupons"))
+                            _TileData(
+                              title: "Coupons",
+                              subtitle: "Create and manage coupons",
+                              icon: Icons.confirmation_number,
+                              page: CouponsPage(),
+                            ),
+                          if (canShow("Star of Month"))
+                            _TileData(
+                              title: "Star of Month",
+                              subtitle: "Manage monthly recognitions",
+                              icon: Icons.star,
+                              page: StarOfMonthPage(),
+                            ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      /// LEARNING OPERATIONS
+                      _sectionTitle(
+                        context,
+                        "LEARNING OPERATIONS",
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      _groupCard(
+                        cs: cs,
+                        context,
+                        items: [
+                          if (canShow("Assessments"))
+                            _TileData(
+                              title: "Assessments",
+                              subtitle: "Manage tests and evaluations",
+                              icon: Icons.assignment,
+                              page: AssessmentsPage(),
+                            ),
+                          if (canShow("Materials"))
+                            _TileData(
+                              title: "Materials",
+                              subtitle: "Learning resources & materials",
+                              icon: Icons.menu_book,
+                              page: MaterialsPage(),
+                            ),
+                          if (canShow("Recommendation"))
+                            _TileData(
+                              title: "Recommendation",
+                              subtitle: "Recommendation settings",
+                              icon: Icons.thumb_up,
+                              page: RecommendationPage(),
+                            ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      /// ADVANCED & RECRUITMENT
+                      _sectionTitle(
+                        context,
+                        "ADVANCED & RECRUITMENT",
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      _groupCard(
+                        cs: cs,
+                        context,
+                        items: [
+                          if (canShow("Hiring"))
+                            _TileData(
+                              title: "Hiring",
+                              subtitle: "Manage recruitment settings",
+                              icon: Icons.work,
+                              page: HiringPage(),
+                            ),
+                          if (canShow("Automation"))
+                            _TileData(
+                              title: "Automation",
+                              subtitle: "Macros and automation tools",
+                              icon: Icons.auto_mode,
+                              page: MacroPage(),
+                            ),
+                          if (canShow("Bulk Upload"))
+                            _TileData(
+                              title: "Bulk Upload",
+                              subtitle: "Upload large datasets easily",
+                              icon: Icons.upload_file,
+                              page: BulkUploadPage(),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],
       ),
     );
   }
+
+  Widget _sectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.bold,
+        color: Theme.of(context).colorScheme.primary,
+        letterSpacing: 1.2,
+      ),
+    );
+  }
+
+  Widget _groupCard(
+    BuildContext context, {
+    required List<_TileData> items,
+    required ColorScheme cs,
+  }) {
+    final filtered = items.toList();
+
+    return Card(
+      elevation: 1,
+      color: cs.onPrimary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: cs.outline.withOpacity(0.5),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: List.generate(filtered.length, (index) {
+          final item = filtered[index];
+
+          return Column(
+            children: [
+              _settingsTile(
+                context,
+                title: item.title,
+                subtitle: item.subtitle,
+                icon: item.icon,
+                page: item.page,
+              ),
+              if (index != filtered.length - 1)
+                Divider(
+                  height: 1,
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _settingsTile(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Widget page,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () => Get.to(() => page),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        child: Row(
+          children: [
+            Container(
+              height: 48,
+              width: 48,
+              decoration: BoxDecoration(
+                color: cs.primary.withOpacity(.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                icon,
+                color: cs.primary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: cs.onSurface.withOpacity(.65),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: cs.onSurface.withOpacity(.5),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _SettingsItem {
+class _TileData {
   final String title;
+  final String subtitle;
   final IconData icon;
   final Widget page;
 
-  _SettingsItem(this.title, this.icon, this.page);
+  _TileData({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.page,
+  });
 }

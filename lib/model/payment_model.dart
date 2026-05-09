@@ -5,26 +5,45 @@ enum PaymentUserType { student, teacher }
 class StudentPaymentModel {
   final String name;
   final String id;
+
   double? balance;
+  int? packages;
   double? admissionFee;
-  int? depTxns;
-  int? credTxns;
-  double? deposited;
+  bool? admissionFeePaid;
+  double? courseFee;
+
+  /// deposit transactions count
+  int? depositTransactions;
+
+  /// credit transactions count
+  int? creditTransactions;
+
+  /// total deposited amount
+  double? depositedAmount;
+
   double? creditLimit;
-  int? depPending;
+
+  /// pending deposit requests
+  int? depositPending;
+
   double? creditAmount;
-  String? status; // pending / approved
+
+  /// pending / approved
+  String? status;
 
   StudentPaymentModel({
     required this.name,
     required this.id,
     this.balance,
+    this.admissionFeePaid,
+    this.packages,
     this.admissionFee,
-    this.depTxns,
-    this.credTxns,
-    this.deposited,
+    this.courseFee,
+    this.depositTransactions,
+    this.creditTransactions,
+    this.depositedAmount,
     this.creditLimit,
-    this.depPending,
+    this.depositPending,
     this.creditAmount,
     this.status,
   });
@@ -33,32 +52,57 @@ class StudentPaymentModel {
 class TeacherPaymentModel {
   final String name;
   final String id;
+
   double? balance;
-  int? total;
-  double? totalWithdawal;
-  int? pending;
-  String? status; // pending / approved
+
+  /// total withdrawal transactions
+  double? totalEarned;
+  double? alreadyPaid;
+
+  /// total withdrawn amount
+  int? withdrawalRequests;
+  List<MonthlyEarning>? monthlyEarnings;
+
+  /// pending withdrawal requests
+  int? pendingTransactions;
+
+  /// pending / approved
+  String? status;
 
   TeacherPaymentModel({
     required this.name,
     required this.id,
     this.balance,
-    this.total,
-    this.totalWithdawal,
-    this.pending,
+    this.totalEarned,
+    this.alreadyPaid,
+    this.monthlyEarnings,
+    this.withdrawalRequests,
+    this.pendingTransactions,
     this.status,
+  });
+}
+
+class MonthlyEarning {
+  final String month;
+  final double amount;
+  final String status; 
+
+  MonthlyEarning({
+    required this.month,
+    required this.amount,
+    required this.status,
   });
 }
 
 class BatchPaymentModel {
   String? status;
   Batch batch;
-   List<PaymentItem> payments;
+  List<PaymentItem> payments;
 
   BatchPaymentModel({
     this.status,
     required this.batch,
-      required this.payments,
+    required this.payments,
   });
 }
 
@@ -66,6 +110,7 @@ class PaymentItem {
   String id;
   String studentName;
   String studentId;
+  String? paymentType;
   DateTime paymentDate;
   double amount;
   double balance;
@@ -76,6 +121,7 @@ class PaymentItem {
     required this.studentName,
     required this.studentId,
     required this.paymentDate,
+    this.paymentType,
     required this.amount,
     required this.balance,
     required this.status,

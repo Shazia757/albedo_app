@@ -1,11 +1,26 @@
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/wallet_model.dart';
 import 'package:get/get.dart';
 
 class PaymentController extends GetxController {
-  // var selectedType = PaymentUserType.student.obs;
+  PaymentController({
+    required this.isStudent,
+  });
+  final bool isStudent;
+  RxBool isSearching = false.obs;
   var selectedTab = 0.obs; // 0 = pending, 1 = approved
+  final tabs = ["Pending", "Approved"];
+  
+  List<String> studentTabs = [
+    "Dep Pending",
+    "Dep Approved",
+    "Cred Pending",
+    "Cred Approved",
+    "Ref Pending",
+    "Ref Approved",
+  ];
 
   var allStudentPayments = <StudentPaymentModel>[].obs;
   var allTeacherPayments = <TeacherPaymentModel>[].obs;
@@ -13,6 +28,12 @@ class PaymentController extends GetxController {
   var studentPayments = <StudentPaymentModel>[].obs;
   var teacherPayments = <TeacherPaymentModel>[].obs;
   var batchPayments = <BatchPaymentModel>[].obs;
+  final filteredStudentPayments = <StudentPaymentModel>[].obs;
+
+  final filteredTeacherPayments = <TeacherPaymentModel>[].obs;
+
+  final filteredBatchPayments = <BatchPaymentModel>[].obs;
+
   var searchQuery = ''.obs;
 
   List<String> statusMap = ["pending", "approved"];
@@ -20,7 +41,16 @@ class PaymentController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    if (isStudent) {
+      fetchStudents();
+    } else {
+      fetchTeachers();
+    }
+
     fetchBatches();
+
+    applyFilters();
   }
 
   void fetchStudents() {
@@ -28,14 +58,14 @@ class PaymentController extends GetxController {
       StudentPaymentModel(
         name: "JOANNA GRACE BENSON",
         id: "ALB/STU/02326",
-        balance: -500.0,
+        balance: 500.0,
         admissionFee: 500,
-        depTxns: 1,
-        credTxns: 0,
-        deposited: 0,
+        depositTransactions: 1,
+        creditTransactions: 0,
+        depositedAmount: 0,
         creditLimit: 0,
         creditAmount: 0,
-        depPending: 11500,
+        depositPending: 11500,
         status: "pending",
       ),
       StudentPaymentModel(
@@ -43,11 +73,11 @@ class PaymentController extends GetxController {
         id: "ALB/STU/04567",
         balance: 2000.0,
         admissionFee: 500,
-        depTxns: 3,
-        credTxns: 1,
-        deposited: 2000,
+        depositTransactions: 3,
+        creditTransactions: 1,
+        depositedAmount: 2000,
         creditLimit: 5000,
-        depPending: 0,
+        depositPending: 0,
         creditAmount: 1000,
         status: "approved",
       ),
@@ -57,21 +87,25 @@ class PaymentController extends GetxController {
   void fetchTeachers() {
     teacherPayments.value = [
       TeacherPaymentModel(
-        name: "MR. JOHN DOE",
-        id: "ALB/TEA/01234",
-        balance: 1500.0,
-        total: 5000,
-        totalWithdawal: 3500,
-        pending: 1,
-        status: "pending",
-      ),
+          name: "MR. JOHN DOE",
+          id: "ALB/TEA/01234",
+          balance: 1500.0,
+          withdrawalRequests: 24,
+          pendingTransactions: 1,
+          status: "pending",
+          monthlyEarnings: [
+            MonthlyEarning(month: 'May 2026', amount: 1000, status: 'Approved'),
+            MonthlyEarning(
+                month: 'March 2026', amount: 5000, status: 'Approved'),
+            MonthlyEarning(
+                month: 'April 2026', amount: 2000, status: 'Pending'),
+          ]),
       TeacherPaymentModel(
         name: "MS. JANE SMITH",
         id: "ALB/TEA/05678",
         balance: 3000.0,
-        total: 8000,
-        totalWithdawal: 5000,
-        pending: 0,
+        withdrawalRequests: 10,
+        pendingTransactions: 0,
         status: "approved",
       ),
     ];
@@ -83,7 +117,7 @@ class PaymentController extends GetxController {
         batch: Batch(
           batchName: "ATTC",
           batchID: "ALB/BAT/01234",
-          mentor:Mentor(name: 'John', empId: 'id'),
+          mentor: Mentor(name: 'John', empId: 'id'),
         ),
         status: "pending",
         payments: [
@@ -118,10 +152,9 @@ class PaymentController extends GetxController {
       ),
       BatchPaymentModel(
         batch: Batch(
-          batchName: "10th CBSE",
-          batchID: "ALB/BAT/05678",
-          mentor:Mentor(name: 'Mary Teacher', empId: 'empId')
-        ),
+            batchName: "10th CBSE",
+            batchID: "ALB/BAT/05678",
+            mentor: Mentor(name: 'Mary Teacher', empId: 'empId')),
         status: "approved",
         payments: [
           PaymentItem(
@@ -165,28 +198,152 @@ class PaymentController extends GetxController {
     ];
   }
 
-  List<StudentPaymentModel> get filteredStudentPayments {
-    return studentPayments.where((e) {
-      return selectedTab.value == 0
-          ? e.status == 'pending'
-          : e.status == 'approved';
-    }).toList();
+  void applyFilters() {
+    final query = searchQuery.value.toLowerCase().trim();
+
+    if (isStudent) {
+      List<StudentPaymentModel> temp = List.from(studentPayments);
+
+      final status = selectedTab.value;
+
+      /// TAB FILTER
+      switch (status) {
+        case 0: // dep pending
+          temp = temp.where((e) => (e.depositPending ?? 0) > 0).toList();
+          break;
+
+        case 1: // dep approved
+          temp = temp.where((e) => (e.depositedAmount ?? 0) > 0).toList();
+          break;
+
+        case 2: // cred pending
+          temp = temp.where((e) => e.status == 'cred_pending').toList();
+          break;
+
+        case 3: // cred approved
+          temp = temp.where((e) => e.status == 'cred_approved').toList();
+          break;
+
+        case 4: // ref pending
+          temp = temp.where((e) => e.status == 'ref_pending').toList();
+          break;
+
+        case 5: // ref approved
+          temp = temp.where((e) => e.status == 'ref_approved').toList();
+          break;
+      }
+
+      /// SEARCH
+      if (query.isNotEmpty) {
+        temp = temp.where((e) {
+          return e.name.toLowerCase().contains(query) ||
+              e.id.toLowerCase().contains(query);
+        }).toList();
+      }
+
+      /// SORT
+      temp.sort((a, b) => a.name.compareTo(b.name));
+
+      filteredStudentPayments.assignAll(temp);
+    } else {
+      List<TeacherPaymentModel> temp = List.from(teacherPayments);
+
+      /// TAB FILTER
+      if (selectedTab.value == 0) {
+        temp = temp.where((e) => (e.pendingTransactions ?? 0) > 0).toList();
+      } else {
+        temp = temp.where((e) => e.status == 'approved').toList();
+      }
+
+      /// SEARCH
+      if (query.isNotEmpty) {
+        temp = temp.where((e) {
+          return e.name.toLowerCase().contains(query) ||
+              e.id.toLowerCase().contains(query);
+        }).toList();
+      }
+
+      temp.sort((a, b) => a.name.compareTo(b.name));
+
+      filteredTeacherPayments.assignAll(temp);
+    }
   }
 
-  List<TeacherPaymentModel> get filteredTeacherPayments {
-    return teacherPayments.where((e) {
-      return selectedTab.value == 0
-          ? e.status == 'pending'
-          : e.status == 'approved';
-    }).toList();
-  }
+  int get pendingCount =>
+      batchPayments.where((e) => e.status == 'pending').length;
 
-  List<BatchPaymentModel> get filteredBatchPayments {
-    return batchPayments.where((e) {
-      return selectedTab.value == 0
-          ? e.status == 'pending'
-          : e.status == 'approved';
-    }).toList();
-  }
+  int get approvedCount =>
+      batchPayments.where((e) => e.status == 'approved').length;
+
+  int get depPendingCount => studentPayments
+      .where(
+        (e) => (e.depositPending ?? 0) > 0,
+      )
+      .length;
+
+  int get depApprovedCount => studentPayments
+      .where(
+        (e) => (e.depositedAmount ?? 0) > 0,
+      )
+      .length;
+
+  int get credPendingCount => studentPayments
+      .where(
+        (e) => (e.creditAmount ?? 0) > 0 && (e.status == 'cred_pending'),
+      )
+      .length;
+
+  int get credApprovedCount => studentPayments
+      .where(
+        (e) => (e.creditAmount ?? 0) > 0 && (e.status == 'cred_approved'),
+      )
+      .length;
+
+  int get refPendingCount => studentPayments
+      .where(
+        (e) => e.status == 'ref_pending',
+      )
+      .length;
+
+  int get refApprovedCount => studentPayments
+      .where(
+        (e) => e.status == 'ref_approved',
+      )
+      .length;
+
+  List<Map<String, dynamic>> get studentTabData => [
+        {
+          "label": "Dep Pending",
+          "count": depPendingCount,
+        },
+        {
+          "label": "Dep Approved",
+          "count": depApprovedCount,
+        },
+        {
+          "label": "Cred Pending",
+          "count": credPendingCount,
+        },
+        {
+          "label": "Cred Approved",
+          "count": credApprovedCount,
+        },
+        {
+          "label": "Ref Pending",
+          "count": refPendingCount,
+        },
+        {
+          "label": "Ref Approved",
+          "count": refApprovedCount,
+        },
+      ];
+  List<Map<String, dynamic>> get tabData => [
+        {"label": "Pending", "count": pendingCount},
+        {"label": "Approved", "count": approvedCount},
+      ];
+
+
+ 
+
 
 }

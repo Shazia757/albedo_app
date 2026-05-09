@@ -18,6 +18,7 @@ class Student {
   String? timezone;
   String? address;
   String? place;
+  int? spotFee;
   String? referredBy;
   bool isFeePaid;
   List<Package>? packages;
@@ -78,6 +79,7 @@ this.joinedAt,
     this.parentName,
     this.parentOccupation,
     this.status,
+    this.spotFee,
     this.packages,
     this.mentor,
     this.wallet,

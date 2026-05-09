@@ -3,6 +3,7 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/coordinator_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/coordinator_detailed_page.dart';
 import 'package:albedo_app/view/users/add_coordinator_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
@@ -103,15 +104,16 @@ class CoordinatorPage extends StatelessWidget {
                   ),
 
                   /// 🧭 Tabs
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                    child: Tabs(
-                      selectedIndex: c.selectedTab,
-                      labels: ['Active', 'Expired'],
-                      onTap: (p0) {
-                        c.selectedTab.value = p0;
+                  Obx(
+                    () => CustomWidgets().customTabs(
+                      context,
+                      tabs: c.tabs,
+                      selectedIndex: c.selectedTab.value,
+                      onTap: (index) {
+                        c.selectedTab.value = index;
                         c.applyFilters();
                       },
+                      getCount: (index) => c.tabData[index]['count'],
                     ),
                   ),
 
@@ -177,12 +179,10 @@ class CoordinatorPage extends StatelessWidget {
                                           (!isCustom ||
                                                   PermissionService.can(
                                                       "view_coordinators"))
-                                              ? () => openCoordinatorProfile(
-                                                    context,
-                                                    coordinator,
-                                                    (p0) => coordinatorToUser(
-                                                        coordinator),
-                                                  )
+                                              ? Get.to(() =>
+                                                  CoordinatorDetailedPage(
+                                                      coordinator: coordinator,
+                                                      initialIndex: index))
                                               : null;
                                         }
                                       },
@@ -236,6 +236,8 @@ class CoordinatorPage extends StatelessWidget {
                                             color: cs.error,
                                             onTap: () => CustomWidgets()
                                                 .showDeleteDialog(
+        title: 'Are you sure?',
+
                                               text:
                                                   'Are you sure you want to delete this coordinator permanently?',
                                               context: context,

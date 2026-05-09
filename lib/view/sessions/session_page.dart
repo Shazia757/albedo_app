@@ -1,4 +1,6 @@
+import 'package:albedo_app/controller/advisor_controller.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/coordinator_controller.dart';
 import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/session_controller.dart';
@@ -6,6 +8,8 @@ import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/advisor_detailed_page.dart';
+import 'package:albedo_app/view/coordinator_detailed_page.dart';
 import 'package:albedo_app/view/mentor_detailed_page.dart';
 import 'package:albedo_app/view/sessions/add_session_page.dart';
 import 'package:albedo_app/view/sessions/session_details_page.dart';
@@ -401,14 +405,28 @@ class SessionPage extends StatelessWidget {
                           context: context,
                           title: "Coordinator",
                           user: data.coordinator,
-                          onTap: (id) => _onUserTap(context, "coordinator", id),
+                          onTap: (id) => Get.to(
+                            () => CoordinatorDetailedPage(
+                                coordinator: data.coordinator!,
+                                initialIndex: initialIndex),
+                            binding: BindingsBuilder(() {
+                              Get.put(CoordinatorController());
+                            }),
+                          ),
                         ),
 
                         buildRoleCard(
                           context: context,
                           title: "Advisor",
                           user: data.advisor,
-                          onTap: (id) => _onUserTap(context, "advisor", id),
+                          onTap: (id) => Get.to(
+                            () => AdvisorDetailedPage(
+                                advisor: data.advisor!,
+                                initialIndex: initialIndex),
+                            binding: BindingsBuilder(() {
+                              Get.put(AdvisorController());
+                            }),
+                          ),
                         ),
 
                         const SizedBox(height: 16),
@@ -661,6 +679,7 @@ class SessionPage extends StatelessWidget {
                               icon: Icons.delete_outline,
                               color: cs.error,
                               onTap: () => CustomWidgets().showDeleteDialog(
+                                title: 'Are you sure?',
                                 text:
                                     'Are you sure you want to delete this session permanently?',
                                 context: context,
@@ -809,20 +828,22 @@ class SessionPage extends StatelessWidget {
                     )),
                 const SizedBox(height: 8),
                 Obx(() {
-                  // if (c.selectedType.value == 'student') {
-                  //   return CustomWidgets().customDropdownField(
-                  //       items: c.studentsList,
-                  //       onChanged: (p0) {},
-                  //       context: context,
-                  //       hint: 'Select student');
-                  // }
-                  // if (c.selectedType.value == 'teacher') {
-                  //   return CustomWidgets().customDropdownField(
-                  //       items: c.teacherList,
-                  //       onChanged: (p0) {},
-                  //       context: context,
-                  //       hint: 'Select teacher');
-                  // }
+                  if (c.selectedType.value == 'student') {
+                    return CustomWidgets().customDropdownField(
+                        items: c.studentsList,
+                        onChanged: (p0) {},
+                        context: context,
+                        itemLabel: (item) => item.name,
+                        hint: 'Select student');
+                  }
+                  if (c.selectedType.value == 'teacher') {
+                    return CustomWidgets().customDropdownField(
+                        items: c.teacherList,
+                        onChanged: (p0) {},
+                        context: context,
+                        itemLabel: (item) => item.name,
+                        hint: 'Select teacher');
+                  }
                   return const SizedBox();
                 }),
                 const SizedBox(height: 12),
@@ -854,40 +875,6 @@ class SessionPage extends StatelessWidget {
       ],
       onSubmit: () {},
     );
-  }
-
-  void _onUserTap(BuildContext context, String role, String? id) {
-    if (id == null || id == "-") return;
-
-    final handlers = {
-      "student": () {
-        final s = c.getStudentById(id);
-        if (s != null) openStudentProfile(context, s);
-      },
-      "teacher": () {
-        final t = c.getTeacherById(id);
-        if (t != null) {
-          openTeacherProfile(context, t, toUser: (p0) => teacherToUser(t));
-        } else {
-          Get.snackbar("Error", "Teacher not found for ID: $id");
-        }
-      },
-      "mentor": () {
-        final m = c.getMentorById(id);
-        if (m != null) openMentorProfile(context, m, (p0) => c.mentorToUser(m));
-      },
-      "coordinator": () {
-        final c1 = c.getCoordinatorById(id);
-        if (c1 != null)
-          openCoordinatorProfile(context, c1, (p0) => coordinatorToUser(c1));
-      },
-      "advisor": () {
-        final a = c.getAdvisorById(id);
-        if (a != null) openAdvisorProfile(context, a, (p0) => advisorToUser(a));
-      },
-    };
-
-    handlers[role]?.call() ?? Get.snackbar("Error", "$role not found");
   }
 
   // ── EDIT SESSION DIALOG ───────────────────────────────────────────────

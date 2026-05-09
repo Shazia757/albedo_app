@@ -1,5 +1,8 @@
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
+
 class Advisor {
-    final String id;
+  final String id;
   final String name;
   String? email;
   String? status;
@@ -16,27 +19,31 @@ class Advisor {
   String? pincode;
   String? address;
   String? coordinatorId;
-String? mentorId;
+  String? mentorId;
+  List<Student>? student;
 
+  List<Experience>? experience;
 
-  Advisor(
-      {required this.name,
-      required this.id,
-      required this.joinedAt,
-      this.email,
-      this.gender,
-      this.status,
-      this.coordinatorId,
-      this.mentorId,
-      this.convertedStudents,
-      this.convertedTotalAmount,
-      this.imageUrl,
-      this.phone,
-      this.whatsapp,
-      this.address,
-      this.dob,
-      this.pincode,
-      this.place,
-      this.qualification,
-      });
+  Advisor({
+    required this.name,
+    required this.id,
+    required this.joinedAt,
+    this.email,
+    this.gender,
+    this.status,
+    this.coordinatorId,
+    this.mentorId,
+    this.convertedStudents,
+    this.convertedTotalAmount,
+    this.imageUrl,
+    this.experience,
+    this.phone,
+    this.whatsapp,
+    this.address,
+    this.dob,
+    this.pincode,
+    this.place,
+    this.student,
+    this.qualification,
+  });
 }
