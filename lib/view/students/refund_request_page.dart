@@ -3,6 +3,7 @@ import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class RefundRequestsPage extends StatelessWidget {
   RefundRequestsPage({super.key});
@@ -59,18 +60,14 @@ class RefundRequestsPage extends StatelessWidget {
                     builder: (context, constraints) {
                       int crossAxisCount = constraints.maxWidth > 1200 ? 3 : 1;
 
-                      return GridView.builder(
+                      return MasonryGridView.count(
                         padding: const EdgeInsets.all(12),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: 3.2,
-                        ),
+                        crossAxisCount: crossAxisCount,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
                         itemCount: requests.length,
                         itemBuilder: (context, index) {
                           final r = requests[index];
-
                           return RefundRequestCard(data: r);
                         },
                       );
@@ -97,156 +94,184 @@ class RefundRequestCard extends StatelessWidget {
 
     return Stack(
       children: [
-        /// 🔹 MAIN CARD
+        /// 🔹 MAIN WRAPPER
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: cs.onPrimary,
+            color: cs.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: cs.outline.withOpacity(0.5), width: 1),
+            border: Border.all(color: cs.outline.withOpacity(0.4)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              )
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
             ],
           ),
-          child: Row(
+          child: Column(
             children: [
-              /// 🔹 STUDENT
-              Expanded(
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        color: cs.primaryContainer.withOpacity(0.4),
-                        child: Image.asset(
-                          "assets/images/logo.png",
-                          fit: BoxFit.contain,
-                        ),
-                      ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: cs.primaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "${data["refundCount"] ?? 0} refunds",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: cs.primary,
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Student",
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: cs.onSurfaceVariant,
-                            ),
-                          ),
-                          Text(
-                            data["studentName"],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Text(
-                            data["studentId"],
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: cs.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
 
-              /// 🔸 DIVIDER
-              Container(
-                width: 1,
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-                color: cs.outline.withOpacity(0.2),
+              /// 🔵 STUDENT (MAIN CARD)
+              _MainUserCard(
+                name: data["studentName"] ?? "-",
+                id: data["studentId"] ?? "-",
+                cs: cs,
               ),
 
-              /// 🔹 MENTOR
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Mentor",
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: cs.onSurfaceVariant,
-                            ),
-                          ),
-                          Text(
-                            data["mentorName"],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Text(
-                            data["mentorId"],
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: cs.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        color: cs.primaryContainer.withOpacity(0.4),
-                        child: Image.asset(
-                          "assets/images/logo.png",
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 12),
+
+              /// 🟣 MENTOR (SECONDARY CARD)
+              _SubUserCard(
+                name: data["mentorName"] ?? "-",
+                id: data["mentorId"] ?? "-",
+                cs: cs,
               ),
             ],
           ),
         ),
-
-        /// 🔴 REFUND BADGE
-        Positioned(
-            top: 10,
-            right: 10,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: (data["refundCount"] > 2
-                        ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).colorScheme.primary)
-                    .withOpacity(0.15),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                "${data["refundCount"]} refunds",
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: data["refundCount"] > 2
-                      ? Theme.of(context).colorScheme.error
-                      : Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            )),
       ],
+    );
+  }
+}
+
+/// 🔵 MAIN (STUDENT CARD)
+class _MainUserCard extends StatelessWidget {
+  final String name;
+  final String id;
+  final ColorScheme cs;
+
+  const _MainUserCard({
+    required this.name,
+    required this.id,
+    required this.cs,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: cs.primary.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Image.asset(
+              "assets/images/logo.png",
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  id,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: cs.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 🟣 SECONDARY (MENTOR CARD)
+class _SubUserCard extends StatelessWidget {
+  final String name;
+  final String id;
+  final ColorScheme cs;
+
+  const _SubUserCard({
+    required this.name,
+    required this.id,
+    required this.cs,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: cs.outline.withOpacity(0.5)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: cs.secondaryContainer.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Image.asset(
+              "assets/images/logo.png",
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  id,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: cs.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -15,7 +15,7 @@ class DeadlinePage extends StatelessWidget {
     return CrudPage<DeadlineConfig>(
       title: 'Completion Deadline',
       items: c.restrictedUsers,
-      enableAdd: false, // ❗ disable add button
+      enableAdd: false,
 
       itemBuilder: (item, i) {
         return DeadlineTile(
@@ -70,9 +70,9 @@ class _DeadlineTileState extends State<DeadlineTile> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cs.onPrimary,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outlineVariant),
+        border: Border.all(color: cs.outline.withOpacity(0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,7 +192,7 @@ class _DeadlineTileState extends State<DeadlineTile> {
                 const SizedBox(width: 10),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: context.theme.colorScheme.secondary),
+                      backgroundColor: context.theme.colorScheme.primary),
                   onPressed: () {
                     Get.back();
                   },

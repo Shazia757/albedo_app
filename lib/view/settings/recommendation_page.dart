@@ -16,11 +16,11 @@ class RecommendationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: const CustomAppBar(),
-         backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: cs.surface,
       floatingActionButton: addRecommendationBtn(context),
       body: Row(
         children: [
@@ -30,220 +30,197 @@ class RecommendationPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Obx(() {
                 final data = c.recommendations;
-                int crossAxisCount = 1;
 
                 if (c.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
+
                 if (data.isEmpty) {
                   return const Center(child: Text("No recommendations found"));
                 }
 
-                if (Responsive.isTablet(context)) {
-                  crossAxisCount = 2;
-                } else if (Responsive.isDesktop(context)) {
-                  crossAxisCount = 3;
-                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// TITLE (outside card)
+                    Text(
+                      "Recommendations",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
 
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = 1;
+                    const SizedBox(height: 12),
 
-                    if (constraints.maxWidth > 1200) {
-                      crossAxisCount = 3;
-                    } else if (constraints.maxWidth > 700) {
-                      crossAxisCount = 2;
-                    }
+                    /// GRID
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount = 1;
 
-                    return MasonryGridView.count(
-                      padding: const EdgeInsets.all(12),
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      itemCount: data.length,
-                      itemBuilder: (_, i) {
-                        final item = data[i];
-                        final isPackage = item.package != null &&
-                            (item.package ?? "").isNotEmpty;
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
 
-                        return CustomCard(
-                          c: c,
-                          content: Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          isPackage
-                                              ? 'Package Name'
-                                              : 'Batch Name',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w500,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
+                          return MasonryGridView.count(
+                            padding: const EdgeInsets.all(12),
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            itemBuilder: (_, i) {
+                              final item = data[i];
+                              final isPackage = (item.package ?? "").isNotEmpty;
+
+                              return CustomCard(
+                                c: c,
+
+                                /// CONTENT
+                                content: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      isPackage ? "Package" : "Batch",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: cs.onSurface.withOpacity(0.6),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+
+                                    Text(
+                                      isPackage
+                                          ? (item.package ?? "-")
+                                          : (item.batch ?? "-"),
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 12),
+
+                                    Text(
+                                      "Syllabuses",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: cs.onSurface.withOpacity(0.6),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+
+                                    Wrap(
+                                      spacing: 6,
+                                      runSpacing: 6,
+                                      children: (item.visibleTo ?? []).map((v) {
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: cs.primaryContainer
                                                 .withOpacity(0.7),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                          child: Text(
+                                            v,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: cs.onPrimaryContainer,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+
+                                    const SizedBox(height: 12),
+
+                                    /// DATES (clean unified style)
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _dateBox(
+                                            context,
+                                            "From",
+                                            item.startDate ?? "-",
                                           ),
                                         ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          isPackage
-                                              ? (item.package ?? '-')
-                                              : (item.batch ?? '-'),
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: _dateBox(
+                                            context,
+                                            "To",
+                                            item.endDate ?? "-",
                                           ),
                                         ),
                                       ],
                                     ),
+                                  ],
+                                ),
+
+                                /// ACTIONS
+                                actions: [
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.edit,
+                                    color: cs.primary,
+                                    onTap: () {
+                                      c.loadRecommendations(item);
+                                      editRecommendation(context);
+                                    },
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Syllabuses',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w500,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withOpacity(0.7),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Wrap(
-                                          spacing: 6,
-                                          runSpacing: 6,
-                                          children:
-                                              (item.visibleTo ?? []).map((v) {
-                                            return Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primaryContainer
-                                                    .withOpacity(0.7),
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                              ),
-                                              child: Text(
-                                                v,
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onPrimaryContainer,
-                                                ),
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "From Date",
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withOpacity(0.7),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          item.startDate ?? '-',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "To Date",
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withOpacity(0.7),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          item.endDate ?? '-',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
+                                  const SizedBox(width: 10),
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.delete,
+                                    color: cs.error,
+                                    onTap: () =>
+                                        CustomWidgets().showDeleteDialog(
+                                      title: 'Are you sure?',
+                                      context: context,
+                                      text:
+                                          'Are you sure you want to delete this recommendation?',
+                                      onConfirm: () => c.delete(item.id),
                                     ),
                                   ),
                                 ],
-                              )
-                            ],
-                          ),
-                          actions: [
-                            CustomWidgets().iconBtn(
-                              icon: Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                              onTap: () {
-                                c.loadRecommendations(item);
-                                editRecommendation(context);
-                              },
-                            ),
-                            CustomWidgets().iconBtn(
-                              icon: Icons.delete,
-                              color: Theme.of(context).colorScheme.error,
-                              onTap: () => CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
-
-                                context: context,
-                                text:
-                                    'Are you sure you want to delete this recommendation?',
-                                onConfirm: () => c.delete(item.id),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               }),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dateBox(BuildContext context, String label, String value) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest.withOpacity(.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: cs.onSurface.withOpacity(0.6),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -401,11 +378,17 @@ class RecommendationPage extends StatelessWidget {
           const SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Start Date'),
           const SizedBox(height: 10),
-          CustomWidgets().dropdownStyledTextField(context: context, hint: ''),
+          CustomWidgets().customDatePickerField(
+              context: context,
+              controller: c.startDateController,
+              selectedDate: c.selectedStartDate),
           const SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('End Date'),
           const SizedBox(height: 10),
-          CustomWidgets().dropdownStyledTextField(context: context, hint: ''),
+          CustomWidgets().customDatePickerField(
+              context: context,
+              controller: c.endDateController,
+              selectedDate: c.selectedEndDate),
           const SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Visible To:'),
           const SizedBox(height: 10),

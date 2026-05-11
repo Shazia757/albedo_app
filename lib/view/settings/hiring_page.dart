@@ -17,11 +17,11 @@ class HiringPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: const CustomAppBar(),
-       backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: cs.surface,
       floatingActionButton: addHiringAdBtn(context),
       body: Row(
         children: [
@@ -31,125 +31,190 @@ class HiringPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Obx(() {
                 final data = c.hiringAd;
-                int crossAxisCount = 1;
 
                 if (c.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
+
                 if (data.isEmpty) {
                   return const Center(child: Text("No hiring ads found"));
                 }
 
-                if (Responsive.isTablet(context)) {
-                  crossAxisCount = 2;
-                } else if (Responsive.isDesktop(context)) {
-                  crossAxisCount = 3;
-                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// TITLE (outside cards)
+                    Text(
+                      "Hiring Ads",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
 
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = 1;
+                    const SizedBox(height: 12),
 
-                    if (constraints.maxWidth > 1200) {
-                      crossAxisCount = 3;
-                    } else if (constraints.maxWidth > 700) {
-                      crossAxisCount = 2;
-                    }
+                    /// GRID
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount = 1;
 
-                    return MasonryGridView.count(
-                      padding: const EdgeInsets.all(12),
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      itemCount: data.length,
-                      itemBuilder: (_, i) {
-                        final item = data[i];
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
 
-                        return CustomCard(
-                          c: c,
-                          content: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              labelValue('Package', item.package, context),
-                              const SizedBox(height: 10),
-                              labelValue("Time", item.time, context),
-                              const SizedBox(height: 10),
-                              labelValue("From", item.startDate, context),
-                              const SizedBox(height: 10),
-                              labelValue("To", item.endDate, context),
-                              const SizedBox(height: 10),
-                              Text(
-                                "Regular Days",
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.7),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
-                                children: (item.days ?? []).map((v) {
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer
-                                          .withOpacity(0.7),
-                                      borderRadius: BorderRadius.circular(50),
+                          return MasonryGridView.count(
+                            padding: const EdgeInsets.all(12),
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            itemBuilder: (_, i) {
+                              final item = data[i];
+
+                              return CustomCard(
+                                c: c,
+
+                                /// CONTENT
+                                content: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _info(cs, "Package", item.package),
+                                    const SizedBox(height: 10),
+                                    _info(cs, "Time", item.time),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _dateBox(
+                                            context,
+                                            "From",
+                                            item.startDate,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: _dateBox(
+                                            context,
+                                            "To",
+                                            item.endDate,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    child: Text(
-                                      v.name.isNotEmpty
-                                          ? v.name[0].toUpperCase() +
-                                              v.name.substring(1)
-                                          : v.name,
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      "Regular Days",
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: FontWeight.w500,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer,
+                                        color: cs.onSurface.withOpacity(0.6),
                                       ),
                                     ),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
-                          actions: [
-                            CustomWidgets().iconBtn(
-                              icon: Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                              onTap: () {
-                                c.loadHiringAds(item);
-                                editHiringAd(context);
-                              },
-                            ),
-                            CustomWidgets().iconBtn(
-                              icon: Icons.delete,
-                              color: Theme.of(context).colorScheme.error,
-                              onTap: () => CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
+                                    const SizedBox(height: 6),
+                                    Wrap(
+                                      spacing: 6,
+                                      runSpacing: 6,
+                                      children: (item.days ?? []).map((v) {
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: cs.primaryContainer
+                                                .withOpacity(0.7),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                          child: Text(
+                                            v.name.isNotEmpty
+                                                ? v.name[0].toUpperCase() +
+                                                    v.name.substring(1)
+                                                : v.name,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: cs.onPrimaryContainer,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ),
 
-                                context: context,
-                                text:
-                                    'Are you sure you want to delete this hiring ad?',
-                                onConfirm: () => c.delete(item.adId),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                                /// ACTIONS
+                                actions: [
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.edit,
+                                    color: cs.primary,
+                                    onTap: () {
+                                      c.loadHiringAds(item);
+                                      editHiringAd(context);
+                                    },
+                                  ),
+                                  const SizedBox(width: 10),
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.delete,
+                                    color: cs.error,
+                                    onTap: () =>
+                                        CustomWidgets().showDeleteDialog(
+                                      title: 'Are you sure?',
+                                      context: context,
+                                      text:
+                                          'Are you sure you want to delete this hiring ad?',
+                                      onConfirm: () => c.delete(item.adId),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               }),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// clean key-value row (replaces labelValue)
+  Widget _info(ColorScheme cs, String label, String? value) {
+    return Text(
+      "$label: ${value ?? '-'}",
+      style: TextStyle(
+        fontSize: 12,
+        color: cs.onSurface.withOpacity(0.7),
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  Widget _dateBox(BuildContext context, String label, String? value) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest.withOpacity(.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: cs.onSurface.withOpacity(0.6),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value ?? '-',
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -261,26 +326,6 @@ class HiringPage extends StatelessWidget {
       child: Icon(
         Icons.add,
         color: context.theme.colorScheme.onPrimary,
-      ),
-    );
-  }
-
-  Widget labelValue(String label, String? value, BuildContext context) {
-    return Text.rich(
-      TextSpan(
-        style: TextStyle(
-          fontSize: 11,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-        ),
-        children: [
-          TextSpan(text: "$label: "),
-          TextSpan(
-            text: value ?? '-',
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -42,13 +43,17 @@ class StudentPackagesPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-
       appBar: const CustomAppBar(),
       drawer: const DrawerMenu(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (packages.isEmpty) {
-            return _EmptyState(cs: cs);
+            return EmptyState(
+              cs: cs,
+              icon: Icons.person_off,
+              title: 'Package not found',
+              subtitle: '',
+            );
           }
 
           return Column(
@@ -106,64 +111,44 @@ class _PackageCard extends StatelessWidget {
     final isActive = data["status"] == "Active";
     final statusColor =
         isActive ? const Color(0xFF1D9E75) : const Color(0xFFBA7517);
-    final balance = (data["totalFee"] as double) - (data["takenFee"] as double);
-    final progress =
-        (data["takenFee"] as double) / (data["totalFee"] as double);
+
+    final total = (data["totalFee"] as double);
+    final paid = (data["takenFee"] as double);
+    final balance = total - paid;
+    final progress = paid / total;
 
     return Container(
       decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(12),
-        border:
-            Border.all(color: cs.outlineVariant.withOpacity(0.4), width: 0.5),
+        color: cs.onPrimary,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: cs.outline.withOpacity(0.5)),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 18,
+            color: Colors.black.withOpacity(0.03),
+            offset: const Offset(0, 6),
+          )
+        ],
       ),
-      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Status accent bar ──────────────────────────────────
-          Container(height: 3, color: statusColor),
-
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Header: teacher + status ───────────────────
+                /// ── header
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Avatar
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        data["teacherImage"] ?? "",
-                        width: 38,
-                        height: 38,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: cs.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            (data["teacherName"] as String)[0].toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: cs.primary,
-                            ),
-                          ),
-                        ),
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundImage: NetworkImage(
+                        data["teacherImage"] ?? "https://i.pravatar.cc/150",
                       ),
+                      backgroundColor: cs.surfaceContainerHighest,
                     ),
-
                     const SizedBox(width: 10),
-
-                    // Teacher name + IDs
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,50 +156,45 @@ class _PackageCard extends StatelessWidget {
                           Text(
                             data["teacherName"],
                             style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
                               color: cs.onSurface,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            "${data["teacherId"]} · ${data["subjectId"]}",
+                            "${data["teacherId"]} • ${data["subjectId"]}",
                             style: TextStyle(
                               fontSize: 11,
-                              fontFamily: 'monospace',
-                              color: cs.onSurface.withOpacity(0.4),
+                              color: cs.onSurface.withOpacity(0.5),
                             ),
                           ),
                         ],
                       ),
                     ),
-
-                    // Status badge
-                    _StatusBadge(label: data["status"], color: statusColor),
+                    _StatusBadge(
+                      label: data["status"],
+                      color: statusColor,
+                    ),
                   ],
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Divider(
-                      height: 1,
-                      thickness: 0.5,
-                      color: cs.outlineVariant.withOpacity(0.4)),
-                ),
+                const SizedBox(height: 12),
 
-                // ── Subject + tags ─────────────────────────────
+                /// subject
                 Text(
                   data["subjectName"],
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
                     letterSpacing: -0.2,
+                    color: cs.onSurface,
                   ),
                 ),
 
                 const SizedBox(height: 8),
 
+                /// tags (same style as your system chips)
                 Row(
                   children: [
                     _Tag(label: data["standard"], cs: cs),
@@ -225,13 +205,13 @@ class _PackageCard extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                // ── Fee stats grid ─────────────────────────────
+                /// fee row (cleaner layout)
                 Row(
                   children: [
                     Expanded(
                       child: _FeeStat(
-                        label: "Total Fee",
-                        value: "₹${data["totalFee"].toStringAsFixed(0)}",
+                        label: "Total",
+                        value: "₹${total.toStringAsFixed(0)}",
                         cs: cs,
                       ),
                     ),
@@ -239,7 +219,7 @@ class _PackageCard extends StatelessWidget {
                     Expanded(
                       child: _FeeStat(
                         label: "Paid",
-                        value: "₹${data["takenFee"].toStringAsFixed(0)}",
+                        value: "₹${paid.toStringAsFixed(0)}",
                         valueColor: const Color(0xFF0F6E56),
                         cs: cs,
                       ),
@@ -250,7 +230,7 @@ class _PackageCard extends StatelessWidget {
                         label: "Balance",
                         value: "₹${balance.toStringAsFixed(0)}",
                         valueColor: balance > 0
-                            ? const Color(0xFF854F0B)
+                            ? const Color(0xFFB26A00)
                             : cs.onSurface,
                         cs: cs,
                       ),
@@ -260,17 +240,21 @@ class _PackageCard extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // ── Progress bar ───────────────────────────────
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Divider(
-                      height: 1,
-                      thickness: 0.5,
-                      color: cs.outlineVariant.withOpacity(0.4)),
+                /// progress (soft style like modern dashboards)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor:
+                        cs.surfaceContainerHighest.withOpacity(0.5),
+                    valueColor: AlwaysStoppedAnimation(statusColor),
+                  ),
                 ),
 
-                // ── Schedule row ───────────────────────────────
+                const SizedBox(height: 14),
+
+                /// schedule row
                 Row(
                   children: [
                     _ScheduleChip(
@@ -278,7 +262,7 @@ class _PackageCard extends StatelessWidget {
                       label: data["time"],
                       cs: cs,
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     _ScheduleChip(
                       icon: Icons.timer_outlined,
                       label: data["duration"],
@@ -440,49 +424,6 @@ class _ScheduleChip extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// EMPTY STATE
-// ═══════════════════════════════════════════════════════════════════════
-class _EmptyState extends StatelessWidget {
-  final ColorScheme cs;
-  const _EmptyState({required this.cs});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: cs.primaryContainer.withOpacity(0.35),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.school_outlined,
-                size: 36, color: cs.primary.withOpacity(0.6)),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            "No packages found",
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: cs.onSurface.withOpacity(0.65),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            "Your enrolled packages will appear here",
-            style:
-                TextStyle(fontSize: 13, color: cs.onSurface.withOpacity(0.4)),
-          ),
-        ],
-      ),
     );
   }
 }

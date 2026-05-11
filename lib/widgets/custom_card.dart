@@ -306,7 +306,6 @@ class PremiumInfoCard extends StatelessWidget {
           color: cs.onPrimary,
           borderRadius: BorderRadius.circular(16),
 
-          // ✅ OUTLINE BORDER
           border: Border.all(
             color: cs.outline.withOpacity(0.5),
             width: 1,

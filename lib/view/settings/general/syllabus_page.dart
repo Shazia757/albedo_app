@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:albedo_app/controller/settings_controller.dart';
 
-/// Clean, responsive, production-ready CRUD with inline edit
 class SyllabusPage extends StatelessWidget {
   SyllabusPage({super.key});
 
@@ -26,8 +25,7 @@ class SyllabusPage extends StatelessWidget {
           },
           onDelete: () {
             CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
-
+              title: 'Are you sure?',
               context: context,
               text: 'Delete this syllabus permanently?',
               onConfirm: () {

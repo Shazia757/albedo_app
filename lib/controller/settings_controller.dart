@@ -56,6 +56,8 @@ class SettingsController extends GetxController {
 
   RxList<VisibleTo> selected = <VisibleTo>[].obs;
   RxList selectedSyllabus = [].obs;
+    var selectedStartDate = Rxn<DateTime>();
+    var selectedEndDate = Rxn<DateTime>();
   RxList<Days> selectedDays = <Days>[].obs;
   RxList<String> selectedTestType = <String>[].obs;
   RxList selectedAttentionQns = [].obs;
@@ -266,7 +268,10 @@ class SettingsController extends GetxController {
       await Future.delayed(const Duration(seconds: 2));
 
       banners.assignAll([
-        Banners(id: '1', visibleTo: [VisibleTo.assistantAdmin])
+        Banners(
+            id: '1',
+            url: 'https:/youtube/',
+            visibleTo: [VisibleTo.assistantAdmin])
       ]);
     } finally {
       isLoading.value = false;
@@ -471,7 +476,7 @@ class SettingsController extends GetxController {
   void loadAssessments(Assessment assessment) {
     titleController.text = assessment.type ?? '';
     dateController.text = assessment.date ?? '';
-    selectedTestType.assignAll(assessment.testType??[]);
+    selectedTestType.assignAll(assessment.testType ?? []);
     selectedAttentionQns.assignAll(assessment.attentionQuestions ?? []);
   }
 

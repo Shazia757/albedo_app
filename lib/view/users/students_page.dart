@@ -3,6 +3,7 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/view/settings/bulk_upload_page.dart';
 import 'package:albedo_app/view/students/refund_request_page.dart';
 import 'package:albedo_app/view/students/student_detail_page.dart';
 import 'package:albedo_app/view/users/add_student_page.dart';
@@ -28,7 +29,6 @@ class StudentsPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
-
     final isCustom = ![
       "admin",
       "mentor",
@@ -40,14 +40,14 @@ class StudentsPage extends StatelessWidget {
       "sales",
       "hr"
     ].contains(role);
-
+    final canSeeRequests = !isCustom || PermissionService.can("refunds");
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(),
       floatingActionButton: (!isCustom || PermissionService.can("add_students"))
           ? FloatingActionButton(
               onPressed: () {
-                Get.to(() => const AddStudentPage());
+                Get.to(() => const AddStudentPage(isEdit: false));
               },
               mini: true,
               backgroundColor: context.theme.colorScheme.primary,
@@ -70,6 +70,7 @@ class StudentsPage extends StatelessWidget {
                   isSearching: c.isSearching,
                   searchQuery: c.searchQuery,
                   onSearchChanged: () => c.applyFilters(),
+
                   onSortTap: () =>
                       CustomWidgets().showSortSheet<StudentSortType>(
                     title: "Sort Students",
@@ -93,9 +94,53 @@ class StudentsPage extends StatelessWidget {
                       c.applyFilters();
                     },
                   ),
-                  onRequestTap: (!isCustom || PermissionService.can("refunds"))
-                      ? () => Get.to(() => RefundRequestsPage())
-                      : null,
+
+                  /// 🔥 NEW ACTION MENU
+                  actions: [
+                    PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      offset: const Offset(0, 45),
+                      color: Theme.of(context).colorScheme.surface,
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      onSelected: (value) {
+                        switch (value) {
+                          case "request":
+                            if (canSeeRequests) {
+                              Get.to(() => RefundRequestsPage());
+                            }
+                            break;
+
+                          case "bulk_upload":
+                            Get.to(() => const BulkUploadPage());
+                            break;
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        if (canSeeRequests)
+                          PopupMenuItem(
+                            value: "request",
+                            child: MenuItem(
+                              icon: Icons.inbox_outlined,
+                              title: "Requests",
+                            ),
+                          ),
+                        PopupMenuItem(
+                          value: "bulk_upload",
+                          child: MenuItem(
+                            icon: Icons.upload_file,
+                            title: "Bulk Upload",
+                          ),
+                        ),
+                      ],
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Icon(Icons.more_vert),
+                      ),
+                    )
+                  ],
                 ),
 
                 /// 🧭 Tabs
@@ -195,7 +240,8 @@ class StudentsPage extends StatelessWidget {
                                       color: cs.secondary,
                                       onTap: () {
                                         c.loadStudents(student!);
-                                        editStudent(context);
+                                        Get.to(
+                                            () => AddStudentPage(isEdit: true));
                                       },
                                     ),
                                   if (!isCustom ||
@@ -437,230 +483,5 @@ class StudentsPage extends StatelessWidget {
       onSubmit: () {},
     );
   }
-
-  FloatingActionButton addStudent(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () => CustomWidgets().showCustomDialog(
-        context: context,
-        title: Text('Add Student'),
-        formKey: GlobalKey<FormState>(),
-        sections: [
-          SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Text('Profile Photo (Max: 50 MB)'),
-                    const SizedBox(height: 10),
-                    InkWell(
-                      onTap: () {},
-                      child: CircleAvatar(
-                        radius: 35,
-                        child: ClipOval(
-                          child: SizedBox(
-                            width: 60,
-                            height: 60,
-                            child: Image.asset(
-                              'assets/images/logo.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Name', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter student name',
-                        controller: c.nameController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Email', required: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter email address',
-                        controller: c.emailController),
-                    const SizedBox(height: 10),
-                    CustomWidgets()
-                        .labelWithAsterisk('Phone Number', required: true),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: '+1234567890',
-                        controller: c.phoneController,
-                        isNumber: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('WhatsApp Number'),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: '+1234567890',
-                        controller: c.whatsappController,
-                        isNumber: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Parent Name'),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter parent name',
-                        controller: c.parentNameController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Parent Occupation'),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter parent occupation',
-                        controller: c.parentOccupationController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Gender'),
-                    const SizedBox(height: 10),
-                    // CustomWidgets().customDropdownField(
-                    //   context: context,
-                    //   hint: 'Select Gender',
-                    //   items: ['Male', 'Female'],
-                    //   onChanged: (p0) {},
-                    // ),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Place'),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter place',
-                        controller: c.placeController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Pincode'),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter pincode/postal code',
-                        controller: c.pincodeController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Address'),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter address',
-                        controller: c.addressController),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Time Zone'),
-                    const SizedBox(height: 10),
-                    // CustomWidgets().customDropdownField(
-                    //   context: context,
-                    //   hint: 'Select Time Zone',
-                    //   items: [],
-                    //   onChanged: (p0) {},
-                    // ),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Mentor'),
-                    const SizedBox(height: 10),
-                    // CustomWidgets().customDropdownField(
-                    //   context: context,
-                    //   hint: 'Select Mentor',
-                    //   items: c.mentorsList,
-                    //   onChanged: (p0) {},
-                    // ),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Advisor'),
-                    const SizedBox(height: 10),
-                    // CustomWidgets().customDropdownField(
-                    //   context: context,
-                    //   hint: 'Select Advisor',
-                    //   items: c.advisorsList,
-                    //   onChanged: (p0) {},
-                    // ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Obx(
-                          () => Checkbox(
-                            value: c.isAdmissionFeePaid.value,
-                            onChanged: (value) => c.isAdmissionFeePaid.value =
-                                !c.isAdmissionFeePaid.value,
-                          ),
-                        ),
-                        Text('Admission Fee Paid'),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Comment'),
-                    const SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter any additional comments',
-                        controller: c.commentController,
-                        isMultiline: true),
-                    const SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('Referred By'),
-                    Obx(() {
-                      final role = c.selectedRole.value;
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: RadioListTile<String>(
-                                  title: const Text("Mentor"),
-                                  value: "mentor",
-                                  groupValue: role,
-                                  onChanged: (value) =>
-                                      c.selectedRole.value = value!,
-                                  dense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                              Expanded(
-                                child: RadioListTile<String>(
-                                  title: const Text("Advisor"),
-                                  value: "advisor",
-                                  groupValue: role,
-                                  onChanged: (value) =>
-                                      c.selectedRole.value = value!,
-                                  dense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                              Expanded(
-                                child: RadioListTile<String>(
-                                  title: const Text("Others"),
-                                  value: "others",
-                                  groupValue: role,
-                                  onChanged: (value) =>
-                                      c.selectedRole.value = value!,
-                                  dense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          if (role.isNotEmpty) ...[
-                            CustomWidgets().labelWithAsterisk(
-                                role[0].toUpperCase() + role.substring(1)),
-                            const SizedBox(height: 10),
-                            // CustomWidgets().customDropdownField(
-                            //   context: context,
-                            //   hint: 'Select',
-                            //   items: [],
-                            //   onChanged: (p0) {},
-                            // ),
-                          ]
-                        ],
-                      );
-                    }),
-                  ],
-                ),
-              ))
-        ],
-        onSubmit: () {},
-      ),
-      mini: true,
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
-    );
-  }
 }
+

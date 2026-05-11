@@ -27,7 +27,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final isTeacher = role == 'teacher';
     final isStudent = role == 'student';
 
-    // ✅ Responsive height
     final height = isDesktop ? 72.0 : 60.0;
 
     return PreferredSize(

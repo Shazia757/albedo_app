@@ -19,8 +19,7 @@ class CouponsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-       backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: addCouponBtn(context),
       body: Row(
         children: [
@@ -28,82 +27,228 @@ class CouponsPage extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Obx(() {
-                final data = c.coupons;
-                int crossAxisCount = 1;
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// ── PAGE TITLE ─────────────────────
+                  Text(
+                    "Coupons",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
 
-                if (c.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (data.isEmpty) {
-                  return const Center(child: Text("No notifications found"));
-                }
+                  const SizedBox(height: 16),
 
-                if (Responsive.isTablet(context)) {
-                  crossAxisCount = 2;
-                } else if (Responsive.isDesktop(context)) {
-                  crossAxisCount = 3;
-                }
+                  /// ── CONTENT ───────────────────────
+                  Expanded(
+                    child: Obx(() {
+                      final data = c.coupons;
 
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = 1;
-
-                    if (constraints.maxWidth > 1200) {
-                      crossAxisCount = 3;
-                    } else if (constraints.maxWidth > 700) {
-                      crossAxisCount = 2;
-                    }
-
-                    return MasonryGridView.count(
-                      padding: const EdgeInsets.all(12),
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      itemCount: data.length,
-                      itemBuilder: (_, i) {
-                        final item = data[i];
-
-                        return CustomCard(
-                          c: c,
-                          title: item.name ?? '',
-                          content: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Code: ${item.code} '),
-                              Text('Discount: ${item.discount ?? ''} '),
-                              Text('Valid From: ${item.startDate} '),
-                              Text('Valid To: ${item.endDate} '),
-                            ],
-                          ),
-                          actions: [
-                            CustomWidgets().iconBtn(
-                              icon: Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                              onTap: () {
-                                c.loadCoupons(item);
-                                editCoupon(context);
-                              },
-                            ),
-                            CustomWidgets().iconBtn(
-                              icon: Icons.delete,
-                              color: Theme.of(context).colorScheme.error,
-                              onTap: () => CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
-
-                                context: context,
-                                text:
-                                    'Are you sure you want to delete this coupon?',
-                                onConfirm: () => c.delete(item.id),
-                              ),
-                            ),
-                          ],
+                      if (c.isLoading.value) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
                         );
-                      },
-                    );
-                  },
-                );
-              }),
+                      }
+
+                      if (data.isEmpty) {
+                        return const Center(
+                          child: Text("No coupons found"),
+                        );
+                      }
+
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount = 1;
+
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
+
+                          return MasonryGridView.count(
+                            padding: EdgeInsets.zero,
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            itemBuilder: (_, i) {
+                              final item = data[i];
+                              final cs = Theme.of(context).colorScheme;
+
+                              return Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: cs.onPrimary,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: cs.outline.withOpacity(.5),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: cs.shadow.withOpacity(.04),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    /// ── HEADER ─────────────────────────────
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 42,
+                                          height: 42,
+                                          decoration: BoxDecoration(
+                                            color: cs.primary.withOpacity(.08),
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                          ),
+                                          child: Icon(
+                                            Icons.discount_rounded,
+                                            color: cs.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                item.name ?? '',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: cs.onSurface,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                item.code ?? '',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: cs.outline,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: cs.primaryContainer
+                                                .withOpacity(.45),
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                          ),
+                                          child: Text(
+                                            "${item.discount ?? 0}% OFF",
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w700,
+                                              color: cs.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 14),
+
+                                    Divider(
+                                      height: 1,
+                                      color: cs.outline.withOpacity(.12),
+                                    ),
+
+                                    const SizedBox(height: 14),
+
+                                    /// ── DATE SECTION ──────────────────────
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: cs.surfaceContainerHighest
+                                            .withOpacity(.22),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: _infoTile(
+                                              context,
+                                              icon:
+                                                  Icons.calendar_month_outlined,
+                                              title: "Valid From",
+                                              value: item.startDate ?? "-",
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 1,
+                                            height: 42,
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 12),
+                                            color: cs.outline.withOpacity(.12),
+                                          ),
+                                          Expanded(
+                                            child: _infoTile(
+                                              context,
+                                              icon:
+                                                  Icons.event_available_rounded,
+                                              title: "Valid To",
+                                              value: item.endDate ?? "-",
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 14),
+
+                                    /// ── ACTIONS ───────────────────────────
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        CustomWidgets().iconBtn(
+                                          icon: Icons.edit_rounded,
+                                          color: cs.primary,
+                                          onTap: () {
+                                            c.loadCoupons(item);
+                                            editCoupon(context);
+                                          },
+                                        ),
+                                        const SizedBox(width: 10),
+                                        CustomWidgets().iconBtn(
+                                          icon: Icons.delete_outline_rounded,
+                                          color: cs.error,
+                                          onTap: () =>
+                                              CustomWidgets().showDeleteDialog(
+                                            title: 'Are you sure?',
+                                            context: context,
+                                            text:
+                                                'Are you sure you want to delete this coupon?',
+                                            onConfirm: () => c.delete(item.id),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -183,13 +328,17 @@ class CouponsPage extends StatelessWidget {
         const SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Start Date'),
         const SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context, hint: '', controller: c.startDateController),
+        CustomWidgets().customDatePickerField(
+            context: context,
+            controller: c.startDateController,
+            selectedDate: c.selectedStartDate),
         const SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('End Date'),
         const SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context, hint: '', controller: c.endDateController),
+        CustomWidgets().customDatePickerField(
+            context: context,
+            controller: c.endDateController,
+            selectedDate: c.selectedEndDate),
         const SizedBox(height: 10),
       ],
       onSubmit: () {},
@@ -282,6 +431,56 @@ class CouponsPage extends StatelessWidget {
         Icons.add,
         color: context.theme.colorScheme.onPrimary,
       ),
+    );
+  }
+
+  Widget _infoTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: cs.primary.withOpacity(.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: cs.primary,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: cs.outline,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: cs.onSurface,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

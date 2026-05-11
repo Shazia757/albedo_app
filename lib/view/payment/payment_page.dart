@@ -125,6 +125,7 @@ class PaymentPage extends StatelessWidget {
                           itemBuilder: (_, i) => _PaymentCard(
                             student: _isStudent ? students[i] : null,
                             teacher: _isStudent ? null : teachers[i],
+                            paymentC: c,
                           ),
                         ),
                       );
@@ -147,10 +148,12 @@ class _PaymentCard extends StatelessWidget {
   const _PaymentCard({
     this.student,
     this.teacher,
+    required this.paymentC,
   });
 
   final StudentPaymentModel? student;
   final TeacherPaymentModel? teacher;
+  final PaymentController paymentC;
 
   @override
   Widget build(BuildContext context) {
@@ -170,24 +173,25 @@ class _PaymentCard extends StatelessWidget {
 
     final statusColor = status == 'approved' ? Colors.green : Colors.orange;
 
- return InkWell(
-  borderRadius: BorderRadius.circular(22),
-  onTap: () {
-    if (isStudent) {
-      Get.to(
-        () => StudentPaymentDetailsPage(
-          student: student!,
-        ),
-      );
-    } else {
-      Get.to(
-        () => TeacherPaymentDetailsPage(
-          teacher: teacher!,
-        ),
-      );
-    }
-  },
-  child: Container(
+    return InkWell(
+      borderRadius: BorderRadius.circular(22),
+      onTap: () {
+        if (isStudent) {
+          Get.to(
+            () => StudentPaymentDetailsPage(
+              student: student!,
+              paymentC: paymentC,
+            ),
+          );
+        } else {
+          Get.to(
+            () => TeacherPaymentDetailsPage(
+              teacher: teacher!,
+            ),
+          );
+        }
+      },
+      child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: cs.onPrimary,
@@ -267,9 +271,9 @@ class _PaymentCard extends StatelessWidget {
                 ),
               ],
             ),
-      
+
             const SizedBox(height: 12),
-      
+
             /// ── BALANCE CARD ────────────────────
             Container(
               padding: const EdgeInsets.fromLTRB(0, 12, 12, 12),
@@ -287,9 +291,9 @@ class _PaymentCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-      
+
                   const SizedBox(width: 14),
-      
+
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,7 +313,7 @@ class _PaymentCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w800,
-      
+
                             /// same red color as title
                             color: Colors.red.shade700,
                           ),
@@ -321,12 +325,12 @@ class _PaymentCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-      
+
             Divider(
               color: cs.outline.withOpacity(.15),
               height: 1,
             ),
-      
+
             const SizedBox(height: 12),
             if (!isStudent) ...[
               Builder(
@@ -335,11 +339,11 @@ class _PaymentCard extends StatelessWidget {
                           ?.where((e) => e.amount > 0)
                           .toList() ??
                       [];
-      
+
                   if (earnings.isEmpty) {
                     return const SizedBox();
                   }
-      
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -358,24 +362,25 @@ class _PaymentCard extends StatelessWidget {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: earnings.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 10),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 10),
                           itemBuilder: (_, i) {
                             final item = earnings[i];
                             final isApproved =
                                 item.status.toLowerCase() == 'approved';
-      
+
                             final bgColor = isApproved
                                 ? Colors.green.withOpacity(.08)
                                 : Colors.grey.withOpacity(.10);
-      
+
                             final borderColor = isApproved
                                 ? Colors.green.withOpacity(.15)
                                 : Colors.grey.withOpacity(.18);
-      
+
                             final textColor = isApproved
                                 ? Colors.green.shade700
                                 : Colors.grey.shade700;
-      
+
                             return Container(
                               width: 84,
                               padding: const EdgeInsets.symmetric(
@@ -430,7 +435,7 @@ class _PaymentCard extends StatelessWidget {
                 },
               ),
             ],
-      
+
             /// ── DETAILS ─────────────────────────
             if (isStudent)
               Column(
@@ -487,7 +492,7 @@ class _PaymentCard extends StatelessWidget {
                   ),
                 ],
               ),
-      
+
             if (!isStudent)
               Column(
                 children: [
@@ -530,18 +535,18 @@ class _PaymentCard extends StatelessWidget {
                   ),
                 ],
               ),
-      
+
             const SizedBox(height: 14),
             if (isStudent) ...[
               Divider(
                 color: cs.outline.withOpacity(.15),
                 height: 1,
               ),
-      
+
               const SizedBox(height: 14),
-      
+
               /// ── FOOTER ──────────────────────────
-      
+
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -625,55 +630,6 @@ class _PaymentCard extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _footerTile(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: cs.primary.withOpacity(.05),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 18,
-            color: cs.primary,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: cs.outline,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: cs.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

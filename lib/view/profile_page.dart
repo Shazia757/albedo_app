@@ -466,7 +466,7 @@ class _SectionCard extends StatelessWidget {
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: cs.outline.withOpacity(0.12),
+          color: cs.outline.withOpacity(0.5),
         ),
       ),
       child: Padding(

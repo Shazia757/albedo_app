@@ -7,12 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AddMentorPage extends StatelessWidget {
-  const AddMentorPage({super.key});
+  const AddMentorPage({
+    super.key,
+    this.isEdit = false,
+  });
+
+  final bool isEdit;
 
   @override
   Widget build(BuildContext context) {
     final c = Get.find<MentorController>();
     final isDesktop = Responsive.isDesktop(context);
+
 
     return Scaffold(
       appBar: CustomAppBar(),
@@ -30,7 +36,7 @@ class AddMentorPage extends StatelessWidget {
                     children: [
                       /// TITLE
                       Text(
-                        'Add Mentor',
+                        isEdit ? 'Edit Mentor' : 'Add Mentor',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
 
@@ -45,14 +51,14 @@ class AddMentorPage extends StatelessWidget {
                             const SizedBox(height: 10),
                             InkWell(
                               onTap: () {},
-                              child: CircleAvatar(
+                              child: const CircleAvatar(
                                 radius: 35,
                                 child: ClipOval(
                                   child: SizedBox(
-                                    width: 60,
-                                    height: 60,
-                                    child: Image.asset(
-                                      'assets/images/logo.png',
+                                    width: 70,
+                                    height: 70,
+                                    child: Image(
+                                      image: AssetImage('assets/images/logo.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -65,11 +71,9 @@ class AddMentorPage extends StatelessWidget {
 
                       const SizedBox(height: 24),
 
-                      /// BASIC INFO
+                      /// NAME
                       CustomWidgets().labelWithAsterisk('Name', required: true),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter mentor name',
@@ -78,11 +82,8 @@ class AddMentorPage extends StatelessWidget {
 
                       const SizedBox(height: 14),
 
-                      CustomWidgets()
-                          .labelWithAsterisk('Email', required: true),
-
+                      CustomWidgets().labelWithAsterisk('Email', required: true),
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter email',
@@ -91,11 +92,8 @@ class AddMentorPage extends StatelessWidget {
 
                       const SizedBox(height: 14),
 
-                      CustomWidgets()
-                          .labelWithAsterisk('Phone Number', required: true),
-
+                      CustomWidgets().labelWithAsterisk('Phone Number', required: true),
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: '+1234567890',
@@ -106,9 +104,7 @@ class AddMentorPage extends StatelessWidget {
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('WhatsApp Number'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: '+1234567890',
@@ -119,9 +115,7 @@ class AddMentorPage extends StatelessWidget {
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('Place'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter place',
@@ -131,9 +125,7 @@ class AddMentorPage extends StatelessWidget {
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('Pincode'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter pincode',
@@ -144,9 +136,7 @@ class AddMentorPage extends StatelessWidget {
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('Address'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter address',
@@ -157,9 +147,7 @@ class AddMentorPage extends StatelessWidget {
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('Qualification'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter qualification',
@@ -190,30 +178,24 @@ class AddMentorPage extends StatelessWidget {
                                 final exp = c.experiences[index];
 
                                 return Card(
-                                  margin:
-                                      const EdgeInsets.symmetric(vertical: 6),
+                                  margin: const EdgeInsets.symmetric(vertical: 6),
                                   child: Padding(
                                     padding: const EdgeInsets.all(14),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "Experience ${index + 1}",
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 15,
                                               ),
                                             ),
                                             if (c.experiences.length > 1)
                                               IconButton(
-                                                onPressed: () {
-                                                  c.removeExperience(index);
-                                                },
+                                                onPressed: () => c.removeExperience(index),
                                                 icon: const Icon(
                                                   Icons.delete_outline,
                                                   color: Colors.red,
@@ -224,13 +206,8 @@ class AddMentorPage extends StatelessWidget {
 
                                         const SizedBox(height: 10),
 
-                                        /// COMPANY
-                                        CustomWidgets().labelWithAsterisk(
-                                          'Company Name',
-                                        ),
-
+                                        CustomWidgets().labelWithAsterisk('Company Name'),
                                         const SizedBox(height: 6),
-
                                         CustomWidgets().dropdownStyledTextField(
                                           context: context,
                                           hint: 'Enter company name',
@@ -239,12 +216,8 @@ class AddMentorPage extends StatelessWidget {
 
                                         const SizedBox(height: 12),
 
-                                        /// YEARS
-                                        CustomWidgets()
-                                            .labelWithAsterisk('Years'),
-
+                                        CustomWidgets().labelWithAsterisk('Years'),
                                         const SizedBox(height: 6),
-
                                         CustomWidgets().dropdownStyledTextField(
                                           context: context,
                                           hint: 'Years',
@@ -254,12 +227,8 @@ class AddMentorPage extends StatelessWidget {
 
                                         const SizedBox(height: 12),
 
-                                        /// MONTHS
-                                        CustomWidgets()
-                                            .labelWithAsterisk('Months'),
-
+                                        CustomWidgets().labelWithAsterisk('Months'),
                                         const SizedBox(height: 6),
-
                                         CustomWidgets().dropdownStyledTextField(
                                           context: context,
                                           hint: 'Months',
@@ -275,16 +244,30 @@ class AddMentorPage extends StatelessWidget {
 
                             const SizedBox(height: 14),
 
-                            /// ADD EXPERIENCE BUTTON
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  c.addExperience();
-                                },
-                                icon: const Icon(Icons.add),
-                                label: const Text('Add Experience'),
-                              ),
+                            ElevatedButton.icon(
+                              onPressed: c.addExperience,
+                              icon: const Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                  ),
+                                  label: const Text(
+                                    "Add Experience",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withOpacity(0.8),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                      horizontal: 16,
+                                    ),
+                                  )
                             ),
                           ],
                         ),
@@ -304,9 +287,7 @@ class AddMentorPage extends StatelessWidget {
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('Account Number'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter account number',
@@ -317,21 +298,17 @@ class AddMentorPage extends StatelessWidget {
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('Account Holder Name'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
-                        hint: 'Enter account holder name',
+                        hint: 'Enter name',
                         controller: c.accountHolderNameController,
                       ),
 
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('UPI ID'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter UPI ID',
@@ -341,40 +318,29 @@ class AddMentorPage extends StatelessWidget {
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('Account Type'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().customDropdownField<String>(
                         context: context,
                         hint: 'Select account type',
-                        items: const [
-                          'Savings',
-                          'Current',
-                        ],
+                        items: const ['Savings', 'Current'],
                         itemLabel: (item) => item,
-                        onChanged: (value) {
-                          c.selectedAccountType.value = value;
-                        },
+                        onChanged: (v) => c.selectedAccountType.value = v,
                       ),
 
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('IFSC Code'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
-                        hint: 'Enter IFSC code',
+                        hint: 'Enter IFSC',
                         controller: c.ifscController,
                       ),
 
                       const SizedBox(height: 14),
 
                       CustomWidgets().labelWithAsterisk('Resume'),
-
                       const SizedBox(height: 8),
-
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter resume URL',
@@ -388,18 +354,17 @@ class AddMentorPage extends StatelessWidget {
                         children: [
                           Expanded(
                             child: OutlinedButton(
-                              onPressed: () {
-                                Get.back();
-                              },
+                              onPressed: () => Get.back(),
                               child: const Text('Cancel'),
                             ),
                           ),
                           const SizedBox(width: 12),
-                           Expanded(
+
+                          Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 if (c.validateMentor(context)) {
-                                  c.addMentor();
+                                  isEdit ? c.updateMentor() : c.addMentor();
                                 }
                               },
                               icon: const Icon(Icons.add,
@@ -421,7 +386,7 @@ class AddMentorPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                       ],
+                        ],
                       ),
 
                       const SizedBox(height: 30),

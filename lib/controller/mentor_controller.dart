@@ -509,4 +509,6 @@ class MentorController extends GetxController {
     experiences[index].dispose();
     experiences.removeAt(index);
   }
+
+  updateMentor() {}
 }

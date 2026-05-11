@@ -1,4 +1,6 @@
+import 'package:albedo_app/controller/payment_controller.dart';
 import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/wallet_model.dart';
 import 'package:get/get.dart';
@@ -6,10 +8,11 @@ import 'package:get/get.dart';
 class StudentWalletController extends GetxController {
   var selectedTab = 0.obs;
 
+
   // Dummy Transactions
   var transactions = <TransactionModel>[
     TransactionModel(
-      status: "Success",
+      status: "Pending",
       type: "Credit",
       title: "Package Payment",
       description: "Paid for Maths package",
@@ -78,12 +81,41 @@ class StudentWalletController extends GetxController {
     return p.packageFee ?? 0 - totalWithdrawals;
   }
 
-  void updateStatus(String id, String status) {
-    final index = transactions.indexWhere((e) => e.id == id);
+ void updateStatus(
+  int transactionIndex,
+  String status,
+  StudentPaymentModel student,
+  PaymentController paymentC,
+) {
+  transactions[transactionIndex] =
+      transactions[transactionIndex].copyWith(
+    status: status,
+  );
 
-    if (index != -1) {
-      transactions[index] = transactions[index].copyWith(status: status);
-      transactions.refresh();
-    }
+  transactions.refresh();
+
+  final studentIndex = paymentC.studentPayments.indexWhere(
+    (e) => e.id == student.id,
+  );
+
+  if (studentIndex == -1) return;
+
+  final current = paymentC.studentPayments[studentIndex];
+
+  /// Deposit Approval
+  if (transactions[transactionIndex].type == "Credit") {
+    paymentC.studentPayments[studentIndex] = current.copyWith(
+      depositPending: status == "approved"
+          ? 0
+          : current.depositPending,
+      depositedAmount: status == "approved"
+          ? (current.depositedAmount ?? 0) +
+              (transactions[transactionIndex].amount ?? 0)
+          : current.depositedAmount,
+    );
   }
-}
+
+  paymentC.studentPayments.refresh();
+
+  paymentC.applyFilters();
+}}

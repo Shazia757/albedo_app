@@ -11,9 +11,12 @@ class StudentPaymentDetailsPage extends StatelessWidget {
   StudentPaymentDetailsPage({
     super.key,
     required this.student,
+    required this.paymentC,
   });
 
   final StudentPaymentModel student;
+  final PaymentController paymentC;
+
   final c = Get.find<StudentWalletController>();
 
   @override
@@ -45,20 +48,31 @@ class StudentPaymentDetailsPage extends StatelessWidget {
 
           /// ───────────────── TRANSACTION LIST ─────────────────
 
-          ...c.transactions.map((item) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _TransactionCard(
-                amount: item.amount ?? 0,
-                addedBy: item.addedBy ?? '',
-                date: item.dateTime ?? DateTime.now(),
-                status: item.status ?? '',
-                onStatusChanged: (newStatus) {
-                  c.updateStatus(item.id, newStatus);
-                },
-              ),
-            );
-          }).toList(),
+          Obx(
+            () => Column(
+              children: c.transactions.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _TransactionCard(
+                    amount: item.amount ?? 0,
+                    addedBy: item.addedBy ?? '',
+                    date: item.dateTime ?? DateTime.now(),
+                    status: item.status ?? 'pending',
+                    onStatusChanged: (newStatus) {
+                      c.updateStatus(
+                        index,
+                        newStatus,
+                        student,
+                        paymentC,
+                      );
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         ],
       ),
     );
@@ -397,11 +411,13 @@ class _TransactionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final normalizedStatus = (status ?? 'pending').toLowerCase().trim();
+    final c = Get.find<StudentWalletController>();
 
-    final color = status == "approved"
+    final normalizedStatus = status.toLowerCase().trim() ?? 'pending';
+
+    final color = normalizedStatus == "approved"
         ? Colors.green
-        : status == "rejected"
+        : normalizedStatus == "rejected"
             ? Colors.red
             : Colors.orange;
 
@@ -411,7 +427,7 @@ class _TransactionCard extends StatelessWidget {
         color: cs.onPrimary,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: cs.outline.withOpacity(.12),
+          color: cs.outline.withOpacity(.5),
         ),
       ),
       child: Row(
@@ -424,7 +440,9 @@ class _TransactionCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
             ),
           ),
+
           const SizedBox(width: 14),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -456,36 +474,77 @@ class _TransactionCard extends StatelessWidget {
               ],
             ),
           ),
-          // SizedBox(
-          //   height: 34,
-          //   child: SegmentedButton<String>(
-          //     segments: const [
-          //       ButtonSegment(
-          //         value: 'pending',
-          //         icon: Icon(Icons.schedule_rounded, size: 16),
-          //       ),
-          //       ButtonSegment(
-          //         value: 'approved',
-          //         icon: Icon(Icons.check_circle, size: 16),
-          //       ),
-          //       ButtonSegment(
-          //         value: 'rejected',
-          //         icon: Icon(Icons.close_rounded, size: 16),
-          //       ),
-          //     ],
-          //     selected: {normalizedStatus},
-          //     onSelectionChanged: (value) {
-          //       onStatusChanged(value.first);
-          //     },
-          //     style: ButtonStyle(
-          //       visualDensity: VisualDensity.compact,
-          //       padding: WidgetStateProperty.all(
-          //         const EdgeInsets.symmetric(horizontal: 10),
-          //       ),
-          //     ),
-          //   ),
-          // )
+
+          /// Status Switch
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: cs.surface,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: cs.outline.withOpacity(.15),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _StatusButton(
+                  icon: Icons.pending,
+                  color: Colors.orange,
+                  selected: normalizedStatus == "pending",
+                  onTap: () => onStatusChanged("pending"),
+                ),
+                _StatusButton(
+                  icon: Icons.check_circle,
+                  color: Colors.green,
+                  selected: normalizedStatus == "approved",
+                  onTap: () => onStatusChanged("approved"),
+                ),
+                _StatusButton(
+                  icon: Icons.cancel,
+                  color: Colors.red,
+                  selected: normalizedStatus == "rejected",
+                  onTap: () => onStatusChanged("rejected"),
+                ),
+              ],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _StatusButton extends StatelessWidget {
+  const _StatusButton({
+    required this.icon,
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: selected ? color.withOpacity(.15) : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: selected ? color : Colors.grey,
+        ),
       ),
     );
   }

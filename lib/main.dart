@@ -9,11 +9,13 @@ import 'package:albedo_app/controller/user_controller.dart';
 import 'package:albedo_app/login_page.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/view/batch/batch_page.dart';
+import 'package:albedo_app/view/batch_payment_page.dart';
 import 'package:albedo_app/view/home_page.dart';
 import 'package:albedo_app/view/payment/payment_page.dart';
 import 'package:albedo_app/view/sessions/add_session_page.dart';
 import 'package:albedo_app/view/sessions/batch_session_page.dart';
 import 'package:albedo_app/view/sessions/session_page.dart';
+import 'package:albedo_app/view/settings/settings_page.dart';
 import 'package:albedo_app/view/students/add_assessment_page.dart';
 import 'package:albedo_app/view/users/advisors_page.dart';
 import 'package:albedo_app/view/users/coordinator_page.dart';
@@ -75,8 +77,7 @@ class MyApp extends StatelessWidget {
 
       themeMode: ThemeMode.light,
 
-      home:
-          isLoggedIn ? PaymentPage(type: PaymentUserType.student) : LoginView(),
+      home: isLoggedIn ? SessionPage() : LoginView(),
     );
   }
 }

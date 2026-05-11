@@ -12,6 +12,7 @@ import 'package:albedo_app/view/advisor_detailed_page.dart';
 import 'package:albedo_app/view/coordinator_detailed_page.dart';
 import 'package:albedo_app/view/mentor_detailed_page.dart';
 import 'package:albedo_app/view/sessions/add_session_page.dart';
+import 'package:albedo_app/view/sessions/reschedule_request_page.dart';
 import 'package:albedo_app/view/sessions/session_details_page.dart';
 import 'package:albedo_app/view/students/student_detail_page.dart';
 import 'package:albedo_app/view/teacher/tr_detailed_page.dart';
@@ -337,7 +338,7 @@ class SessionPage extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: i == index
                                     ? cs.primary
-                                    : cs.outlineVariant.withOpacity(0.4),
+                                    : cs.outline.withOpacity(0.5),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
@@ -512,8 +513,28 @@ class SessionPage extends StatelessWidget {
                                         onPressed: () {
                                           c.openSessionReportDialog(data);
                                         },
-                                        icon: const Icon(Icons.add),
-                                        label: const Text("Add Report"),
+                                        icon: const Icon(Icons.add,
+                                            color: Colors.white),
+                                        label: const Text(
+                                          "Add Report",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              cs.primary.withOpacity(0.8),
+                                          elevation: 0,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                            horizontal: 16,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   );
@@ -1168,7 +1189,6 @@ class _SessionCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final textPrimary = cs.onSurface;
     final textSecondary = cs.onSurface.withOpacity(0.5);
-    final dividerColor = cs.outlineVariant.withOpacity(0.35);
     final auth = Get.find<AuthController>();
     final user = auth.activeUser;
 
@@ -1381,12 +1401,28 @@ class _SessionCard extends StatelessWidget {
                         TextButton.icon(
                           onPressed: () =>
                               _openRescheduleDialog(context, session),
-                          icon: const Icon(Icons.schedule, size: 18),
-                          label: const Text("Reschedule"),
+                          icon: const Icon(
+                            Icons.schedule,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Reschedule",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
                           style: TextButton.styleFrom(
-                            foregroundColor: cs.primary,
+                            backgroundColor: cs.primary.withOpacity(0.8),
+                            elevation: 0,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
+                              vertical: 16,
+                              horizontal: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
                       ],
@@ -1524,7 +1560,7 @@ class _TopBar extends StatelessWidget {
         },
       ),
       onRequestTap: (!isCustom || PermissionService.can("reschedule_requests"))
-          ? () {}
+          ? () => Get.to(() => RescheduleRequestsPage())
           : null,
     );
   }
@@ -1555,7 +1591,7 @@ class _DialogSectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surfaceContainerHighest.withOpacity(0.3),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outlineVariant.withOpacity(0.4), width: 1),
+        border: Border.all(color: cs.outline.withOpacity(0.5), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

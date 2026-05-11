@@ -27,12 +27,17 @@ class StudentWalletPage extends StatelessWidget {
           floatingActionButton: AnimatedBuilder(
             animation: tabController,
             builder: (_, __) {
-              if (tabController.index != 0) return const SizedBox();
+              final isTransactionsTab = tabController.index == 0;
 
+              if (!isTransactionsTab) return const SizedBox.shrink();
               return FloatingActionButton(
+                mini: true,
                 elevation: 3,
-                backgroundColor: cs.primary,
-                foregroundColor: cs.onPrimary,
+                backgroundColor: context.theme.colorScheme.primary,
+                child: Icon(
+                  Icons.add,
+                  color: context.theme.colorScheme.onPrimary,
+                ),
                 onPressed: () => DialogUtils.showDepositDialog(
                   context,
                   onSubmit: (txn) {

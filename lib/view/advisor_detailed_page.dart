@@ -62,7 +62,7 @@ class AdvisorDetailedPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Tabs (untouched) ───────────────────────────────
+            // ── Tabs  ───────────────────────────────
             Obx(() => CustomWidgets().customTabs(
                   context,
                   tabs: c.detailedTabs,
@@ -71,7 +71,7 @@ class AdvisorDetailedPage extends StatelessWidget {
                 )),
             const SizedBox(height: 16),
 
-            // ── Tab bodies (upgraded) ──────────────────────────
+            // ── Tab bodies  ──────────────────────────
             Obx(() {
               final index = c.selectedIndex.value;
               final walletController = Get.put(TeacherWalletController());

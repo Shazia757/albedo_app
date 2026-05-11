@@ -313,4 +313,6 @@ class CoordinatorController extends GetxController {
     experiences[index].dispose();
     experiences.removeAt(index);
   }
+
+  updateCoordinator() {}
 }

@@ -16,6 +16,22 @@ class FeedbackController extends GetxController {
   void setFilter(String value) => selectedFilter.value = value;
   void setSort(String value) => selectedSort.value = value;
 
+  @override
+  void onInit() {
+    super.onInit();
+    fetchFeedbacks();
+  }
+
+  Future<void> fetchFeedbacks() async {
+    isLoading.value = true;
+
+    await Future.delayed(const Duration(seconds: 1)); // simulate API
+
+    feedbacks.value = []; // replace with API data
+
+    isLoading.value = false;
+  }
+
   List<String> tabs = [
     "From Student",
     "From Teacher",
@@ -26,63 +42,46 @@ class FeedbackController extends GetxController {
     "Student",
     "Teacher",
     "Mentor",
-    
   ];
 
   var feedbacks = <Feedbacks>[].obs;
 
-    List<Feedbacks> get filteredSessions {
-      return [];
-    // final status = statusMap[selectedTab.value];
+  List<Feedbacks> get filteredSessions {
+    List<Feedbacks> filtered = feedbacks;
 
-    // ✅ Step 1: Filter first
-    // List<Feedbacks> filtered = feedbacks.where((s) {
-    //   final matchesStatus = s.status == status;
+    final query = searchQuery.value.toLowerCase();
 
-    //   final matchesSearch = s.student!.name
-    //           .toLowerCase()
-    //           .contains(searchQuery.value.toLowerCase()) ||
-    //       s.student!.studentId!
-    //           .toLowerCase()
-    //           .contains(searchQuery.value.toLowerCase()) ||
-    //       s.teacher!.id
-    //           .toLowerCase()
-    //           .contains(searchQuery.value.toLowerCase()) ||
-    //       s.teacher!.name
-    //           .toLowerCase()
-    //           .contains(searchQuery.value.toLowerCase()) ||
-    //       s.id.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-    //       s.package.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-    //       s.className.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-    //       s.date.toString().contains(searchQuery.value.toLowerCase());
+    if (query.isNotEmpty) {
+      filtered = filtered.where((s) {
+        return s.student!.name.toLowerCase().contains(query) ||
+            s.teacher!.name.toLowerCase().contains(query) ||
+            s.id.toLowerCase().contains(query);
+      }).toList();
+    }
 
-    //   return matchesStatus && matchesSearch;
-    // }).toList();
-    // if (selectedTeacher.value != null && selectedTeacher.value!.isNotEmpty) {
-    //   filtered = filtered
-    //       .where((s) => s.teacher?.name == selectedTeacher.value)
-    //       .toList();
-    // }
+    // Example filter logic
+    if (selectedFilter.value != 'All') {
+      filtered = filtered.where((s) {
+        return s.rating >= int.parse(selectedFilter.value[0]);
+      }).toList();
+    }
 
-    // // 🔥 Step 2: ADD SORTING HERE (THIS IS WHAT YOU ASKED)
-    // switch (sortType.value) {
-    //   case SortType.newest:
-    //     filtered.sort((a, b) => b.date.compareTo(a.date));
-    //     break;
-    //   case SortType.oldest:
-    //     filtered.sort((a, b) => a.date.compareTo(b.date));
-    //     break;
-    //   case SortType.student:
-    //     filtered.sort((a, b) => a.student!.name.compareTo(b.student!.name));
-    //     break;
-    //   case SortType.teacher:
-    //     filtered.sort((a, b) => a.teacher!.name.compareTo(b.teacher!.name));
-    //     break;
-    // }
+    // sorting
+    switch (selectedSort.value) {
+      case 'Newest':
+        filtered.sort((a, b) => b.date.compareTo(a.date));
+        break;
+      case 'Oldest':
+        filtered.sort((a, b) => a.date.compareTo(b.date));
+        break;
+      case 'Highest Rating':
+        filtered.sort((a, b) => b.rating.compareTo(a.rating));
+        break;
+      case 'Lowest Rating':
+        filtered.sort((a, b) => a.rating.compareTo(b.rating));
+        break;
+    }
 
-    // // ✅ Step 3: Return final list
-    // return filtered;
+    return filtered;
   }
-
-
 }

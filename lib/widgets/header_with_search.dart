@@ -66,8 +66,6 @@ class HeaderWithSearch extends StatelessWidget {
               },
             ),
 
-            if (actions != null) ...actions!,
-
             /// 🔽 SORT
             if (onSortTap != null)
               IconButton(
@@ -77,10 +75,12 @@ class HeaderWithSearch extends StatelessWidget {
 
             if (onRequestTap != null)
               IconButton(
-                icon: const Icon(Icons.inbox_outlined), 
+                icon: const Icon(Icons.inbox_outlined),
                 tooltip: "Requests",
                 onPressed: onRequestTap,
               ),
+
+            if (actions != null) ...actions!,
           ],
         );
       }),

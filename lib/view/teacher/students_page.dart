@@ -19,8 +19,7 @@ class TrStudentsPage extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: CustomAppBar(),
       drawer: DrawerMenu(),
       body: Obx(() {
@@ -121,7 +120,7 @@ class _StudentCard extends StatelessWidget {
         color: cs.onPrimary,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: cs.outline.withOpacity(0.08),
+          color: cs.outline.withOpacity(0.5),
         ),
       ),
       child: Column(
@@ -288,7 +287,7 @@ class _MentorCard extends StatelessWidget {
         color: cs.surfaceVariant.withOpacity(0.4),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: cs.outline.withOpacity(0.08),
+          color: cs.outline.withOpacity(0.3),
         ),
       ),
       child: Row(
@@ -369,20 +368,6 @@ class _MentorAvatar extends StatelessWidget {
   }
 }
 
-class _SoftDivider extends StatelessWidget {
-  final ColorScheme cs;
-
-  const _SoftDivider({required this.cs});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 1,
-      color: cs.outline.withOpacity(0.08),
-    );
-  }
-}
-
 class _Avatar extends StatelessWidget {
   final String name;
   final ColorScheme cs;
@@ -405,94 +390,6 @@ class _Avatar extends StatelessWidget {
           fontWeight: FontWeight.w700,
           color: cs.primary,
         ),
-      ),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final ColorScheme cs;
-
-  const _InfoRow({
-    required this.icon,
-    required this.text,
-    required this.cs,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: cs.onSurface.withOpacity(0.6)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.bodySmall,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PackagesView extends StatelessWidget {
-  final List<Package> packages;
-  final ColorScheme cs;
-
-  const _PackagesView({
-    required this.packages,
-    required this.cs,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (packages.isEmpty) {
-      return Text(
-        "No packages",
-        style: TextStyle(color: cs.onSurface.withOpacity(0.6)),
-      );
-    }
-
-    final visible = packages.take(2).toList();
-    final remaining = packages.length - visible.length;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ...visible.map((p) => _packageChip(
-              "${p.subjectName} • Std ${p.standard}",
-            )),
-        if (remaining > 0)
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Text(
-              "+$remaining more",
-              style: TextStyle(
-                fontSize: 12,
-                color: cs.primary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _packageChip(String text) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: cs.primary.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 12, color: cs.primary),
       ),
     );
   }

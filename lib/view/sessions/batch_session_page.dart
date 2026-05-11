@@ -100,7 +100,8 @@ class BatchesListPage extends StatelessWidget {
                                 batch: data[i],
                                 statusColor: getStatusColor(
                                     context, data[i].status ?? ""),
-                                onTap: () => openSessionDetails(context, data, i),
+                                onTap: () =>
+                                    openSessionDetails(context, data, i),
                               );
                             },
                           );
@@ -117,389 +118,347 @@ class BatchesListPage extends StatelessWidget {
     );
   }
 
-void openSessionDetails(
-  BuildContext context,
-  List<Session> sessions,
-  int currentIndex,
-) {
-  int index = currentIndex;
+  void openSessionDetails(
+    BuildContext context,
+    List<Session> sessions,
+    int currentIndex,
+  ) {
+    int index = currentIndex;
 
-  CustomWidgets().showCustomDialog(
-    context: context,
-    title: const Text(
-      "Session Details",
-      style: TextStyle(color: Colors.white),
-    ),
-    icon: Icons.schedule,
-    formKey: GlobalKey<FormState>(),
-    submitText: "Close",
-    onSubmit: () {},
-    isViewOnly: true,
-    sections: [
-      StatefulBuilder(
-        builder: (context, setState) {
-          final session = sessions[index];
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: const Text(
+        "Session Details",
+        style: TextStyle(color: Colors.white),
+      ),
+      icon: Icons.schedule,
+      formKey: GlobalKey<FormState>(),
+      submitText: "Close",
+      onSubmit: () {},
+      isViewOnly: true,
+      sections: [
+        StatefulBuilder(
+          builder: (context, setState) {
+            final session = sessions[index];
 
-          final batch = session.batch;
-          final package = session.package;
-          final teacher = package?.teacher;
+            final batch = session.batch;
+            final package = session.package;
+            final teacher = package?.teacher;
 
-          final cs = Theme.of(context).colorScheme;
+            final cs = Theme.of(context).colorScheme;
 
-          return SizedBox(
-            height: MediaQuery.of(context).size.height * 0.75,
-            child: Column(
-              children: [
-                /// NAVIGATION
-                Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: index > 0
-                          ? () => setState(() => index--)
-                          : null,
-                      icon: const Icon(Icons.arrow_back_ios),
-                    ),
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.75,
+              child: Column(
+                children: [
+                  /// NAVIGATION
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed:
+                            index > 0 ? () => setState(() => index--) : null,
+                        icon: const Icon(Icons.arrow_back_ios),
+                      ),
+                      Text(
+                        "Session ${index + 1}/${sessions.length}",
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      IconButton(
+                        onPressed: index < sessions.length - 1
+                            ? () => setState(() => index++)
+                            : null,
+                        icon: const Icon(Icons.arrow_forward_ios),
+                      ),
+                    ],
+                  ),
 
-                    Text(
-                      "Session ${index + 1}/${sessions.length}",
-                      style:
-                          Theme.of(context).textTheme.labelMedium,
-                    ),
+                  const SizedBox(height: 8),
 
-                    IconButton(
-                      onPressed:
-                          index < sessions.length - 1
-                              ? () => setState(() => index++)
-                              : null,
-                      icon:
-                          const Icon(Icons.arrow_forward_ios),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        /// BATCH
-                        detailCard(
-                          context,
-                          title: "Batch",
-                          name: batch?.batchName ?? "-",
-                          id: batch?.batchID ?? "-",
-                          onTap: () => Get.to(
-                            () => BatchDetailedPage(
-                              batch: batch!,
-                              initialIndex: index,
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          /// BATCH
+                          detailCard(
+                            context,
+                            title: "Batch",
+                            name: batch?.batchName ?? "-",
+                            id: batch?.batchID ?? "-",
+                            onTap: () => Get.to(
+                              () => BatchDetailedPage(
+                                batch: batch!,
+                                initialIndex: index,
+                              ),
+                              binding: BindingsBuilder(() {
+                                Get.put(BatchController());
+                              }),
                             ),
-                            binding: BindingsBuilder(() {
-                              Get.put(BatchController());
-                            }),
                           ),
-                        ),
 
-                        /// TEACHER
-                        detailCard(
-                          context,
-                          title: "Teacher",
-                          name: teacher?.name ?? "-",
-                          id: teacher?.id ?? "-",
-                          onTap: () => Get.to(
-                            () => TeacherDetailsPage(
-                              teacher: teacher!,
-                              initialIndex: index,
+                          /// TEACHER
+                          detailCard(
+                            context,
+                            title: "Teacher",
+                            name: teacher?.name ?? "-",
+                            id: teacher?.id ?? "-",
+                            onTap: () => Get.to(
+                              () => TeacherDetailsPage(
+                                teacher: teacher!,
+                                initialIndex: index,
+                              ),
+                              binding: BindingsBuilder(() {
+                                Get.put(TeacherController());
+                              }),
                             ),
-                            binding: BindingsBuilder(() {
-                              Get.put(TeacherController());
-                            }),
                           ),
-                        ),
 
-                        const SizedBox(height: 10),
+                          const SizedBox(height: 10),
 
-                        /// SCHEDULE
-                        EditableInfoCard(
-                          type: "schedule",
-                          icon: Icons.schedule,
-                          title: "Schedule",
-                          date: formatDate(
-                            session.date ?? DateTime.now(),
+                          /// SCHEDULE
+                          EditableInfoCard(
+                            type: "schedule",
+                            icon: Icons.schedule,
+                            title: "Schedule",
+                            date: formatDate(
+                              session.date ?? DateTime.now(),
+                            ),
+                            time:
+                                "${session.startTime ?? '-'} - ${session.endTime ?? '-'}",
+                            duration: "${session.duration ?? '-'} mins",
+                            onSave: (date, time) {},
                           ),
-                          time:
-                              "${session.startTime ?? '-'} - ${session.endTime ?? '-'}",
-                          duration:
-                              "${session.duration ?? '-'} mins",
-                          onSave: (date, time) {},
-                        ),
 
-                        /// SESSION INFO
-                        infoCard(
-                          context,
-                          type: "session",
-                          icon: Icons.menu_book,
-                          title: "Session Info",
-                          children: [
-                            infoRow(
-                              label: "Package",
-                              value: package?.name ?? "-",
-                            ),
-
-                            infoRow(
-                              label: "Standard",
-                              value:
-                                  package?.standard ?? "-",
-                            ),
-
-                            infoRow(
-                              label: "Syllabus",
-                              value:
-                                  package?.syllabus ?? "-",
-                            ),
-
-                            infoRow(
-                              label: "Topic",
-                              value:
-                                  session.topic ?? "-",
-                            ),
-
-                            infoRow(
-                              label: "Class",
-                              value:
-                                  session.className ?? "-",
-                            ),
-                          ],
-                        ),
-
-                        /// STATUS
-                        infoCard(
-                          context,
-                          type: "status",
-                          icon: Icons.flag,
-                          title: "Status",
-                          children: [
-                            infoRow(
-                              label: "Current Status",
-                              value: session.status,
-                            ),
-
-                            infoRow(
-                              label: "Completed",
-                              value:
-                                  session.isCompleted == true
-                                      ? "Yes"
-                                      : "No",
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        /// REPORT
-                        infoCard(
-                          context,
-                          type: "report",
-                          icon: Icons.description,
-                          title: "Session Report",
-                          children: [
-                            Obx(() {
-                              final report =
-                                  c.reportRx.value;
-
-                              if (report == null) {
-                                return Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment
-                                          .start,
-                                  children: [
-                                    const Text(
-                                      "No session report available yet.",
-                                    ),
-
-                                    const SizedBox(
-                                        height: 8),
-
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        c.openSessionReportDialog(
-                                          session,
-                                        );
-                                      },
-                                      icon:
-                                          const Icon(Icons.add),
-                                      label: const Text(
-                                        "Add Report",
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              }
-
-                              return Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  ListTile(
-                                    contentPadding:
-                                        EdgeInsets.zero,
-                                    title: Text(
-                                      report.studentName,
-                                    ),
-                                    subtitle: Text(
-                                      report.isCompleted
-                                          ? "Completed"
-                                          : "Not Completed",
-                                    ),
-                                    trailing:
-                                        TextButton.icon(
-                                      onPressed: () {
-                                        c.openSessionReportDialog(
-                                          session,
-                                        );
-                                      },
-                                      icon: const Icon(
-                                        Icons.edit,
-                                        size: 18,
-                                      ),
-                                      label:
-                                          const Text("Edit"),
-                                    ),
-                                  ),
-
-                                  if (!report.isCompleted &&
-                                      report.reason !=
-                                          null)
-                                    Container(
-                                      padding:
-                                          const EdgeInsets
-                                              .all(10),
-                                      decoration:
-                                          BoxDecoration(
-                                        color: Colors.red
-                                            .withOpacity(
-                                                0.05),
-                                        borderRadius:
-                                            BorderRadius
-                                                .circular(
-                                                    10),
-                                      ),
-                                      child: Text(
-                                        "Reason: ${report.reason}",
-                                        style:
-                                            const TextStyle(
-                                          color:
-                                              Colors.red,
-                                        ),
-                                      ),
-                                    ),
-
-                                  if (report.isCompleted) ...[
-                                    infoRow(
-                                      label:
-                                          "Topics Covered",
-                                      value:
-                                          report.topicsCovered ??
-                                              "-",
-                                    ),
-
-                                    infoRow(
-                                      label:
-                                          "Teacher Notes",
-                                      value:
-                                          report.teacherNotes ??
-                                              "-",
-                                    ),
-                                  ],
-                                ],
-                              );
-                            }),
-                          ],
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        /// ACTIONS
-                        if (session.status !=
-                            'completed')
-                          Row(
+                          /// SESSION INFO
+                          infoCard(
+                            context,
+                            type: "session",
+                            icon: Icons.menu_book,
+                            title: "Session Info",
                             children: [
-                              Expanded(
-                                child:
-                                    _DetailActionButton(
-                                  label: "Edit",
-                                  icon: Icons.edit_outlined,
-                                  color: cs.secondary,
-                                  onTap: () {
-                                    c.loadSession(
-                                      session,
-                                    );
-
-                                    editSession(
-                                      context,
-                                    );
-                                  },
-                                ),
+                              infoRow(
+                                label: "Package",
+                                value: package?.name ?? "-",
                               ),
-
-                              const SizedBox(width: 8),
-
-                              Expanded(
-                                child:
-                                    _DetailActionButton(
-                                  label: "Delete",
-                                  icon:
-                                      Icons.delete_outline,
-                                  color: cs.error,
-                                  onTap: () {
-                                    CustomWidgets()
-                                        .showDeleteDialog(
-                                      title:
-                                          'Are you sure?',
-                                      text:
-                                          'Delete this session permanently?',
-                                      context: context,
-                                      onConfirm: () {
-                                        c.delete(
-                                          session.id,
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
+                              infoRow(
+                                label: "Standard",
+                                value: package?.standard ?? "-",
                               ),
-
-                              const SizedBox(width: 8),
-
-                              Expanded(
-                                child:
-                                    _DetailActionButton(
-                                  label: "Support",
-                                  icon: Icons
-                                      .support_agent_outlined,
-                                  color: cs.tertiary,
-                                  onTap: () =>
-                                      _addSupport(
-                                    context,
-                                  ),
-                                ),
+                              infoRow(
+                                label: "Syllabus",
+                                value: package?.syllabus ?? "-",
+                              ),
+                              infoRow(
+                                label: "Topic",
+                                value: session.topic ?? "-",
+                              ),
+                              infoRow(
+                                label: "Class",
+                                value: session.className ?? "-",
                               ),
                             ],
                           ),
-                      ],
+
+                          /// STATUS
+                          infoCard(
+                            context,
+                            type: "status",
+                            icon: Icons.flag,
+                            title: "Status",
+                            children: [
+                              infoRow(
+                                label: "Current Status",
+                                value: session.status,
+                              ),
+                              infoRow(
+                                label: "Completed",
+                                value:
+                                    session.isCompleted == true ? "Yes" : "No",
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          /// REPORT
+                          infoCard(
+                            context,
+                            type: "report",
+                            icon: Icons.description,
+                            title: "Session Report",
+                            children: [
+                              Obx(() {
+                                final report = c.reportRx.value;
+
+                                if (report == null) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "No session report available yet.",
+                                      ),
+                                      const SizedBox(height: 8),
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          c.openSessionReportDialog(
+                                            session,
+                                          );
+                                        },
+                                        icon: const Icon(Icons.add,
+                                            color: Colors.white),
+                                        label: const Text(
+                                          "Add Report",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              cs.primary.withOpacity(0.8),
+                                          elevation: 0,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                            horizontal: 16,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }
+
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(
+                                        report.studentName,
+                                      ),
+                                      subtitle: Text(
+                                        report.isCompleted
+                                            ? "Completed"
+                                            : "Not Completed",
+                                      ),
+                                      trailing: TextButton.icon(
+                                        onPressed: () {
+                                          c.openSessionReportDialog(
+                                            session,
+                                          );
+                                        },
+                                        icon: const Icon(
+                                          Icons.edit,
+                                          size: 18,
+                                        ),
+                                        label: const Text("Edit"),
+                                      ),
+                                    ),
+                                    if (!report.isCompleted &&
+                                        report.reason != null)
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.05),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          "Reason: ${report.reason}",
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ),
+                                    if (report.isCompleted) ...[
+                                      infoRow(
+                                        label: "Topics Covered",
+                                        value: report.topicsCovered ?? "-",
+                                      ),
+                                      infoRow(
+                                        label: "Teacher Notes",
+                                        value: report.teacherNotes ?? "-",
+                                      ),
+                                    ],
+                                  ],
+                                );
+                              }),
+                            ],
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          /// ACTIONS
+                          if (session.status != 'completed')
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _DetailActionButton(
+                                    label: "Edit",
+                                    icon: Icons.edit_outlined,
+                                    color: cs.secondary,
+                                    onTap: () {
+                                      c.loadSession(
+                                        session,
+                                      );
+
+                                      editSession(
+                                        context,
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _DetailActionButton(
+                                    label: "Delete",
+                                    icon: Icons.delete_outline,
+                                    color: cs.error,
+                                    onTap: () {
+                                      CustomWidgets().showDeleteDialog(
+                                        title: 'Are you sure?',
+                                        text:
+                                            'Delete this session permanently?',
+                                        context: context,
+                                        onConfirm: () {
+                                          c.delete(
+                                            session.id,
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _DetailActionButton(
+                                    label: "Support",
+                                    icon: Icons.support_agent_outlined,
+                                    color: cs.tertiary,
+                                    onTap: () => _addSupport(
+                                      context,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    ],
-  );
-}
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   FloatingActionButton addSessionBtn(BuildContext context) {
     return FloatingActionButton(
       onPressed: () => CustomWidgets().showCustomDialog(

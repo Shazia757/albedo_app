@@ -25,7 +25,7 @@ class AccountController extends GetxController {
   onInit() {
     super.onInit();
     if (kDebugMode) {
-      emailController.text = 'student@gmail.com';
+      emailController.text = 'admin@gmail.com';
       passwordController.text = '0000';
     }
   }
@@ -48,7 +48,7 @@ class AccountController extends GetxController {
 
       LocalStorage().writeUser(user);
 
-      Get.snackbar("Success", "Login Successful as ${user.role}");
+      Get.snackbar("Success", "Login Successful");
       Get.offAll(() => HomeView());
     } catch (e) {
       Get.snackbar("Error", e.toString());
@@ -223,7 +223,7 @@ class AccountController extends GetxController {
 
   void logout() {
     LocalStorage().clearAll();
-    Get.offAll(LoginView()); 
+    Get.offAll(LoginView());
   }
 
   Future<void> forgotPassword() async {

@@ -1,11 +1,4 @@
-import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
-import 'package:albedo_app/model/users/advisor_model.dart';
-import 'package:albedo_app/model/users/coordinator_model.dart';
-import 'package:albedo_app/model/users/mentor_model.dart';
-import 'package:albedo_app/model/users/other_users_model.dart';
-import 'package:albedo_app/model/users/student_model.dart';
-import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -14,12 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AddTeacherPage extends StatelessWidget {
-  const AddTeacherPage({super.key});
+  const AddTeacherPage({
+    super.key,
+    required this.isEdit,
+  });
+
+  final bool isEdit;
 
   @override
   Widget build(BuildContext context) {
     final c = Get.find<TeacherController>();
     final isDesktop = Responsive.isDesktop(context);
+
     final timezones = [
       'Asia/Kolkata',
       'Asia/Dubai',
@@ -32,7 +31,9 @@ class AddTeacherPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(
+     
+      ),
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
@@ -41,31 +42,34 @@ class AddTeacherPage extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 800),
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Add Teacher',
+                        isEdit ? 'Edit Teacher' : 'Add Teacher',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      const SizedBox(height: 10),
+
+                      const SizedBox(height: 20),
+
+                      /// PROFILE
                       Align(
                         alignment: Alignment.center,
                         child: Column(
                           children: [
-                            Text('Profile Photo (Max: 50 MB)'),
+                            const Text('Profile Photo (Max: 50 MB)'),
                             const SizedBox(height: 10),
                             InkWell(
                               onTap: () {},
-                              child: CircleAvatar(
+                              child: const CircleAvatar(
                                 radius: 35,
                                 child: ClipOval(
                                   child: SizedBox(
-                                    width: 60,
-                                    height: 60,
-                                    child: Image.asset(
-                                      'assets/images/logo.png',
+                                    width: 70,
+                                    height: 70,
+                                    child: Image(
+                                      image: AssetImage('assets/images/logo.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -75,121 +79,136 @@ class AddTeacherPage extends StatelessWidget {
                           ],
                         ),
                       ),
+
                       const SizedBox(height: 10),
+
+                      /// NAME
                       CustomWidgets().labelWithAsterisk('Name', required: true),
                       const SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
-                          context: context,
-                          hint: 'Enter teacher name',
-                          controller: c.nameController),
+                        context: context,
+                        hint: 'Enter teacher name',
+                        controller: c.nameController,
+                      ),
+
                       const SizedBox(height: 10),
-                      CustomWidgets()
-                          .labelWithAsterisk('Email', required: true),
+
+                      /// EMAIL
+                      CustomWidgets().labelWithAsterisk('Email', required: true),
                       const SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
-                          context: context,
-                          hint: 'Enter email address',
-                          controller: c.emailController),
+                        context: context,
+                        hint: 'Enter email address',
+                        controller: c.emailController,
+                      ),
+
                       const SizedBox(height: 10),
-                      CustomWidgets()
-                          .labelWithAsterisk('Phone Number', required: true),
+
+                      /// PHONE
+                      CustomWidgets().labelWithAsterisk('Phone Number', required: true),
                       CustomWidgets().dropdownStyledTextField(
-                          context: context,
-                          hint: '+1234567890',
-                          controller: c.phoneController,
-                          isNumber: true),
+                        context: context,
+                        hint: '+1234567890',
+                        controller: c.phoneController,
+                        isNumber: true,
+                      ),
+
                       const SizedBox(height: 10),
+
+                      /// WHATSAPP
                       CustomWidgets().labelWithAsterisk('WhatsApp Number'),
                       const SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
-                          context: context,
-                          hint: '+1234567890',
-                          controller: c.whatsappController,
-                          isNumber: true),
+                        context: context,
+                        hint: '+1234567890',
+                        controller: c.whatsappController,
+                        isNumber: true,
+                      ),
+
                       const SizedBox(height: 10),
-                      const SizedBox(height: 10),
+
+                      /// GENDER
                       CustomWidgets().labelWithAsterisk('Gender'),
                       const SizedBox(height: 10),
                       CustomWidgets().customDropdownField(
                         context: context,
                         hint: 'Select Gender',
-                        items: ['Male', 'Female'],
-                        onChanged: (p0) {},
+                        items: const ['Male', 'Female'],
+                        onChanged: (v) {},
                         itemLabel: (item) => item,
                       ),
+
                       const SizedBox(height: 10),
+
+                      /// PLACE
                       CustomWidgets().labelWithAsterisk('Place'),
                       CustomWidgets().dropdownStyledTextField(
-                          context: context,
-                          hint: 'Enter place',
-                          controller: c.placeController),
+                        context: context,
+                        hint: 'Enter place',
+                        controller: c.placeController,
+                      ),
+
                       const SizedBox(height: 10),
+
+                      /// PINCODE
                       CustomWidgets().labelWithAsterisk('Pincode'),
-                      const SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
-                          context: context,
-                          hint: 'Enter pincode/postal code',
-                          controller: c.pincodeController),
+                        context: context,
+                        hint: 'Enter pincode',
+                        controller: c.pincodeController,
+                      ),
+
                       const SizedBox(height: 10),
+
+                      /// ADDRESS
                       CustomWidgets().labelWithAsterisk('Address'),
-                      const SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
-                          context: context,
-                          hint: 'Enter address',
-                          controller: c.addressController),
+                        context: context,
+                        hint: 'Enter address',
+                        controller: c.addressController,
+                      ),
+
                       const SizedBox(height: 10),
+
+                      /// TIMEZONE
                       CustomWidgets().labelWithAsterisk('Time Zone'),
                       const SizedBox(height: 10),
                       CustomWidgets().customDropdownField(
                         context: context,
-                        itemLabel: (item) => item,
                         hint: 'Select Time Zone',
                         items: timezones,
-                        onChanged: (p0) {
-                          c.selectedTimezone.value = p0;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      CustomWidgets().labelWithAsterisk('Date of Birth'),
-                      CustomWidgets().dropdownStyledTextField(
-                          context: context,
-                          hint: 'Select date',
-                          controller: c.dobController),
-                      const SizedBox(height: 10),
-                      CustomWidgets().labelWithAsterisk('Qualification'),
-                      CustomWidgets().dropdownStyledTextField(
-                          context: context,
-                          hint: 'Enter qualification',
-                          controller: c.qualificationController),
-                      const SizedBox(height: 10),
-                      CustomWidgets().labelWithAsterisk('Preferred Language',
-                          required: true),
-                      CustomWidgets().customDropdownField(
-                        context: context,
-                        hint: 'Select Languages',
-                        items: const [
-                          'English',
-                          'Malayalam',
-                          'Hindi',
-                          'Tamil',
-                          'Arabic',
-                        ],
                         itemLabel: (item) => item,
-                        onChanged: (value) {
-                          c.prefLangController.text = value;
-                        },
+                        onChanged: (v) => c.selectedTimezone.value = v,
                       ),
 
                       const SizedBox(height: 10),
-                      CustomWidgets()
-                          .labelWithAsterisk('Tuition Mode', required: true),
+
+                      /// DOB
+                      CustomWidgets().labelWithAsterisk('Date of Birth'),
+                      CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Select date',
+                        controller: c.dobController,
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      /// QUALIFICATION
+                      CustomWidgets().labelWithAsterisk('Qualification'),
+                      CustomWidgets().dropdownStyledTextField(
+                        context: context,
+                        hint: 'Enter qualification',
+                        controller: c.qualificationController,
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      /// LANG
+                      CustomWidgets().labelWithAsterisk('Preferred Language'),
                       CustomWidgets().customDropdownField(
                         context: context,
-                        hint: 'Select Mode',
-                        items: const [
-                          'Online Tution',
-                          'Home Tution',
-                        ],
+                        hint: 'Select language',
+                        items: const ['English', 'Malayalam', 'Hindi', 'Tamil', 'Arabic'],
                         itemLabel: (item) => item,
                         onChanged: (value) {
                           c.tutionModeController.text = value;
@@ -288,8 +307,28 @@ class AddTeacherPage extends StatelessWidget {
                                   onPressed: () {
                                     c.addExperience();
                                   },
-                                  icon: Icon(Icons.add),
-                                  label: Text("Add Experience"),
+                                 icon: const Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                  ),
+                                  label: const Text(
+                                    "Add Experience",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withOpacity(0.8),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                      horizontal: 16,
+                                    ),
+                                  )
                                 ),
                               ),
 
@@ -386,7 +425,7 @@ class AddTeacherPage extends StatelessWidget {
 
                       const SizedBox(height: 20),
 
-                      /// SUBMIT BUTTON
+                      /// BUTTONS
                       Row(
                         children: [
                           Expanded(
@@ -411,11 +450,12 @@ class AddTeacherPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 10),
+
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 if (c.validateTeacher(context)) {
-                                  c.addTeacher();
+                                  isEdit ? c.updateTeacher() : c.addTeacher();
                                 }
                               },
                               icon: const Icon(Icons.add,
@@ -438,7 +478,7 @@ class AddTeacherPage extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -450,7 +490,6 @@ class AddTeacherPage extends StatelessWidget {
     );
   }
 }
-
 class ExperienceFormData {
   final companyController = TextEditingController();
   final yearController = TextEditingController();

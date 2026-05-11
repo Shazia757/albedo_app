@@ -572,4 +572,6 @@ bool validateStudent(BuildContext context) {
   return true;
 }
   void addStudent() {}
+
+  void updateStudent() {}
 }

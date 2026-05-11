@@ -16,11 +16,11 @@ class AssessmentsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: const CustomAppBar(),
-           backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: cs.surface,
       floatingActionButton: addAssessmentBtn(context),
       body: Row(
         children: [
@@ -30,83 +30,100 @@ class AssessmentsPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Obx(() {
                 final data = c.assessments;
-                int crossAxisCount = 1;
+                final cs = Theme.of(context).colorScheme;
 
                 if (c.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
+
                 if (data.isEmpty) {
                   return const Center(child: Text("No assessments found"));
                 }
 
-                if (Responsive.isTablet(context)) {
-                  crossAxisCount = 2;
-                } else if (Responsive.isDesktop(context)) {
-                  crossAxisCount = 3;
-                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// 🔥 PAGE TITLE (same style as before)
+                    Text(
+                      "Assessments",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
 
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = 1;
+                    const SizedBox(height: 12),
 
-                    if (constraints.maxWidth > 1200) {
-                      crossAxisCount = 3;
-                    } else if (constraints.maxWidth > 700) {
-                      crossAxisCount = 2;
-                    }
+                    /// GRID
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount = 1;
 
-                    return MasonryGridView.count(
-                      padding: const EdgeInsets.all(12),
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      itemCount: data.length,
-                      itemBuilder: (_, i) {
-                        final item = data[i];
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
 
-                        return CustomCard(
-                          c: c,
-                          content: Column(
-                            children: [
-                              Text(
-                                'Title',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.7),
+                          return MasonryGridView.count(
+                            padding: const EdgeInsets.all(12),
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            itemBuilder: (_, i) {
+                              final item = data[i];
+
+                              return CustomCard(
+                                c: c,
+                                content: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Assessment Type",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: cs.onSurface.withOpacity(0.6),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item.type ?? '-',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              Text(item.type ?? ''),
-                            ],
-                          ),
-                          actions: [
-                            CustomWidgets().iconBtn(
-                              icon: Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                              onTap: () {
-                                c.loadAssessments(item);
-                                editAssessment(context);
-                              },
-                            ),
-                            CustomWidgets().iconBtn(
-                              icon: Icons.delete,
-                              color: Theme.of(context).colorScheme.error,
-                              onTap: () => CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
-
-                                context: context,
-                                text:
-                                    'Are you sure you want to delete this assessment?',
-                                onConfirm: () => c.delete(item.id),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                                actions: [
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.edit,
+                                    color: cs.primary,
+                                    onTap: () {
+                                      c.loadAssessments(item);
+                                      editAssessment(context);
+                                    },
+                                  ),
+                                  const SizedBox(width: 10),
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.delete,
+                                    color: cs.error,
+                                    onTap: () =>
+                                        CustomWidgets().showDeleteDialog(
+                                      title: 'Are you sure?',
+                                      context: context,
+                                      text:
+                                          'Are you sure you want to delete this assessment?',
+                                      onConfirm: () => c.delete(item.id),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               }),
             ),
@@ -116,10 +133,11 @@ class AssessmentsPage extends StatelessWidget {
     );
   }
 
+  /// ================= EDIT =================
   void editAssessment(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: Text('Edit Assessment'),
+      title: const Text('Edit Assessment'),
       icon: Icons.edit,
       formKey: GlobalKey<FormState>(),
       sections: [
@@ -130,37 +148,40 @@ class AssessmentsPage extends StatelessWidget {
           hint: 'Enter title',
           controller: c.titleController,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
         CustomWidgets().labelWithAsterisk('Select Test Types'),
         const SizedBox(height: 10),
         MultiSelector<String>(
           items: c.testTypes,
           initial: List<String>.from(c.selectedTestType),
-          onChanged: (p0) {},
-          labelBuilder: (p0) => p0,
+          onChanged: (val) => c.selectedTestType.assignAll(val),
+          labelBuilder: (v) => v,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
         CustomWidgets().labelWithAsterisk('Select Attention Questions'),
         const SizedBox(height: 10),
         MultiSelector<String>(
           items: c.assessmentAttentionQn,
           initial: List<String>.from(c.selectedAttentionQns),
-          onChanged: (p0) {},
-          labelBuilder: (p0) => p0,
+          onChanged: (val) => c.selectedAttentionQns.assignAll(val),
+          labelBuilder: (v) => v,
         ),
       ],
       onSubmit: () {},
     );
   }
 
+  /// ================= ADD =================
   FloatingActionButton addAssessmentBtn(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return FloatingActionButton(
       onPressed: () {
         c.titleController.clear();
-        c.messageController.clear();
+
         CustomWidgets().showCustomDialog(
           context: context,
-          title: Text("Add Assessment"),
+          title: const Text("Add Assessment"),
           formKey: GlobalKey<FormState>(),
           onSubmit: () {},
           sections: [
@@ -171,34 +192,30 @@ class AssessmentsPage extends StatelessWidget {
               hint: 'Enter title',
               controller: c.titleController,
             ),
-            const SizedBox(height: 10),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             CustomWidgets().labelWithAsterisk('Select Test Types'),
             const SizedBox(height: 10),
             MultiSelector<String>(
               items: c.testTypes,
-              initial: [],
-              onChanged: (p0) {},
-              labelBuilder: (p0) => p0,
+              initial: const [],
+              onChanged: (val) => c.selectedTestType.assignAll(val),
+              labelBuilder: (v) => v,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             CustomWidgets().labelWithAsterisk('Select Attention Questions'),
             const SizedBox(height: 10),
             MultiSelector<String>(
               items: c.assessmentAttentionQn,
-              initial: [],
-              onChanged: (p0) {},
-              labelBuilder: (p0) => p0,
+              initial: const [],
+              onChanged: (val) => c.selectedAttentionQns.assignAll(val),
+              labelBuilder: (v) => v,
             ),
           ],
         );
       },
       mini: true,
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
+      backgroundColor: cs.primary,
+      child: Icon(Icons.add, color: cs.onPrimary),
     );
   }
 }

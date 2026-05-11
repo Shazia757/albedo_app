@@ -1,16 +1,19 @@
-import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/feedback_controller.dart';
-import 'package:albedo_app/controller/request_controller.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
-import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
 
 class MentorFeedbackPage extends StatelessWidget {
-  MentorFeedbackPage({super.key});
+  MentorFeedbackPage({
+    super.key,
+    required this.title,
+    required this.role,
+  });
+
+  final String title;
+  final String role;
 
   final c = FeedbackController();
 
@@ -22,6 +25,9 @@ class MentorFeedbackPage extends StatelessWidget {
       "mentorName": "Mentor ${i % 5}",
       "mentorId": "MEN00${i % 5}",
       "mentorImage": "https://i.pravatar.cc/150?img=${i + 20}",
+      "teacherName": "Teacher ${i % 4}",
+      "teacherId": "TCH00${i % 4}",
+      "teacherImage": "https://i.pravatar.cc/150?img=${i + 30}",
       "rating": (i % 5) + 1,
       "description": [
         "Great mentor, explains concepts clearly and is very supportive.",
@@ -43,6 +49,11 @@ class MentorFeedbackPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.of(context).size.width > 900;
+    final filteredFeedbacks = feedbacks.where((f) {
+      return role == "teacher"
+          ? f.containsKey("teacherName")
+          : f.containsKey("mentorName");
+    }).toList();
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -58,7 +69,9 @@ class MentorFeedbackPage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 15.0, vertical: 12),
                   child: Text(
-                    'Mentor Feedbacks',
+                    role == "teacher"
+                        ? "Teacher Feedbacks"
+                        : "Mentor Feedbacks",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -87,10 +100,10 @@ class MentorFeedbackPage extends StatelessWidget {
                         crossAxisCount: crossAxisCount,
                         mainAxisSpacing: 12,
                         crossAxisSpacing: 12,
-                        itemCount: feedbacks.length,
+                        itemCount: filteredFeedbacks.length,
                         itemBuilder: (context, index) {
-                          final r = feedbacks[index];
-                          return FeedbackCard(data: r);
+                          final r = filteredFeedbacks[index];
+                          return FeedbackCard(data: r, role: role);
                         },
                       );
                     },
@@ -107,8 +120,13 @@ class MentorFeedbackPage extends StatelessWidget {
 
 class FeedbackCard extends StatelessWidget {
   final Map<String, dynamic> data;
+  final String role;
 
-  const FeedbackCard({super.key, required this.data});
+  const FeedbackCard({
+    super.key,
+    required this.data,
+    required this.role,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -204,23 +222,28 @@ class FeedbackCard extends StatelessWidget {
           ),
 
           /// 🔹 MENTOR SECTION (UPGRADED)
+          /// 🔹 PERSON SECTION (MENTOR / TEACHER)
           Row(
             children: [
-              /// AVATAR
               CircleAvatar(
                 radius: 16,
-                backgroundImage: NetworkImage(data["mentorImage"]),
+                backgroundImage: NetworkImage(
+                  role == "teacher"
+                      ? data["teacherImage"]
+                      : data["mentorImage"],
+                ),
               ),
 
               const SizedBox(width: 8),
 
-              /// NAME + ID
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data["mentorName"],
+                      role == "teacher"
+                          ? data["teacherName"]
+                          : data["mentorName"],
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -228,7 +251,7 @@ class FeedbackCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      data["mentorId"],
+                      role == "teacher" ? data["teacherId"] : data["mentorId"],
                       style: TextStyle(
                         fontSize: 11,
                         color: cs.onSurface.withOpacity(0.6),
@@ -238,13 +261,22 @@ class FeedbackCard extends StatelessWidget {
                 ),
               ),
 
-              /// LABEL
-              Text(
-                "Mentor",
-                style: TextStyle(
-                  fontSize: 11,
-                  color: cs.onSurface.withOpacity(0.5),
-                  fontWeight: FontWeight.w500,
+              /// LABEL CHIP (better UI than plain text)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: role == "teacher"
+                      ? Colors.blue.withOpacity(0.1)
+                      : Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  role == "teacher" ? "Teacher" : "Mentor",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: role == "teacher" ? Colors.blue : Colors.green,
+                  ),
                 ),
               ),
             ],

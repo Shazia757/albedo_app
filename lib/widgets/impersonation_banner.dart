@@ -27,7 +27,7 @@ class ImpersonationBanner extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  "Impersonating ${user?.name ?? ''} (${user?.role})",
+                  "Impersonating ${user?.name ?? ''}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,

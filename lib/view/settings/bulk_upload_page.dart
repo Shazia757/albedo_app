@@ -1,151 +1,157 @@
+import 'package:albedo_app/controller/settings_controller.dart';
+import 'package:albedo_app/view/settings/banner_ads_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
+import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class BulkUploadPage extends StatelessWidget {
   const BulkUploadPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDesktop = Responsive.isDesktop(context);
+    final c = Get.put(SettingsController());
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-
-      appBar: CustomAppBar(),
-      body: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Bulk Upload Settings',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Easily download sample CSV templates for bulk uploading students, teachers, or mentors.',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              const SizedBox(height: 20),
-
-              // Template Download Buttons
-              SizedBox(
-                width: double.infinity,
-                height: 45,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Trigger upload logic
-                  },
-                  icon: const Icon(
-                    Icons.download,
-                    color: Colors.white,
-                  ),
-                  label: const Text('Sample CSV - Students'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primary, // Deep Purple
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+      backgroundColor: cs.surface,
+      appBar: const CustomAppBar(),
+      body: Row(
+        children: [
+          if (isDesktop) const DrawerMenu(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// TITLE (outside card)
+                    Text(
+                      "Bulk Upload",
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 45,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Trigger upload logic
-                  },
-                  icon: const Icon(
-                    Icons.download,
-                    color: Colors.white,
-                  ),
-                  label: const Text('Sample CSV - Teachers'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // Deep Purple
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
+                    const SizedBox(height: 12),
 
-              SizedBox(
-                width: double.infinity,
-                height: 45,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Trigger upload logic
-                  },
-                  icon: const Icon(
-                    Icons.download,
-                    color: Colors.white,
-                  ),
-                  label: const Text('Sample CSV - Mentors'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange, // Deep Purple
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    /// MAIN CARD
+                    CustomCard(
+                      c: c,
+                      content: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Download sample CSV templates or upload bulk data for students, teachers, and mentors.",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: cs.onSurface.withOpacity(0.6),
+                              height: 1.4,
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          /// TEMPLATE BUTTONS
+                          _actionButton(
+                            context,
+                            label: "Sample CSV - Students",
+                            icon: Icons.download,
+                            color: cs.primary,
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 12),
+
+                          _actionButton(
+                            context,
+                            label: "Sample CSV - Teachers",
+                            icon: Icons.download,
+                            color: Colors.green,
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 12),
+
+                          _actionButton(
+                            context,
+                            label: "Sample CSV - Mentors",
+                            icon: Icons.download,
+                            color: Colors.orange,
+                            onTap: () {},
+                          ),
+
+                          const SizedBox(height: 16),
+                          Divider(color: cs.outline.withOpacity(0.2)),
+                          const SizedBox(height: 16),
+
+                          /// PRIMARY UPLOAD BUTTON
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              onPressed: () {},
+                              icon: const Icon(Icons.cloud_upload),
+                              label: const Text("Bulk Upload"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: cs.primary,
+                                foregroundColor: cs.onPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 16),
-              const Divider(),
-              const SizedBox(height: 16),
-
-              // Primary Upload Button
-              SizedBox(
-                width: double.infinity,
-                height: 45,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Trigger upload logic
-                  },
-                  icon: const Icon(Icons.cloud_upload),
-                  label: const Text('Bulk Upload'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF673AB7), // Deep Purple
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildTemplateButton(IconData icon, String label, Color color) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+  Widget _label(ColorScheme cs, String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        color: cs.onSurface.withOpacity(0.6),
+      ),
+    );
+  }
+
+  Widget _actionButton(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
       child: OutlinedButton.icon(
-        onPressed: () {},
+        onPressed: onTap,
         icon: Icon(icon, size: 18, color: color),
-        label: Text(label, style: const TextStyle(color: Colors.black87)),
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 45),
-          alignment: Alignment.centerLeft,
-          side: BorderSide(color: Colors.grey.shade300),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: cs.onSurface,
+            fontWeight: FontWeight.w500,
           ),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: cs.outline.withOpacity(0.3)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          alignment: Alignment.centerLeft,
         ),
       ),
     );

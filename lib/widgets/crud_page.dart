@@ -1,5 +1,6 @@
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -33,31 +34,84 @@ class CrudPage<T> extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: const CustomAppBar(),
       backgroundColor: cs.surface,
       floatingActionButton: enableAdd
-          ? FloatingActionButton.extended(
+          ? FloatingActionButton(
+              mini: true,
               onPressed: () => _openAdd(context),
-              icon: const Icon(Icons.add),
-              label: const Text('Add'),
+              backgroundColor: cs.primary,
+              child: Icon(
+                Icons.add,
+                color: cs.onPrimary,
+              ),
             )
           : null,
       body: Row(
         children: [
-          /// 🧭 Desktop Drawer
           if (MediaQuery.of(context).size.width > 900) const DrawerMenu(),
-
-          /// 📦 Main Content
           Expanded(
-            child: items.isEmpty
-                ? _EmptyState(
-                    onAdd: enableAdd ? () => _openAdd(context) : null,
-                  )
-                : ResponsiveMasonry(
-                    children: List.generate(items.length, (i) {
-                      return itemBuilder(items[i], i);
-                    }),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// ── PAGE TITLE ─────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    16,
+                    16,
+                    16,
+                    8,
                   ),
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ),
+
+                /// ── CONTENT ────────────────────────
+                Expanded(
+                  child: items.isEmpty
+                      ? _EmptyState(
+                          onAdd: enableAdd ? () => _openAdd(context) : null,
+                        )
+                      : LayoutBuilder(
+                          builder: (context, constraints) {
+                            int crossAxisCount = 1;
+
+                            if (constraints.maxWidth > 1200) {
+                              crossAxisCount = 4;
+                            } else if (constraints.maxWidth > 900) {
+                              crossAxisCount = 3;
+                            } else if (constraints.maxWidth > 600) {
+                              crossAxisCount = 2;
+                            }
+
+                            return MasonryGridView.count(
+                              crossAxisCount: crossAxisCount,
+                              padding: const EdgeInsets.fromLTRB(
+                                16,
+                                8,
+                                16,
+                                24,
+                              ),
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: items.length,
+                              itemBuilder: (_, i) {
+                                return itemBuilder(
+                                  items[i],
+                                  i,
+                                );
+                              },
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -71,17 +125,21 @@ class CrudPage<T> extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Add Item'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        title: const Text(
+          'Add Item',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         content: Form(
           key: formKey,
-          child: TextFormField(
+          child: CustomWidgets().dropdownStyledTextField(
+            context: context,
             controller: ctrl,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              border: OutlineInputBorder(),
-            ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Enter value' : null,
+            hint: 'Enter value',
           ),
         ),
         actions: [
@@ -89,13 +147,15 @@ class CrudPage<T> extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          FilledButton.icon(
             onPressed: () async {
               if (formKey.currentState?.validate() != true) return;
+
               await onAdd(ctrl.text.trim());
+
               Navigator.pop(context);
             },
-            child: const Text('Add'),
+            label: const Text('Add'),
           )
         ],
       ),
@@ -115,74 +175,60 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.inbox_outlined, size: 64, color: cs.outline),
-        const SizedBox(height: 12),
-        Text('No items yet', style: TextStyle(color: cs.onSurfaceVariant)),
-        if (onAdd != null) ...[
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: onAdd,
-            icon: const Icon(Icons.add),
-            label: const Text('Add Item'),
-          )
-        ]
-      ],
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                color: cs.primary.withOpacity(.08),
+                borderRadius: BorderRadius.circular(28),
+              ),
+              child: Icon(
+                Icons.inbox_rounded,
+                size: 42,
+                color: cs.primary,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              'No items yet',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: cs.onSurface,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Create your first item to get started',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: cs.outline,
+              ),
+            ),
+            if (onAdd != null) ...[
+              const SizedBox(height: 22),
+              FilledButton.icon(
+                onPressed: onAdd,
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Add Item'),
+              ),
+            ]
+          ],
+        ),
+      ),
     );
   }
 }
 
 /// ==============================
-/// RESPONSIVE MASONRY
+/// EDITABLE TILE
 /// ==============================
-
-class ResponsiveMasonry extends StatelessWidget {
-  final List<Widget> children;
-
-  const ResponsiveMasonry({super.key, required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-
-    // 📱 Mobile → list
-    if (width < 600) {
-      return ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: children.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (_, i) => children[i],
-      );
-    }
-
-    // 📟 Tablet → 2 columns
-    if (width < 900) {
-      return MasonryGridView.count(
-        padding: const EdgeInsets.all(16),
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        itemCount: children.length,
-        itemBuilder: (_, i) => children[i],
-      );
-    }
-
-    // 💻 Desktop → responsive columns
-    final crossAxisCount = (width ~/ 320).clamp(2, 5);
-
-    return MasonryGridView.count(
-      padding: const EdgeInsets.all(16),
-      crossAxisCount: crossAxisCount,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      itemCount: children.length,
-      itemBuilder: (_, i) => children[i],
-    );
-  }
-}
-
 class EditableTile extends StatefulWidget {
   final String value;
   final ValueChanged<String> onSave;
@@ -203,6 +249,7 @@ class EditableTile extends StatefulWidget {
 
 class _EditableTileState extends State<EditableTile> {
   late TextEditingController _ctrl;
+
   bool _editing = false;
 
   @override
@@ -214,8 +261,9 @@ class _EditableTileState extends State<EditableTile> {
   @override
   void didUpdateWidget(covariant EditableTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (!_editing && oldWidget.value != widget.value) {
-      _ctrl.text = widget.value; // keep in sync with source
+      _ctrl.text = widget.value;
     }
   }
 
@@ -227,13 +275,17 @@ class _EditableTileState extends State<EditableTile> {
 
   void _save() {
     final v = _ctrl.text.trim();
+
     if (v.isEmpty) return;
+
     widget.onSave(v);
+
     setState(() => _editing = false);
   }
 
   void _cancel() {
     _ctrl.text = widget.value;
+
     setState(() => _editing = false);
   }
 
@@ -241,81 +293,110 @@ class _EditableTileState extends State<EditableTile> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outlineVariant),
+        color: cs.onPrimary,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: cs.outline.withOpacity(.5),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: cs.shadow.withOpacity(.04),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: cs.primaryContainer,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(widget.icon, color: cs.onPrimaryContainer),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: cs.primary.withOpacity(.08),
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _editing
-                  ? TextField(
-                      controller: _ctrl,
-                      autofocus: true,
-                      textInputAction: TextInputAction.done,
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        border: InputBorder.none,
-                        hintText: 'Enter value',
-                      ),
-                      onSubmitted: (_) => _save(),
-                    )
-                  : Text(
-                      widget.value,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+            child: Icon(
+              widget.icon,
+              color: cs.primary,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: _editing
+                ? TextField(
+                    controller: _ctrl,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: 'Enter value',
+                      filled: true,
+                      isDense: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-            ),
-            const SizedBox(width: 8),
-            if (_editing) ...[
-              IconButton(
-                tooltip: 'Save',
-                icon: const Icon(Icons.check),
-                onPressed: _save,
-              ),
-              IconButton(
-                tooltip: 'Cancel',
-                icon: const Icon(Icons.close),
-                onPressed: _cancel,
-              ),
-            ] else ...[
-              if (!_editing) ...[
-                IconButton(
-                  tooltip: 'Edit',
-                  icon: const Icon(Icons.edit_outlined),
-                  onPressed: () => setState(() => _editing = true),
-                ),
-                if (widget.onDelete != null)
-                  IconButton(
-                    tooltip: 'Delete',
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: widget.onDelete,
+                    onSubmitted: (_) => _save(),
+                  )
+                : Text(
+                    widget.value,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface,
+                    ),
                   ),
-              ]
-            ]
-          ],
-        ),
+          ),
+          const SizedBox(width: 8),
+          if (_editing) ...[
+            IconButton(
+              tooltip: 'Save',
+              icon: Icon(
+                Icons.check_circle_rounded,
+                color: Colors.green.shade600,
+              ),
+              onPressed: _save,
+            ),
+            IconButton(
+              tooltip: 'Cancel',
+              icon: Icon(
+                Icons.cancel_rounded,
+                color: cs.outline,
+              ),
+              onPressed: _cancel,
+            ),
+          ] else ...[
+            IconButton(
+              tooltip: 'Edit',
+              icon: Icon(
+                Icons.edit_rounded,
+                color: cs.primary,
+              ),
+              onPressed: () {
+                setState(() => _editing = true);
+              },
+            ),
+            if (widget.onDelete != null)
+              IconButton(
+                tooltip: 'Delete',
+                icon: const Icon(
+                  Icons.delete_rounded,
+                  color: Colors.red,
+                ),
+                onPressed: widget.onDelete,
+              ),
+          ]
+        ],
       ),
     );
   }
 }
 
+/// ==============================
+/// VIEW EDIT TILE
+/// ==============================
 class ViewEditTile extends StatelessWidget {
   final String value;
   final IconData icon;
@@ -335,43 +416,58 @@ class ViewEditTile extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(22),
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: cs.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outlineVariant),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: cs.primaryContainer,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(icon, color: cs.onPrimaryContainer),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              IconButton(
-                tooltip: 'Edit',
-                icon: const Icon(Icons.edit_outlined),
-                onPressed: onEdit,
-              ),
-            ],
+          color: cs.onPrimary,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: cs.outline.withOpacity(.12),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: cs.shadow.withOpacity(.04),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: cs.primary.withOpacity(.08),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                icon,
+                color: cs.primary,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface,
+                ),
+              ),
+            ),
+            IconButton(
+              tooltip: 'Edit',
+              icon: Icon(
+                Icons.edit_rounded,
+                color: cs.primary,
+              ),
+              onPressed: onEdit,
+            ),
+          ],
         ),
       ),
     );

@@ -20,8 +20,7 @@ class MaterialsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: addMaterialBtn(context),
       body: Row(
         children: [
@@ -31,73 +30,103 @@ class MaterialsPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Obx(() {
                 final data = c.materials;
-                int crossAxisCount = 1;
+                final cs = Theme.of(context).colorScheme;
 
                 if (c.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
+
                 if (data.isEmpty) {
                   return const Center(child: Text("No materials found"));
                 }
 
-                if (Responsive.isTablet(context)) {
-                  crossAxisCount = 2;
-                } else if (Responsive.isDesktop(context)) {
-                  crossAxisCount = 3;
-                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// 🔥 PAGE TITLE
+                    Text(
+                      "Materials",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
 
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = 1;
+                    const SizedBox(height: 12),
 
-                    if (constraints.maxWidth > 1200) {
-                      crossAxisCount = 3;
-                    } else if (constraints.maxWidth > 700) {
-                      crossAxisCount = 2;
-                    }
+                    /// GRID
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount = 1;
 
-                    return MasonryGridView.count(
-                      padding: const EdgeInsets.all(12),
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      itemCount: data.length,
-                      itemBuilder: (_, i) {
-                        final item = data[i];
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
 
-                        return CustomCard(
-                          c: c,
-                          content: Column(
-                            children: [
-                              Text(item.title ?? ''),
-                            ],
-                          ),
-                          actions: [
-                            CustomWidgets().iconBtn(
-                              icon: Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                              onTap: () {
-                                c.loadMaterials(item);
-                                editMaterials(context);
-                              },
-                            ),
-                            CustomWidgets().iconBtn(
-                              icon: Icons.delete,
-                              color: Theme.of(context).colorScheme.error,
-                              onTap: () => CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
+                          return MasonryGridView.count(
+                            padding: const EdgeInsets.all(12),
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            itemBuilder: (_, i) {
+                              final item = data[i];
 
-                                context: context,
-                                text:
-                                    'Are you sure you want to delete this assessment?',
-                                onConfirm: () => c.delete(item.id),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                              return CustomCard(
+                                c: c,
+
+                                /// 🔥 CLEAN CARD CONTENT
+                                content: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Material Title",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: cs.onSurface.withOpacity(0.6),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item.title ?? '-',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                actions: [
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.edit,
+                                    color: cs.primary,
+                                    onTap: () {
+                                      c.loadMaterials(item);
+                                      editMaterials(context);
+                                    },
+                                  ),
+                                  const SizedBox(width: 10),
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.delete,
+                                    color: cs.error,
+                                    onTap: () =>
+                                        CustomWidgets().showDeleteDialog(
+                                      title: 'Are you sure?',
+                                      context: context,
+                                      text:
+                                          'Are you sure you want to delete this material?',
+                                      onConfirm: () => c.delete(item.id),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               }),
             ),

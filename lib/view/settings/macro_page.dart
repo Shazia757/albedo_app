@@ -17,11 +17,11 @@ class MacroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: const CustomAppBar(),
-         backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: cs.surface,
       floatingActionButton: addSupportBtn(context),
       body: Row(
         children: [
@@ -31,96 +31,104 @@ class MacroPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Obx(() {
                 final data = c.supports;
-                int crossAxisCount = 1;
 
                 if (c.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
+
                 if (data.isEmpty) {
-                  return const Center(child: Text("No hiring ads found"));
+                  return const Center(child: Text("No supports found"));
                 }
 
-                if (Responsive.isTablet(context)) {
-                  crossAxisCount = 2;
-                } else if (Responsive.isDesktop(context)) {
-                  crossAxisCount = 3;
-                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// TITLE (outside grid)
+                    Text(
+                      " Macro",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 12),
 
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = 1;
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount = 1;
 
-                    if (constraints.maxWidth > 1200) {
-                      crossAxisCount = 3;
-                    } else if (constraints.maxWidth > 700) {
-                      crossAxisCount = 2;
-                    }
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
 
-                    return MasonryGridView.count(
-                      padding: const EdgeInsets.all(12),
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      itemCount: data.length,
-                      itemBuilder: (_, i) {
-                        final item = data[i];
+                          return MasonryGridView.count(
+                            padding: const EdgeInsets.all(12),
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            itemBuilder: (_, i) {
+                              final item = data[i];
 
-                        return CustomCard(
-                          c: c,
-                          content: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Title',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.7),
+                              return CustomCard(
+                                c: c,
+
+                                /// CONTENT (modern style)
+                                content: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _label(cs, "Title"),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item.title ?? '-',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    _label(cs, "Description"),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item.description ?? '-',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              Text(item.title),
-                              const SizedBox(height: 10),
-                              Text(
-                                'Description',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.7),
-                                ),
-                              ),
-                              Text(item.description)
-                            ],
-                          ),
-                          actions: [
-                            CustomWidgets().iconBtn(
-                              icon: Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                              onTap: () {
-                                c.loadSupports(item);
-                                editMacro(context);
-                              },
-                            ),
-                            CustomWidgets().iconBtn(
-                              icon: Icons.delete,
-                              color: Theme.of(context).colorScheme.error,
-                              onTap: () => CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
 
-                                context: context,
-                                text:
-                                    'Are you sure you want to delete this hiring ad?',
-                                onConfirm: () => c.delete(item.id),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                                actions: [
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.edit,
+                                    color: cs.primary,
+                                    onTap: () {
+                                      c.loadSupports(item);
+                                      editMacro(context);
+                                    },
+                                  ),
+                                  const SizedBox(width: 10),
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.delete,
+                                    color: cs.error,
+                                    onTap: () =>
+                                        CustomWidgets().showDeleteDialog(
+                                      title: 'Are you sure?',
+                                      context: context,
+                                      text:
+                                          'Are you sure you want to delete this support item?',
+                                      onConfirm: () => c.delete(item.id),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               }),
             ),
@@ -130,10 +138,21 @@ class MacroPage extends StatelessWidget {
     );
   }
 
+  Widget _label(ColorScheme cs, String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 11,
+        color: cs.onSurface.withOpacity(0.6),
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
   void editMacro(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: Text('Edit Support'),
+      title: const Text('Edit Support'),
       icon: Icons.edit,
       formKey: GlobalKey<FormState>(),
       sections: [
@@ -151,8 +170,8 @@ class MacroPage extends StatelessWidget {
           context: context,
           hint: 'Enter description',
           controller: c.messageController,
+          isMultiline: true,
         ),
-        const SizedBox(height: 10),
       ],
       onSubmit: () {},
     );
@@ -163,9 +182,10 @@ class MacroPage extends StatelessWidget {
       onPressed: () {
         c.titleController.clear();
         c.messageController.clear();
+
         CustomWidgets().showCustomDialog(
           context: context,
-          title: Text("Add Support"),
+          title: const Text("Add Support"),
           formKey: GlobalKey<FormState>(),
           onSubmit: () {},
           sections: [
@@ -183,8 +203,8 @@ class MacroPage extends StatelessWidget {
               context: context,
               hint: 'Enter description',
               controller: c.messageController,
+              isMultiline: true,
             ),
-            const SizedBox(height: 10),
           ],
         );
       },

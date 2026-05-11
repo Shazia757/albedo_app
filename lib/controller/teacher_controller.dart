@@ -675,4 +675,6 @@ class TeacherController extends GetxController {
 
     return true;
   }
+
+  updateTeacher() {}
 }

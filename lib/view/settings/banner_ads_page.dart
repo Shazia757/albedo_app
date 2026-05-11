@@ -19,82 +19,102 @@ class BannerAdsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-           backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: addBannerBtn(context),
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Obx(() {
-                final data = c.banners;
-                int crossAxisCount = 1;
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// ── PAGE TITLE ─────────────────────
+                  Text(
+                    "Banner Advertisements",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
 
-                if (c.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (data.isEmpty) {
-                  return const Center(child: Text("No banners found"));
-                }
+                  const SizedBox(height: 24),
 
-                if (Responsive.isTablet(context)) {
-                  crossAxisCount = 2;
-                } else if (Responsive.isDesktop(context)) {
-                  crossAxisCount = 3;
-                }
+                  /// ── CONTENT ────────────────────────
+                  Expanded(
+                    child: Obx(() {
+                      final data = c.banners;
 
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = 1;
-
-                    if (constraints.maxWidth > 1200) {
-                      crossAxisCount = 3;
-                    } else if (constraints.maxWidth > 700) {
-                      crossAxisCount = 2;
-                    }
-
-                    return MasonryGridView.count(
-                      padding: const EdgeInsets.all(12),
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      itemCount: data.length,
-                      itemBuilder: (_, i) {
-                        final item = data[i];
-
-                        return CustomCard(
-                          c: c,
-                          visibleTo: item.visibleTo,
-                          actions: [
-                            CustomWidgets().iconBtn(
-                              icon: Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                              onTap: () {
-                                c.loadBanners(item);
-                                editBanner(context);
-                              },
-                            ),
-                            CustomWidgets().iconBtn(
-                              icon: Icons.delete,
-                              color: Theme.of(context).colorScheme.error,
-                              onTap: () => CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
-
-                                context: context,
-                                text:
-                                    'Are you sure you want to delete this action?',
-                                onConfirm: () => c.delete(item.id),
-                              ),
-                            ),
-                          ],
+                      if (c.isLoading.value) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
                         );
-                      },
-                    );
-                  },
-                );
-              }),
+                      }
+
+                      if (data.isEmpty) {
+                        return const Center(
+                          child: Text("No banners found"),
+                        );
+                      }
+
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount = 1;
+
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
+
+                          return MasonryGridView.count(
+                            padding: EdgeInsets.zero,
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (_, i) {
+                              final item = data[i];
+
+                              return CustomCard(
+                                title: item.url,
+                                c: c,
+                                visibleTo: item.visibleTo,
+                                actions: [
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.edit,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    onTap: () {
+                                      c.loadBanners(item);
+                                      editBanner(context);
+                                    },
+                                  ),
+                                  const SizedBox(width: 10),
+                                  CustomWidgets().iconBtn(
+                                    icon: Icons.delete,
+                                    color: Theme.of(context).colorScheme.error,
+                                    onTap: () {
+                                      CustomWidgets().showDeleteDialog(
+                                        title: 'Are you sure?',
+                                        context: context,
+                                        text:
+                                            'Are you sure you want to delete this action?',
+                                        onConfirm: () => c.delete(item.id),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -299,101 +319,139 @@ class CustomCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cs.onPrimary,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: cs.outlineVariant),
+        border: Border.all(
+          color: cs.outline.withOpacity(.5),
+        ),
         boxShadow: [
           BoxShadow(
-            color: cs.shadow.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: cs.shadow.withOpacity(.03),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// 🔥 Header
+          /// HEADER
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (isImportant)
-                Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: cs.errorContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(Icons.priority_high,
-                      size: 16, color: cs.onErrorContainer),
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: cs.primary.withOpacity(.08),
+                  borderRadius: BorderRadius.circular(14),
                 ),
+                child: Icon(
+                  Icons.image_outlined,
+                  color: cs.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  title ?? '',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title ?? '',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                    if (isImportant) ...[
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: cs.error.withOpacity(.08),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Text(
+                          "IMPORTANT",
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1,
+                            color: cs.error,
+                          ),
+                        ),
+                      ),
+                    ]
+                  ],
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 8),
           if (content != null) ...[
+            const SizedBox(height: 14),
             content!,
-            const SizedBox(height: 10),
           ],
 
-          const SizedBox(height: 10),
-
-          /// 🔥 Visible To Chips
           if ((visibleTo ?? []).isNotEmpty) ...[
+            const SizedBox(height: 14),
             Text(
-              'Shown in:',
+              "VISIBLE TO",
               style: TextStyle(
-                fontSize: 11,
-                color: cs.onSurface.withOpacity(0.9),
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1,
+                color: cs.outline,
               ),
             ),
             const SizedBox(height: 10),
             Wrap(
-              spacing: 6,
-              runSpacing: 6,
+              spacing: 8,
+              runSpacing: 8,
               children: (visibleTo ?? []).map((v) {
                 return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: cs.primaryContainer.withOpacity(0.6),
-                    borderRadius:
-                        BorderRadius.circular(50), // 🔥 fully rounded pill
+                    color: cs.primary.withOpacity(.08),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                   child: Text(
                     c.getLabel(v),
                     style: TextStyle(
-                      fontSize: 10, // 🔥 smaller text
-                      fontWeight: FontWeight.w500,
-                      color: cs.onPrimaryContainer,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: cs.primary,
                     ),
                   ),
                 );
               }).toList(),
             ),
           ],
-          const SizedBox(height: 12),
 
-          /// 🔥 Actions
-          if (actions != null && actions!.isNotEmpty)
-            Align(
-              alignment: Alignment.centerRight,
-              child: Wrap(
-                spacing: 6,
-                children: actions!,
-              ),
+          if (actions != null && actions!.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Divider(
+              height: 1,
+              color: cs.outline.withOpacity(.08),
             ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: actions!,
+            ),
+          ],
         ],
       ),
     );
@@ -447,7 +505,7 @@ class _MultiSelectorState<T> extends State<MultiSelector<T>> {
         if (isAllSelected) {
           selected.clear(); // unselect all
         } else {
-          selected = List<T>.from(allExceptAll); // ✅ select everything
+          selected = List<T>.from(allExceptAll); 
         }
       } else {
         if (selected.contains(value)) {

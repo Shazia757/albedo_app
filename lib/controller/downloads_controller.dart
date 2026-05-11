@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 
 class DownloadsController extends GetxController {
   var assessments = <Assessment>[].obs;
+var selectedIndex=0.obs;
+
+List<String> tabs =['Certificates', 'Assessments'];
 
   @override
   void onInit() {

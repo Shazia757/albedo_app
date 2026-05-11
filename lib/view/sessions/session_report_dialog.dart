@@ -109,7 +109,7 @@ class _StatusToggle extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: cs.outlineVariant.withOpacity(0.3)),
+        border: Border.all(color: cs.outline.withOpacity(0.5)),
       ),
       child: Row(
         children: [

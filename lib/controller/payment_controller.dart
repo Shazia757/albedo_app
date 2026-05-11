@@ -1,7 +1,6 @@
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
-import 'package:albedo_app/model/wallet_model.dart';
 import 'package:get/get.dart';
 
 class PaymentController extends GetxController {
@@ -12,7 +11,7 @@ class PaymentController extends GetxController {
   RxBool isSearching = false.obs;
   var selectedTab = 0.obs; // 0 = pending, 1 = approved
   final tabs = ["Pending", "Approved"];
-  
+
   List<String> studentTabs = [
     "Dep Pending",
     "Dep Approved",
@@ -267,6 +266,28 @@ class PaymentController extends GetxController {
 
       filteredTeacherPayments.assignAll(temp);
     }
+
+    /// ───── BATCH FILTER ─────
+    List<BatchPaymentModel> batchTemp = [];
+
+    final tab = selectedTab.value == 0 ? "pending" : "completed";
+
+    for (final batch in batchPayments) {
+      final filteredPayments =
+          batch.payments.where((p) => p.status == tab).toList();
+
+      if (filteredPayments.isNotEmpty) {
+        batchTemp.add(
+          BatchPaymentModel(
+            batch: batch.batch,
+            status: tab,
+            payments: filteredPayments,
+          ),
+        );
+      }
+    }
+
+    filteredBatchPayments.assignAll(batchTemp);
   }
 
   int get pendingCount =>
@@ -341,9 +362,4 @@ class PaymentController extends GetxController {
         {"label": "Pending", "count": pendingCount},
         {"label": "Approved", "count": approvedCount},
       ];
-
-
- 
-
-
 }
