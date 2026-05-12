@@ -56,40 +56,43 @@ class StudentPackagesPage extends StatelessWidget {
             );
           }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Page title ──────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child: Text(
-                  "My Packages",
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Page title ──────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "My Packages",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.3,
-                      ),
+                        color: cs.primary),
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 14),
+                SizedBox(height: 14),
 
-              // ── Grid ────────────────────────────────────────────
-              Expanded(
-                child: MasonryGridView.count(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                  crossAxisCount: constraints.maxWidth > 900
-                      ? 3
-                      : constraints.maxWidth > 600
-                          ? 2
-                          : 1,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  itemCount: packages.length,
-                  itemBuilder: (context, index) =>
-                      _PackageCard(data: packages[index], cs: cs),
+                // ── Grid ────────────────────────────────────────────
+                Expanded(
+                  child: MasonryGridView.count(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    crossAxisCount: constraints.maxWidth > 900
+                        ? 3
+                        : constraints.maxWidth > 600
+                            ? 2
+                            : 1,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    itemCount: packages.length,
+                    itemBuilder: (context, index) =>
+                        _PackageCard(data: packages[index], cs: cs),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
@@ -148,26 +151,25 @@ class _PackageCard extends StatelessWidget {
                       ),
                       backgroundColor: cs.surfaceContainerHighest,
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             data["teacherName"],
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: cs.onSurface,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall!
+                                .copyWith(color: cs.onSurface),
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: 2),
                           Text(
                             "${data["teacherId"]} • ${data["subjectId"]}",
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: cs.onSurface.withOpacity(0.5),
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall!
+                                .copyWith(color: cs.onSurface.withOpacity(0.5)),
                           ),
                         ],
                       ),
@@ -179,31 +181,29 @@ class _PackageCard extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
                 /// subject
                 Text(
                   data["subjectName"],
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.2,
-                    color: cs.onSurface,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(letterSpacing: -0.2, color: cs.onSurface),
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
 
                 /// tags (same style as your system chips)
                 Row(
                   children: [
                     _Tag(label: data["standard"], cs: cs),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     _Tag(label: data["syllabus"], cs: cs),
                   ],
                 ),
 
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
 
                 /// fee row (cleaner layout)
                 Row(
@@ -215,7 +215,7 @@ class _PackageCard extends StatelessWidget {
                         cs: cs,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Expanded(
                       child: _FeeStat(
                         label: "Paid",
@@ -224,7 +224,7 @@ class _PackageCard extends StatelessWidget {
                         cs: cs,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Expanded(
                       child: _FeeStat(
                         label: "Balance",
@@ -238,7 +238,7 @@ class _PackageCard extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
                 /// progress (soft style like modern dashboards)
                 ClipRRect(
@@ -252,7 +252,7 @@ class _PackageCard extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
 
                 /// schedule row
                 Row(
@@ -262,7 +262,7 @@ class _PackageCard extends StatelessWidget {
                       label: data["time"],
                       cs: cs,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     _ScheduleChip(
                       icon: Icons.timer_outlined,
                       label: data["duration"],
@@ -302,14 +302,11 @@ class _StatusBadge extends StatelessWidget {
             height: 5,
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
-          const SizedBox(width: 5),
+          SizedBox(width: 5),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: color,
-            ),
+            style:
+                Theme.of(context).textTheme.labelSmall!.copyWith(color: color),
           ),
         ],
       ),
@@ -336,11 +333,10 @@ class _Tag extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: cs.onSurface.withOpacity(0.55),
-        ),
+        style: Theme.of(context)
+            .textTheme
+            .labelSmall!
+            .copyWith(color: cs.onSurface.withOpacity(0.55)),
       ),
     );
   }
@@ -375,19 +371,18 @@ class _FeeStat extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
-              fontSize: 10,
-              color: cs.onSurface.withOpacity(0.45),
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall!
+                .copyWith(color: cs.onSurface.withOpacity(0.45)),
           ),
-          const SizedBox(height: 3),
+          SizedBox(height: 3),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: valueColor ?? cs.onSurface,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall!
+                .copyWith(color: valueColor ?? cs.onSurface),
             overflow: TextOverflow.ellipsis,
           ),
         ],
@@ -414,14 +409,13 @@ class _ScheduleChip extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 14, color: cs.onSurface.withOpacity(0.4)),
-        const SizedBox(width: 5),
+        SizedBox(width: 5),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: cs.onSurface.withOpacity(0.6),
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .labelMedium!
+              .copyWith(color: cs.onSurface.withOpacity(0.6)),
         ),
       ],
     );

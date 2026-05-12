@@ -2,7 +2,6 @@ import 'package:albedo_app/controller/payment_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
 import 'package:albedo_app/view/payment/student_payment_detail_page.dart';
 import 'package:albedo_app/view/payment/teacher_payment_detail_page.dart';
-import 'package:albedo_app/widgets/custom_tab.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -87,7 +86,7 @@ class PaymentPage extends StatelessWidget {
                   },
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
                 // ── List ──────────────────────────────────────────────
                 Expanded(
@@ -225,7 +224,7 @@ class _PaymentCard extends StatelessWidget {
                     color: cs.primary,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,19 +233,18 @@ class _PaymentCard extends StatelessWidget {
                         name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          color: cs.onSurface,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(color: cs.onSurface),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         id,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: cs.outline,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelSmall!
+                            .copyWith(color: cs.outline),
                       ),
                     ],
                   ),
@@ -262,17 +260,16 @@ class _PaymentCard extends StatelessWidget {
                   ),
                   child: Text(
                     status.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: statusColor,
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelMedium!
+                        .copyWith(color: statusColor),
                   ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             /// ── BALANCE CARD ────────────────────
             Container(
@@ -292,7 +289,7 @@ class _PaymentCard extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
 
                   Expanded(
                     child: Column(
@@ -300,23 +297,21 @@ class _PaymentCard extends StatelessWidget {
                       children: [
                         Text(
                           "BALANCE DUE",
-                          style: TextStyle(
-                            fontSize: 10,
-                            letterSpacing: 1.1,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.red.shade700,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelMedium!
+                              .copyWith(
+                                  letterSpacing: 1.1,
+                                  color: Colors.red.shade700),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           "₹${balance.toStringAsFixed(0)}",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
+                          style:
+                              Theme.of(context).textTheme.titleLarge!.copyWith(
 
-                            /// same red color as title
-                            color: Colors.red.shade700,
-                          ),
+                                  /// same red color as title
+                                  color: Colors.red.shade700),
                         ),
                       ],
                     ),
@@ -324,14 +319,14 @@ class _PaymentCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             Divider(
               color: cs.outline.withOpacity(.15),
               height: 1,
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             if (!isStudent) ...[
               Builder(
                 builder: (_) {
@@ -341,7 +336,7 @@ class _PaymentCard extends StatelessWidget {
                       [];
 
                   if (earnings.isEmpty) {
-                    return const SizedBox();
+                    return SizedBox();
                   }
 
                   return Column(
@@ -349,21 +344,18 @@ class _PaymentCard extends StatelessWidget {
                     children: [
                       Text(
                         "MONTHLY EARNINGS",
-                        style: TextStyle(
-                          fontSize: 10,
-                          letterSpacing: 1,
-                          fontWeight: FontWeight.w700,
-                          color: cs.outline,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelMedium!
+                            .copyWith(letterSpacing: 1, color: cs.outline),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       SizedBox(
-                        height: 78,
+                        height: 92,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: earnings.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 10),
+                          separatorBuilder: (_, __) => SizedBox(width: 10),
                           itemBuilder: (_, i) {
                             final item = earnings[i];
                             final isApproved =
@@ -371,15 +363,14 @@ class _PaymentCard extends StatelessWidget {
 
                             final bgColor = isApproved
                                 ? Colors.green.withOpacity(.08)
-                                : Colors.grey.withOpacity(.10);
+                                : cs.outline.withOpacity(.10);
 
                             final borderColor = isApproved
                                 ? Colors.green.withOpacity(.15)
-                                : Colors.grey.withOpacity(.18);
+                                : cs.outline.withOpacity(.18);
 
-                            final textColor = isApproved
-                                ? Colors.green.shade700
-                                : Colors.grey.shade700;
+                            final textColor =
+                                isApproved ? Colors.green.shade700 : cs.outline;
 
                             return Container(
                               width: 84,
@@ -400,23 +391,23 @@ class _PaymentCard extends StatelessWidget {
                                 children: [
                                   Text(
                                     item.month.toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      letterSpacing: 1,
-                                      fontWeight: FontWeight.w700,
-                                      color: textColor,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .copyWith(
+                                            letterSpacing: 1, color: textColor),
                                   ),
-                                  const SizedBox(height: 6),
+                                  SizedBox(height: 6),
                                   Text(
                                     "₹${item.amount}",
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800,
-                                      color: textColor,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .copyWith(
+                                            color: textColor,
+                                            fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -424,12 +415,12 @@ class _PaymentCard extends StatelessWidget {
                           },
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14),
                       Divider(
                         color: cs.outline.withOpacity(.15),
                         height: 1,
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                     ],
                   );
                 },
@@ -458,7 +449,7 @@ class _PaymentCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -477,7 +468,7 @@ class _PaymentCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -514,7 +505,7 @@ class _PaymentCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -536,14 +527,14 @@ class _PaymentCard extends StatelessWidget {
                 ],
               ),
 
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             if (isStudent) ...[
               Divider(
                 color: cs.outline.withOpacity(.15),
                 height: 1,
               ),
 
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               /// ── FOOTER ──────────────────────────
 
@@ -563,33 +554,29 @@ class _PaymentCard extends StatelessWidget {
                       size: 18,
                       color: cs.primary,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Text(
                       "${student?.packages ?? 0} Packages",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall!
+                          .copyWith(color: cs.onSurface),
                     ),
                     const Spacer(),
                     Text(
                       "Admission Fee:",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: cs.outline,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: cs.outline),
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Text(
                       (student?.admissionFeePaid ?? false) ? "Paid" : "Unpaid",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: (student?.admissionFeePaid ?? false)
-                            ? Colors.green
-                            : cs.error,
-                      ),
+                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                          color: (student?.admissionFeePaid ?? false)
+                              ? Colors.green
+                              : cs.error),
                     ),
                   ],
                 ),
@@ -613,21 +600,18 @@ class _PaymentCard extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: cs.outline,
-            letterSpacing: .5,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .labelMedium!
+              .copyWith(color: cs.outline, letterSpacing: .5),
         ),
-        const SizedBox(height: 5),
+        SizedBox(height: 5),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: cs.onSurface,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: cs.onSurface),
         ),
       ],
     );

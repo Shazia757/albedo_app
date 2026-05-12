@@ -1,8 +1,6 @@
 import 'package:albedo_app/controller/payment_controller.dart';
 import 'package:albedo_app/controller/student_wallet_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
-import 'package:albedo_app/model/wallet_model.dart';
-import 'package:albedo_app/view/batch_payment_detailed.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -32,19 +30,18 @@ class StudentPaymentDetailsPage extends StatelessWidget {
           /// ───────────────── STUDENT CARD ─────────────────
           _StudentExpandableCard(student: student),
 
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
 
           /// ───────────────── TRANSACTIONS TITLE ─────────────────
           Text(
             "Transactions",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: cs.onSurface,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge!
+                .copyWith(color: cs.onSurface),
           ),
 
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
 
           /// ───────────────── TRANSACTION LIST ─────────────────
 
@@ -144,7 +141,7 @@ class _StudentExpandableCardState extends State<_StudentExpandableCard> {
                     ),
                   ),
 
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
 
                   /// student details
                   Expanded(
@@ -153,27 +150,26 @@ class _StudentExpandableCardState extends State<_StudentExpandableCard> {
                       children: [
                         Text(
                           widget.student.name,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: cs.onSurface,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(color: cs.onSurface),
                         ),
-                        const SizedBox(height: 5),
+                        SizedBox(height: 5),
                         Text(
                           widget.student.id,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: cs.outline,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(color: cs.outline),
                         ),
-                        const SizedBox(height: 3),
+                        SizedBox(height: 3),
                         Text(
                           "+91 9876543210",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: cs.outline,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(color: cs.outline),
                         ),
                       ],
                     ),
@@ -198,7 +194,7 @@ class _StudentExpandableCardState extends State<_StudentExpandableCard> {
             duration: const Duration(milliseconds: 250),
             crossFadeState:
                 expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-            firstChild: const SizedBox(),
+            firstChild: SizedBox(),
             secondChild: Padding(
               padding: const EdgeInsets.fromLTRB(
                 16,
@@ -212,7 +208,7 @@ class _StudentExpandableCardState extends State<_StudentExpandableCard> {
                     color: cs.outline.withOpacity(.12),
                   ),
 
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   /// mentor + coordinator
                   Container(
@@ -253,7 +249,7 @@ class _StudentExpandableCardState extends State<_StudentExpandableCard> {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   /// timeline card
                   Container(
@@ -311,37 +307,34 @@ class _StudentExpandableCardState extends State<_StudentExpandableCard> {
       children: [
         Text(
           title.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1,
-            color: cs.primary,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(letterSpacing: 1, color: cs.primary),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Text(
           name,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: cs.onSurface,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: cs.onSurface),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(
           id,
-          style: TextStyle(
-            fontSize: 12,
-            color: cs.outline,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: cs.outline),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(
           phone,
-          style: TextStyle(
-            fontSize: 12,
-            color: cs.outline,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: cs.outline),
         ),
       ],
     );
@@ -361,25 +354,25 @@ class _StudentExpandableCardState extends State<_StudentExpandableCard> {
           size: 18,
           color: cs.primary,
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: cs.outline,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .labelSmall!
+                    .copyWith(color: cs.outline),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 value,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: cs.onSurface,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleSmall!
+                    .copyWith(color: cs.onSurface),
               ),
             ],
           ),
@@ -441,7 +434,7 @@ class _TransactionCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
 
           Expanded(
             child: Column(
@@ -449,27 +442,26 @@ class _TransactionCard extends StatelessWidget {
               children: [
                 Text(
                   "₹${amount.toStringAsFixed(0)}",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: cs.onSurface,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge!
+                      .copyWith(color: cs.onSurface),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text(
                   date.toString(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: cs.outline,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: cs.outline),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   "Added by $addedBy",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: cs.outline,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: cs.outline),
                 ),
               ],
             ),

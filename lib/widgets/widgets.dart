@@ -42,14 +42,13 @@ class CustomWidgets {
                   color: effectiveColor,
                 ),
               if (title != null) ...[
-                if (icon != null) const SizedBox(width: 6),
+                if (icon != null) SizedBox(width: 6),
                 Text(
                   title,
-                  style: TextStyle(
-                    color: effectiveColor,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context ?? Get.context!)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: effectiveColor),
                 ),
               ],
             ],
@@ -90,7 +89,7 @@ class CustomWidgets {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isLoading) ...[
-              const SizedBox(
+              SizedBox(
                 height: 18,
                 width: 18,
                 child: CircularProgressIndicator(
@@ -98,17 +97,17 @@ class CustomWidgets {
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(
                 isLoading ? loadingText ?? '' : text,
-                style: const TextStyle(fontSize: 16),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
             ] else ...[
               if (icon != null) ...[
                 Icon(icon, color: Colors.white),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
               ],
-              Text(text, style: const TextStyle(fontSize: 16)),
+              Text(text, style: Theme.of(context).textTheme.bodyLarge),
             ]
           ],
         ),
@@ -142,19 +141,20 @@ class CustomWidgets {
       child: TextField(
         controller: controller,
         onChanged: onChanged,
-        style: TextStyle(
-          fontSize: 14,
-          color: cs.onSurface,
-        ),
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: cs.onSurface),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(
-            color: cs.onSurface.withOpacity(0.5),
-          ),
+          hintStyle: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: cs.onSurface.withOpacity(0.5)),
           prefixIcon: Icon(
             Icons.search,
             size: 20,
-            color: cs.onSurface.withOpacity(0.6),
+            color: cs.primary,
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -203,14 +203,13 @@ class CustomWidgets {
                     /// Title
                     Text(
                       title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(color: cs.onSurface),
                     ),
 
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     /// Options
                     ...options.map((e) {
@@ -246,20 +245,22 @@ class CustomWidgets {
                                     ? cs.primary
                                     : cs.onSurface.withOpacity(0.6),
                               ),
-                              const SizedBox(width: 10),
+                              SizedBox(width: 10),
 
                               /// Label
                               Expanded(
                                 child: Text(
                                   e.label,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: isSelected
-                                        ? FontWeight.w600
-                                        : FontWeight.w400,
-                                    color:
-                                        isSelected ? cs.primary : cs.onSurface,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                          fontWeight: isSelected
+                                              ? FontWeight.w600
+                                              : FontWeight.w400,
+                                          color: isSelected
+                                              ? cs.primary
+                                              : cs.onSurface),
                                 ),
                               ),
 
@@ -323,14 +324,13 @@ class CustomWidgets {
                 /// Title
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(color: cs.onSurface),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 /// 🔥 FIX: scrollable options
                 Flexible(
@@ -370,19 +370,20 @@ class CustomWidgets {
                                       ? cs.primary
                                       : cs.onSurface.withOpacity(0.6),
                                 ),
-                                const SizedBox(width: 10),
+                                SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
                                     e.label,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.w400,
-                                      color: isSelected
-                                          ? cs.primary
-                                          : cs.onSurface,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(
+                                            fontWeight: isSelected
+                                                ? FontWeight.w600
+                                                : FontWeight.w400,
+                                            color: isSelected
+                                                ? cs.primary
+                                                : cs.onSurface),
                                   ),
                                 ),
                                 if (isSelected)
@@ -406,8 +407,6 @@ class CustomWidgets {
       ),
     );
   }
-
-  
 
   Widget customTabs(
     BuildContext context, {
@@ -457,11 +456,9 @@ class CustomWidgets {
                 ),
                 child: Text(
                   label,
-                  style: TextStyle(
-                    color: isActive ? cs.onPrimary : cs.onSurface,
-                    fontSize: 12,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: isActive ? cs.onPrimary : cs.onSurface,
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500),
                 ),
               ),
             );
@@ -516,32 +513,28 @@ class CustomWidgets {
                 ),
               ),
 
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               /// 🔹 TITLE
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: cs.onSurface,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge!
+                    .copyWith(color: cs.onSurface),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
 
               /// 🔹 MESSAGE
               Text(
                 text,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  height: 1.5,
-                  color: cs.onSurface.withOpacity(0.6),
-                ),
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    height: 1.5, color: cs.onSurface.withOpacity(0.6)),
               ),
 
-              const SizedBox(height: 22),
+              SizedBox(height: 22),
 
               /// 🔹 ACTIONS
               Row(
@@ -561,15 +554,15 @@ class CustomWidgets {
                       ),
                       child: Text(
                         "Cancel",
-                        style: TextStyle(
-                          color: cs.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(color: cs.onSurface),
                       ),
                     ),
                   ),
 
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
 
                   /// DELETE
                   Expanded(
@@ -587,9 +580,12 @@ class CustomWidgets {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
+                      child: Text(
                         "Yes",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ),
@@ -647,32 +643,28 @@ class CustomWidgets {
                 ),
               ),
 
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               /// 🔹 TITLE
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: cs.onSurface,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge!
+                    .copyWith(color: cs.onSurface),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
 
               /// 🔹 MESSAGE
               Text(
                 text,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  height: 1.5,
-                  color: cs.onSurface.withOpacity(0.6),
-                ),
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    height: 1.5, color: cs.onSurface.withOpacity(0.6)),
               ),
 
-              const SizedBox(height: 22),
+              SizedBox(height: 22),
 
               /// 🔹 ACTIONS
               Row(
@@ -692,15 +684,15 @@ class CustomWidgets {
                       ),
                       child: Text(
                         "Cancel",
-                        style: TextStyle(
-                          color: cs.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(color: cs.onSurface),
                       ),
                     ),
                   ),
 
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
 
                   /// DELETE
                   Expanded(
@@ -718,9 +710,9 @@ class CustomWidgets {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
+                      child: Text(
                         "Yes",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
                   ),
@@ -778,32 +770,28 @@ class CustomWidgets {
                 ),
               ),
 
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               /// 🔹 TITLE (specific intent)
               Text(
                 "Deactivate Account?",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: cs.onSurface,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge!
+                    .copyWith(color: cs.onSurface),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
 
               /// 🔹 MESSAGE
               Text(
                 text,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  height: 1.5,
-                  color: cs.onSurface.withOpacity(0.6),
-                ),
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    height: 1.5, color: cs.onSurface.withOpacity(0.6)),
               ),
 
-              const SizedBox(height: 22),
+              SizedBox(height: 22),
 
               /// 🔹 ACTIONS
               Row(
@@ -823,15 +811,15 @@ class CustomWidgets {
                       ),
                       child: Text(
                         "Cancel",
-                        style: TextStyle(
-                          color: cs.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(color: cs.onSurface),
                       ),
                     ),
                   ),
 
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
 
                   /// DEACTIVATE
                   Expanded(
@@ -849,9 +837,9 @@ class CustomWidgets {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
+                      child: Text(
                         "Deactivate",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
                   ),
@@ -1009,10 +997,12 @@ class CustomWidgets {
                                     child: Center(
                                       child: Text(
                                         "No items found",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: cs.onSurface.withOpacity(0.6),
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(
+                                                color: cs.onSurface
+                                                    .withOpacity(0.6)),
                                       ),
                                     ),
                                   )
@@ -1040,10 +1030,10 @@ class CustomWidgets {
                                           ),
                                           child: Text(
                                             itemLabel(item),
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: cs.onSurface,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(color: cs.onSurface),
                                           ),
                                         ),
                                       );
@@ -1081,7 +1071,10 @@ class CustomWidgets {
               link: layerLink,
               child: TextFormField(
                 controller: textController,
-                style: TextStyle(fontSize: 13, color: cs.onSurface),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .copyWith(color: cs.onSurface),
                 onTap: () {
                   if (overlayEntry == null) {
                     filteredItems = List.from(items);
@@ -1210,10 +1203,12 @@ class CustomWidgets {
                                     child: Center(
                                       child: Text(
                                         "No items found",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: cs.onSurface.withOpacity(0.6),
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(
+                                                color: cs.onSurface
+                                                    .withOpacity(0.6)),
                                       ),
                                     ),
                                   )
@@ -1242,10 +1237,11 @@ class CustomWidgets {
                                               Expanded(
                                                 child: Text(
                                                   itemLabel(item),
-                                                  style: TextStyle(
-                                                    fontSize: 13,
-                                                    color: cs.onSurface,
-                                                  ),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(
+                                                          color: cs.onSurface),
                                                 ),
                                               ),
                                             ],
@@ -1288,10 +1284,10 @@ class CustomWidgets {
 
                     return TextFormField(
                       readOnly: true,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: cs.onSurface,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: cs.onSurface),
                       decoration: appInputDecoration(
                         context: context,
                         hint: hint,
@@ -1360,16 +1356,14 @@ class CustomWidgets {
                           ),
                           child: Icon(icon, color: Colors.white),
                         ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(
                         child: DefaultTextStyle(
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                          child: title,
-                        ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .copyWith(color: Colors.white),
+                            child: title),
                       ),
                       IconButton(
                         onPressed: () => Get.back(),
@@ -1412,12 +1406,16 @@ class CustomWidgets {
                             onPressed: () => Get.back(),
                             child: Text(
                               "Cancel",
-                              style: TextStyle(
-                                  color: context.theme.colorScheme.onSurface),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color:
+                                          context.theme.colorScheme.onSurface),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10),
                         Expanded(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -1434,7 +1432,10 @@ class CustomWidgets {
                             },
                             child: Text(
                               submitText,
-                              style: TextStyle(color: Colors.white),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(color: Colors.white),
                             ),
                           ),
                         ),
@@ -1493,14 +1494,14 @@ class CustomWidgets {
           Row(
             children: [
               Icon(icon, size: 18),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: Get.textTheme.titleSmall,
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           child,
         ],
       ),
@@ -1533,7 +1534,7 @@ class CustomWidgets {
               size: 18,
               color: cs.onSurface.withOpacity(0.7),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1705,7 +1706,7 @@ class CustomWidgets {
               child: GestureDetector(
                 onTap: () => overlayEntry?.remove(),
                 behavior: HitTestBehavior.translucent,
-                child: const SizedBox(),
+                child: SizedBox(),
               ),
             ),
 
@@ -1838,8 +1839,7 @@ class CustomWidgets {
                     },
                     child: Text(
                       monthName(currentMonth.month),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 13),
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),
 
@@ -1852,8 +1852,7 @@ class CustomWidgets {
                     },
                     child: Text(
                       "${currentMonth.year}",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 13),
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),
 
@@ -1869,7 +1868,7 @@ class CustomWidgets {
                 ],
               ),
 
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
 
               /// WEEKDAYS
               Row(
@@ -1878,18 +1877,19 @@ class CustomWidgets {
                           child: Center(
                             child: Text(
                               d,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: context.theme.colorScheme.onSurface
-                                    .withOpacity(0.5),
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall!
+                                  .copyWith(
+                                      color: context.theme.colorScheme.onSurface
+                                          .withOpacity(0.5)),
                             ),
                           ),
                         ))
                     .toList(),
               ),
 
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
 
               /// GRID
               GridView.builder(
@@ -1900,7 +1900,7 @@ class CustomWidgets {
                     crossAxisCount: 7,
                   ),
                   itemBuilder: (context, index) {
-                    if (index < startWeekday) return const SizedBox();
+                    if (index < startWeekday) return SizedBox();
 
                     final day = index - startWeekday + 1;
                     final date =
@@ -1947,21 +1947,23 @@ class CustomWidgets {
 
                           child: Text(
                             "$day",
-                            style: TextStyle(
-                              fontSize: 11,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall!
+                                .copyWith(
 
-                              /// 🎨 TEXT COLOR LOGIC
-                              color: isPast
-                                  ? context.theme.colorScheme.onSurface
-                                      .withOpacity(0.3) // faded
-                                  : isSelected
-                                      ? context.theme.colorScheme.onPrimary
-                                      : context.theme.colorScheme.onSurface,
-
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                            ),
+                                    /// 🎨 TEXT COLOR LOGIC
+                                    color: isPast
+                                        ? context.theme.colorScheme.onSurface
+                                            .withOpacity(0.3) // faded
+                                        : isSelected
+                                            ? context
+                                                .theme.colorScheme.onPrimary
+                                            : context
+                                                .theme.colorScheme.onSurface,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w400),
                           ),
                         ),
                       ),
@@ -1987,7 +1989,7 @@ class CustomWidgets {
             child: Center(
               child: Text(
                 monthName(i + 1),
-                style: const TextStyle(fontSize: 12),
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
           );
@@ -2078,7 +2080,7 @@ class CustomWidgets {
       controller: controller,
       readOnly: true,
       onTap: pickTime,
-      style: const TextStyle(fontSize: 12),
+      style: Theme.of(context).textTheme.bodySmall,
       decoration: appInputDecoration(
         context: context,
         hint: hint,
@@ -2094,6 +2096,7 @@ class MenuItem extends StatelessWidget {
   final String title;
 
   const MenuItem({
+    super.key,
     required this.icon,
     required this.title,
   });
@@ -2110,7 +2113,7 @@ class MenuItem extends StatelessWidget {
           ),
           child: Icon(icon, size: 18),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Text(title, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );

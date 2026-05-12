@@ -38,10 +38,10 @@ class AddSessionPage extends StatelessWidget {
                         'Add Session',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets()
                           .labelWithAsterisk('Session Type', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// TYPE SWITCH
                       Obx(
@@ -57,7 +57,7 @@ class AddSessionPage extends StatelessWidget {
                                 onTap: () => c.selectedType.value = "session",
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12),
                             Expanded(
                               child: _buildTypeCard(
                                 context: context,
@@ -71,7 +71,7 @@ class AddSessionPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
 
                       /// CONTENT
                       Obx(() {
@@ -82,7 +82,7 @@ class AddSessionPage extends StatelessWidget {
                         }
                       }),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// SUBMIT BUTTON
                       Row(
@@ -93,10 +93,13 @@ class AddSessionPage extends StatelessWidget {
                               icon: const SizedBox.shrink(),
                               label: Text(
                                 'Cancel',
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
                               ),
                               style: OutlinedButton.styleFrom(
                                 backgroundColor:
@@ -108,7 +111,7 @@ class AddSessionPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
@@ -118,10 +121,12 @@ class AddSessionPage extends StatelessWidget {
                               },
                               icon: const Icon(Icons.add,
                                   size: 15, color: Colors.white),
-                              label: const Text(
+                              label: Text(
                                 'Add',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
@@ -187,7 +192,7 @@ class AddSessionPage extends StatelessWidget {
                   ? theme.colorScheme.primary
                   : theme.colorScheme.onSurface.withOpacity(0.6),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
 
             /// TEXT
             Expanded(
@@ -213,7 +218,7 @@ class AddSessionPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomWidgets().labelWithAsterisk('Select Student', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDropdownField<Student>(
           context: context,
           hint: 'Select Student',
@@ -222,20 +227,20 @@ class AddSessionPage extends StatelessWidget {
           itemLabel: (s) => s.name,
           onChanged: (student) => c.onStudentSelected(student),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Select Package', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDropdownField(
           context: context,
           hint: 'Select Package',
           items: c.packagesList,
           value: c.selectedPackage.value,
-          itemLabel: (p) => p.subjectName??'',
+          itemLabel: (p) => p.subjectName ?? '',
           onChanged: (p0) => c.selectedPackage.value = p0,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Select Teacher', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDropdownField(
           context: context,
           hint: 'Select Teacher',
@@ -244,33 +249,33 @@ class AddSessionPage extends StatelessWidget {
           value: c.selectedTeacher.value,
           itemLabel: (item) => item.name,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Teacher Salary'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Teacher Salary',
             controller: c.salaryController,
             isNumber: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Session Date', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDatePickerField(
           context: context,
           controller: c.dateController,
           selectedDate: c.selectedDate,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Session Time', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().timePickerStyledField(
           context: context,
           controller: c.timeController,
           selectedTime: c.selectedTime,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Select Duration', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDropdownField(
           context: context,
           hint: 'Select Duration',
@@ -290,13 +295,13 @@ class AddSessionPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomWidgets().labelWithAsterisk('Meet Title', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Meet Title',
           controller: c.meetTitleController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         _buildMultiSelect<Mentor>(
           context: context,
           title: "Mentors",
@@ -345,29 +350,29 @@ class AddSessionPage extends StatelessWidget {
           selectAll: c.selectAllOtherUsers,
           itemLabel: (item) => item.name,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Text('Session Details',
             style:
                 textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Session Date', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDatePickerField(
           context: context,
           controller: c.dateController,
           selectedDate: c.selectedDate,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Session Time', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().timePickerStyledField(
           context: context,
           controller: c.timeController,
           selectedTime: c.selectedTime,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Select Duration', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDropdownField(
             context: context,
             hint: 'Select Duration',
@@ -375,9 +380,9 @@ class AddSessionPage extends StatelessWidget {
             value: c.selectedDuration.value,
             onChanged: (p0) => c.selectedDuration.value = p0,
             itemLabel: (item) => "$item minutes"),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Description', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Description',
@@ -430,7 +435,7 @@ class AddSessionPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                 )),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text(
               'Select All $title',
               style: theme.textTheme.bodyMedium,
@@ -443,11 +448,10 @@ class AddSessionPage extends StatelessWidget {
             items: list,
             selectedItems: selectedList,
             itemLabel: itemLabel),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
       ],
     );
   }
-
 }
 
 class DropdownItem<T> {

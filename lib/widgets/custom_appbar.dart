@@ -39,7 +39,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: AppBar(
             toolbarHeight: height,
 
-            // 🎨 UPDATED BACKGROUND
             backgroundColor: cs.onPrimary,
             elevation: 0,
             scrolledUnderElevation: 4,
@@ -50,7 +49,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     icon: Icon(
                       Icons.arrow_back_ios_new,
                       size: 18,
-                      color: cs.onSurface,
+                      color: cs.primary,
                     ),
                     onPressed: () => Get.back(),
                   )
@@ -59,7 +58,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         builder: (context) => IconButton(
                           icon: Icon(
                             Icons.segment,
-                            color: cs.onSurface,
+                            color: cs.primary,
                             size: 22,
                           ),
                           onPressed: () {
@@ -92,10 +91,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                           height: isDesktop ? 32 : 28, // responsive
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                     ],
                   ),
-            // ✅ ACTIONS (responsive spacing)
             actions: [
               _actionButton(
                 icon: Icons.notifications_none,
@@ -153,13 +151,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       onTap: onTap,
       child: Ink(
         decoration: BoxDecoration(
-          // 🎨 slightly improved contrast for glass bg
-          color: color.onSurface.withOpacity(0.08),
+          color: color.primary.withOpacity(0.08),
           shape: BoxShape.circle,
         ),
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Icon(icon, color: color.onSurface.withOpacity(0.8), size: 22),
+          child: Icon(icon, color: color.primary, size: 22),
         ),
       ),
     );

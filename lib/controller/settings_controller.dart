@@ -56,8 +56,8 @@ class SettingsController extends GetxController {
 
   RxList<VisibleTo> selected = <VisibleTo>[].obs;
   RxList selectedSyllabus = [].obs;
-    var selectedStartDate = Rxn<DateTime>();
-    var selectedEndDate = Rxn<DateTime>();
+  var selectedStartDate = Rxn<DateTime>();
+  var selectedEndDate = Rxn<DateTime>();
   RxList<Days> selectedDays = <Days>[].obs;
   RxList<String> selectedTestType = <String>[].obs;
   RxList selectedAttentionQns = [].obs;

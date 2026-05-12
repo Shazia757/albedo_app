@@ -52,7 +52,7 @@ class LoginView extends StatelessWidget {
                     /// 🧠 Logo
                     Image.asset("assets/images/logo.png", height: 80),
 
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
 
                     /// 🧊 Card
                     Container(
@@ -76,7 +76,7 @@ class LoginView extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
 
                           /// ✏️ Subtitle
                           Text(
@@ -86,7 +86,7 @@ class LoginView extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           /// 📧 Email
                           CustomTextField(
@@ -101,7 +101,7 @@ class LoginView extends StatelessWidget {
                             // helperText: "We'll never share your email",
                           ),
 
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
 
                           /// 🔒 Password
                           CustomTextField(
@@ -118,7 +118,7 @@ class LoginView extends StatelessWidget {
                             // helperText: "Minimum 8 characters",
                           ),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           /// 🔘 Login Button
                           Obx(() {
@@ -161,16 +161,17 @@ class LoginView extends StatelessWidget {
                                             Text("Logging in..."),
                                           ],
                                         )
-                                      : const Text(
-                                          "Login",
-                                          style: TextStyle(fontSize: 16),
-                                        ),
+                                      : Text("Login",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge!
+                                              .copyWith(color: Colors.white)),
                                 ),
                               ),
                             );
                           }),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           /// ➖ Divider
                           Row(
@@ -180,11 +181,14 @@ class LoginView extends StatelessWidget {
                                   color: Colors.white.withOpacity(0.2),
                                 ),
                               ),
-                              const Padding(
+                              Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 12),
                                 child: Text(
                                   "OR",
-                                  style: TextStyle(color: Colors.white54),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(color: Colors.white54),
                                 ),
                               ),
                               Expanded(
@@ -195,7 +199,7 @@ class LoginView extends StatelessWidget {
                             ],
                           ),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           /// 🔵 Google Button (Improved)
                           SizedBox(
@@ -220,19 +224,18 @@ class LoginView extends StatelessWidget {
                                     "assets/images/google.png",
                                     height: 22,
                                   ),
-                                  const SizedBox(width: 12),
-                                  const Text(
-                                    "Sign in with Google",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                                  SizedBox(width: 12),
+                                  Text("Sign in with Google",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .copyWith(color: Colors.black)),
                                 ],
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           /// 🔗 Forgot Password
                           Center(

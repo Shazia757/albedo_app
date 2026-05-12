@@ -1,4 +1,6 @@
 import 'package:albedo_app/model/feedback_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
 class FeedbackController extends GetxController {
@@ -83,5 +85,9 @@ class FeedbackController extends GetxController {
     }
 
     return filtered;
+  }
+
+  Widget applyFilters() {
+    return SizedBox(); //TODO
   }
 }

@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 class StudentWalletController extends GetxController {
   var selectedTab = 0.obs;
 
-
   // Dummy Transactions
   var transactions = <TransactionModel>[
     TransactionModel(
@@ -81,41 +80,39 @@ class StudentWalletController extends GetxController {
     return p.packageFee ?? 0 - totalWithdrawals;
   }
 
- void updateStatus(
-  int transactionIndex,
-  String status,
-  StudentPaymentModel student,
-  PaymentController paymentC,
-) {
-  transactions[transactionIndex] =
-      transactions[transactionIndex].copyWith(
-    status: status,
-  );
-
-  transactions.refresh();
-
-  final studentIndex = paymentC.studentPayments.indexWhere(
-    (e) => e.id == student.id,
-  );
-
-  if (studentIndex == -1) return;
-
-  final current = paymentC.studentPayments[studentIndex];
-
-  /// Deposit Approval
-  if (transactions[transactionIndex].type == "Credit") {
-    paymentC.studentPayments[studentIndex] = current.copyWith(
-      depositPending: status == "approved"
-          ? 0
-          : current.depositPending,
-      depositedAmount: status == "approved"
-          ? (current.depositedAmount ?? 0) +
-              (transactions[transactionIndex].amount ?? 0)
-          : current.depositedAmount,
+  void updateStatus(
+    int transactionIndex,
+    String status,
+    StudentPaymentModel student,
+    PaymentController paymentC,
+  ) {
+    transactions[transactionIndex] = transactions[transactionIndex].copyWith(
+      status: status,
     );
+
+    transactions.refresh();
+
+    final studentIndex = paymentC.studentPayments.indexWhere(
+      (e) => e.id == student.id,
+    );
+
+    if (studentIndex == -1) return;
+
+    final current = paymentC.studentPayments[studentIndex];
+
+    /// Deposit Approval
+    if (transactions[transactionIndex].type == "Credit") {
+      paymentC.studentPayments[studentIndex] = current.copyWith(
+        depositPending: status == "approved" ? 0 : current.depositPending,
+        depositedAmount: status == "approved"
+            ? (current.depositedAmount ?? 0) +
+                (transactions[transactionIndex].amount ?? 0)
+            : current.depositedAmount,
+      );
+    }
+
+    paymentC.studentPayments.refresh();
+
+    paymentC.applyFilters();
   }
-
-  paymentC.studentPayments.refresh();
-
-  paymentC.applyFilters();
-}}
+}

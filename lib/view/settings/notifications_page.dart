@@ -19,8 +19,7 @@ class NotificationsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-          backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: addNotificationBtn(context),
       body: Row(
         children: [
@@ -33,10 +32,10 @@ class NotificationsPage extends StatelessWidget {
                 int crossAxisCount = 1;
 
                 if (c.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
                 if (data.isEmpty) {
-                  return const Center(child: Text("No notifications found"));
+                  return Center(child: Text("No notifications found"));
                 }
 
                 if (Responsive.isTablet(context)) {
@@ -72,13 +71,14 @@ class NotificationsPage extends StatelessWidget {
                             item.message ?? '',
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.7),
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.7)),
                           ),
                           isImportant: item.isImportant,
                           actions: [
@@ -94,8 +94,7 @@ class NotificationsPage extends StatelessWidget {
                               icon: Icons.delete,
                               color: Theme.of(context).colorScheme.error,
                               onTap: () => CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
-
+                                title: 'Are you sure?',
                                 context: context,
                                 text: 'Delete this notification?',
                                 onConfirm: () => c.delete(item.id),
@@ -123,21 +122,21 @@ class NotificationsPage extends StatelessWidget {
       formKey: GlobalKey<FormState>(),
       sections: [
         CustomWidgets().labelWithAsterisk('Title'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Enter notification title',
             controller: c.titleController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Message'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Enter notification message',
             controller: c.messageController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Visible to:'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         VisibleToSelector(
           c: c,
           initial: List<VisibleTo>.from(c.selected),
@@ -159,17 +158,17 @@ class NotificationsPage extends StatelessWidget {
         onSubmit: () {},
         sections: [
           CustomWidgets().labelWithAsterisk('Title'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(
               context: context, hint: 'Enter notification title'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Message'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(
               context: context, hint: 'Enter notification message'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Visible to:'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           VisibleToSelector(
             c: c,
             initial: [],
@@ -264,7 +263,7 @@ class _VisibleToSelectorState extends State<VisibleToSelector> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: isSelected ? cs.primaryContainer : cs.surfaceVariant,
+                  color: isSelected ? cs.primaryContainer : cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: isSelected ? cs.primary : cs.outlineVariant,
@@ -280,10 +279,10 @@ class _VisibleToSelectorState extends State<VisibleToSelector> {
                       size: 18,
                       color: isSelected ? cs.primary : cs.onSurfaceVariant,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Text(
                       widget.c.getLabel(v),
-                      style: const TextStyle(fontSize: 13),
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),

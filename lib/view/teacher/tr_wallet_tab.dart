@@ -21,7 +21,7 @@ Widget walletTab(
   CoordinatorController? coordinatorController,
   required TeacherWalletController wallet,
 }) {
-  final cs = Theme.of(context).colorScheme;
+  final cs = Get.theme.colorScheme;
   final auth = Get.find<AuthController>();
   final user = auth.activeUser;
   final isCoordinator = user?.role == 'coordinator';
@@ -59,12 +59,11 @@ Widget walletTab(
               size: 18,
               color: Colors.white,
             ),
-            label: const Text(
+            label: Text(
               'Wallet Summary',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-              ),
+              style: Get.textTheme
+                  .bodySmall!
+                  .copyWith(color: Colors.white),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: cs.primary,
@@ -129,7 +128,7 @@ void _showWalletSummary(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: isTeacher ? 6 : 3,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, __) => SizedBox(height: 10),
         itemBuilder: (context, index) {
           /// Teacher cards
           final teacherItems = [
@@ -236,29 +235,24 @@ Widget _summaryInfoCard({
               size: 16,
               color: color,
             ),
-            const SizedBox(width: 6),
+            SizedBox(width: 6),
             Expanded(
               child: Text(
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: color,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Get.textTheme
+                    .titleSmall!
+                    .copyWith(color: color),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           "₹${amount.toStringAsFixed(0)}",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+          style:
+              Get.textTheme.titleMedium!.copyWith(color: color),
         ),
       ],
     ),
@@ -282,7 +276,7 @@ Widget _filters(BuildContext context, TeacherWalletController c) {
             );
           }),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: Obx(() {
             return CustomWidgets().customDropdownField<String>(
@@ -308,11 +302,11 @@ Widget _totalBalance(ColorScheme cs) {
       color: cs.primaryContainer,
       borderRadius: BorderRadius.circular(12),
     ),
-    child: const Row(
+    child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text("Total Balance"),
-        Text("₹45,000", style: TextStyle(fontWeight: FontWeight.bold)),
+        Text("₹45,000", style: Get.textTheme.titleSmall),
       ],
     ),
   );
@@ -348,17 +342,13 @@ Widget _monthCard(BuildContext context, Wallet data, ColorScheme cs) {
                 children: [
                   Text(
                     "${data.month} ${data.year}",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: Get.textTheme.titleMedium,
                   ),
                   Text(
                     "${data.transactions} transactions",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: cs.onSurface.withOpacity(0.6),
-                    ),
+                    style: Get.textTheme
+                        .bodySmall!
+                        .copyWith(color: cs.onSurface.withOpacity(0.6)),
                   ),
                 ],
               ),
@@ -369,25 +359,22 @@ Widget _monthCard(BuildContext context, Wallet data, ColorScheme cs) {
                 children: [
                   Text(
                     "₹${data.net}",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: cs.primary,
-                    ),
+                    style: Get.textTheme
+                        .titleMedium!
+                        .copyWith(color: cs.primary),
                   ),
                   Text(
                     "Net",
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: cs.onSurface.withOpacity(0.6),
-                    ),
+                    style: Get.textTheme
+                        .labelSmall!
+                        .copyWith(color: cs.onSurface.withOpacity(0.6)),
                   ),
                 ],
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           /// 🔥 MINI CARDS
           Row(
@@ -400,7 +387,7 @@ Widget _monthCard(BuildContext context, Wallet data, ColorScheme cs) {
                   Colors.green,
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: _miniCard(
                   "Withdrawals",
@@ -431,7 +418,9 @@ void _openDialog(BuildContext context, Wallet data) {
           Text("${data.month} ${data.year}"),
           Text(
             "${data.transactions} transactions",
-            style: const TextStyle(fontSize: 12, color: Colors.white70),
+            style: Get.textTheme
+                .bodySmall!
+                .copyWith(color: Colors.white70),
           ),
         ],
       ),
@@ -450,7 +439,7 @@ void _openDialog(BuildContext context, Wallet data) {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildSummaryToggle(c, data),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               _buildTabsSection(data),
             ],
           );
@@ -479,19 +468,16 @@ Widget _studentDetailsView(
           ),
           Text(
             student["name"],
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+            style: Get.textTheme.titleMedium,
           ),
         ],
       ),
 
-      const SizedBox(height: 6),
+      SizedBox(height: 6),
 
       Text("$tx transactions • ₹$amount"),
 
-      const SizedBox(height: 10),
+      SizedBox(height: 10),
 
       /// 🔥 TRANSACTIONS LIST
       SizedBox(
@@ -522,24 +508,26 @@ Widget _studentDetailsView(
                       children: [
                         Text(
                           t.subject,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          style: Get.textTheme.titleSmall,
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         Text(
                           t.subjectCode,
-                          style:
-                              const TextStyle(fontSize: 11, color: Colors.grey),
+                          style: Get.textTheme
+                              .labelSmall!
+                              .copyWith(color: Colors.grey),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           _formatDate(t.dateTime),
-                          style:
-                              const TextStyle(fontSize: 11, color: Colors.grey),
+                          style: Get.textTheme
+                              .labelSmall!
+                              .copyWith(color: Colors.grey),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         Text(
                           "Note: ${t.note}",
-                          style: const TextStyle(fontSize: 12),
+                          style: Get.textTheme.bodySmall,
                         ),
                       ],
                     ),
@@ -555,10 +543,9 @@ Widget _studentDetailsView(
                     ),
                     child: Text(
                       "$sign₹${t.amount}",
-                      style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Get.textTheme
+                          .titleSmall!
+                          .copyWith(color: color),
                     ),
                   ),
                 ],
@@ -601,10 +588,12 @@ Widget _buildSummaryToggle(TeacherWalletController c, Wallet data) {
                 size: 18,
                 color: Colors.blue,
               ),
-              const SizedBox(width: 4),
-              const Text(
+              SizedBox(width: 4),
+              Text(
                 "View summary",
-                style: TextStyle(fontSize: 13, color: Colors.blue),
+                style: Get.textTheme
+                    .bodySmall!
+                    .copyWith(color: Colors.blue),
               ),
             ],
           ),
@@ -612,7 +601,7 @@ Widget _buildSummaryToggle(TeacherWalletController c, Wallet data) {
 
         /// 🔽 ONLY SHOW WHEN EXPANDED
         if (isExpanded) ...[
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
 
           /// 🔥 SAME HEIGHT CARDS
           IntrinsicHeight(
@@ -626,7 +615,7 @@ Widget _buildSummaryToggle(TeacherWalletController c, Wallet data) {
                     Colors.green,
                   ),
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Expanded(
                   child: _summaryCard(
                     "Withdrawals",
@@ -635,7 +624,7 @@ Widget _buildSummaryToggle(TeacherWalletController c, Wallet data) {
                     Colors.red,
                   ),
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Expanded(
                   child: _summaryCard(
                     "Net",
@@ -648,7 +637,7 @@ Widget _buildSummaryToggle(TeacherWalletController c, Wallet data) {
             ),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           if (data.earnings?.amount != 0) _earningsBreakdown(),
         ],
@@ -724,27 +713,19 @@ Widget _summaryCard(
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontSize: 12,
-            color: color,
-            fontWeight: FontWeight.w600,
-          ),
+          style: Get.textTheme.titleSmall!.copyWith(color: color),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           "₹$amount",
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: Get.textTheme.titleMedium,
         ),
         if (count != null)
           Text(
             "$count transactions",
-            style: const TextStyle(
-              fontSize: 11,
-              color: Colors.grey,
-            ),
+            style: Get.textTheme
+                .labelSmall!
+                .copyWith(color: Colors.grey),
           ),
       ],
     ),
@@ -755,9 +736,8 @@ Widget _earningsBreakdown() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const Text("Earnings Breakdown",
-          style: TextStyle(fontWeight: FontWeight.bold)),
-      const SizedBox(height: 8),
+      Text("Earnings Breakdown", style: Get.textTheme.titleSmall),
+      SizedBox(height: 8),
       IntrinsicHeight(
         child: Row(
           children: [
@@ -782,23 +762,21 @@ Widget _breakdownCard(String title, int amount, int count) {
     ),
     child: Column(
       children: [
-        Text(title,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            )),
+        Text(title, style: Get.textTheme.titleSmall),
 
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
 
         Text(
           "₹$amount",
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: Get.textTheme.titleSmall,
         ),
 
         /// 🔢 TX COUNT UNDER EACH BREAKDOWN
         Text(
           "$count txns",
-          style: const TextStyle(fontSize: 11, color: Colors.grey),
+          style: Get.textTheme
+              .labelSmall!
+              .copyWith(color: Colors.grey),
         ),
       ],
     ),
@@ -862,15 +840,15 @@ Widget _studentCard(Map<String, dynamic> student) {
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       title: Text(
         student["name"],
-        style: const TextStyle(fontWeight: FontWeight.w600),
+        style: Get.textTheme.titleSmall,
       ),
       subtitle: Text(
         "${student["tx"]} transactions",
-        style: const TextStyle(fontSize: 12),
+        style: Get.textTheme.bodySmall,
       ),
       trailing: Text(
         "₹${student["amount"]}",
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: Get.textTheme.titleSmall,
       ),
       onTap: () {
         final c = Get.find<TeacherWalletController>();
@@ -893,26 +871,18 @@ Widget _miniCard(String title, int amount, int count, Color color) {
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontSize: 12,
-            color: color,
-            fontWeight: FontWeight.w600,
-          ),
+          style: Get.textTheme.titleSmall!.copyWith(color: color),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           "₹$amount",
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
+          style: Get.textTheme.titleSmall,
         ),
         Text(
           "$count transactions",
-          style: const TextStyle(
-            fontSize: 11,
-            color: Colors.grey,
-          ),
+          style: Get.textTheme
+              .labelSmall!
+              .copyWith(color: Colors.grey),
         ),
       ],
     ),

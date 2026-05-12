@@ -86,7 +86,7 @@ class OtherUsersController extends GetxController {
     /// 🔍 SEARCH FILTER
     if (searchQuery.value.isNotEmpty) {
       temp = temp.where((t) {
-        final name = t.name?.toLowerCase() ?? "";
+        final name = t.name.toLowerCase() ?? "";
         return name.contains(searchQuery.value.toLowerCase());
       }).toList();
     }

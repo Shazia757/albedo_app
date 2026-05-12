@@ -161,7 +161,7 @@ class FeedbackCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
 
               Expanded(
                 child: Column(
@@ -169,19 +169,18 @@ class FeedbackCard extends StatelessWidget {
                   children: [
                     Text(
                       data["studentName"],
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: cs.onSurface,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(color: cs.onSurface),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       data["studentId"],
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelSmall!
+                          .copyWith(color: cs.onSurface.withOpacity(0.6)),
                     ),
                   ],
                 ),
@@ -200,19 +199,18 @@ class FeedbackCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           /// 📝 FEEDBACK TEXT
           Text(
             data["description"] ?? "No feedback provided",
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.onSurface.withOpacity(0.8),
-              height: 1.4,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(color: cs.onSurface.withOpacity(0.8), height: 1.4),
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           /// 🔻 DIVIDER
           Divider(
@@ -234,7 +232,7 @@ class FeedbackCard extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
 
               Expanded(
                 child: Column(
@@ -244,18 +242,17 @@ class FeedbackCard extends StatelessWidget {
                       role == "teacher"
                           ? data["teacherName"]
                           : data["mentorName"],
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall!
+                          .copyWith(color: cs.onSurface),
                     ),
                     Text(
                       role == "teacher" ? data["teacherId"] : data["mentorId"],
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelSmall!
+                          .copyWith(color: cs.onSurface.withOpacity(0.6)),
                     ),
                   ],
                 ),
@@ -272,11 +269,8 @@ class FeedbackCard extends StatelessWidget {
                 ),
                 child: Text(
                   role == "teacher" ? "Teacher" : "Mentor",
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: role == "teacher" ? Colors.blue : Colors.green,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                      color: role == "teacher" ? Colors.blue : Colors.green),
                 ),
               ),
             ],

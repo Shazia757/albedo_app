@@ -28,7 +28,7 @@ class TrStudentsController extends GetxController {
         joinedAt: DateTime.now(),
         studentId: "STU-1001",
         email: "aisha@gmail.com",
-      mentor: Mentor(name: '', empId: '', joinedAt: DateTime.now()),
+        mentor: Mentor(name: '', empId: '', joinedAt: DateTime.now()),
         teacherId: "T1",
       ),
       Student(
@@ -36,8 +36,7 @@ class TrStudentsController extends GetxController {
         joinedAt: DateTime.now(),
         studentId: "STU-1002",
         email: "rahul@gmail.com",
-           mentor: Mentor(name: '', empId: '', joinedAt: DateTime.now()),
-
+        mentor: Mentor(name: '', empId: '', joinedAt: DateTime.now()),
         teacherId: "T1",
       ),
     ];
@@ -45,8 +44,8 @@ class TrStudentsController extends GetxController {
     /// 🔸 Dummy Packages
     packages.value = [
       Package(
-          teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+        teacher: Teacher(
+            id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
         subjectId: "SUB1",
         subjectName: "Mathematics",
         standard: "10",
@@ -71,5 +70,5 @@ class TrStudentsController extends GetxController {
   }
 
   var searchQuery = ''.obs;
-  var isSearching=false.obs;
+  var isSearching = false.obs;
 }

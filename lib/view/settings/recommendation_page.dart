@@ -32,11 +32,11 @@ class RecommendationPage extends StatelessWidget {
                 final data = c.recommendations;
 
                 if (c.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 if (data.isEmpty) {
-                  return const Center(child: Text("No recommendations found"));
+                  return Center(child: Text("No recommendations found"));
                 }
 
                 return Column(
@@ -48,7 +48,7 @@ class RecommendationPage extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
 
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     /// GRID
                     Expanded(
@@ -81,33 +81,36 @@ class RecommendationPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       isPackage ? "Package" : "Batch",
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: cs.onSurface.withOpacity(0.6),
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!
+                                          .copyWith(
+                                              color: cs.onSurface
+                                                  .withOpacity(0.6)),
                                     ),
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: 4),
 
                                     Text(
                                       isPackage
                                           ? (item.package ?? "-")
                                           : (item.batch ?? "-"),
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
                                     ),
 
-                                    const SizedBox(height: 12),
+                                    SizedBox(height: 12),
 
                                     Text(
                                       "Syllabuses",
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: cs.onSurface.withOpacity(0.6),
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!
+                                          .copyWith(
+                                              color: cs.onSurface
+                                                  .withOpacity(0.6)),
                                     ),
-                                    const SizedBox(height: 6),
+                                    SizedBox(height: 6),
 
                                     Wrap(
                                       spacing: 6,
@@ -124,16 +127,18 @@ class RecommendationPage extends StatelessWidget {
                                           ),
                                           child: Text(
                                             v,
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: cs.onPrimaryContainer,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall!
+                                                .copyWith(
+                                                    color:
+                                                        cs.onPrimaryContainer),
                                           ),
                                         );
                                       }).toList(),
                                     ),
 
-                                    const SizedBox(height: 12),
+                                    SizedBox(height: 12),
 
                                     /// DATES (clean unified style)
                                     Row(
@@ -145,7 +150,7 @@ class RecommendationPage extends StatelessWidget {
                                             item.startDate ?? "-",
                                           ),
                                         ),
-                                        const SizedBox(width: 10),
+                                        SizedBox(width: 10),
                                         Expanded(
                                           child: _dateBox(
                                             context,
@@ -168,7 +173,7 @@ class RecommendationPage extends StatelessWidget {
                                       editRecommendation(context);
                                     },
                                   ),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: 10),
                                   CustomWidgets().iconBtn(
                                     icon: Icons.delete,
                                     color: cs.error,
@@ -212,15 +217,15 @@ class RecommendationPage extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
-              color: cs.onSurface.withOpacity(0.6),
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall!
+                .copyWith(color: cs.onSurface.withOpacity(0.6)),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.titleSmall,
           ),
         ],
       ),
@@ -235,15 +240,15 @@ class RecommendationPage extends StatelessWidget {
       formKey: GlobalKey<FormState>(),
       sections: [
         CustomWidgets().labelWithAsterisk('Coupon Name'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context, hint: '', controller: c.nameController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Coupon Code'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context, hint: '', controller: c.codeController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Discount Type', required: true),
         Obx(
           () => Row(
@@ -268,14 +273,14 @@ class RecommendationPage extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Obx(() {
           if (c.selectedDiscountType.value == 'percentage') {
             return Column(
               children: [
                 CustomWidgets()
                     .labelWithAsterisk('Discount Percentage', required: true),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 CustomWidgets().dropdownStyledTextField(
                     context: context,
                     hint: 'Enter discount percentage',
@@ -288,25 +293,25 @@ class RecommendationPage extends StatelessWidget {
               children: [
                 CustomWidgets()
                     .labelWithAsterisk('Discount Amount', required: true),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 CustomWidgets().dropdownStyledTextField(
                     context: context, hint: 'Enter discount amount'),
               ],
             );
           }
-          return const SizedBox();
+          return SizedBox();
         }),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Start Date'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context, hint: '', controller: c.startDateController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('End Date'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context, hint: '', controller: c.endDateController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
       ],
       onSubmit: () {},
     );
@@ -322,7 +327,7 @@ class RecommendationPage extends StatelessWidget {
         sections: [
           CustomWidgets()
               .labelWithAsterisk('Select recommendation Type', required: true),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Obx(
             () => Row(
               children: [
@@ -349,14 +354,14 @@ class RecommendationPage extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Obx(() {
             if (c.selectedRecommendationType.value == 'package') {
               return Column(
                 children: [
                   CustomWidgets()
                       .labelWithAsterisk('Recommended Package', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context, hint: 'Select Package'),
                 ],
@@ -367,31 +372,31 @@ class RecommendationPage extends StatelessWidget {
                 children: [
                   CustomWidgets()
                       .labelWithAsterisk('Recommended Batch', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context, hint: 'Select batch'),
                 ],
               );
             }
-            return const SizedBox();
+            return SizedBox();
           }),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Start Date'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().customDatePickerField(
               context: context,
               controller: c.startDateController,
               selectedDate: c.selectedStartDate),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('End Date'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().customDatePickerField(
               context: context,
               controller: c.endDateController,
               selectedDate: c.selectedEndDate),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Visible To:'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           MultiSelector(
             items: c.syllabus,
             allValue: "All",

@@ -155,8 +155,8 @@ class BatchListController extends GetxController {
           (s.batch?.batchID?.toLowerCase().contains(query) ?? false) ||
           (s.id.toLowerCase().contains(query)) ||
           (s.package?.name?.toLowerCase().contains(query) ?? false) ||
-          (s.package?.teacher?.name?.toLowerCase().contains(query) ?? false) ||
-          (s.package?.teacher?.id?.toLowerCase().contains(query) ?? false) ||
+          (s.package?.teacher?.name.toLowerCase().contains(query) ?? false) ||
+          (s.package?.teacher?.id.toLowerCase().contains(query) ?? false) ||
           (s.package?.standard?.toLowerCase().contains(query) ?? false) ||
           (s.package?.syllabus?.toLowerCase().contains(query) ?? false) ||
           (s.date?.toString().toLowerCase().contains(query) ?? false);
@@ -200,9 +200,9 @@ class BatchListController extends GetxController {
             (s.batch?.batchID?.toLowerCase().contains(query) ?? false) ||
             s.id.toLowerCase().contains(query) ||
             (s.package?.name?.toLowerCase().contains(query) ?? false) ||
-            (s.package?.teacher?.name?.toLowerCase().contains(query) ??
+            (s.package?.teacher?.name.toLowerCase().contains(query) ??
                 false) ||
-            (s.package?.teacher?.id?.toLowerCase().contains(query) ?? false) ||
+            (s.package?.teacher?.id.toLowerCase().contains(query) ?? false) ||
             (s.package?.standard?.toLowerCase().contains(query) ?? false) ||
             (s.package?.syllabus?.toLowerCase().contains(query) ?? false);
       }).toList();
@@ -323,7 +323,7 @@ class BatchListController extends GetxController {
 
     CustomWidgets().showCustomDialog(
       context: Get.context!,
-      title: const Text("Edit Session Report"),
+      title: Text("Edit Session Report"),
       icon: Icons.description,
       formKey: GlobalKey<FormState>(),
       isViewOnly: false,

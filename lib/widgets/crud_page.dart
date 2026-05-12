@@ -128,11 +128,9 @@ class CrudPage<T> extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
         ),
-        title: const Text(
+        title: Text(
           'Add Item',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-          ),
+          style: Theme.of(context).textTheme.titleSmall,
         ),
         content: Form(
           key: formKey,
@@ -145,7 +143,7 @@ class CrudPage<T> extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           FilledButton.icon(
             onPressed: () async {
@@ -155,7 +153,7 @@ class CrudPage<T> extends StatelessWidget {
 
               Navigator.pop(context);
             },
-            label: const Text('Add'),
+            label: Text('Add'),
           )
         ],
       ),
@@ -194,29 +192,29 @@ class _EmptyState extends StatelessWidget {
                 color: cs.primary,
               ),
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: 18),
             Text(
               'No items yet',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: cs.onSurface,
-              ),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge!
+                  .copyWith(color: cs.onSurface),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               'Create your first item to get started',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: cs.outline,
-              ),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: cs.outline),
             ),
             if (onAdd != null) ...[
-              const SizedBox(height: 22),
+              SizedBox(height: 22),
               FilledButton.icon(
                 onPressed: onAdd,
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('Add Item'),
+                label: Text('Add Item'),
               ),
             ]
           ],
@@ -324,7 +322,7 @@ class _EditableTileState extends State<EditableTile> {
               color: cs.primary,
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: _editing
                 ? TextField(
@@ -342,14 +340,13 @@ class _EditableTileState extends State<EditableTile> {
                   )
                 : Text(
                     widget.value,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: cs.onSurface,
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall!
+                        .copyWith(color: cs.onSurface),
                   ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           if (_editing) ...[
             IconButton(
               tooltip: 'Save',
@@ -448,15 +445,14 @@ class ViewEditTile extends StatelessWidget {
                 color: cs.primary,
               ),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
             Expanded(
               child: Text(
                 value,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: cs.onSurface,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleSmall!
+                    .copyWith(color: cs.onSurface),
               ),
             ),
             IconButton(

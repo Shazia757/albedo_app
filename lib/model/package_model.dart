@@ -10,7 +10,7 @@ class Package {
   DateTime? enrolledAt;
   Teacher? teacher;
   int? expenseRatio;
-    DateTime? date;
+  DateTime? date;
 
   ///TODO
   Days? days;
@@ -28,7 +28,7 @@ class Package {
   String? standard;
   String? syllabus;
 
-String? status; // Active / Completed / Pending
+  String? status; // Active / Completed / Pending
 
   double? teacherSalaryPerHour;
   double? studentFeePerHour;
@@ -68,7 +68,7 @@ String? status; // Active / Completed / Pending
     this.subjectName,
     this.standard,
     this.syllabus,
-  this.status,
+    this.status,
     this.packageFee,
     this.takenFee,
     this.balance,

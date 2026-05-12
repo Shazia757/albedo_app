@@ -56,7 +56,7 @@ class DrawerMenu extends StatelessWidget {
 
               final user = auth.activeUser;
               if (user == null) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator());
               }
               final role = auth.activeUser?.role;
               final isAdmin = role == "admin";
@@ -522,24 +522,21 @@ class DrawerMenu extends StatelessWidget {
       child: Row(
         children: [
           _buildAvatar(context, size: 36),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 auth.activeUser?.name ?? '',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                ),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: 2),
               Text(
                 auth.activeUser?.email ?? '',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: cs.onSurface.withOpacity(0.6),
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .labelSmall!
+                    .copyWith(color: cs.onSurface.withOpacity(0.6)),
               ),
             ],
           )
@@ -619,16 +616,14 @@ class DrawerMenu extends StatelessWidget {
                           isActive ? cs.primary : cs.onSurface.withOpacity(0.5),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       title,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight:
-                            isActive ? FontWeight.w600 : FontWeight.w400,
-                        color: isActive ? cs.primary : cs.onSurface,
-                      ),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          fontWeight:
+                              isActive ? FontWeight.w600 : FontWeight.w400,
+                          color: isActive ? cs.primary : cs.onSurface),
                     ),
                   ),
                 ],
@@ -661,13 +656,11 @@ class DrawerMenu extends StatelessWidget {
           child: Row(
             children: [
               _buildAvatar(context, size: 32),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: Text(
                   "View Profile",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
               Icon(Icons.arrow_forward_ios, size: 14),
@@ -771,17 +764,15 @@ class DrawerExpansionMenu extends StatelessWidget {
                           isActive ? cs.primary : cs.onSurface.withOpacity(0.5),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
 
                   Expanded(
                     child: Text(
                       title,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight:
-                            isActive ? FontWeight.w600 : FontWeight.w400,
-                        color: isActive ? cs.primary : cs.onSurface,
-                      ),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          fontWeight:
+                              isActive ? FontWeight.w600 : FontWeight.w400,
+                          color: isActive ? cs.primary : cs.onSurface),
                     ),
                   ),
 
@@ -802,7 +793,7 @@ class DrawerExpansionMenu extends StatelessWidget {
 
           /// 🔹 Children (Animated)
           AnimatedCrossFade(
-            firstChild: const SizedBox(),
+            firstChild: SizedBox(),
             secondChild: Column(
               children: children.map((item) {
                 return _ProSubItem(
@@ -892,11 +883,9 @@ class _ProSubItemState extends State<_ProSubItem> {
 
                 Text(
                   widget.item.title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                    color: isActive ? cs.primary : cs.onSurface,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                      color: isActive ? cs.primary : cs.onSurface),
                 ),
               ],
             ),
@@ -952,11 +941,9 @@ class DrawerSubItemWidget extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 16),
           title: Text(
             item.title,
-            style: TextStyle(
-              fontSize: 12,
-              color: isActive ? cs.primary : cs.onSurface,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-            ),
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: isActive ? cs.primary : cs.onSurface,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400),
           ),
           onTap: () {
             selectedParentIndex.value = parentIndex;

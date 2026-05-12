@@ -1,7 +1,6 @@
 import 'package:albedo_app/controller/settings_controller.dart';
 import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/widgets/crud_page.dart';
-import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -82,8 +81,7 @@ class _DeadlineTileState extends State<DeadlineTile> {
             children: [
               Text(
                 widget.config.role,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               const Spacer(),
               if (!editing)
@@ -102,10 +100,13 @@ class _DeadlineTileState extends State<DeadlineTile> {
                       ? "${temp.value} hours after session"
                       : "${temp.value} day of next month"
                   : "No time limit",
-              style: TextStyle(color: cs.onSurface.withOpacity(0.6)),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: cs.onSurface.withOpacity(0.6)),
             ),
           ] else ...[
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             /// 🔘 TYPE
             Column(
@@ -115,21 +116,21 @@ class _DeadlineTileState extends State<DeadlineTile> {
                   groupValue: temp.type,
                   onChanged: (val) =>
                       setState(() => temp.type = val.toString()),
-                  title: const Text("Hours after session"),
-                  subtitle: const Text("e.g. 48 = 2 days after session"),
+                  title: Text("Hours after session"),
+                  subtitle: Text("e.g. 48 = 2 days after session"),
                 ),
                 RadioListTile(
                   value: "dayOfMonth",
                   groupValue: temp.type,
                   onChanged: (val) =>
                       setState(() => temp.type = val.toString()),
-                  title: const Text("Day of next month"),
-                  subtitle: const Text("e.g. 3 = 3rd of next month"),
+                  title: Text("Day of next month"),
+                  subtitle: Text("e.g. 3 = 3rd of next month"),
                 ),
               ],
             ),
 
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             /// 🔢 INPUT + SWITCH
             Row(
@@ -149,7 +150,7 @@ class _DeadlineTileState extends State<DeadlineTile> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Column(
                   children: [
                     Switch(
@@ -158,14 +159,14 @@ class _DeadlineTileState extends State<DeadlineTile> {
                     ),
                     Text(
                       temp.enabled ? "Enforced" : "Disabled",
-                      style: const TextStyle(fontSize: 11),
+                      style: Theme.of(context).textTheme.labelSmall,
                     )
                   ],
                 )
               ],
             ),
 
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             /// 🔘 ACTIONS
             Row(
@@ -185,11 +186,13 @@ class _DeadlineTileState extends State<DeadlineTile> {
                   },
                   child: Text(
                     "Cancel",
-                    style:
-                        TextStyle(color: context.theme.colorScheme.onSurface),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(color: context.theme.colorScheme.onSurface),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       backgroundColor: context.theme.colorScheme.primary),
@@ -198,7 +201,10 @@ class _DeadlineTileState extends State<DeadlineTile> {
                   },
                   child: Text(
                     'Edit',
-                    style: TextStyle(color: Colors.white),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(color: Colors.white),
                   ),
                 ),
               ],

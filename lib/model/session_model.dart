@@ -11,9 +11,9 @@ class Session {
   final String id;
   Student? student;
   Batch? batch;
-Package? package;
+  Package? package;
   String? syllabus;
- String? className;
+  String? className;
   Teacher? teacher;
   Mentor? mentor;
   Coordinator? coordinator;
@@ -28,22 +28,22 @@ Package? package;
   String? topic;
   String? googleMeetLink;
 
-   DateTime? date;
-   String status;
+  DateTime? date;
+  String status;
   int? duration;
   double? teacherSalary;
 
   Session({
     required this.id,
     this.student,
-     this.package,
-     this.batch,
-     this.startTime,
-     this.endTime,
-     this.syllabus,
-     this.className,
+    this.package,
+    this.batch,
+    this.startTime,
+    this.endTime,
+    this.syllabus,
+    this.className,
     this.teacher,
-     this.date,
+    this.date,
     required this.status,
     this.advisor,
     this.coordinator,
@@ -85,8 +85,9 @@ class SessionReport {
     this.reason,
   });
 }
+
 class BatchSessionReport {
- final List<Student> students;
+  final List<Student> students;
   final Package package;
   final String sessionDate;
   final String duration;

@@ -81,13 +81,10 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
           Row(
             children: [
               Icon(widget.icon, size: 16, color: color),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(
                 widget.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall
-                    ?.copyWith(color: color),
+                style: Get.textTheme.titleSmall?.copyWith(color: color),
               ),
               const Spacer(),
               InkWell(
@@ -103,7 +100,7 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
             ],
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           /// Content
           if (!isEditing) ...[
@@ -112,23 +109,23 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
             infoRow(label: "Duration", value: widget.duration),
           ] else ...[
             CustomWidgets().labelWithAsterisk('Session Date', required: true),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
 
             CustomWidgets().dropdownStyledTextField(
               controller: dateController,
               hint: 'Date',
               context: context,
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             CustomWidgets().labelWithAsterisk('Session Time', required: true),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
 
             CustomWidgets().dropdownStyledTextField(
               controller: timeController,
               hint: 'Time',
               context: context,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             /// Actions
             Row(
@@ -142,7 +139,7 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
                       timeController.text = widget.time;
                     });
                   },
-                  child: const Text("Cancel"),
+                  child: Text("Cancel"),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -153,7 +150,7 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
 
                     setState(() => isEditing = false);
                   },
-                  child: const Text("Save"),
+                  child: Text("Save"),
                 ),
               ],
             ),
@@ -171,14 +168,11 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
   //       children: [
   //         Text(
   //           label,
-  //           style: const TextStyle(fontSize: 12),
+  //           style: Get.textTheme.bodySmall,
   //         ),
   //         Text(
   //           value,
-  //           style: const TextStyle(
-  //             fontWeight: FontWeight.w500,
-  //             fontSize: 12,
-  //           ),
+  //           style: Get.textTheme.labelMedium!.copyWith(//             //             //),
   //         ),
   //       ],
   //     ),
@@ -194,7 +188,7 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
       case "schedule":
         return Colors.orange;
       default:
-        return Theme.of(context).colorScheme.primary;
+        return Get.theme.colorScheme.primary;
     }
   }
 }
@@ -268,7 +262,7 @@ class _EditableDetailCardState extends State<EditableDetailCard> {
                 radius: 18,
                 child: Image.asset('assets/images/logo.png'),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
 
               Expanded(
                 child: Column(
@@ -276,29 +270,23 @@ class _EditableDetailCardState extends State<EditableDetailCard> {
                   children: [
                     Text(
                       widget.title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelSmall
-                          ?.copyWith(color: color),
+                      style: Get.textTheme.labelSmall?.copyWith(color: color),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
 
                     /// 🔥 SWITCH CONTENT
                     if (!isEditing) ...[
-                      Text(widget.name,
-                          style: Theme.of(context).textTheme.titleMedium),
+                      Text(widget.name, style: Get.textTheme.titleMedium),
                       if (widget.id.isNotEmpty)
                         Text(widget.id,
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall
+                            style: Get.textTheme.labelSmall
                                 ?.copyWith(color: color)),
                     ] else ...[
                       CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Name',
                           controller: field1Controller),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6),
                       CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Mentor Id',
@@ -340,7 +328,7 @@ class _EditableDetailCardState extends State<EditableDetailCard> {
                     field2Controller.text = widget.id;
                   });
                 },
-                child: const Text("Cancel"),
+                child: Text("Cancel"),
               ),
             ),
         ],
@@ -389,8 +377,8 @@ Widget detailCard(
   String? Function()? getImageUrl,
 }) {
   final color = getRoleColor(context, title.toLowerCase());
-  final cs = Theme.of(context).colorScheme;
-  final textTheme = Theme.of(context).textTheme;
+  final cs = Get.theme.colorScheme;
+  final textTheme = Get.textTheme;
 
   final imageUrl = getImageUrl?.call();
 
@@ -418,7 +406,7 @@ Widget detailCard(
                 ? Icon(Icons.person, size: 18, color: color)
                 : null,
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,7 +415,7 @@ Widget detailCard(
                   title,
                   style: textTheme.labelSmall?.copyWith(color: color),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   isMissing ? "Not assigned" : (name ?? "-"),
                   style: textTheme.titleSmall?.copyWith(
@@ -456,7 +444,7 @@ Widget detailCard(
 }
 
 Color getRoleColor(BuildContext context, String role) {
-  final cs = Theme.of(context).colorScheme;
+  final cs = Get.theme.colorScheme;
 
   switch (role) {
     case "student":
@@ -504,12 +492,12 @@ Widget infoCard(
         Row(
           children: [
             Icon(icon, size: 16, color: color),
-            const SizedBox(width: 6),
+            SizedBox(width: 6),
             Text(
               title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: color,
-                  ),
+              style: Get.textTheme.titleSmall?.copyWith(
+                color: color,
+              ),
             ),
             const Spacer(),
             if (onEdit != null) // 👈 show only if editable
@@ -523,7 +511,7 @@ Widget infoCard(
               ),
           ],
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         ...children,
       ],
     ),
@@ -542,7 +530,7 @@ Widget infoRow({
       children: [
         if (icon != null) ...[
           Icon(icon, size: 16, color: Colors.grey),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
         ],
 
         /// 🔹 Label
@@ -550,10 +538,7 @@ Widget infoRow({
           width: 80, // keeps alignment clean
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
+            style: Get.textTheme.bodySmall!.copyWith(color: Colors.grey),
           ),
         ),
 
@@ -561,10 +546,7 @@ Widget infoRow({
         Expanded(
           child: Text(
             value ?? "-",
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
+            style: Get.textTheme.labelMedium,
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
           ),
@@ -600,7 +582,8 @@ class IconChip extends StatelessWidget {
   final ColorScheme cs;
   final VoidCallback onTap;
 
-  const IconChip({required this.icon, required this.cs, required this.onTap});
+  const IconChip(
+      {super.key, required this.icon, required this.cs, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -612,8 +595,6 @@ class IconChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surfaceContainerHighest.withOpacity(0.6),
           borderRadius: BorderRadius.circular(12),
-          border:
-              Border.all(color: cs.outlineVariant.withOpacity(0.5), width: 1),
         ),
         child: Icon(icon, size: 19, color: cs.onSurface),
       ),
@@ -628,6 +609,7 @@ class MetaItem extends StatelessWidget {
   final Color textSecondary;
 
   const MetaItem({
+    super.key,
     required this.label,
     required this.value,
     required this.textSecondary,
@@ -635,7 +617,7 @@ class MetaItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
@@ -644,18 +626,15 @@ class MetaItem extends StatelessWidget {
           width: 46,
           child: Text(
             label,
-            style: TextStyle(fontSize: 11, color: textSecondary),
+            style: Get.textTheme.labelSmall!.copyWith(color: textSecondary),
           ),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: 4),
         Expanded(
           child: Text(
             value,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: cs.onSurface.withOpacity(0.8),
-            ),
+            style: Get.textTheme.labelMedium!
+                .copyWith(color: cs.onSurface.withOpacity(0.8)),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -766,7 +745,7 @@ Widget idCardCTA({
             ),
           ),
 
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
 
           /// 🔹 TEXT
           Expanded(
@@ -775,16 +754,16 @@ Widget idCardCTA({
               children: [
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Colors.white,
-                      ),
+                  style: Get.textTheme.titleSmall?.copyWith(
+                    color: Colors.white,
+                  ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.white70,
-                      ),
+                  style: Get.textTheme.bodySmall?.copyWith(
+                    color: Colors.white70,
+                  ),
                 ),
               ],
             ),
@@ -896,12 +875,12 @@ void openMentorProfile(
 }
 
 void openBatchProfile(BuildContext context, Batch data) {
-  final primary = Theme.of(context).colorScheme.primary;
+  final primary = Get.theme.colorScheme.primary;
   openProfileDialog(
       context: context,
       title: 'Batch profile',
       icon: Icons.people,
-      color: Theme.of(context).colorScheme.primary,
+      color: Get.theme.colorScheme.primary,
       content: SingleChildScrollView(
         child: Column(children: [
           profileHeader<Batch>(
@@ -914,7 +893,7 @@ void openBatchProfile(BuildContext context, Batch data) {
             getImageUrl: (b) => b.imageUrl ?? '',
             getStatus: (p0) => p0.status ?? '',
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           infoCard(
             context,
             type: "schedule",
@@ -972,7 +951,7 @@ void openBatchProfile(BuildContext context, Batch data) {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
@@ -1006,7 +985,7 @@ void openBatchProfile(BuildContext context, Batch data) {
                 ),
               if (data.coordinator?.name == null)
                 simpleText("No coordinator assigned"),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               EditableDetailCard(
                 type: "mentor",
                 title: "Mentor",
@@ -1207,10 +1186,7 @@ void openProfileDialog({
     isViewOnly: true,
     context: context,
     title: Text(title,
-        style: Theme.of(context)
-            .textTheme
-            .titleMedium
-            ?.copyWith(color: Colors.white)),
+        style: Get.textTheme.titleMedium?.copyWith(color: Colors.white)),
     icon: icon,
     formKey: GlobalKey<FormState>(),
     submitText: "Close",
@@ -1245,9 +1221,9 @@ Widget profileCard(
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(color: color),
+          style: Get.textTheme.titleSmall?.copyWith(color: color),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         ...children,
       ],
     ),
@@ -1259,10 +1235,7 @@ Widget simpleText(String text) {
     padding: const EdgeInsets.only(bottom: 6),
     child: Text(
       text,
-      style: const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-      ),
+      style: Get.textTheme.titleSmall,
     ),
   );
 }
@@ -1293,7 +1266,7 @@ Widget buildProfileContent<T>({
         getImageUrl: getImageUrl,
         onDashboardTap: onDashboardTap,
       ),
-      const SizedBox(height: 10),
+      SizedBox(height: 10),
       ...sections,
     ],
   );
@@ -1357,27 +1330,26 @@ Widget profileHeader<T>({
           ],
         ),
 
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
 
         /// 🔹 INFO
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(getName(data),
-                  style: Theme.of(context).textTheme.titleMedium),
+              Text(getName(data), style: Get.textTheme.titleMedium),
 
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
 
               if (email != null && email.isNotEmpty) ...[
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   email,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: Get.textTheme.bodySmall,
                 ),
               ],
 
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
 
               /// 🪪 ID CHIP
               Container(
@@ -1388,10 +1360,7 @@ Widget profileHeader<T>({
                 ),
                 child: Text(
                   getId(data) ?? "-",
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(color: color),
+                  style: Get.textTheme.labelSmall?.copyWith(color: color),
                 ),
               ),
             ],
@@ -1411,9 +1380,9 @@ Widget profileHeader<T>({
             onPressed: onDashboardTap,
             child: Text(
               "Dashboard",
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Colors.white,
-                  ),
+              style: Get.textTheme.labelMedium?.copyWith(
+                color: Colors.white,
+              ),
             ),
           ),
       ],
@@ -1457,7 +1426,7 @@ class StatusBadge extends StatelessWidget {
   final String status;
   final Color color;
 
-  const StatusBadge({required this.status, required this.color});
+  const StatusBadge({super.key, required this.status, required this.color});
 
   String get _label {
     final words =
@@ -1475,11 +1444,7 @@ class StatusBadge extends StatelessWidget {
       ),
       child: Text(
         _label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: color,
-        ),
+        style: Get.textTheme.labelSmall!.copyWith(color: color),
       ),
     );
   }
@@ -1493,6 +1458,7 @@ class NameCell extends StatelessWidget {
   final Color textSecondary;
 
   const NameCell({
+    super.key,
     required this.label,
     required this.name,
     required this.textPrimary,
@@ -1506,21 +1472,13 @@ class NameCell extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            color: textSecondary,
-            letterSpacing: 0.6,
-          ),
+          style: Get.textTheme.labelSmall!
+              .copyWith(color: textSecondary, letterSpacing: 0.6),
         ),
-        const SizedBox(height: 2),
+        SizedBox(height: 2),
         Text(
           name,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: textPrimary,
-          ),
+          style: Get.textTheme.titleSmall!.copyWith(color: textPrimary),
           overflow: TextOverflow.ellipsis,
         ),
       ],
@@ -1533,24 +1491,21 @@ class DetailSectionLabel extends StatelessWidget {
   final String label;
   final IconData icon;
 
-  const DetailSectionLabel({required this.label, required this.icon});
+  const DetailSectionLabel(
+      {super.key, required this.label, required this.icon});
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Row(
       children: [
         Icon(icon, size: 14, color: cs.primary.withOpacity(0.7)),
-        const SizedBox(width: 6),
+        SizedBox(width: 6),
         Text(
           label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: cs.onSurface.withOpacity(0.45),
-            letterSpacing: 0.8,
-          ),
+          style: Get.textTheme.titleSmall!.copyWith(
+              color: cs.onSurface.withOpacity(0.45), letterSpacing: 0.8),
         ),
       ],
     );
@@ -1568,6 +1523,7 @@ class DialogSectionCard extends StatelessWidget {
   final Widget child;
 
   const DialogSectionCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.child,
@@ -1575,7 +1531,7 @@ class DialogSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -1590,18 +1546,14 @@ class DialogSectionCard extends StatelessWidget {
           Row(
             children: [
               Icon(icon, size: 16, color: cs.primary),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
-                ),
+                style: Get.textTheme.titleSmall!.copyWith(color: cs.onSurface),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           child,
         ],
       ),
@@ -1617,6 +1569,7 @@ class DetailActionButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const DetailActionButton({
+    super.key,
     required this.label,
     required this.icon,
     required this.color,
@@ -1629,7 +1582,7 @@ class DetailActionButton extends StatelessWidget {
       onPressed: onTap,
       icon: Icon(icon, size: 15, color: Colors.white),
       label: Text(label,
-          style: const TextStyle(color: Colors.white, fontSize: 13)),
+          style: Get.textTheme.bodySmall!.copyWith(color: Colors.white)),
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         elevation: 0,
@@ -1650,6 +1603,7 @@ class EmptyState extends StatelessWidget {
   final IconData icon;
 
   const EmptyState({
+    super.key,
     required this.cs,
     required this.title,
     required this.subtitle,
@@ -1675,22 +1629,17 @@ class EmptyState extends StatelessWidget {
                 color: cs.primary.withOpacity(0.6),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: cs.onSurface.withOpacity(0.7),
-              ),
+              style: Get.textTheme.titleMedium!
+                  .copyWith(color: cs.onSurface.withOpacity(0.7)),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               subtitle,
-              style: TextStyle(
-                fontSize: 13,
-                color: cs.onSurface.withOpacity(0.4),
-              ),
+              style: Get.textTheme.bodySmall!
+                  .copyWith(color: cs.onSurface.withOpacity(0.4)),
             ),
           ],
         ),

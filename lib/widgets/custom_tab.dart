@@ -1,4 +1,3 @@
-import 'package:albedo_app/controller/payment_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -79,11 +78,9 @@ class _TabItem extends StatelessWidget {
             child: Text(
               label,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isOn ? FontWeight.w500 : FontWeight.w400,
-                color: isOn ? cs.primary : cs.onSurface.withOpacity(0.45),
-              ),
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  fontWeight: isOn ? FontWeight.w500 : FontWeight.w400,
+                  color: isOn ? cs.primary : cs.onSurface.withOpacity(0.45)),
             ),
           ),
         ),

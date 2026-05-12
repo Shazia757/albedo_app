@@ -42,22 +42,22 @@ class Users {
   }
 
   Users copyWith({
-  String? name,
-  String? id,
-  String? role,
-  String? email,
-  String? contact,
-  String? profileImage,
-}) {
-  return Users(
-    name: name ?? this.name,
-    id: id ?? this.id,
-    role: role ?? this.role,
-    email: email ?? this.email,
-    contact: contact ?? this.contact,
-    profileImage: profileImage ?? this.profileImage,
-  );
-}
+    String? name,
+    String? id,
+    String? role,
+    String? email,
+    String? contact,
+    String? profileImage,
+  }) {
+    return Users(
+      name: name ?? this.name,
+      id: id ?? this.id,
+      role: role ?? this.role,
+      email: email ?? this.email,
+      contact: contact ?? this.contact,
+      profileImage: profileImage ?? this.profileImage,
+    );
+  }
 }
 
 class DeadlineConfig {

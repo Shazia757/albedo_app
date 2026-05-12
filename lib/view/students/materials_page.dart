@@ -12,7 +12,6 @@ class StudentMaterialsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-
       appBar: CustomAppBar(),
       drawer: DrawerMenu(),
       body: Center(

@@ -74,7 +74,7 @@
 //                         'Session Details',
 //                         style: Theme.of(context).textTheme.titleLarge,
 //                       ),
-//                       const SizedBox(height: 10),
+//                       SizedBox(height: 10),
 //                       Obx(() {
 //                         final index = c.currentSessionIndex.value;
 //                         final data = sessions[index];
@@ -99,7 +99,7 @@
 //                                       Text(
 //                                         "Session ${index + 1} of ${sessions.length}",
 //                                       ),
-//                                       const SizedBox(height: 6),
+//                                       SizedBox(height: 6),
 //                                       Row(
 //                                         mainAxisAlignment:
 //                                             MainAxisAlignment.center,
@@ -190,14 +190,14 @@
 //                                         _onUserTap(context, "advisor", id),
 //                                   ),
 
-//                                   const SizedBox(height: 16),
+//                                   SizedBox(height: 16),
 
 //                                   DetailSectionLabel(
 //                                     label: "Schedule & Info",
 //                                     icon: Icons.event_outlined,
 //                                   ),
 
-//                                   const SizedBox(height: 8),
+//                                   SizedBox(height: 8),
 
 //                                   EditableInfoCard(
 //                                     type: "schedule",
@@ -228,14 +228,14 @@
 //                                     ],
 //                                   ),
 
-//                                   const SizedBox(height: 16),
+//                                   SizedBox(height: 16),
 
 //                                   DetailSectionLabel(
 //                                     label: "Status",
 //                                     icon: Icons.flag_outlined,
 //                                   ),
 
-//                                   const SizedBox(height: 8),
+//                                   SizedBox(height: 8),
 
 //                                   infoCard(
 //                                     context,
@@ -250,7 +250,7 @@
 //                                     ],
 //                                   ),
 
-//                                   const SizedBox(height: 10),
+//                                   SizedBox(height: 10),
 
 //                                   /// (KEEP REPORT SECTION EXACTLY AS YOU HAVE)
 //                                 ],
@@ -284,7 +284,7 @@
 //                                           },
 //                                         ),
 //                                       ),
-//                                     const SizedBox(width: 8),
+//                                     SizedBox(width: 8),
 //                                     Expanded(
 //                                       child: DetailActionButton(
 //                                         label: "Support",
@@ -294,7 +294,7 @@
 //                                       ),
 //                                     ),
 //                                     if (data.status == 'pending') ...[
-//                                       const SizedBox(width: 8),
+//                                       SizedBox(width: 8),
 //                                       Expanded(
 //                                         child: DetailActionButton(
 //                                           label: "Complete",
@@ -308,7 +308,7 @@
 //                                       ),
 //                                     ],
 //                                     if (!isCoordinator) ...[
-//                                       const SizedBox(width: 8),
+//                                       SizedBox(width: 8),
 //                                       Expanded(
 //                                         child: DetailActionButton(
 //                                           label: "Delete",
@@ -380,7 +380,7 @@
 //                   ? theme.colorScheme.primary
 //                   : theme.colorScheme.onSurface.withOpacity(0.6),
 //             ),
-//             const SizedBox(width: 10),
+//             SizedBox(width: 10),
 
 //             /// TEXT
 //             Expanded(
@@ -406,7 +406,7 @@
 //       crossAxisAlignment: CrossAxisAlignment.start,
 //       children: [
 //         CustomWidgets().labelWithAsterisk('Select Student', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().customDropdownField<Student>(
 //           context: context,
 //           hint: 'Select Student',
@@ -415,9 +415,9 @@
 //           itemLabel: (s) => s.name,
 //           onChanged: (student) => c.onStudentSelected(student),
 //         ),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Select Package', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().customDropdownField(
 //           context: context,
 //           hint: 'Select Package',
@@ -426,9 +426,9 @@
 //           itemLabel: (p) => p.subjectName ?? '',
 //           onChanged: (p0) => c.selectedPackage.value = p0,
 //         ),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Select Teacher', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().customDropdownField(
 //           context: context,
 //           hint: 'Select Teacher',
@@ -437,33 +437,33 @@
 //           value: c.selectedTeacher.value,
 //           itemLabel: (item) => item.name,
 //         ),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Teacher Salary'),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().dropdownStyledTextField(
 //             context: context,
 //             hint: 'Teacher Salary',
 //             controller: c.salaryController,
 //             isNumber: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Session Date', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().customDatePickerField(
 //           context: context,
 //           controller: c.dateController,
 //           selectedDate: c.selectedDate,
 //         ),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Session Time', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().timePickerStyledField(
 //           context: context,
 //           controller: c.timeController,
 //           selectedTime: c.selectedTime,
 //         ),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Select Duration', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().customDropdownField(
 //           context: context,
 //           hint: 'Select Duration',
@@ -483,13 +483,13 @@
 //       crossAxisAlignment: CrossAxisAlignment.start,
 //       children: [
 //         CustomWidgets().labelWithAsterisk('Meet Title', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().dropdownStyledTextField(
 //           context: context,
 //           hint: 'Meet Title',
 //           controller: c.meetTitleController,
 //         ),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         _buildMultiSelect<Mentor>(
 //           context: context,
 //           title: "Mentors",
@@ -538,29 +538,29 @@
 //           selectAll: c.selectAllOtherUsers,
 //           itemLabel: (item) => item.name,
 //         ),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         Text('Session Details',
 //             style:
 //                 textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Session Date', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().customDatePickerField(
 //           context: context,
 //           controller: c.dateController,
 //           selectedDate: c.selectedDate,
 //         ),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Session Time', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().timePickerStyledField(
 //           context: context,
 //           controller: c.timeController,
 //           selectedTime: c.selectedTime,
 //         ),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Select Duration', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().customDropdownField(
 //             context: context,
 //             hint: 'Select Duration',
@@ -568,9 +568,9 @@
 //             value: c.selectedDuration.value,
 //             onChanged: (p0) => c.selectedDuration.value = p0,
 //             itemLabel: (item) => "$item minutes"),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().labelWithAsterisk('Description', required: true),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //         CustomWidgets().dropdownStyledTextField(
 //           context: context,
 //           hint: 'Description',
@@ -623,7 +623,7 @@
 //                     borderRadius: BorderRadius.circular(4),
 //                   ),
 //                 )),
-//             const SizedBox(width: 8),
+//             SizedBox(width: 8),
 //             Text(
 //               'Select All $title',
 //               style: theme.textTheme.bodyMedium,
@@ -636,7 +636,7 @@
 //             items: list,
 //             selectedItems: selectedList,
 //             itemLabel: itemLabel),
-//         const SizedBox(height: 10),
+//         SizedBox(height: 10),
 //       ],
 //     );
 //   }
@@ -678,7 +678,7 @@
 //   void editSession(BuildContext context) {
 //     CustomWidgets().showCustomDialog(
 //       context: context,
-//       title: const Text('Edit Session'),
+//       title: Text('Edit Session'),
 //       icon: Icons.edit_outlined,
 //       formKey: GlobalKey<FormState>(),
 //       sections: [
@@ -695,7 +695,7 @@
 //                       children: [
 //                         CustomWidgets()
 //                             .labelWithAsterisk('Session Date', required: true),
-//                         const SizedBox(height: 8),
+//                         SizedBox(height: 8),
 //                         CustomWidgets().customDatePickerField(
 //                             context: context,
 //                             selectedDate: c.selectedDate,
@@ -703,14 +703,14 @@
 //                       ],
 //                     ),
 //                   ),
-//                   const SizedBox(width: 12),
+//                   SizedBox(width: 12),
 //                   Expanded(
 //                     child: Column(
 //                       crossAxisAlignment: CrossAxisAlignment.start,
 //                       children: [
 //                         CustomWidgets()
 //                             .labelWithAsterisk('Session Time', required: true),
-//                         const SizedBox(height: 8),
+//                         SizedBox(height: 8),
 //                         CustomWidgets().timePickerStyledField(
 //                             selectedTime: c.selectedTime,
 //                             context: context,
@@ -722,7 +722,7 @@
 //                 ],
 //               ),
 //             ),
-//             const SizedBox(height: 12),
+//             SizedBox(height: 12),
 //             DialogSectionCard(
 //               icon: Icons.school_outlined,
 //               title: "Session Details",
@@ -730,7 +730,7 @@
 //                 crossAxisAlignment: CrossAxisAlignment.start,
 //                 children: [
 //                   CustomWidgets().labelWithAsterisk('Duration', required: true),
-//                   const SizedBox(height: 8),
+//                   SizedBox(height: 8),
 //                   // CustomWidgets().customDropdownField(
 //                   //   context: context,
 //                   //   hint: 'Select Duration',
@@ -738,9 +738,9 @@
 //                   //       c.durationOptions.map((e) => "${(e)} minutes").toList(),
 //                   //   onChanged: (p0) {},
 //                   // ),
-//                   const SizedBox(height: 12),
+//                   SizedBox(height: 12),
 //                   CustomWidgets().labelWithAsterisk('Teacher', required: true),
-//                   const SizedBox(height: 8),
+//                   SizedBox(height: 8),
 //                   // CustomWidgets().customDropdownField(
 //                   //     context: context,
 //                   //     hint: 'Select Teacher',
@@ -750,7 +750,7 @@
 //                 ],
 //               ),
 //             ),
-//             const SizedBox(height: 12),
+//             SizedBox(height: 12),
 //             DialogSectionCard(
 //               icon: Icons.payments_outlined,
 //               title: "Payment",
@@ -759,7 +759,7 @@
 //                 children: [
 //                   CustomWidgets().labelWithAsterisk(
 //                       'Teacher Salary (per hour — optional)'),
-//                   const SizedBox(height: 8),
+//                   SizedBox(height: 8),
 //                   CustomWidgets().dropdownStyledTextField(
 //                       isNumber: true,
 //                       context: context,
@@ -779,7 +779,7 @@
 //   void _addSupport(BuildContext context) {
 //     CustomWidgets().showCustomDialog(
 //       context: context,
-//       title: const Text('Add New Ticket'),
+//       title: Text('Add New Ticket'),
 //       icon: Icons.support_agent_outlined,
 //       formKey: GlobalKey<FormState>(),
 //       sections: [
@@ -790,38 +790,38 @@
 //               crossAxisAlignment: CrossAxisAlignment.start,
 //               children: [
 //                 CustomWidgets().labelWithAsterisk('Title', required: true),
-//                 const SizedBox(height: 8),
+//                 SizedBox(height: 8),
 //                 CustomWidgets().dropdownStyledTextField(
 //                     context: context,
 //                     hint: 'Enter ticket title',
 //                     controller: c.titleController),
-//                 const SizedBox(height: 12),
+//                 SizedBox(height: 12),
 //                 CustomWidgets().labelWithAsterisk('Category', required: true),
-//                 const SizedBox(height: 8),
+//                 SizedBox(height: 8),
 //                 // CustomWidgets().customDropdownField(
 //                 //   context: context,
 //                 //   hint: 'Select category',
 //                 //   items: c.categoryList,
 //                 //   onChanged: (p0) {},
 //                 // ),
-//                 const SizedBox(height: 12),
+//                 SizedBox(height: 12),
 //                 CustomWidgets().labelWithAsterisk('Priority', required: true),
-//                 const SizedBox(height: 8),
+//                 SizedBox(height: 8),
 //                 // CustomWidgets().customDropdownField(
 //                 //   context: context,
 //                 //   hint: 'Select priority',
 //                 //   items: ['High', 'Medium', 'Low'],
 //                 //   onChanged: (p0) {},
 //                 // ),
-//                 const SizedBox(height: 12),
+//                 SizedBox(height: 12),
 //                 CustomWidgets().labelWithAsterisk('User', required: true),
-//                 const SizedBox(height: 8),
+//                 SizedBox(height: 8),
 //                 Obx(() => Row(
 //                       children: [
 //                         Expanded(
 //                           child: RadioListTile(
 //                             dense: true,
-//                             title: const Text('Student'),
+//                             title: Text('Student'),
 //                             value: "student",
 //                             groupValue: c.selectedType.value,
 //                             onChanged: (value) => c.selectedType.value = value!,
@@ -830,7 +830,7 @@
 //                         Expanded(
 //                           child: RadioListTile(
 //                             dense: true,
-//                             title: const Text('Teacher'),
+//                             title: Text('Teacher'),
 //                             value: "teacher",
 //                             groupValue: c.selectedType.value,
 //                             onChanged: (value) => c.selectedType.value = value!,
@@ -838,7 +838,7 @@
 //                         ),
 //                       ],
 //                     )),
-//                 const SizedBox(height: 8),
+//                 SizedBox(height: 8),
 //                 Obx(() {
 //                   // if (c.selectedType.value == 'student') {
 //                   //   return CustomWidgets().customDropdownField(
@@ -854,11 +854,11 @@
 //                   //       context: context,
 //                   //       hint: 'Select teacher');
 //                   // }
-//                   return const SizedBox();
+//                   return SizedBox();
 //                 }),
-//                 const SizedBox(height: 12),
+//                 SizedBox(height: 12),
 //                 CustomWidgets().labelWithAsterisk('Attachment'),
-//                 const SizedBox(height: 8),
+//                 SizedBox(height: 8),
 //                 CustomWidgets().attachmentStyledField(
 //                   context: context,
 //                   label: "Attachment",
@@ -867,17 +867,17 @@
 //                   onTap: () {},
 //                   onClear: () {},
 //                 ),
-//                 const SizedBox(height: 12),
+//                 SizedBox(height: 12),
 //                 CustomWidgets()
 //                     .labelWithAsterisk('Description', required: true),
-//                 const SizedBox(height: 8),
+//                 SizedBox(height: 8),
 //                 CustomWidgets().dropdownStyledTextField(
 //                   context: context,
 //                   hint: 'Describe the issue...',
 //                   controller: c.descriptionController,
 //                   isMultiline: true,
 //                 ),
-//                 const SizedBox(height: 16),
+//                 SizedBox(height: 16),
 //               ],
 //             ),
 //           ),
@@ -890,28 +890,28 @@
 //   void _markSessionCompleted(BuildContext context, DateTime date) {
 //     CustomWidgets().showCustomDialog(
 //       context: context,
-//       title: const Text('Mark Session as Completed'),
+//       title: Text('Mark Session as Completed'),
 //       formKey: GlobalKey<FormState>(),
 //       sections: [
 //         Column(
 //           children: [
 //             CustomWidgets().labelWithAsterisk('Session Date', required: true),
-//             const SizedBox(height: 8),
+//             SizedBox(height: 8),
 //             CustomWidgets().customDatePickerField(
 //                 context: context,
 //                 selectedDate: c.selectedDate,
 //                 controller: c.dateController),
-//             const SizedBox(width: 12),
+//             SizedBox(width: 12),
 //             CustomWidgets().labelWithAsterisk('Start Time', required: true),
-//             const SizedBox(height: 8),
+//             SizedBox(height: 8),
 //             CustomWidgets().timePickerStyledField(
 //                 selectedTime: c.selectedTime,
 //                 context: context,
 //                 hint: 'Time',
 //                 controller: c.timeController),
-//             const SizedBox(height: 12),
+//             SizedBox(height: 12),
 //             CustomWidgets().labelWithAsterisk('Duration', required: true),
-//             const SizedBox(height: 8),
+//             SizedBox(height: 8),
 //             // CustomWidgets().customDropdownField(
 //             //   context: context,
 //             //   hint: 'Select Duration',

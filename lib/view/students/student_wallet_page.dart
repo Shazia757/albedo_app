@@ -15,14 +15,14 @@ class StudentWalletPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return DefaultTabController(
       length: 2,
       child: Builder(builder: (context) {
         final tabController = DefaultTabController.of(context);
         return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Get.theme.colorScheme.surface,
           appBar: CustomAppBar(),
           floatingActionButton: AnimatedBuilder(
             animation: tabController,
@@ -55,10 +55,10 @@ class StudentWalletPage extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                 child: Text(
                   "Wallet",
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.5,
-                      ),
+                  style: Get.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.5,
+                      color: cs.primary),
                 ),
               ),
 
@@ -80,14 +80,8 @@ class StudentWalletPage extends StatelessWidget {
                   indicatorSize: TabBarIndicatorSize.tab,
                   labelColor: cs.onPrimary,
                   unselectedLabelColor: cs.onSurfaceVariant,
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
+                  labelStyle: Get.textTheme.titleSmall,
+                  unselectedLabelStyle: Get.textTheme.titleSmall,
                   tabs: const [
                     Tab(text: "Transactions"),
                     Tab(text: "Packages"),
@@ -95,7 +89,7 @@ class StudentWalletPage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
 
               Expanded(
                 child: TabBarView(
@@ -123,38 +117,38 @@ class StudentWalletPage extends StatelessWidget {
   //     context: context,
   //     formKey: formKey,
   //     icon: Icons.account_balance_wallet,
-  //     title: const Text("Deposit Funds"),
+  //     title: Text("Deposit Funds"),
   //     sections: [
   //       // 🔷 Amount
 
   //       CustomWidgets().labelWithAsterisk('Amount(₹)', required: true),
-  //       const SizedBox(height: 10),
+  //       SizedBox(height: 10),
   //       CustomWidgets().dropdownStyledTextField(
   //           context: context,
   //           hint: 'Enter deposit amount',
   //           controller: amountController),
-  //       const SizedBox(height: 10),
+  //       SizedBox(height: 10),
   //       CustomWidgets().labelWithAsterisk('Description (Optional)'),
-  //       const SizedBox(height: 10),
+  //       SizedBox(height: 10),
   //       CustomWidgets().dropdownStyledTextField(
   //           context: context,
   //           hint: 'Bank transfer, cash deposit, etc.',
   //           controller: descController),
-  //       const SizedBox(height: 10),
+  //       SizedBox(height: 10),
   //       CustomWidgets().labelWithAsterisk('Deposit Date', required: true),
-  //       const SizedBox(height: 10),
+  //       SizedBox(height: 10),
   //       CustomWidgets().dropdownStyledTextField(
   //           context: context,
   //           hint: 'Bank transfer, cash deposit, etc.',
   //           controller: dateController),
-  //       const SizedBox(height: 10),
+  //       SizedBox(height: 10),
   //       CustomWidgets().labelWithAsterisk('Attatchment (Proof of payment)'),
-  //       const SizedBox(height: 10),
+  //       SizedBox(height: 10),
   //       CustomWidgets().dropdownStyledTextField(
   //         context: context,
   //         hint: 'Select Screenshots',
   //       ),
-  //       const SizedBox(height: 10),
+  //       SizedBox(height: 10),
   //     ],
   //     onSubmit: () {
   //       final amount = double.tryParse(amountController.text) ?? 0;
@@ -176,7 +170,7 @@ class StudentWalletPage extends StatelessWidget {
   // ---------------- TRANSACTIONS ----------------
 
   Widget _transactionsTab(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Obx(() {
       if (c.transactions.isEmpty) {
@@ -196,19 +190,19 @@ class StudentWalletPage extends StatelessWidget {
                   color: cs.outline,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Text(
                 "No Transactions Yet",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Get.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 "Your transaction history will appear here",
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurfaceVariant,
-                    ),
+                style: Get.textTheme.bodySmall?.copyWith(
+                  color: cs.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -263,7 +257,7 @@ class StudentWalletPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
 
                   // DETAILS
                   Expanded(
@@ -272,22 +266,17 @@ class StudentWalletPage extends StatelessWidget {
                       children: [
                         Text(
                           t.title ?? '',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
+                          style: Get.textTheme.titleMedium,
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           t.description ?? '',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: cs.onSurfaceVariant,
-                          ),
+                          style: Get.textTheme.bodySmall!
+                              .copyWith(color: cs.onSurfaceVariant),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         Row(
                           children: [
                             Icon(
@@ -295,13 +284,11 @@ class StudentWalletPage extends StatelessWidget {
                               size: 12,
                               color: cs.outline,
                             ),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4),
                             Text(
                               _formatDateTime(t.dateTime ?? DateTime.now()),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: cs.outline,
-                              ),
+                              style: Get.textTheme.bodySmall!
+                                  .copyWith(color: cs.outline),
                             ),
                           ],
                         ),
@@ -309,7 +296,7 @@ class StudentWalletPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
 
                   // AMOUNT & STATUS
                   Column(
@@ -317,15 +304,12 @@ class StudentWalletPage extends StatelessWidget {
                     children: [
                       Text(
                         "${isCredit ? '+' : '-'}₹${t.amount?.toStringAsFixed(2)}",
-                        style: TextStyle(
-                          color: isCredit
-                              ? const Color(0xFF10B981)
-                              : const Color(0xFFEF4444),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
+                        style: Get.textTheme.titleMedium!.copyWith(
+                            color: isCredit
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFFEF4444)),
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
@@ -338,11 +322,8 @@ class StudentWalletPage extends StatelessWidget {
                         ),
                         child: Text(
                           t.status ?? '',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: _getStatusColor(t.status ?? ''),
-                          ),
+                          style: Get.textTheme.titleSmall!
+                              .copyWith(color: _getStatusColor(t.status ?? '')),
                         ),
                       ),
                     ],
@@ -383,7 +364,7 @@ class StudentWalletPage extends StatelessWidget {
   }
 
   Widget _totalBalance(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       width: double.infinity,
@@ -424,27 +405,20 @@ class StudentWalletPage extends StatelessWidget {
                           color: Colors.white.withOpacity(0.9),
                           size: 16,
                         ),
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Text(
                           "Total Balance",
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.3,
-                          ),
+                          style: Get.textTheme.titleSmall!.copyWith(
+                              color: Colors.white.withOpacity(0.9),
+                              letterSpacing: 0.3),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       "₹${c.totalBalance.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
+                      style: Get.textTheme.headlineLarge!
+                          .copyWith(color: Colors.white, letterSpacing: -0.5),
                     ),
                   ],
                 ),
@@ -462,7 +436,7 @@ class StudentWalletPage extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -516,25 +490,18 @@ class StudentWalletPage extends StatelessWidget {
                 color: Colors.white,
                 size: 14,
               ),
-              const SizedBox(width: 4),
+              SizedBox(width: 4),
               Text(
                 label,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: Get.textTheme.labelMedium!
+                    .copyWith(color: Colors.white.withOpacity(0.9)),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             "₹${value.toStringAsFixed(2)}",
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-            ),
+            style: Get.textTheme.titleMedium!.copyWith(color: Colors.white),
           ),
         ],
       ),
@@ -544,7 +511,7 @@ class StudentWalletPage extends StatelessWidget {
   // ---------------- PACKAGES ----------------
 
   Widget _packagesTab(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Obx(() {
       if (c.packages.isEmpty) {
@@ -564,19 +531,19 @@ class StudentWalletPage extends StatelessWidget {
                   color: cs.outline,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Text(
                 "No Packages Yet",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Get.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 "Your enrolled packages will appear here",
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurfaceVariant,
-                    ),
+                style: Get.textTheme.bodySmall?.copyWith(
+                  color: cs.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -625,19 +592,16 @@ class StudentWalletPage extends StatelessWidget {
                         size: 24,
                       ),
                     ),
-                    const SizedBox(width: 14),
+                    SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             p.subjectName ?? '',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
+                            style: Get.textTheme.titleMedium,
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Row(
                             children: [
                               Icon(
@@ -645,13 +609,11 @@ class StudentWalletPage extends StatelessWidget {
                                 size: 12,
                                 color: cs.onSurfaceVariant,
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(width: 4),
                               Text(
                                 "${p.standard} • ${p.syllabus}",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: cs.onSurfaceVariant,
-                                ),
+                                style: Get.textTheme.bodySmall!
+                                    .copyWith(color: cs.onSurfaceVariant),
                               ),
                             ],
                           ),
@@ -663,24 +625,18 @@ class StudentWalletPage extends StatelessWidget {
                       children: [
                         Text(
                           "Balance",
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: cs.onSurfaceVariant,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Get.textTheme.labelSmall!
+                              .copyWith(color: cs.onSurfaceVariant),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         Text(
                           "₹${balance.toStringAsFixed(2)}",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            color: Color(0xFF10B981),
-                          ),
+                          style: Get.textTheme.titleMedium!
+                              .copyWith(color: Color(0xFF10B981)),
                         ),
                       ],
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 16,
@@ -726,7 +682,7 @@ class StudentWalletPage extends StatelessWidget {
           ],
         ),
 
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
 
         // 🔷 WITHDRAWAL HISTORY
         _sectionTitle(context, "Withdrawals"),
@@ -736,13 +692,10 @@ class StudentWalletPage extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: Get.theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context)
-                    .colorScheme
-                    .outlineVariant
-                    .withOpacity(0.5),
+                color: Get.theme.colorScheme.outlineVariant.withOpacity(0.5),
                 width: 1,
               ),
             ),
@@ -754,18 +707,13 @@ class StudentWalletPage extends StatelessWidget {
                     children: [
                       Text(
                         "₹${w.amount.toStringAsFixed(2)}",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                        ),
+                        style: Get.textTheme.titleMedium,
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         _formatDateTime(w.date),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                        style: Get.textTheme.bodySmall!.copyWith(
+                            color: Get.theme.colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -777,29 +725,26 @@ class StudentWalletPage extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
+                      color: Get.theme.colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       w.note!,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: Get.textTheme.labelMedium!.copyWith(
+                          color: Get.theme.colorScheme.onPrimaryContainer),
                     ),
                   ),
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
       onSubmit: () {},
     );
   }
 
   Widget _sectionTitle(BuildContext context, String title) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, top: 4),
@@ -813,14 +758,10 @@ class StudentWalletPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Text(
             title,
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
-              color: cs.onSurface,
-            ),
+            style: Get.textTheme.titleMedium!.copyWith(color: cs.onSurface),
           ),
         ],
       ),
@@ -828,7 +769,7 @@ class StudentWalletPage extends StatelessWidget {
   }
 
   Widget _groupCard(BuildContext context, List<Widget> children) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -852,19 +793,15 @@ class StudentWalletPage extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey.shade700,
-            ),
+            style:
+                Get.textTheme.titleSmall!.copyWith(color: Colors.grey.shade700),
           ),
           Text(
             value is double ? "₹${value.toStringAsFixed(2)}" : value.toString(),
-            style: TextStyle(
-              fontWeight: highlight ? FontWeight.w700 : FontWeight.w600,
-              fontSize: highlight ? 16 : 14,
-              color: highlight ? const Color(0xFF10B981) : Colors.black87,
-            ),
+            style: Get.textTheme.bodyMedium!.copyWith(
+                fontWeight: highlight ? FontWeight.w700 : FontWeight.w600,
+                fontSize: highlight ? 16 : 14,
+                color: highlight ? const Color(0xFF10B981) : Colors.black87),
           ),
         ],
       ),

@@ -1189,7 +1189,7 @@ class SessionController extends GetxController {
 
     CustomWidgets().showCustomDialog(
       context: Get.context!,
-      title: const Text("Edit Session Report"),
+      title: Text("Edit Session Report"),
       icon: Icons.description,
       formKey: GlobalKey<FormState>(),
       isViewOnly: false,

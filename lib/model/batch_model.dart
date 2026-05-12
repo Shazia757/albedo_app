@@ -9,8 +9,8 @@ class Batch {
   String? batchID;
   String? batchName;
   String? mode;
- List< Student>? student;
- List< PaymentItem>? payment;
+  List<Student>? student;
+  List<PaymentItem>? payment;
   String? course;
   List? materials;
   String? imageUrl;
@@ -19,11 +19,11 @@ class Batch {
   int? totalPaid;
   int? balance;
   int? expenseRatio;
- int? duration;
+  int? duration;
   Mentor? mentor;
   Coordinator? coordinator;
   final String? coordinatorId;
- List<Package>? packages;
+  List<Package>? packages;
   final String? syllabus;
   final DateTime? date;
   final String? startTime;

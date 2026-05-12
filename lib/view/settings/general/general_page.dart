@@ -29,19 +29,19 @@ class GeneralPage extends StatelessWidget {
       icon: Icons.attach_money,
       items: [
         _Item("Registration Fee", Icons.payments, (ctx) {
-          final _formKey = GlobalKey<FormState>();
+          final formKey = GlobalKey<FormState>();
           final c = Get.put(SettingsController());
 
           CustomWidgets().showCustomDialog(
             context: ctx,
             title: Text('Update Registration Fee'),
-            formKey: _formKey,
+            formKey: formKey,
             submitText: 'Update',
             sections: [
               Column(
                 children: [
                   Text('Please click update button after changing the amount'),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 150),
                     child: CustomWidgets().dropdownStyledTextField(
@@ -49,7 +49,7 @@ class GeneralPage extends StatelessWidget {
                         hint: '0.0',
                         controller: c.regFeeController),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Text('Last updated: ')
                 ],
               )
@@ -58,19 +58,19 @@ class GeneralPage extends StatelessWidget {
           );
         }),
         _Item("Factor Value", Icons.tune, (ctx) {
-          final _formKey = GlobalKey<FormState>();
+          final formKey = GlobalKey<FormState>();
           final c = Get.put(SettingsController());
 
           CustomWidgets().showCustomDialog(
             context: ctx,
             title: Text('Update Factor Value'),
-            formKey: _formKey,
+            formKey: formKey,
             submitText: 'Update',
             sections: [
               Column(
                 children: [
                   Text('Please click update button after changing the value'),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 150),
                     child: CustomWidgets().dropdownStyledTextField(
@@ -78,7 +78,7 @@ class GeneralPage extends StatelessWidget {
                         hint: '0.0',
                         controller: c.factorValueController),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                 ],
               )
             ],
@@ -86,28 +86,28 @@ class GeneralPage extends StatelessWidget {
           );
         }),
         _Item("Tax", Icons.receipt_long, (ctx) {
-          final _formKey = GlobalKey<FormState>();
+          final formKey = GlobalKey<FormState>();
           final c = Get.put(SettingsController());
 
           CustomWidgets().showCustomDialog(
             context: ctx,
             title: Text('Update Salary Invoice Tax'),
-            formKey: _formKey,
+            formKey: formKey,
             submitText: 'Update',
             sections: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Please click update button after changing'),
+                  Text('Please click update button after changing'),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
 
                   /// 🔘 TYPE SELECTION
                   Obx(() => Row(
                         children: [
                           Expanded(
                             child: RadioListTile<String>(
-                              title: const Text("Percentage"),
+                              title: Text("Percentage"),
                               value: "percentage",
                               groupValue: c.feeType.value,
                               onChanged: (val) => c.feeType.value = val!,
@@ -117,7 +117,7 @@ class GeneralPage extends StatelessWidget {
                           ),
                           Expanded(
                             child: RadioListTile<String>(
-                              title: const Text("Amount"),
+                              title: Text("Amount"),
                               value: "amount",
                               groupValue: c.feeType.value,
                               onChanged: (val) => c.feeType.value = val!,
@@ -128,7 +128,7 @@ class GeneralPage extends StatelessWidget {
                         ],
                       )),
 
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
 
                   /// 💰 INPUT FIELD
                   Padding(
@@ -142,26 +142,26 @@ class GeneralPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   /// 🔁 STATUS TOGGLE
                   Obx(() => Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             "Status",
-                            style: TextStyle(fontWeight: FontWeight.w500),
+                            style: Get.textTheme.titleSmall,
                           ),
                           Row(
                             children: [
                               ChoiceChip(
-                                label: const Text("Active"),
+                                label: Text("Active"),
                                 selected: c.status.value == "active",
                                 onSelected: (_) => c.status.value = "active",
                               ),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8),
                               ChoiceChip(
-                                label: const Text("Inactive"),
+                                label: Text("Inactive"),
                                 selected: c.status.value == "inactive",
                                 onSelected: (_) => c.status.value = "inactive",
                               ),
@@ -292,23 +292,20 @@ class GeneralPage extends StatelessWidget {
                   ),
                   child: Icon(section.icon, color: Colors.blue),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     section.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Divider(
               color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Column(
               children: section.items
                   .map((item) => Padding(
@@ -337,11 +334,11 @@ class GeneralPage extends StatelessWidget {
         child: Row(
           children: [
             Icon(item.icon, size: 20, color: Colors.grey[700]),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: Text(
                 item.title,
-                style: const TextStyle(fontSize: 14),
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
             const Icon(Icons.arrow_forward_ios, size: 14)

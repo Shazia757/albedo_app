@@ -38,7 +38,7 @@ class BannerAdsPage extends StatelessWidget {
                         ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   /// ── CONTENT ────────────────────────
                   Expanded(
@@ -46,13 +46,13 @@ class BannerAdsPage extends StatelessWidget {
                       final data = c.banners;
 
                       if (c.isLoading.value) {
-                        return const Center(
+                        return Center(
                           child: CircularProgressIndicator(),
                         );
                       }
 
                       if (data.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: Text("No banners found"),
                         );
                       }
@@ -91,7 +91,7 @@ class BannerAdsPage extends StatelessWidget {
                                       editBanner(context);
                                     },
                                   ),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: 10),
                                   CustomWidgets().iconBtn(
                                     icon: Icons.delete,
                                     color: Theme.of(context).colorScheme.error,
@@ -130,24 +130,24 @@ class BannerAdsPage extends StatelessWidget {
       formKey: GlobalKey<FormState>(),
       sections: [
         Container(),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Redirect URL'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context, hint: '', controller: c.urlController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('From Date'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context, hint: '', controller: c.startDateController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('To Date'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context, hint: '', controller: c.endDateController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Visible To:'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         MultiSelector<VisibleTo>(
           items: VisibleTo.values.where((e) => e != VisibleTo.all).toList(),
           labelBuilder: (v) => c.getLabel(v),
@@ -206,36 +206,36 @@ class BannerAdsPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Obx(() {
                     if (c.selectedType.value == BannerType.regularBanner) {
                       return Column(
                         children: [
                           Container(),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Redirect URL'),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().dropdownStyledTextField(
                               context: context,
                               hint: '',
                               controller: c.urlController),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('From Date'),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().dropdownStyledTextField(
                               context: context,
                               hint: '',
                               controller: c.startDateController),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('To Date'),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().dropdownStyledTextField(
                               context: context,
                               hint: '',
                               controller: c.endDateController),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Visible To:'),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           MultiSelector<VisibleTo>(
                             items: VisibleTo.values
                                 .where((e) => e != VisibleTo.all)
@@ -254,16 +254,16 @@ class BannerAdsPage extends StatelessWidget {
                       return Column(
                         children: [
                           Container(),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Redirect URL'),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().dropdownStyledTextField(
                               context: context,
                               hint: '',
                               controller: c.urlController),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Visible To:'),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           MultiSelector<VisibleTo>(
                             items: VisibleTo.values
                                 .where((e) => e != VisibleTo.all)
@@ -278,7 +278,7 @@ class BannerAdsPage extends StatelessWidget {
                         ],
                       );
                     }
-                    return const SizedBox();
+                    return SizedBox();
                   })
                 ],
               ),
@@ -354,7 +354,7 @@ class CustomCard extends StatelessWidget {
                   size: 22,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -363,14 +363,13 @@ class CustomCard extends StatelessWidget {
                       title ?? '',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: cs.onSurface,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall!
+                          .copyWith(color: cs.onSurface),
                     ),
                     if (isImportant) ...[
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -382,12 +381,10 @@ class CustomCard extends StatelessWidget {
                         ),
                         child: Text(
                           "IMPORTANT",
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1,
-                            color: cs.error,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall!
+                              .copyWith(letterSpacing: 1, color: cs.error),
                         ),
                       ),
                     ]
@@ -398,22 +395,20 @@ class CustomCard extends StatelessWidget {
           ),
 
           if (content != null) ...[
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             content!,
           ],
 
           if ((visibleTo ?? []).isNotEmpty) ...[
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Text(
               "VISIBLE TO",
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1,
-                color: cs.outline,
-              ),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall!
+                  .copyWith(letterSpacing: 1, color: cs.outline),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -429,11 +424,10 @@ class CustomCard extends StatelessWidget {
                   ),
                   child: Text(
                     c.getLabel(v),
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: cs.primary,
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall!
+                        .copyWith(color: cs.primary),
                   ),
                 );
               }).toList(),
@@ -441,12 +435,12 @@ class CustomCard extends StatelessWidget {
           ],
 
           if (actions != null && actions!.isNotEmpty) ...[
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Divider(
               height: 1,
               color: cs.outline.withOpacity(.08),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: actions!,
@@ -505,7 +499,7 @@ class _MultiSelectorState<T> extends State<MultiSelector<T>> {
         if (isAllSelected) {
           selected.clear(); // unselect all
         } else {
-          selected = List<T>.from(allExceptAll); 
+          selected = List<T>.from(allExceptAll);
         }
       } else {
         if (selected.contains(value)) {
@@ -545,7 +539,7 @@ class _MultiSelectorState<T> extends State<MultiSelector<T>> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: isSelected ? cs.primaryContainer : cs.surfaceVariant,
+              color: isSelected ? cs.primaryContainer : cs.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: isSelected ? cs.primary : cs.outlineVariant,
@@ -559,10 +553,10 @@ class _MultiSelectorState<T> extends State<MultiSelector<T>> {
                   size: 18,
                   color: isSelected ? cs.primary : cs.onSurfaceVariant,
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Text(
                   widget.labelBuilder(v),
-                  style: const TextStyle(fontSize: 13),
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),

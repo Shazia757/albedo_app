@@ -49,43 +49,38 @@ class StudentPaymentModel {
   });
 
   StudentPaymentModel copyWith({
-  String? name,
-  String? id,
-  double? balance,
-  int? packages,
-  double? admissionFee,
-  bool? admissionFeePaid,
-  double? courseFee,
-  int? depositTransactions,
-  int? creditTransactions,
-  double? depositedAmount,
-  double? creditLimit,
-  double? depositPending,
-  double? creditAmount,
-  String? status,
-}) {
-  return StudentPaymentModel(
-    name: name ?? this.name,
-    id: id ?? this.id,
-    balance: balance ?? this.balance,
-    packages: packages ?? this.packages,
-    admissionFee: admissionFee ?? this.admissionFee,
-    admissionFeePaid:
-        admissionFeePaid ?? this.admissionFeePaid,
-    courseFee: courseFee ?? this.courseFee,
-    depositTransactions:
-        depositTransactions ?? this.depositTransactions,
-    creditTransactions:
-        creditTransactions ?? this.creditTransactions,
-    depositedAmount:
-        depositedAmount ?? this.depositedAmount,
-    creditLimit: creditLimit ?? this.creditLimit,
-    depositPending:
-        depositPending ?? this.depositPending,
-    creditAmount: creditAmount ?? this.creditAmount,
-    status: status ?? this.status,
-  );
-}
+    String? name,
+    String? id,
+    double? balance,
+    int? packages,
+    double? admissionFee,
+    bool? admissionFeePaid,
+    double? courseFee,
+    int? depositTransactions,
+    int? creditTransactions,
+    double? depositedAmount,
+    double? creditLimit,
+    double? depositPending,
+    double? creditAmount,
+    String? status,
+  }) {
+    return StudentPaymentModel(
+      name: name ?? this.name,
+      id: id ?? this.id,
+      balance: balance ?? this.balance,
+      packages: packages ?? this.packages,
+      admissionFee: admissionFee ?? this.admissionFee,
+      admissionFeePaid: admissionFeePaid ?? this.admissionFeePaid,
+      courseFee: courseFee ?? this.courseFee,
+      depositTransactions: depositTransactions ?? this.depositTransactions,
+      creditTransactions: creditTransactions ?? this.creditTransactions,
+      depositedAmount: depositedAmount ?? this.depositedAmount,
+      creditLimit: creditLimit ?? this.creditLimit,
+      depositPending: depositPending ?? this.depositPending,
+      creditAmount: creditAmount ?? this.creditAmount,
+      status: status ?? this.status,
+    );
+  }
 }
 
 class TeacherPaymentModel {
@@ -124,7 +119,7 @@ class TeacherPaymentModel {
 class MonthlyEarning {
   final String month;
   final double amount;
-  final String status; 
+  final String status;
 
   MonthlyEarning({
     required this.month,

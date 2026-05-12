@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 class AddAssessmentPage extends StatelessWidget {
   AddAssessmentPage({super.key});
 
-  final c = Get.put(AssessmentController(),permanent: true);
+  final c = Get.put(AssessmentController(), permanent: true);
 
   @override
   Widget build(BuildContext context) {
@@ -34,38 +34,38 @@ class AddAssessmentPage extends StatelessWidget {
                         'Add Assessment',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       _assessmentSelector(c),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
 
                       _attentionCard(c, context),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
 
                       _testReportSection(context, c),
 
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       _voiceNotesCard(context),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
 
                       CustomWidgets()
                           .labelWithAsterisk("Parent Opinion", required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Type your opinion',
                           controller: c.parentOpinionController,
                           isMultiline: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().labelWithAsterisk("Assessment Summary",
                           required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Type here',
                           controller: c.assessmentSummaryController,
                           isMultiline: true),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// SUBMIT BUTTON
                       Row(
@@ -76,10 +76,13 @@ class AddAssessmentPage extends StatelessWidget {
                               icon: const SizedBox.shrink(),
                               label: Text(
                                 'Cancel',
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
                               ),
                               style: OutlinedButton.styleFrom(
                                 backgroundColor:
@@ -91,7 +94,7 @@ class AddAssessmentPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
@@ -101,10 +104,12 @@ class AddAssessmentPage extends StatelessWidget {
                               },
                               icon: const Icon(Icons.add,
                                   size: 15, color: Colors.white),
-                              label: const Text(
+                              label: Text(
                                 'Add',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
@@ -160,11 +165,10 @@ class AddAssessmentPage extends StatelessWidget {
                     c.selectedAssessment.value = item;
                   },
                   selectedColor: cs.primary.withOpacity(0.15),
-                  labelStyle: TextStyle(
-                    color: isSelected ? cs.primary : cs.onSurface,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
+                  labelStyle: Get.textTheme.bodyMedium!.copyWith(
+                      color: isSelected ? cs.primary : cs.onSurface,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                     side: BorderSide(
@@ -186,7 +190,6 @@ class AddAssessmentPage extends StatelessWidget {
       "Listening",
       "Participation",
     ];
-    
 
     // ensure controllers exist
     c.initAttentionQuestions(questions);
@@ -204,7 +207,7 @@ class AddAssessmentPage extends StatelessWidget {
                     initial: c.attentionRatings[q] ?? 0,
                     onChanged: (val) => c.attentionRatings[q] = val,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   SizedBox(
                     width: 125,
                     child: CustomWidgets().dropdownStyledTextField(
@@ -215,7 +218,7 @@ class AddAssessmentPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
             ],
           );
         }).toList(),
@@ -230,25 +233,25 @@ class AddAssessmentPage extends StatelessWidget {
       return Column(
         children: [
           Text('TEST REPORTS'),
-          const SizedBox(height: 5),
+          SizedBox(height: 5),
           if (type.toLowerCase().contains("academic"))
             _academicCard(context, c),
           if (type.toLowerCase().contains("basics")) _languageCard(context, c),
           if (type.toLowerCase().contains("maths")) _mathCard(context, c),
           if (type.trim().toLowerCase().contains("online schooling")) ...[
             _languageCard(context, c),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _mathCard(context, c),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _subjectsCard(context, c),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _keyPointsCard(context),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _academicCard(context, c),
           ],
           if (type.toLowerCase().contains("pencil foundation")) ...[
             _languageCard(context, c),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _mathCard(context, c),
           ],
           if (type.toLowerCase().contains("song")) _subjectsCard(context, c),
@@ -287,9 +290,7 @@ class AddAssessmentPage extends StatelessWidget {
                         children: [
                           Text(
                             'Subject ${index + 1}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
 
                           /// ❌ Remove (from 2nd)
@@ -302,41 +303,37 @@ class AddAssessmentPage extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
 
                       /// 🔷 Subject field
                       CustomWidgets().labelWithAsterisk('Subject'),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter subject...',
                         onTap: () {},
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// ⭐ Ratings
                       Column(
                         children: [
                           Text(
                             'Current Grade',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                           _ratingRow((v) {
                             item["current"] = v;
                           }),
-                          const SizedBox(height: 5)
+                          SizedBox(height: 5)
                         ],
                       ),
                       Column(
                         children: [
                           Text(
                             "Expected Grade",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                           _ratingRow((v) {
                             item["expected"] = v;
@@ -357,9 +354,12 @@ class AddAssessmentPage extends StatelessWidget {
                         .add({"name": "", "current": 0, "expected": 0});
                   },
                   icon: const Icon(Icons.add, size: 18, color: Colors.white),
-                  label: const Text(
+                  label: Text(
                     "Add Academic Subject",
-                    style: TextStyle(color: Colors.white, fontSize: 13),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
@@ -384,9 +384,12 @@ class AddAssessmentPage extends StatelessWidget {
           children: [
             /// 🔷 Subtitle only when empty
             if (!c.isAddingLanguage.value && c.languages.isEmpty)
-              const Text(
+              Text(
                 "Add languages to assess student's language skills",
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .copyWith(color: Colors.grey),
               ),
 
             /// 🔷 Input Mode
@@ -396,7 +399,7 @@ class AddAssessmentPage extends StatelessWidget {
                 hint: 'Enter language name',
                 controller: c.languageController,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -414,13 +417,12 @@ class AddAssessmentPage extends StatelessWidget {
                       ),
                       child: Text(
                         "Cancel",
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 13),
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -448,7 +450,10 @@ class AddAssessmentPage extends StatelessWidget {
                       ),
                       child: Text(
                         "Add",
-                        style: TextStyle(color: Colors.white, fontSize: 13),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ),
@@ -456,7 +461,7 @@ class AddAssessmentPage extends StatelessWidget {
               ),
             ],
 
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             /// 🔷 Language Cards
             ...c.languages.asMap().entries.map((entry) {
@@ -482,7 +487,7 @@ class AddAssessmentPage extends StatelessWidget {
                       children: [
                         Text(
                           item["name"],
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                         IconButton(
                           icon: const Icon(Icons.close, size: 18),
@@ -491,7 +496,7 @@ class AddAssessmentPage extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     /// Checkboxes
                     Wrap(
@@ -524,13 +529,13 @@ class AddAssessmentPage extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     /// Mark
                     Row(
                       children: [
-                        const Text("Mark:"),
-                        const SizedBox(width: 10),
+                        Text("Mark:"),
+                        SizedBox(width: 10),
                         SizedBox(
                           width: 80,
                           child: CustomWidgets().dropdownStyledTextField(
@@ -542,7 +547,7 @@ class AddAssessmentPage extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     /// Rating
                     _starRating(
@@ -558,7 +563,7 @@ class AddAssessmentPage extends StatelessWidget {
             }),
 
             /// 🔷 Divider + Add Button AT LAST
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             if (!c.isAddingLanguage.value)
               Column(
                 children: [
@@ -566,7 +571,7 @@ class AddAssessmentPage extends StatelessWidget {
                     color:
                         Theme.of(context).colorScheme.outline.withOpacity(0.2),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -575,9 +580,12 @@ class AddAssessmentPage extends StatelessWidget {
                       },
                       icon:
                           const Icon(Icons.add, size: 15, color: Colors.white),
-                      label: const Text(
+                      label: Text(
                         'Add Language',
-                        style: TextStyle(color: Colors.white, fontSize: 13),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -647,9 +655,9 @@ class AddAssessmentPage extends StatelessWidget {
                     children: [
                       Text(
                         t,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       _starRating(onChanged: (v) {}),
                     ],
                   ),
@@ -682,12 +690,10 @@ class AddAssessmentPage extends StatelessWidget {
                           Center(
                             child: Text(
                               item["name"] ?? "",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context).textTheme.titleSmall,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           _starRating(onChanged: (v) {
                             item["rating"] = v;
                           }),
@@ -710,7 +716,7 @@ class AddAssessmentPage extends StatelessWidget {
                 );
               }),
 
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               /// 🔷 ADD MODE
               if (c.isAddingMath.value) ...[
@@ -719,7 +725,7 @@ class AddAssessmentPage extends StatelessWidget {
                   hint: 'Enter math topic ',
                   controller: c.mathController,
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
@@ -738,14 +744,16 @@ class AddAssessmentPage extends StatelessWidget {
                         ),
                         child: Text(
                           "Cancel",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 13,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -768,9 +776,12 @@ class AddAssessmentPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Add",
-                          style: TextStyle(color: Colors.white, fontSize: 13),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(color: Colors.white),
                         ),
                       ),
                     ),
@@ -787,9 +798,12 @@ class AddAssessmentPage extends StatelessWidget {
                       c.isAddingMath.value = true;
                     },
                     icon: const Icon(Icons.add, size: 15, color: Colors.white),
-                    label: const Text(
+                    label: Text(
                       'Add Math Topic',
-                      style: TextStyle(color: Colors.white, fontSize: 13),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
@@ -838,9 +852,9 @@ class AddAssessmentPage extends StatelessWidget {
                   children: [
                     Text(
                       t,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     _starRating(onChanged: (v) {}),
                   ],
                 ),
@@ -870,12 +884,10 @@ class AddAssessmentPage extends StatelessWidget {
                         Center(
                           child: Text(
                             item["name"] ?? "",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         _starRating(onChanged: (v) {
                           item["rating"] = v;
                           c.subjects.refresh();
@@ -899,7 +911,7 @@ class AddAssessmentPage extends StatelessWidget {
               );
             }),
 
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             /// 🔷 ADD MODE
             if (c.isAddingSubject.value) ...[
@@ -908,7 +920,7 @@ class AddAssessmentPage extends StatelessWidget {
                 hint: 'Enter subject',
                 controller: c.subjectController,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -926,14 +938,12 @@ class AddAssessmentPage extends StatelessWidget {
                       ),
                       child: Text(
                         "Cancel",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 13,
-                        ),
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -955,9 +965,12 @@ class AddAssessmentPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Add",
-                        style: TextStyle(color: Colors.white, fontSize: 13),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ),
@@ -974,9 +987,12 @@ class AddAssessmentPage extends StatelessWidget {
                     c.isAddingSubject.value = true;
                   },
                   icon: const Icon(Icons.add, size: 15, color: Colors.white),
-                  label: const Text(
+                  label: Text(
                     'Add Subject',
-                    style: TextStyle(color: Colors.white, fontSize: 13),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
@@ -1025,11 +1041,9 @@ class AddAssessmentPage extends StatelessWidget {
                     children: [
                       Text(
                         t,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       _starRating(
                         onChanged: (p0) {},
                       )
@@ -1062,12 +1076,10 @@ class AddAssessmentPage extends StatelessWidget {
                           Center(
                             child: Text(
                               item["name"] ?? "",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context).textTheme.titleSmall,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           _starRating(onChanged: (v) {
                             item["rating"] = v;
                           }),
@@ -1090,7 +1102,7 @@ class AddAssessmentPage extends StatelessWidget {
                 );
               }),
 
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               /// 🔷 ADD MODE
               if (c.isAddingKeypoints.value) ...[
@@ -1099,7 +1111,7 @@ class AddAssessmentPage extends StatelessWidget {
                   hint: 'Enter key point ',
                   controller: c.keypointController,
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
@@ -1118,14 +1130,16 @@ class AddAssessmentPage extends StatelessWidget {
                         ),
                         child: Text(
                           "Cancel",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 13,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -1148,9 +1162,12 @@ class AddAssessmentPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Add",
-                          style: TextStyle(color: Colors.white, fontSize: 13),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(color: Colors.white),
                         ),
                       ),
                     ),
@@ -1164,9 +1181,12 @@ class AddAssessmentPage extends StatelessWidget {
                       c.isAddingKeypoints.value = true;
                     },
                     icon: const Icon(Icons.add, size: 15, color: Colors.white),
-                    label: const Text(
+                    label: Text(
                       'Add Key Point',
-                      style: TextStyle(color: Colors.white, fontSize: 13),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
@@ -1189,9 +1209,12 @@ class AddAssessmentPage extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: () {},
         icon: const Icon(Icons.add, size: 18, color: Colors.white),
-        label: const Text(
+        label: Text(
           "Start Recording",
-          style: TextStyle(color: Colors.white, fontSize: 13),
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: Colors.white),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
@@ -1219,11 +1242,11 @@ class AddAssessmentPage extends StatelessWidget {
         child: Column(
           children: [
             Text(title.toUpperCase(),
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+                style: Get.textTheme.titleSmall),
+            SizedBox(height: 10),
             if (subtitle != null) ...[
-              Text(subtitle, style: const TextStyle(fontSize: 12)),
-              const SizedBox(height: 20),
+              Text(subtitle, style: Get.textTheme.bodySmall),
+              SizedBox(height: 20),
             ],
             child
           ],

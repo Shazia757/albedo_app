@@ -30,6 +30,7 @@ class HeaderWithSearch extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       child: Obx(() {
         final searching = isSearching.value;
+        final cs = Theme.of(context).colorScheme;
 
         return Row(
           children: [
@@ -38,7 +39,10 @@ class HeaderWithSearch extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge!
+                      .copyWith(color: cs.primary),
                 ),
               )
             else
@@ -55,7 +59,10 @@ class HeaderWithSearch extends StatelessWidget {
 
             /// 🔍 TOGGLE
             IconButton(
-              icon: Icon(searching ? Icons.close : Icons.search),
+              icon: Icon(
+                searching ? Icons.close : Icons.search,
+                color: cs.primary,
+              ),
               onPressed: () {
                 isSearching.value = !searching;
 
@@ -71,11 +78,15 @@ class HeaderWithSearch extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.sort),
                 onPressed: onSortTap,
+                color: cs.primary,
               ),
 
             if (onRequestTap != null)
               IconButton(
-                icon: const Icon(Icons.inbox_outlined),
+                icon: Icon(
+                  Icons.inbox_outlined,
+                  color: cs.primary,
+                ),
                 tooltip: "Requests",
                 onPressed: onRequestTap,
               ),

@@ -25,9 +25,6 @@ class Student {
   List<Assessment>? assessment;
   List<Certificate>? certificate;
   List<Batch>? batch;
-  
-
-
 
   int? classHours;
   int? pincode;
@@ -70,7 +67,7 @@ class Student {
 
   Student({
     required this.name,
-this.joinedAt,
+    this.joinedAt,
     this.email,
     this.batch,
     this.admissionDate,
@@ -89,7 +86,7 @@ this.joinedAt,
     this.createdBy,
     this.address,
     this.gender,
-    this.isFeePaid=false,
+    this.isFeePaid = false,
     this.timezone,
     this.place,
     this.studentId,
@@ -127,7 +124,6 @@ this.joinedAt,
       joinedAt: DateTime.parse(json['joinedAt']),
       studentId: json['studentId'],
       email: json['email'],
-      
       phone: json['phone'],
       whatsapp: json['whatsapp'],
       parentName: json['parentName'],
@@ -225,5 +221,4 @@ this.joinedAt,
   }
 }
 
-class Certificate {
-}
+class Certificate {}

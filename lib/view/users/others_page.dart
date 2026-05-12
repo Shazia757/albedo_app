@@ -8,6 +8,7 @@ import 'package:albedo_app/view/permissions_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -34,21 +35,27 @@ class OthersPage extends StatelessWidget {
           if (isDesktop) const DrawerMenu(),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: Column(
                 children: [
-                  _topBar(context),
-                  const SizedBox(height: 12),
+                  HeaderWithSearch(
+                    title: 'Users',
+                    hint: 'Search ...',
+                    isSearching: c.isSearching,
+                    searchQuery: c.searchQuery,
+                    onSearchChanged: () {},
+                  ),
+                  SizedBox(height: 12),
                   Expanded(
                     child: Obx(() {
                       final data = c.filteredOtherUsers;
                       int crossAxisCount = 1;
 
                       if (c.isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
+                        return Center(child: CircularProgressIndicator());
                       }
                       if (data.isEmpty) {
-                        return const Center(child: Text("No users found"));
+                        return Center(child: Text("No users found"));
                       }
 
                       return LayoutBuilder(builder: (context, constraints) {
@@ -76,181 +83,173 @@ class OthersPage extends StatelessWidget {
                                       const BoxConstraints(maxWidth: 700),
                                   child: PremiumInfoCard(
                                     id: otherUsers.id ?? "",
-                                    title: otherUsers?.name ?? "",
-                                    subtitle: otherUsers?.email ?? "",
-                                    status: otherUsers?.status,
+                                    title: otherUsers.name ?? "",
+                                    subtitle: otherUsers.email ?? "",
+                                    status: otherUsers.status,
                                     statusColor:
-                                        getStatusColor(otherUsers?.status),
+                                        getStatusColor(otherUsers.status),
                                     footerText:
-                                        "Joined • ${otherUsers?.joinedAt.toString().substring(0, 16)}",
-                                    extraInfo: otherUsers?.phone != null
-                                        ? "Contact • ${otherUsers!.phone}"
+                                        "Joined • ${otherUsers.joinedAt.toString().substring(0, 16)}",
+                                    extraInfo: otherUsers.phone != null
+                                        ? "Contact • ${otherUsers.phone}"
                                         : null,
                                     onTap: () {
-                                      if (otherUsers != null) {
-                                        {
-                                          showDialog(
-                                            context: context,
-                                            builder: (_) => Dialog(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(20),
-                                                width: 350,
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    /// 🔹 Profile Image
-                                                    CircleAvatar(
-                                                      radius: 40,
-                                                      // backgroundImage:
-                                                      //     user.imageUrl != null ? NetworkImage(user.imageUrl!) : null,
-                                                      child: otherUsers
-                                                                  .imageUrl ==
-                                                              null
-                                                          ? Image.asset(
-                                                              'assets/images/logo.png')
-                                                          : null,
-                                                    ),
+                                      {
+                                        showDialog(
+                                          context: context,
+                                          builder: (_) => Dialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(20),
+                                              width: 350,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  /// 🔹 Profile Image
+                                                  CircleAvatar(
+                                                    radius: 40,
+                                                    // backgroundImage:
+                                                    //     user.imageUrl != null ? NetworkImage(user.imageUrl!) : null,
+                                                    child: otherUsers
+                                                                .imageUrl ==
+                                                            null
+                                                        ? Image.asset(
+                                                            'assets/images/logo.png')
+                                                        : null,
+                                                  ),
 
-                                                    const SizedBox(height: 12),
+                                                  SizedBox(height: 12),
 
-                                                    /// 🔹 Name
-                                                    Text(
-                                                      otherUsers.name ?? "-",
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .titleMedium,
-                                                    ),
+                                                  /// 🔹 Name
+                                                  Text(
+                                                    otherUsers.name ?? "-",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleMedium,
+                                                  ),
 
-                                                    const SizedBox(height: 4),
+                                                  SizedBox(height: 4),
 
-                                                    /// 🔹 Role
-                                                    Text(
-                                                      otherUsers.role ?? "User",
-                                                      style: TextStyle(
+                                                  /// 🔹 Role
+                                                  Text(
+                                                    otherUsers.role ?? "User",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium!
+                                                        .copyWith(
+                                                            color: Colors
+                                                                .grey[600]),
+                                                  ),
+
+                                                  const Divider(height: 24),
+
+                                                  /// 🔹 Details
+                                                  infoRow(
+                                                      icon: Icons.badge,
+                                                      label: "Emp ID",
+                                                      value: otherUsers.id),
+                                                  infoRow(
+                                                      icon: Icons.email,
+                                                      label: "Email",
+                                                      value: otherUsers.email),
+                                                  infoRow(
+                                                      icon: Icons.phone,
+                                                      label: "Phone",
+                                                      value: otherUsers.phone),
+
+                                                  SizedBox(height: 20),
+
+                                                  /// 🔹 Actions
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      InfoActionButton(
+                                                        action: InfoAction(
+                                                          icon: Icons.dashboard,
                                                           color:
-                                                              Colors.grey[600]),
-                                                    ),
-
-                                                    const Divider(height: 24),
-
-                                                    /// 🔹 Details
-                                                    infoRow(
-                                                        icon: Icons.badge,
-                                                        label: "Emp ID",
-                                                        value: otherUsers.id),
-                                                    infoRow(
-                                                        icon: Icons.email,
-                                                        label: "Email",
-                                                        value:
-                                                            otherUsers.email),
-                                                    infoRow(
-                                                        icon: Icons.phone,
-                                                        label: "Phone",
-                                                        value:
-                                                            otherUsers.phone),
-
-                                                    const SizedBox(height: 20),
-
-                                                    /// 🔹 Actions
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceEvenly,
-                                                      children: [
-                                                        InfoActionButton(
-                                                          action: InfoAction(
-                                                            icon:
-                                                                Icons.dashboard,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .primary,
-                                                            onTap: () {
-                                                              final auth = Get.find<
-                                                                  AuthController>();
-                                                              final user =
-                                                                  otherUserToUser(
-                                                                      otherUsers);
-
-                                                              auth.startImpersonation(
-                                                                  user);
-                                                              Get.offAll(() =>
-                                                                  const Root());
-                                                            },
-                                                          ),
-                                                        ),
-                                                        if (otherUsers.role !=
-                                                                'finance' &&
-                                                            otherUsers.role !=
-                                                                'sales' &&
-                                                            otherUsers.role !=
-                                                                'admin' &&
-                                                            otherUsers.role !=
-                                                                'hr')
-                                                          InfoActionButton(
-                                                            action: InfoAction(
-                                                              icon: Icons
-                                                                  .accessibility_new,
-                                                              color: Theme.of(
-                                                                      context)
+                                                              Theme.of(context)
                                                                   .colorScheme
-                                                                  .tertiary,
-                                                              onTap: () =>
-                                                                  Get.to(() =>
-                                                                      PermissionsPage()),
-                                                            ),
-                                                          ),
+                                                                  .primary,
+                                                          onTap: () {
+                                                            final auth = Get.find<
+                                                                AuthController>();
+                                                            final user =
+                                                                otherUserToUser(
+                                                                    otherUsers);
+
+                                                            auth.startImpersonation(
+                                                                user);
+                                                            Get.offAll(() =>
+                                                                const Root());
+                                                          },
+                                                        ),
+                                                      ),
+                                                      if (otherUsers.role !=
+                                                              'finance' &&
+                                                          otherUsers.role !=
+                                                              'sales' &&
+                                                          otherUsers.role !=
+                                                              'admin' &&
+                                                          otherUsers.role !=
+                                                              'hr')
                                                         InfoActionButton(
                                                           action: InfoAction(
-                                                            icon: Icons.edit,
+                                                            icon: Icons
+                                                                .accessibility_new,
                                                             color: Theme.of(
                                                                     context)
                                                                 .colorScheme
-                                                                .secondary,
-                                                            onTap: () {
-                                                              if (otherUsers !=
-                                                                  null) {
-                                                                c.loadOtherUsers(
-                                                                    otherUsers);
-                                                                editUser(
-                                                                    context);
-                                                              }
-                                                            },
+                                                                .tertiary,
+                                                            onTap: () => Get.to(
+                                                                () =>
+                                                                    PermissionsPage()),
                                                           ),
                                                         ),
-                                                        InfoActionButton(
-                                                          action: InfoAction(
-                                                            icon: Icons.delete,
-                                                            color: cs.error,
-                                                            onTap: () =>
-                                                                CustomWidgets()
-                                                                    .showDeleteDialog(
-        title: 'Are you sure?',
-
-                                                              text:
-                                                                  'Are you sure you want to delete this user permanently?',
-                                                              context: context,
-                                                              onConfirm: () =>
-                                                                  c.delete(
-                                                                      otherUsers!
-                                                                          .id),
-                                                            ),
+                                                      InfoActionButton(
+                                                        action: InfoAction(
+                                                          icon: Icons.edit,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .secondary,
+                                                          onTap: () {
+                                                            c.loadOtherUsers(
+                                                                otherUsers);
+                                                            editUser(context);
+                                                          },
+                                                        ),
+                                                      ),
+                                                      InfoActionButton(
+                                                        action: InfoAction(
+                                                          icon: Icons.delete,
+                                                          color: cs.error,
+                                                          onTap: () =>
+                                                              CustomWidgets()
+                                                                  .showDeleteDialog(
+                                                            title:
+                                                                'Are you sure?',
+                                                            text:
+                                                                'Are you sure you want to delete this user permanently?',
+                                                            context: context,
+                                                            onConfirm: () =>
+                                                                c.delete(
+                                                                    otherUsers
+                                                                        .id),
                                                           ),
                                                         ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
                                               ),
                                             ),
-                                          );
-                                        }
+                                          ),
+                                        );
                                       }
                                     },
                                     actions: [],
@@ -282,7 +281,7 @@ class OthersPage extends StatelessWidget {
             /// 🔹 TITLE / SEARCH ROW
             Row(
               children: [
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
 
                 if (!searching)
                   Expanded(
@@ -318,13 +317,13 @@ class OthersPage extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             /// 🔽 FILTER + SORT (UNCHANGED)
             Row(
               children: [
                 Expanded(child: _filterButton(context)),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(child: _sortButton(context, c)),
               ],
             )
@@ -351,9 +350,9 @@ class OthersPage extends StatelessWidget {
             onChanged: (val) => c.searchQuery.value = val,
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         _filterButton(context),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         _sortButton(context, c),
       ],
     );
@@ -389,7 +388,7 @@ class OthersPage extends StatelessWidget {
             color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
           ),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.sort, size: 18),
@@ -420,10 +419,10 @@ class OthersPage extends StatelessWidget {
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Icon(Icons.filter_list, size: 18),
               SizedBox(width: 6),
-              Text("Filter", style: TextStyle(fontSize: 13)),
+              Text("Filter", style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
         ));
@@ -433,15 +432,15 @@ class OthersPage extends StatelessWidget {
     return FloatingActionButton(
       onPressed: () => CustomWidgets().showCustomDialog(
         context: context,
-        title: const Text('Add New User'),
+        title: Text('Add New User'),
         formKey: GlobalKey<FormState>(),
         sections: [
           SingleChildScrollView(
             child: Column(
               children: [
                 /// 🔹 Profile
-                const Text('Profile Photo (Max: 50 MB)'),
-                const SizedBox(height: 10),
+                Text('Profile Photo (Max: 50 MB)'),
+                SizedBox(height: 10),
                 InkWell(
                   onTap: () {},
                   child: CircleAvatar(
@@ -459,32 +458,32 @@ class OthersPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 /// 🔹 Basic Info
                 CustomWidgets().labelWithAsterisk('Name', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter name',
                   controller: c.nameController,
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 CustomWidgets().labelWithAsterisk('Email', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter email',
                   controller: c.emailController,
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 CustomWidgets()
                     .labelWithAsterisk('Phone Number', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter phone number',
@@ -492,10 +491,10 @@ class OthersPage extends StatelessWidget {
                   isNumber: true,
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 CustomWidgets().labelWithAsterisk('Position', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Select Position',
@@ -522,7 +521,7 @@ class OthersPage extends StatelessWidget {
   void editUser(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text('Edit User'),
+      title: Text('Edit User'),
       icon: Icons.edit,
       formKey: GlobalKey<FormState>(),
       sections: [
@@ -532,8 +531,8 @@ class OthersPage extends StatelessWidget {
             child: Column(
               children: [
                 /// 🔹 Profile
-                const Text('Profile Photo (Max: 50 MB)'),
-                const SizedBox(height: 10),
+                Text('Profile Photo (Max: 50 MB)'),
+                SizedBox(height: 10),
                 InkWell(
                   onTap: () {},
                   child: CircleAvatar(
@@ -551,52 +550,52 @@ class OthersPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 /// 🔹 Basic Info
                 CustomWidgets().labelWithAsterisk('Name', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter name',
                   controller: c.nameController,
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 CustomWidgets()
                     .labelWithAsterisk('Employee ID', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: '',
                   controller: c.empIdController,
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 CustomWidgets().labelWithAsterisk('Email', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter email',
                   controller: c.emailController,
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 CustomWidgets()
                     .labelWithAsterisk('Phone Number', required: true),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter phone number',
                   controller: c.phoneController,
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
 
                 CustomWidgets().labelWithAsterisk('Position'),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Select Position',
@@ -604,7 +603,7 @@ class OthersPage extends StatelessWidget {
                   isNumber: true,
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
               ],
             ),
           ),

@@ -1,7 +1,5 @@
 import 'package:albedo_app/controller/batch_list_controller.dart';
-import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -51,7 +49,7 @@ class BatchTopBar extends StatelessWidget {
         return Row(
           children: [
             Expanded(child: searching ? searchField : pageTitle),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             searchToggle,
           ],
         );
@@ -65,7 +63,7 @@ class BatchTopBar extends StatelessWidget {
           ] else ...[
             Expanded(child: searchField),
           ],
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           searchToggle,
         ],
       );
@@ -91,8 +89,7 @@ class BatchCard extends StatelessWidget {
     final textPrimary = cs.onSurface;
     final textSecondary = cs.onSurface.withOpacity(0.5);
     final dividerColor = cs.outline.withOpacity(0.12);
-final teacher = batch.package?.teacher;
- 
+    final teacher = batch.package?.teacher;
 
     return Material(
       color: cs.onPrimary,
@@ -122,12 +119,10 @@ final teacher = batch.package?.teacher;
                     Expanded(
                       child: Text(
                         batch.id ?? "—",
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontFamily: 'monospace',
-                          color: textSecondary,
-                          letterSpacing: 0.3,
-                        ),
+                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                            fontFamily: 'monospace',
+                            color: textSecondary,
+                            letterSpacing: 0.3),
                       ),
                     ),
                     StatusBadge(
@@ -137,7 +132,7 @@ final teacher = batch.package?.teacher;
                   ],
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
 
                 Divider(
                   height: 16,
@@ -145,7 +140,7 @@ final teacher = batch.package?.teacher;
                   color: dividerColor,
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 // ── Row 2: Batch + Teacher (profile style) ───────────
                 Row(
@@ -163,28 +158,28 @@ final teacher = batch.package?.teacher;
                               fit: BoxFit.contain,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   batch.batch?.batchName ?? "—",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: textPrimary,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleSmall!
+                                      .copyWith(color: textPrimary),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                const SizedBox(height: 2),
+                                SizedBox(height: 2),
                                 Text(
                                   "Batch ID: ${batch.id ?? '—'}",
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: textSecondary,
-                                    fontFamily: 'monospace',
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall!
+                                      .copyWith(
+                                          color: textSecondary,
+                                          fontFamily: 'monospace'),
                                 ),
                               ],
                             ),
@@ -193,7 +188,7 @@ final teacher = batch.package?.teacher;
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
 
                     // ── Teacher ─────────────────────────────
                     Expanded(
@@ -209,28 +204,28 @@ final teacher = batch.package?.teacher;
                               fit: BoxFit.contain,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                teacher?.name ?? "—",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: textPrimary,
-                                  ),
+                                  teacher?.name ?? "—",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleSmall!
+                                      .copyWith(color: textPrimary),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                const SizedBox(height: 2),
+                                SizedBox(height: 2),
                                 Text(
                                   "ID: ${teacher?.id ?? '—'}",
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: textSecondary,
-                                    fontFamily: 'monospace',
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall!
+                                      .copyWith(
+                                          color: textSecondary,
+                                          fontFamily: 'monospace'),
                                 ),
                               ],
                             ),
@@ -241,7 +236,7 @@ final teacher = batch.package?.teacher;
                   ],
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 Divider(
                   height: 16,
@@ -249,7 +244,7 @@ final teacher = batch.package?.teacher;
                   color: dividerColor,
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 // ── Row 3: Meta ───────────────────────────────
                 Row(
@@ -263,7 +258,7 @@ final teacher = batch.package?.teacher;
                         textSecondary: textSecondary,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: MetaItem(
                         label: "Time",
@@ -276,7 +271,7 @@ final teacher = batch.package?.teacher;
                 ),
 
                 if (batch.syllabus != null && batch.syllabus!.isNotEmpty) ...[
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   MetaItem(
                     label: "Syllabus",
                     value: batch.syllabus!,
@@ -291,4 +286,3 @@ final teacher = batch.package?.teacher;
     );
   }
 }
-

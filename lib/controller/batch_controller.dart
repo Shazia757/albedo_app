@@ -24,6 +24,9 @@ class BatchController extends GetxController {
   var sortType = SortType.newest.obs;
   var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
+  RxList<Student> studentsList = <Student>[].obs;
+  Rx<Student?> selectedStudent = Rx<Student?>(null);
+  Rx<String> selectedMaterialType = 'drive'.obs;
 
   List<String> detailedTabs = [
     "Batch",
@@ -51,6 +54,8 @@ class BatchController extends GetxController {
   TextEditingController batchModeController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController courseController = TextEditingController();
+  TextEditingController totalFeeController = TextEditingController();
+  TextEditingController spotFeeController = TextEditingController();
 
   TextEditingController mentorController = TextEditingController();
 

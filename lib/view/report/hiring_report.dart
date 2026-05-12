@@ -27,7 +27,7 @@ Widget hiringsTab(BuildContext context) {
           columnSpacing: 26,
           headingRowHeight: 50,
           dataRowHeight: 68,
-          headingRowColor: MaterialStateProperty.all(const Color(0xFFF4F6FB)),
+          headingRowColor: WidgetStateProperty.all(const Color(0xFFF4F6FB)),
           columns: const [
             DataColumn(label: Text("Teacher")),
             DataColumn(label: Text("Hiring Package")),
@@ -42,14 +42,13 @@ Widget hiringsTab(BuildContext context) {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(s.teacher.name,
-                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                        style: Theme.of(context).textTheme.titleSmall),
                     Text(s.teacher.id ?? '',
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.6),
-                            fontSize: 12)),
+                                .withOpacity(0.6))),
                   ],
                 )),
                 // Package
@@ -66,9 +65,12 @@ Widget hiringsTab(BuildContext context) {
                     color: Colors.green.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
+                  child: Text(
                     "Interested",
-                    style: TextStyle(color: Colors.green, fontSize: 12),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(color: Colors.green),
                   ),
                 )),
               ],

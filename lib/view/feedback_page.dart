@@ -1,6 +1,7 @@
 import 'package:albedo_app/controller/feedback_controller.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -24,8 +25,7 @@ class FeedbackPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-            backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -36,8 +36,14 @@ class FeedbackPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _TopBar(c: c),
-                  const SizedBox(height: 14),
+                  HeaderWithSearch(
+                    title: 'Feedbacks',
+                    hint: 'Search feedbacks',
+                    isSearching: c.isSearching,
+                    searchQuery: c.searchQuery,
+                    onSearchChanged: () => c.applyFilters(),
+                  ),
+                  SizedBox(height: 14),
 
                   // ── STATUS TABS ─────────────────────────────────────
                   Obx(
@@ -55,7 +61,7 @@ class FeedbackPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   // ── SESSION GRID ────────────────────────────────────
                   Expanded(
@@ -136,6 +142,7 @@ class _TopBar extends StatelessWidget {
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w700,
               letterSpacing: -0.3,
+              color: cs.primary,
             ),
       );
 
@@ -148,30 +155,6 @@ class _TopBar extends StatelessWidget {
         },
       );
 
-      // Widget filterBtn = _ChipButton(
-      //   icon: Icons.tune_rounded,
-      //   label: "Filter",
-      //   cs: cs,
-      //   onTap: () => CustomWidgets().showFilterSheet(
-      //     title: "Filter Sessions",
-      //     options: _filterOptions,
-      //     selectedValue: c.filterType.value,
-      //     onSelected: (val) => c.filterType.value = val,
-      //   ),
-      // );
-
-      // Widget sortBtn = _ChipButton(
-      //   icon: Icons.swap_vert_rounded,
-      //   label: "Sort",
-      //   cs: cs,
-      //   onTap: () => CustomWidgets().showSortSheet(
-      //     title: "Sort Sessions",
-      //     options: _sortOptions,
-      //     selectedValue: c.sortType.value,
-      //     onSelected: (val) => c.sortType.value = val,
-      //   ),
-      // );
-
       if (isMobile) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,16 +166,16 @@ class _TopBar extends StatelessWidget {
                 ] else ...[
                   Expanded(child: searchField),
                 ],
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 searchToggle,
               ],
             ),
             if (!searching) ...[
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               // Row(
               //   children: [
               //     Expanded(child: filterBtn),
-              //     const SizedBox(width: 8),
+              //     SizedBox(width: 8),
               //     Expanded(child: sortBtn),
               //   ],
               // ),
@@ -209,12 +192,12 @@ class _TopBar extends StatelessWidget {
           ] else ...[
             Expanded(flex: 3, child: searchField),
           ],
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           searchToggle,
           // if (!searching) ...[
-          //   const SizedBox(width: 8),
+          //   SizedBox(width: 8),
           //   filterBtn,
-          //   const SizedBox(width: 8),
+          //   SizedBox(width: 8),
           //   sortBtn,
           // ],
         ],

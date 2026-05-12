@@ -33,7 +33,7 @@ class ProfilePage extends StatelessWidget {
                 /// ── PROFILE HERO CARD ──────────────────────────────────
                 _ProfileHeroCard(user: user, cs: cs, c: c),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 /// ── ACCOUNT INFO ───────────────────────────────────────
                 _SectionCard(
@@ -62,7 +62,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 /// ── QUICK ACCESS ───────────────────────────────────────
                 _SectionCard(
@@ -70,20 +70,6 @@ class ProfilePage extends StatelessWidget {
                   icon: Icons.grid_view_rounded,
                   child: Column(
                     children: [
-                      _QuickAccessTile(
-                        label: "Android App",
-                        icon: Icons.android_rounded,
-                        iconColor: const Color(0xFF3DDC84),
-                        onTap: () {},
-                      ),
-                      _Divider(cs: cs),
-                      _QuickAccessTile(
-                        label: "iOS App",
-                        icon: Icons.phone_iphone_rounded,
-                        iconColor: const Color(0xFF007AFF),
-                        onTap: () {},
-                      ),
-                      _Divider(cs: cs),
                       _QuickAccessTile(
                         label: "Documentation",
                         icon: Icons.menu_book_rounded,
@@ -101,12 +87,12 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
 
                 /// ── DANGER ZONE ────────────────────────────────────────
                 _DangerZoneCard(cs: cs, c: c),
 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
               ],
             ),
           ),
@@ -121,38 +107,38 @@ class ProfilePage extends StatelessWidget {
     CustomWidgets().showCustomDialog(
       context: context,
       icon: Icons.lock_reset,
-      title: const Text("Reset Password"),
+      title: Text("Reset Password"),
       formKey: formKey,
       submitText: "Reset",
       sections: [
         CustomWidgets().labelWithAsterisk('Email', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Enter email',
             controller: c.emailController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Old Password', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Enter old password',
             controller: c.oldPasswordController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('New Password', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Enter new password',
             controller: c.newPasswordController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Confirm Password', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Confirm new password',
             controller: c.confirmPassController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
       ],
       onSubmit: () {
         c.resetPassword(
@@ -253,30 +239,27 @@ class _ProfileHeroCard extends StatelessWidget {
                               user.name != null && user.name.isNotEmpty
                                   ? user.name[0].toUpperCase()
                                   : "?",
-                              style: const TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineLarge!
+                                  .copyWith(color: Colors.white),
                             ),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Name
                 Text(
                   user.name ?? "N/A",
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: -0.3,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall!
+                      .copyWith(color: Colors.white, letterSpacing: -0.3),
                 ),
 
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
 
                 // Role pill
                 Container(
@@ -288,16 +271,13 @@ class _ProfileHeroCard extends StatelessWidget {
                   ),
                   child: Text(
                     user.role ?? "Member",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.9),
-                      letterSpacing: 0.3,
-                    ),
+                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                        color: Colors.white.withOpacity(0.9),
+                        letterSpacing: 0.3),
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 // Action Buttons
                 Row(
@@ -310,7 +290,7 @@ class _ProfileHeroCard extends StatelessWidget {
                         onTap: () => _openResetDialog(context),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: _HeroButton(
                         label: "Logout",
@@ -334,33 +314,33 @@ class _ProfileHeroCard extends StatelessWidget {
     CustomWidgets().showCustomDialog(
       context: context,
       icon: Icons.lock_reset,
-      title: const Text("Reset Password"),
+      title: Text("Reset Password"),
       formKey: formKey,
       submitText: "Reset",
       sections: [
         CustomWidgets().labelWithAsterisk('Email', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Enter email',
             controller: c.emailController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Old Password', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Enter old password',
             controller: c.oldPasswordController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('New Password', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Enter new password',
             controller: c.newPasswordController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Confirm Password', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Confirm new password',
@@ -423,16 +403,13 @@ class _HeroButton extends StatelessWidget {
                     ? Colors.white
                     : Theme.of(context).colorScheme.primary,
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w600,
-                  color: outlined
-                      ? Colors.white
-                      : Theme.of(context).colorScheme.primary,
-                ),
+                style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    color: outlined
+                        ? Colors.white
+                        : Theme.of(context).colorScheme.primary),
               ),
             ],
           ),
@@ -463,7 +440,7 @@ class _SectionCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cs.onPrimary,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: cs.outline.withOpacity(0.5),
@@ -484,7 +461,7 @@ class _SectionCard extends StatelessWidget {
                   ),
                   child: Icon(icon, size: 18, color: cs.primary),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Text(
                   title,
                   style: textTheme.titleMedium?.copyWith(
@@ -493,7 +470,7 @@ class _SectionCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             child,
           ],
         ),
@@ -526,7 +503,7 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 18, color: cs.primary.withOpacity(0.7)),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Text(
               label,
@@ -597,7 +574,7 @@ class _QuickAccessTileState extends State<_QuickAccessTile> {
                 ),
                 child: Icon(widget.icon, size: 18, color: widget.iconColor),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14),
               Expanded(
                 child: Text(
                   widget.label,
@@ -641,31 +618,30 @@ class _DangerZoneCard extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.logout_rounded, size: 20, color: cs.error),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Sign out",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: cs.error,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: cs.error),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   "You will need to log in again to access your account.",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: cs.onSurface.withOpacity(0.5),
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: cs.onSurface.withOpacity(0.5)),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           TextButton(
             onPressed: () => c.logout(),
             style: TextButton.styleFrom(
@@ -676,9 +652,9 @@ class _DangerZoneCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
+            child: Text(
               "Logout",
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              style: Theme.of(context).textTheme.titleSmall,
             ),
           )
         ],

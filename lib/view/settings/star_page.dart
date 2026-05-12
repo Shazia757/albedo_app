@@ -32,7 +32,7 @@ class StarOfMonthPage extends StatelessWidget {
                       ),
                 ),
 
-                const SizedBox(height: 18),
+                SizedBox(height: 18),
 
                 /// ── CARD ───────────────────────────
                 Container(
@@ -69,26 +69,25 @@ class StarOfMonthPage extends StatelessWidget {
                               color: cs.primary,
                             ),
                           ),
-                          const SizedBox(width: 14),
+                          SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "Rating Values",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: cs.onSurface,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge!
+                                      .copyWith(color: cs.onSurface),
                                 ),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 Text(
                                   "Manage rating values used for monthly star calculations.",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: cs.outline,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(color: cs.outline),
                                 ),
                               ],
                             ),
@@ -96,14 +95,14 @@ class StarOfMonthPage extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       Divider(
                         height: 1,
                         color: cs.outline.withOpacity(.12),
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// ── LIST ───────────────────────
                       Obx(
@@ -111,8 +110,7 @@ class StarOfMonthPage extends StatelessWidget {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: controller.ratingValues.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 12),
+                          separatorBuilder: (_, __) => SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final item = controller.ratingValues[index];
 
@@ -139,15 +137,14 @@ class StarOfMonthPage extends StatelessWidget {
                                     ),
                                     child: Text(
                                       item.label,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: cs.primary,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .copyWith(color: cs.primary),
                                     ),
                                   ),
 
-                                  const SizedBox(width: 14),
+                                  SizedBox(width: 14),
 
                                   /// Input
                                   Expanded(
@@ -160,7 +157,7 @@ class StarOfMonthPage extends StatelessWidget {
                                     ),
                                   ),
 
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: 12),
 
                                   /// Delete
                                   InkWell(
@@ -186,14 +183,14 @@ class StarOfMonthPage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 22),
+                      SizedBox(height: 22),
 
                       Divider(
                         height: 1,
                         color: cs.outline.withOpacity(.12),
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// ── ACTIONS ────────────────────
                       Row(
@@ -202,7 +199,7 @@ class StarOfMonthPage extends StatelessWidget {
                             child: FilledButton.icon(
                               onPressed: controller.addField,
                               icon: const Icon(Icons.add_rounded),
-                              label: const Text("Add Field"),
+                              label: Text("Add Field"),
                               style: FilledButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16,
@@ -213,12 +210,12 @@ class StarOfMonthPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 14),
+                          SizedBox(width: 14),
                           Expanded(
                             child: OutlinedButton.icon(
                               onPressed: controller.saveSettings,
                               icon: const Icon(Icons.save_rounded),
-                              label: const Text("Save"),
+                              label: Text("Save"),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16,

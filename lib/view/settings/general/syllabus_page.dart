@@ -80,13 +80,13 @@ class AddItemTile extends StatelessWidget {
           child: Row(
             children: [
               Icon(Icons.add, color: accent),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(
                 title,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: accent,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleSmall!
+                    .copyWith(color: accent),
               ),
             ],
           ),
@@ -155,16 +155,13 @@ class CrudItemTile extends StatelessWidget {
                 child: Icon(icon, size: 18, color: accent),
               ),
 
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
 
               // Title
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
 
@@ -185,7 +182,7 @@ class CrudItemTile extends StatelessWidget {
                     InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: onDelete,
-                      child: const Padding(
+                      child: Padding(
                         padding: EdgeInsets.all(6),
                         child: Icon(Icons.delete, size: 18, color: Colors.red),
                       ),

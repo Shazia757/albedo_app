@@ -50,15 +50,15 @@ class AddCoordinatorPage extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// PROFILE
                       Align(
                         alignment: Alignment.center,
                         child: Column(
                           children: [
-                            const Text('Profile Photo (Max: 50 MB)'),
-                            const SizedBox(height: 10),
+                            Text('Profile Photo (Max: 50 MB)'),
+                            SizedBox(height: 10),
                             InkWell(
                               onTap: () {},
                               child: const CircleAvatar(
@@ -80,30 +80,30 @@ class AddCoordinatorPage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// NAME
                       CustomWidgets().labelWithAsterisk('Name', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter coordinator name',
                         controller: c.nameController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// EMAIL
                       CustomWidgets()
                           .labelWithAsterisk('Email', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter email address',
                         controller: c.emailController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// PHONE
                       CustomWidgets()
@@ -115,10 +115,10 @@ class AddCoordinatorPage extends StatelessWidget {
                         isNumber: true,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().labelWithAsterisk('WhatsApp Number'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: '+1234567890',
@@ -126,9 +126,9 @@ class AddCoordinatorPage extends StatelessWidget {
                         isNumber: true,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Gender'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().customDropdownField(
                         itemLabel: (item) => item,
                         context: context,
@@ -136,7 +136,7 @@ class AddCoordinatorPage extends StatelessWidget {
                         items: ['Male', 'Female'],
                         onChanged: (p0) {},
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// PLACE
                       CustomWidgets().labelWithAsterisk('Place'),
@@ -146,7 +146,7 @@ class AddCoordinatorPage extends StatelessWidget {
                         controller: c.placeController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// PINCODE
                       CustomWidgets().labelWithAsterisk('Pincode'),
@@ -156,7 +156,7 @@ class AddCoordinatorPage extends StatelessWidget {
                         controller: c.pincodeController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// ADDRESS
                       CustomWidgets().labelWithAsterisk('Address'),
@@ -166,7 +166,7 @@ class AddCoordinatorPage extends StatelessWidget {
                         controller: c.addressController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// TIMEZONE
                       CustomWidgets().labelWithAsterisk('Time Zone'),
@@ -178,7 +178,7 @@ class AddCoordinatorPage extends StatelessWidget {
                         onChanged: (v) => c.selectedTimezone.value = v,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// DOB
                       CustomWidgets().labelWithAsterisk('Date of Birth'),
@@ -188,7 +188,7 @@ class AddCoordinatorPage extends StatelessWidget {
                         selectedDate: c.selectedDate,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// QUALIFICATION
                       CustomWidgets().labelWithAsterisk('Qualification'),
@@ -198,18 +198,18 @@ class AddCoordinatorPage extends StatelessWidget {
                         controller: c.qualificationController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// EXPERIENCE SECTION (UNCHANGED)
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           'Experience',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       Obx(() => Column(
                             children: [
@@ -245,7 +245,7 @@ class AddCoordinatorPage extends StatelessWidget {
                                                 ),
                                             ],
                                           ),
-                                          const SizedBox(height: 10),
+                                          SizedBox(height: 10),
                                           CustomWidgets().labelWithAsterisk(
                                               'Company Name'),
                                           CustomWidgets()
@@ -254,7 +254,7 @@ class AddCoordinatorPage extends StatelessWidget {
                                             hint: 'Enter company',
                                             controller: exp.companyController,
                                           ),
-                                          const SizedBox(height: 10),
+                                          SizedBox(height: 10),
                                           CustomWidgets()
                                               .labelWithAsterisk('Years'),
                                           CustomWidgets()
@@ -264,7 +264,7 @@ class AddCoordinatorPage extends StatelessWidget {
                                             controller: exp.yearController,
                                             isNumber: true,
                                           ),
-                                          const SizedBox(height: 10),
+                                          SizedBox(height: 10),
                                           CustomWidgets()
                                               .labelWithAsterisk('Months'),
                                           CustomWidgets()
@@ -280,19 +280,19 @@ class AddCoordinatorPage extends StatelessWidget {
                                   );
                                 },
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               ElevatedButton.icon(
-                                onPressed: c.addExperience,
-                               icon: const Icon(
+                                  onPressed: c.addExperience,
+                                  icon: const Icon(
                                     Icons.add,
                                     color: Colors.white,
                                   ),
-                                     label: const Text(
+                                  label: Text(
                                     "Add Experience",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .copyWith(color: Colors.white),
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Theme.of(context)
@@ -304,20 +304,19 @@ class AddCoordinatorPage extends StatelessWidget {
                                       vertical: 16,
                                       horizontal: 16,
                                     ),
-                                  )
-                              ),
+                                  )),
                             ],
                           )),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// BANK DETAILS (UNCHANGED)
-                      const Text(
+                      Text(
                         'Bank Details',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
@@ -326,7 +325,7 @@ class AddCoordinatorPage extends StatelessWidget {
                         isNumber: true,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
@@ -334,15 +333,15 @@ class AddCoordinatorPage extends StatelessWidget {
                         controller: c.accountHolderNameController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Enter UPI ID',
                           controller: c.upiIdController),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Account Type'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().customDropdownField(
                         context: context,
@@ -351,9 +350,9 @@ class AddCoordinatorPage extends StatelessWidget {
                         onChanged: (p0) {},
                         itemLabel: (item) => item,
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Bank Name'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().customDropdownField<String>(
                         context: context,
                         hint: 'Select bank',
@@ -363,9 +362,9 @@ class AddCoordinatorPage extends StatelessWidget {
                         },
                         itemLabel: (item) => item,
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Branch Name'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       Obx(
                         () => CustomWidgets().customDropdownField<String>(
                           context: context,
@@ -377,14 +376,14 @@ class AddCoordinatorPage extends StatelessWidget {
                           itemLabel: (item) => item,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('IFSC Code'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Auto-filled',
                           controller: c.ifscController),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
@@ -392,7 +391,7 @@ class AddCoordinatorPage extends StatelessWidget {
                         controller: c.resumeController,
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// BUTTONS
                       Row(
@@ -400,28 +399,28 @@ class AddCoordinatorPage extends StatelessWidget {
                           Expanded(
                             child: OutlinedButton.icon(
                               onPressed: () => Get.back(),
-                                      icon: const SizedBox.shrink(),
-                                      label: Text(
-                                        'Cancel',
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
-                                            fontSize: 13),
-                                      ),
-                                      style: OutlinedButton.styleFrom(
-                                        backgroundColor: Theme.of(context)
+                              icon: const SizedBox.shrink(),
+                              label: Text(
+                                'Cancel',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        color: Theme.of(context)
                                             .colorScheme
-                                            .surface,
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                      ),
+                                            .onSurface),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.surface,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
@@ -431,24 +430,24 @@ class AddCoordinatorPage extends StatelessWidget {
                                       : c.addCoordinator();
                                 }
                               },
-                                      icon: const Icon(Icons.add,
-                                          size: 15, color: Colors.white),
-                                      label: const Text(
-                                        'Add',
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 13),
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        elevation: 0,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 12),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
+                              icon: const Icon(Icons.add,
+                                  size: 15, color: Colors.white),
+                              label: Text(
+                                'Add',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
                             ),
                           ),

@@ -3,7 +3,6 @@ import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/wallet_model.dart';
-import 'package:flutter/material.dart';
 
 class Teacher {
   final String id;
@@ -12,10 +11,10 @@ class Teacher {
   String? imageUrl;
   List<Student>? student;
 
-   String? status;
-   String? gender;
+  String? status;
+  String? gender;
   String? type;
-   DateTime? joinedAt;
+  DateTime? joinedAt;
   String? phone;
   String? whatsapp;
   String? dob;
@@ -36,7 +35,7 @@ class Teacher {
   int? totalStudents;
   int? totalPackages;
   int? salary;
-    Wallet? wallet;
+  Wallet? wallet;
   int? paid;
   double? balance;
   double? totalSessions;
@@ -51,16 +50,16 @@ class Teacher {
       required this.name,
       this.email,
       this.ifscCode,
-   this.status,
+      this.status,
       this.imageUrl,
       this.student,
       this.type,
       this.wallet,
       this.batch,
       this.experience,
-       this.joinedAt,
+      this.joinedAt,
       this.phone,
-  this.gender,
+      this.gender,
       this.whatsapp,
       this.totalStudents,
       this.totalPackages,

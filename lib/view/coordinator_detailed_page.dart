@@ -35,7 +35,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       appBar: CustomAppBar(),
@@ -69,7 +69,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
           );
         }
 
-        return const SizedBox();
+        return SizedBox();
       }),
 
       body: SingleChildScrollView(
@@ -84,7 +84,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                   selectedIndex: c.selectedIndex.value,
                   onTap: (index) => c.selectedIndex.value = index,
                 )),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // ── Tab bodies  ──────────────────────────
             Obx(() {
@@ -133,14 +133,14 @@ class CoordinatorDetailedPage extends StatelessWidget {
                             .map((e) => _accessCard(e, context))
                             .toList(),
                       ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     _unlockButton(context),
                     _unlockForm(context),
                   ],
                 );
               }
 
-              return const SizedBox();
+              return SizedBox();
             }),
           ],
         ),
@@ -156,7 +156,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _profileCard(context),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Personal Information card
         _glassCard(
@@ -172,7 +172,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                 children: [
                   _contactRow(context, Icons.phone_outlined, 'Mobile',
                       coordinator.phone ?? '-'),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
                       coordinator.whatsapp ?? '-'),
                 ],
@@ -183,7 +183,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                 children: [
                   _contactRow(
                       context, Icons.place, 'Place', coordinator.place ?? "-"),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   _contactRow(context, Icons.calendar_today_outlined,
                       'Date Of Birth', coordinator.dob ?? "-"),
                 ],
@@ -192,7 +192,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Academic Details card
         _glassCard(
@@ -206,34 +206,28 @@ class CoordinatorDetailedPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('UPI ID',
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: cs.outline,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
+                      style: Get.textTheme
+                          .titleSmall!
+                          .copyWith(color: cs.outline)),
+                  SizedBox(height: 4),
                   Text(coordinator.upiId ?? '-',
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 8),
+                      style: Get.textTheme.titleSmall),
+                  SizedBox(height: 8),
                   Text('Account No.',
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: cs.outline,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
+                      style: Get.textTheme
+                          .titleSmall!
+                          .copyWith(color: cs.outline)),
+                  SizedBox(height: 4),
                   Text(coordinator.accountNumber ?? '-',
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 8),
+                      style: Get.textTheme.titleSmall),
+                  SizedBox(height: 8),
                   Text('IFSC Code',
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: cs.outline,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
+                      style: Get.textTheme
+                          .titleSmall!
+                          .copyWith(color: cs.outline)),
+                  SizedBox(height: 4),
                   Text(coordinator.ifscCode ?? '-',
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w700)),
+                      style: Get.textTheme.titleSmall),
                 ],
               )
             ],
@@ -263,7 +257,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
     totalMonths = totalMonths % 12;
 
     /// 🔹 Final formatted text
-    final experienceText = '$totalYears Years ${totalMonths} Months';
+    final experienceText = '$totalYears Years $totalMonths Months';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +276,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
 
               _divider(cs),
 
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               /// Qualification + Experience
               Row(
@@ -295,7 +289,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                       icon: Icons.school_outlined,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: _infoTile(
                       context,
@@ -307,7 +301,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               /// Preferred Language
               _infoTile(
@@ -317,7 +311,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                 icon: Icons.language_outlined,
               ),
 
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               /// Work Experience
               Container(
@@ -334,23 +328,20 @@ class CoordinatorDetailedPage extends StatelessWidget {
                   children: [
                     Text(
                       'Work Experience',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: cs.onSurface,
-                      ),
+                      style: Get.textTheme
+                          .titleSmall!
+                          .copyWith(color: cs.onSurface),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if ((coordinator.experience ?? []).isEmpty)
                           Text(
                             'No work experience added',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: cs.outline,
-                            ),
+                            style: Get.textTheme
+                                .bodySmall!
+                                .copyWith(color: cs.outline),
                           )
                         else
                           Column(
@@ -373,7 +364,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                                         color: cs.primary,
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
+                                    SizedBox(width: 10),
                                     SizedBox(
                                       width: MediaQuery.of(context).size.width *
                                           0.6,
@@ -383,19 +374,16 @@ class CoordinatorDetailedPage extends StatelessWidget {
                                         children: [
                                           Text(
                                             exp.companyName ?? '-',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                              color: cs.onSurface,
-                                            ),
+                                            style: Get.textTheme
+                                                .titleSmall!
+                                                .copyWith(color: cs.onSurface),
                                           ),
-                                          const SizedBox(height: 2),
+                                          SizedBox(height: 2),
                                           Text(
                                             '${exp.years ?? 0} Years ${exp.months ?? 0} Months',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: cs.outline,
-                                            ),
+                                            style: Get.textTheme
+                                                .labelSmall!
+                                                .copyWith(color: cs.outline),
                                           ),
                                         ],
                                       ),
@@ -413,15 +401,17 @@ class CoordinatorDetailedPage extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.perm_identity_rounded,
                 size: 15, color: Colors.white),
-            label: const Text('ID Card',
-                style: TextStyle(color: Colors.white, fontSize: 13)),
+            label: Text('ID Card',
+                style: Get.textTheme
+                    .bodySmall!
+                    .copyWith(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: cs.primary,
               elevation: 0,
@@ -441,7 +431,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
     required String value,
     required IconData icon,
   }) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -466,27 +456,23 @@ class CoordinatorDetailedPage extends StatelessWidget {
               color: cs.primary,
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.outline,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Get.textTheme
+                      .titleSmall!
+                      .copyWith(color: cs.outline),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   value,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: cs.onSurface,
-                  ),
+                  style: Get.textTheme
+                      .titleSmall!
+                      .copyWith(color: cs.onSurface),
                 ),
               ],
             ),
@@ -500,7 +486,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
   //  PROFILE CARD
   // ══════════════════════════════════════════════════════════
   Widget _profileCard(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       width: double.infinity,
@@ -552,12 +538,13 @@ class CoordinatorDetailedPage extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(coordinator.name,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 4),
+                          style: Get.textTheme.titleLarge),
+                      SizedBox(height: 4),
                       Text(coordinator.email ?? '-',
-                          style: TextStyle(fontSize: 13, color: cs.outline)),
-                      const SizedBox(height: 10),
+                          style: Get.textTheme
+                              .bodySmall!
+                              .copyWith(color: cs.outline)),
+                      SizedBox(height: 10),
 
                       // ID badge
                       Container(
@@ -568,13 +555,12 @@ class CoordinatorDetailedPage extends StatelessWidget {
                           border: Border.all(color: _blue.withOpacity(0.3)),
                         ),
                         child: Text('ID: ${coordinator.id}',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: _blue)),
+                            style: Get.textTheme
+                                .titleSmall!
+                                .copyWith(color: _blue)),
                       ),
 
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
 
                       // Dashboard button
                       SizedBox(
@@ -590,9 +576,10 @@ class CoordinatorDetailedPage extends StatelessWidget {
                           icon: const Icon(Icons.arrow_right_alt,
                               size: 15, color: Colors.white),
                           iconAlignment: IconAlignment.end,
-                          label: const Text('Go to Dashboard',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 13)),
+                          label: Text('Go to Dashboard',
+                              style: Get.textTheme
+                                  .bodySmall!
+                                  .copyWith(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: cs.primary,
                             elevation: 0,
@@ -617,7 +604,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
   //  FEEDBACK CARD
   // ══════════════════════════════════════════════════════════
   Widget feedbackCard(Map<String, dynamic> feedback, BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -642,7 +629,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                   size: 18,
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
 
               /// NAME + DATE
               Expanded(
@@ -653,18 +640,14 @@ class CoordinatorDetailedPage extends StatelessWidget {
                       feedback['student_name'] ??
                           feedback['mentor_name'] ??
                           '-',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
+                      style: Get.textTheme.titleSmall,
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       feedback['date'] ?? '-',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: cs.outline,
-                      ),
+                      style: Get.textTheme
+                          .labelSmall!
+                          .copyWith(color: cs.outline),
                     ),
                   ],
                 ),
@@ -687,27 +670,22 @@ class CoordinatorDetailedPage extends StatelessWidget {
                       size: 14,
                       color: Colors.amber,
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
                     Text(
                       "${feedback['rating'] ?? 0}",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: Get.textTheme.titleSmall,
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Text(
             feedback['message'] ?? '-',
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.onSurface.withOpacity(.8),
-              height: 1.4,
-            ),
+            style: Get.textTheme
+                .bodySmall!
+                .copyWith(color: cs.onSurface.withOpacity(.8), height: 1.4),
           ),
         ],
       ),
@@ -718,7 +696,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
   // ══════════════════════════════════════════════════════════
 
   Widget _glassCard({required BuildContext context, required Widget child}) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -748,9 +726,8 @@ class CoordinatorDetailedPage extends StatelessWidget {
           ),
           child: Icon(icon, size: 16, color: _blue),
         ),
-        const SizedBox(width: 10),
-        Text(title,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+        SizedBox(width: 10),
+        Text(title, style: Get.textTheme.titleMedium),
       ],
     );
   }
@@ -762,7 +739,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
 
   Widget _contactRow(
       BuildContext context, IconData icon, String label, String value) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Row(
       children: [
         Container(
@@ -773,14 +750,15 @@ class CoordinatorDetailedPage extends StatelessWidget {
           ),
           child: Icon(icon, size: 16, color: _blue),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(fontSize: 11, color: cs.outline)),
-            Text(value,
-                style:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            Text(label,
+                style: Get.textTheme
+                    .labelSmall!
+                    .copyWith(color: cs.outline)),
+            Text(value, style: Get.textTheme.titleSmall),
           ],
         ),
       ],
@@ -796,8 +774,8 @@ class CoordinatorDetailedPage extends StatelessWidget {
         border: Border.all(color: color.withOpacity(0.4)),
       ),
       child: Text(label,
-          style: TextStyle(
-              fontSize: 11, fontWeight: FontWeight.w600, color: color)),
+          style:
+              Get.textTheme.titleSmall!.copyWith(color: color)),
     );
   }
 
@@ -836,7 +814,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
           hint: 'Search mentors...',
           onChanged: (p0) {},
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -892,7 +870,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                               : null,
                     ),
 
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
 
                     /// 🔹 Student Details
                     Expanded(
@@ -901,19 +879,16 @@ class CoordinatorDetailedPage extends StatelessWidget {
                         children: [
                           Text(
                             mentor.name,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: cs.onSurface,
-                            ),
+                            style: Get.textTheme
+                                .titleMedium!
+                                .copyWith(color: cs.onSurface),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             mentor.empId ?? '-',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: cs.outline,
-                            ),
+                            style: Get.textTheme
+                                .bodySmall!
+                                .copyWith(color: cs.outline),
                           ),
                         ],
                       ),
@@ -945,7 +920,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
   }
 
   Widget _unlockButton(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final c = Get.find<MentorController>();
 
     return SizedBox(
@@ -955,9 +930,11 @@ class CoordinatorDetailedPage extends StatelessWidget {
           c.showUnlockForm.value = true;
         },
         icon: const Icon(Icons.add, size: 15, color: Colors.white),
-        label: const Text(
+        label: Text(
           'Add Unlock',
-          style: TextStyle(color: Colors.white, fontSize: 13),
+          style: Get.textTheme
+              .bodySmall!
+              .copyWith(color: Colors.white),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: cs.secondary,
@@ -972,14 +949,14 @@ class CoordinatorDetailedPage extends StatelessWidget {
   }
 
   Widget _unlockForm(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final c = Get.find<MentorController>();
     final RxList<Map<String, dynamic>> selectedItems =
         <Map<String, dynamic>>[].obs;
     selectedItems.add({"id": "all", "name": "All Students"});
 
     return Obx(() {
-      if (!c.showUnlockForm.value) return const SizedBox();
+      if (!c.showUnlockForm.value) return SizedBox();
 
       return Container(
         margin: const EdgeInsets.only(top: 12),
@@ -992,39 +969,39 @@ class CoordinatorDetailedPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "New Unlock Window",
-              style: TextStyle(fontWeight: FontWeight.w700),
+              style: Get.textTheme.titleSmall,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             CustomWidgets().labelWithAsterisk('Unlock from', required: true),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets().customDatePickerField(
                 controller: c.startDateController,
                 context: context,
                 selectedDate: c.selectedFromDate),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets().labelWithAsterisk('Unlock until', required: true),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets().customDatePickerField(
                 controller: c.endDateController,
                 context: context,
                 selectedDate: c.selectedUntilDate),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets()
                 .labelWithAsterisk('Re-lock After (hours) - optional'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets().dropdownStyledTextField(
               context: context,
               hint: "e.g. 24",
               isNumber: true,
               controller: c.relockController,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets().labelWithAsterisk('Target Students'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _studentMultiSelect(context),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Row(
               children: [
                 Expanded(
@@ -1036,19 +1013,21 @@ class CoordinatorDetailedPage extends StatelessWidget {
                       backgroundColor: cs.secondary,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text(
+                    child: Text(
                       "Grant Access",
-                      style: TextStyle(color: Colors.white),
+                      style: Get.textTheme
+                          .bodyMedium!
+                          .copyWith(color: Colors.white),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () {
                       c.showUnlockForm.value = false;
                     },
-                    child: const Text("Cancel"),
+                    child: Text("Cancel"),
                   ),
                 ),
               ],
@@ -1061,7 +1040,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
 
   Widget _studentMultiSelect(BuildContext context) {
     final c = Get.find<MentorController>();
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     final students = [
       {"id": "STU001", "name": "Amina"},
@@ -1104,10 +1083,10 @@ class CoordinatorDetailedPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text(
               'Select All Students',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Get.textTheme.bodyMedium,
             ),
           ],
         ),
@@ -1118,13 +1097,13 @@ class CoordinatorDetailedPage extends StatelessWidget {
           selectedItems: c.selectedStudents,
           itemLabel: (item) => item['name'] ?? '',
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
       ],
     );
   }
 
   Widget _accessCard(Map<String, dynamic> data, BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -1139,18 +1118,14 @@ class CoordinatorDetailedPage extends StatelessWidget {
         children: [
           Text(
             data['title'] ?? 'Temporary Access',
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-            ),
+            style: Get.textTheme.titleSmall,
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(
             "From: ${data['from']}  →  To: ${data['to']}",
-            style: TextStyle(
-              fontSize: 12,
-              color: cs.outline,
-            ),
+            style: Get.textTheme
+                .bodySmall!
+                .copyWith(color: cs.outline),
           ),
         ],
       ),
@@ -1184,20 +1159,24 @@ Widget summaryCard({
           ),
           child: Center(
             child: Text(value.substring(0, 1),
-                style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w900, color: color)),
+                style: Get.textTheme
+                    .titleLarge!
+                    .copyWith(color: color)),
           ),
         ),
-        const SizedBox(width: 14),
+        SizedBox(width: 14),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
-            const SizedBox(height: 3),
+                style: Get.textTheme
+                    .labelSmall!
+                    .copyWith(color: color.withOpacity(0.8))),
+            SizedBox(height: 3),
             Text(value,
-                style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w800, color: color)),
+                style: Get.textTheme
+                    .titleLarge!
+                    .copyWith(color: color)),
           ],
         ),
       ],

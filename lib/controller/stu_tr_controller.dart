@@ -38,8 +38,8 @@ class StudentTeachersController extends GetxController {
 
     packages.value = [
       Package(
-                  teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+        teacher: Teacher(
+            id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
         subjectId: "S1",
         subjectName: "Maths",
         standard: "10",

@@ -44,7 +44,7 @@ class ForgotPasswordPage extends StatelessWidget {
                 children: [
                   // Logo
                   Image.asset("assets/images/logo.png", height: 80),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
 
                   Container(
                     width: 400,
@@ -62,23 +62,22 @@ class ForgotPasswordPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Forgot Password?",
-                          style: TextStyle(
-                            fontSize: 28,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium!
+                              .copyWith(color: Colors.white),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Text(
                           "Please enter your email address to receive a password reset token.",
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
-                            fontSize: 14,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(color: Colors.white.withOpacity(0.7)),
                         ),
-                        const SizedBox(height: 30),
+                        SizedBox(height: 30),
 
                         // Email Input
                         CustomTextField(
@@ -87,7 +86,7 @@ class ForgotPasswordPage extends StatelessWidget {
                           controller: c.emailController,
                         ),
 
-                        const SizedBox(height: 25),
+                        SizedBox(height: 25),
 
                         // Send Request Button (Vibrant Purple)
                         Obx(() => SizedBox(
@@ -105,15 +104,15 @@ class ForgotPasswordPage extends StatelessWidget {
                                 child: c.isLoading.value
                                     ? const CircularProgressIndicator(
                                         color: Colors.white)
-                                    : const Text("Send Request",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
+                                    : Text("Send Request",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium!
+                                            .copyWith(color: Colors.white)),
                               ),
                             )),
 
-                        const SizedBox(height: 15),
+                        SizedBox(height: 15),
 
                         // Back to Login Button (Blueish tint to match screenshot)
                         SizedBox(
@@ -130,9 +129,11 @@ class ForgotPasswordPage extends StatelessWidget {
                             ),
                             onPressed: () =>
                                 Get.offAll(() => const LoginView()),
-                            child: const Text("Back to Login",
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white)),
+                            child: Text("Back to Login",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(color: Colors.white)),
                           ),
                         ),
                       ],

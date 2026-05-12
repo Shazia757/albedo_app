@@ -9,7 +9,6 @@
 
 //   final c = RequestController();
 
-
 //   @override
 //   Widget build(BuildContext context) {
 //     final isDesktop = MediaQuery.of(context).size.width > 900;
@@ -118,7 +117,7 @@
 //                         ),
 //                       ),
 //                     ),
-//                     const SizedBox(width: 10),
+//                     SizedBox(width: 10),
 //                     Expanded(
 //                       child: Column(
 //                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,23 +125,17 @@
 //                         children: [
 //                           Text(
 //                             "Student",
-//                             style: TextStyle(
-//                               fontSize: 11,
-//                               color: cs.onSurfaceVariant,
-//                             ),
+//                             style: Theme.of(context).textTheme.labelSmall!.copyWith(//                               //                               color: cs.onSurfaceVariant,
+//),
 //                           ),
 //                           Text(
 //                             data["studentName"],
-//                             style: const TextStyle(
-//                               fontWeight: FontWeight.w600,
-//                             ),
+//                             style: Theme.of(context).textTheme.titleSmall!.copyWith(//                               //),
 //                           ),
 //                           Text(
 //                             data["studentId"],
-//                             style: TextStyle(
-//                               fontSize: 12,
-//                               color: cs.onSurfaceVariant,
-//                             ),
+//                             style: Theme.of(context).textTheme.bodySmall!.copyWith(//                               //                               color: cs.onSurfaceVariant,
+//),
 //                           ),
 //                         ],
 //                       ),
@@ -169,28 +162,22 @@
 //                         children: [
 //                           Text(
 //                             "Mentor",
-//                             style: TextStyle(
-//                               fontSize: 11,
-//                               color: cs.onSurfaceVariant,
-//                             ),
+//                             style: Theme.of(context).textTheme.labelSmall!.copyWith(//                               //                               color: cs.onSurfaceVariant,
+//),
 //                           ),
 //                           Text(
 //                             data["mentorName"],
-//                             style: const TextStyle(
-//                               fontWeight: FontWeight.w600,
-//                             ),
+//                             style: Theme.of(context).textTheme.titleSmall!.copyWith(//                               //),
 //                           ),
 //                           Text(
 //                             data["mentorId"],
-//                             style: TextStyle(
-//                               fontSize: 12,
-//                               color: cs.onSurfaceVariant,
-//                             ),
+//                             style: Theme.of(context).textTheme.bodySmall!.copyWith(//                               //                               color: cs.onSurfaceVariant,
+//),
 //                           ),
 //                         ],
 //                       ),
 //                     ),
-//                     const SizedBox(width: 10),
+//                     SizedBox(width: 10),
 //                     ClipRRect(
 //                       borderRadius: BorderRadius.circular(10),
 //                       child: Container(
@@ -225,13 +212,10 @@
 //               ),
 //               child: Text(
 //                 "${data["refundCount"]} refunds",
-//                 style: TextStyle(
-//                   fontSize: 11,
-//                   fontWeight: FontWeight.w500,
-//                   color: data["refundCount"] > 2
+//                 style: Theme.of(context).textTheme.labelSmall!.copyWith(//                   //                   //                   color: data["refundCount"] > 2
 //                       ? Theme.of(context).colorScheme.error
 //                       : Theme.of(context).colorScheme.primary,
-//                 ),
+//),
 //               ),
 //             )),
 //       ],

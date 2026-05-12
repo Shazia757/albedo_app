@@ -7,7 +7,6 @@ import 'package:albedo_app/view/coordinator_detailed_page.dart';
 import 'package:albedo_app/view/users/add_coordinator_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
-import 'package:albedo_app/widgets/custom_tab.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -63,119 +62,121 @@ class CoordinatorPage extends StatelessWidget {
           children: [
             if (isDesktop) DrawerMenu(),
             Expanded(
-              child: Column(
-                children: [
-                  /// 🔍 Search + Sort
-                  HeaderWithSearch(
-                    title: "Coordinators",
-                    hint: "Search coordinators...",
-                    isSearching: c.isSearching,
-                    searchQuery: c.searchQuery,
-                    onSearchChanged: () => c.applyFilters(),
-                    onSortTap: () => CustomWidgets().showSortSheet<SortType>(
-                      title: "Sort Coordinators",
-                      options: [
-                        SortOption(
-                          label: "Newest",
-                          value: SortType.newest,
-                          icon: Icons.schedule,
-                        ),
-                        SortOption(
-                          label: "Oldest",
-                          value: SortType.oldest,
-                          icon: Icons.history,
-                        ),
-                        SortOption(
-                          label: "Name A-Z",
-                          value: SortType.name,
-                          icon: Icons.sort_by_alpha,
-                        ),
-                      ],
-                      selectedValue: c.sortType.value,
-                      onSelected: (val) {
-                        c.sortType.value = val;
-                        c.applyFilters();
-                      },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Column(
+                  children: [
+                    /// 🔍 Search + Sort
+                    HeaderWithSearch(
+                      title: "Coordinators",
+                      hint: "Search coordinators...",
+                      isSearching: c.isSearching,
+                      searchQuery: c.searchQuery,
+                      onSearchChanged: () => c.applyFilters(),
+                      onSortTap: () => CustomWidgets().showSortSheet<SortType>(
+                        title: "Sort Coordinators",
+                        options: [
+                          SortOption(
+                            label: "Newest",
+                            value: SortType.newest,
+                            icon: Icons.schedule,
+                          ),
+                          SortOption(
+                            label: "Oldest",
+                            value: SortType.oldest,
+                            icon: Icons.history,
+                          ),
+                          SortOption(
+                            label: "Name A-Z",
+                            value: SortType.name,
+                            icon: Icons.sort_by_alpha,
+                          ),
+                        ],
+                        selectedValue: c.sortType.value,
+                        onSelected: (val) {
+                          c.sortType.value = val;
+                          c.applyFilters();
+                        },
+                      ),
+                      onRequestTap: (!isCustom ||
+                              PermissionService.can("verification_requests"))
+                          ? () {}
+                          : null,
                     ),
-                    onRequestTap: (!isCustom ||
-                            PermissionService.can("verification_requests"))
-                        ? () {}
-                        : null,
-                  ),
+                    SizedBox(height: 5),
 
-                  /// 🧭 Tabs
-                  Obx(
-                    () => CustomWidgets().customTabs(
-                      context,
-                      tabs: c.tabs,
-                      selectedIndex: c.selectedTab.value,
-                      onTap: (index) {
-                        c.selectedTab.value = index;
-                        c.applyFilters();
-                      },
-                      getCount: (index) => c.tabData[index]['count'],
+                    /// 🧭 Tabs
+                    Obx(
+                      () => CustomWidgets().customTabs(
+                        context,
+                        tabs: c.tabs,
+                        selectedIndex: c.selectedTab.value,
+                        onTap: (index) {
+                          c.selectedTab.value = index;
+                          c.applyFilters();
+                        },
+                        getCount: (index) => c.tabData[index]['count'],
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
-                  /// 📋 List
-                  Expanded(
-                    child: Obx(() {
-                      if (c.isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (c.filteredCoordinators.isEmpty) {
-                        return const Center(
-                            child: Text("No coordinators found"));
-                      }
-                      int crossAxisCount = 1;
-
-                      if (Responsive.isTablet(context)) {
-                        crossAxisCount = 2;
-                      } else if (Responsive.isDesktop(context)) {
-                        crossAxisCount = 3;
-                      }
-
-                      return LayoutBuilder(builder: (context, constraints) {
+                    /// 📋 List
+                    Expanded(
+                      child: Obx(() {
+                        if (c.isLoading.value) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        if (c.filteredCoordinators.isEmpty) {
+                          return Center(child: Text("No coordinators found"));
+                        }
                         int crossAxisCount = 1;
 
-                        if (constraints.maxWidth > 1200) {
-                          crossAxisCount = 3;
-                        } else if (constraints.maxWidth > 700) {
+                        if (Responsive.isTablet(context)) {
                           crossAxisCount = 2;
+                        } else if (Responsive.isDesktop(context)) {
+                          crossAxisCount = 3;
                         }
 
-                        return MasonryGridView.count(
-                            crossAxisCount: crossAxisCount,
-                            padding: const EdgeInsets.symmetric(vertical: 6),
-                            itemCount: c.filteredCoordinators.length,
-                            itemBuilder: (context, index) {
-                              final coordinator = c.filteredCoordinators[index];
-                              final cs = Theme.of(context).colorScheme;
+                        return LayoutBuilder(builder: (context, constraints) {
+                          int crossAxisCount = 1;
 
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: ConstrainedBox(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 700),
-                                    child: PremiumInfoCard(
-                                      id: coordinator.id ?? "",
-                                      title: coordinator?.name ?? "",
-                                      subtitle: coordinator?.email ?? "",
-                                      status: coordinator?.status,
-                                      statusColor:
-                                          getStatusColor(coordinator?.status),
-                                      footerText:
-                                          "Joined • ${coordinator?.joinedAt.toString().substring(0, 16)}",
-                                      extraInfo: coordinator?.phone != null
-                                          ? "Contact • ${coordinator!.phone}"
-                                          : null,
-                                      onTap: () {
-                                        if (coordinator != null) {
+                          if (constraints.maxWidth > 1200) {
+                            crossAxisCount = 3;
+                          } else if (constraints.maxWidth > 700) {
+                            crossAxisCount = 2;
+                          }
+
+                          return MasonryGridView.count(
+                              crossAxisCount: crossAxisCount,
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              itemCount: c.filteredCoordinators.length,
+                              itemBuilder: (context, index) {
+                                final coordinator =
+                                    c.filteredCoordinators[index];
+                                final cs = Theme.of(context).colorScheme;
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: ConstrainedBox(
+                                      constraints:
+                                          const BoxConstraints(maxWidth: 700),
+                                      child: PremiumInfoCard(
+                                        id: coordinator.id ?? "",
+                                        title: coordinator.name ?? "",
+                                        subtitle: coordinator.email ?? "",
+                                        status: coordinator.status,
+                                        statusColor:
+                                            getStatusColor(coordinator.status),
+                                        footerText:
+                                            "Joined • ${coordinator.joinedAt.toString().substring(0, 16)}",
+                                        extraInfo: coordinator.phone != null
+                                            ? "Contact • ${coordinator.phone}"
+                                            : null,
+                                        onTap: () {
                                           (!isCustom ||
                                                   PermissionService.can(
                                                       "view_coordinators"))
@@ -184,77 +185,75 @@ class CoordinatorPage extends StatelessWidget {
                                                       coordinator: coordinator,
                                                       initialIndex: index))
                                               : null;
-                                        }
-                                      },
-                                      actions: [
-                                        InfoAction(
-                                          icon: Icons.dashboard,
-                                          color: cs.primary,
-                                          onTap: () {
-                                            final auth =
-                                                Get.find<AuthController>();
-                                            final user =
-                                                coordinatorToUser(coordinator);
-
-                                            auth.startImpersonation(user);
-
-                                            Get.offAll(() => const Root());
-                                          },
-                                        ),
-                                        if ((!isCustom ||
-                                            PermissionService.can(
-                                                "edit_coordinators")))
+                                        },
+                                        actions: [
                                           InfoAction(
-                                            icon: Icons.edit,
-                                            color: cs.secondary,
+                                            icon: Icons.dashboard,
+                                            color: cs.primary,
                                             onTap: () {
-                                              if (coordinator != null) {
+                                              final auth =
+                                                  Get.find<AuthController>();
+                                              final user = coordinatorToUser(
+                                                  coordinator);
+
+                                              auth.startImpersonation(user);
+
+                                              Get.offAll(() => const Root());
+                                            },
+                                          ),
+                                          if ((!isCustom ||
+                                              PermissionService.can(
+                                                  "edit_coordinators")))
+                                            InfoAction(
+                                              icon: Icons.edit,
+                                              color: cs.secondary,
+                                              onTap: () {
                                                 c.loadCoordinators(coordinator);
                                                 Get.to(() => AddCoordinatorPage(
                                                     isEdit: true));
-                                              }
-                                            },
-                                          ),
-                                        if ((!isCustom ||
-                                            PermissionService.can(
-                                                "resign_coordinators")))
-                                          InfoAction(
-                                              icon: Icons.block,
+                                              },
+                                            ),
+                                          if ((!isCustom ||
+                                              PermissionService.can(
+                                                  "resign_coordinators")))
+                                            InfoAction(
+                                                icon: Icons.block,
+                                                color: cs.error,
+                                                onTap: () => CustomWidgets()
+                                                        .showDeactivateDialog(
+                                                      text:
+                                                          'Are you sure you want to resign this coordinator permanently?',
+                                                      context: context,
+                                                      onConfirm: () => c.resign(
+                                                          coordinator.id),
+                                                    )),
+                                          if ((!isCustom ||
+                                              PermissionService.can(
+                                                  "delete_coordinators")))
+                                            InfoAction(
+                                              icon: Icons.delete,
                                               color: cs.error,
                                               onTap: () => CustomWidgets()
-                                                      .showDeactivateDialog(
-                                                    text:
-                                                        'Are you sure you want to resign this coordinator permanently?',
-                                                    context: context,
-                                                    onConfirm: () => c.resign(
-                                                        coordinator.id!),
-                                                  )),
-                                        if ((!isCustom ||
-                                            PermissionService.can(
-                                                "delete_coordinators")))
-                                          InfoAction(
-                                            icon: Icons.delete,
-                                            color: cs.error,
-                                            onTap: () => CustomWidgets()
-                                                .showDeleteDialog(
-                                              title: 'Are you sure?',
-                                              text:
-                                                  'Are you sure you want to delete this coordinator permanently?',
-                                              context: context,
-                                              onConfirm: () =>
-                                                  c.delete(coordinator!.id),
+                                                  .showDeleteDialog(
+                                                title: 'Are you sure?',
+                                                text:
+                                                    'Are you sure you want to delete this coordinator permanently?',
+                                                context: context,
+                                                onConfirm: () =>
+                                                    c.delete(coordinator.id),
+                                              ),
                                             ),
-                                          ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            });
-                      });
-                    }),
-                  ),
-                ],
+                                );
+                              });
+                        });
+                      }),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

@@ -33,11 +33,11 @@ class MaterialsPage extends StatelessWidget {
                 final cs = Theme.of(context).colorScheme;
 
                 if (c.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 if (data.isEmpty) {
-                  return const Center(child: Text("No materials found"));
+                  return Center(child: Text("No materials found"));
                 }
 
                 return Column(
@@ -49,7 +49,7 @@ class MaterialsPage extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
 
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     /// GRID
                     Expanded(
@@ -81,18 +81,19 @@ class MaterialsPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       "Material Title",
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: cs.onSurface.withOpacity(0.6),
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!
+                                          .copyWith(
+                                              color: cs.onSurface
+                                                  .withOpacity(0.6)),
                                     ),
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: 4),
                                     Text(
                                       item.title ?? '-',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
                                     ),
                                   ],
                                 ),
@@ -106,7 +107,7 @@ class MaterialsPage extends StatelessWidget {
                                       editMaterials(context);
                                     },
                                   ),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: 10),
                                   CustomWidgets().iconBtn(
                                     icon: Icons.delete,
                                     color: cs.error,
@@ -174,7 +175,7 @@ class MaterialsPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 /// 🔥 Your dynamic section
                 Obx(() {
@@ -182,7 +183,7 @@ class MaterialsPage extends StatelessWidget {
                     return Column(
                       children: [
                         CustomWidgets().labelWithAsterisk('Batches'),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Select batches',
@@ -196,39 +197,39 @@ class MaterialsPage extends StatelessWidget {
                     return Column(
                       children: [
                         CustomWidgets().labelWithAsterisk('Packages(Optional)'),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Select Packages',
                           controller: c.packageController,
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().labelWithAsterisk('Categories'),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Select Categories',
                           controller: c.categoryController,
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().labelWithAsterisk('Courses'),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Select Courses',
                           controller: c.courseController,
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().labelWithAsterisk('Syllabus'),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Select Syllabus',
                           controller: c.syllabusController,
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().labelWithAsterisk('Standards'),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Select Standards',
@@ -238,20 +239,20 @@ class MaterialsPage extends StatelessWidget {
                     );
                   }
 
-                  return const SizedBox();
+                  return SizedBox();
                 }),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 CustomWidgets().labelWithAsterisk('Title'),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Enter title',
                   controller: c.titleController,
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 /// Material type
                 Obx(
@@ -285,7 +286,7 @@ class MaterialsPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 /// dynamic material fields
                 Obx(() {
@@ -293,7 +294,7 @@ class MaterialsPage extends StatelessWidget {
                     return Column(
                       children: [
                         CustomWidgets().labelWithAsterisk('Drive Link'),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Paste Drive Link',
@@ -307,7 +308,7 @@ class MaterialsPage extends StatelessWidget {
                     return Column(
                       children: [
                         CustomWidgets().labelWithAsterisk('YouTube Link'),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().dropdownStyledTextField(
                           controller: c.urlController,
                           context: context,
@@ -321,22 +322,20 @@ class MaterialsPage extends StatelessWidget {
                     return Column(
                       children: [
                         CustomWidgets().labelWithAsterisk('Upload file'),
-                        const SizedBox(height: 10),
-                        CustomWidgets().dropdownStyledTextField(
-                            controller: c.urlController,
-                            context: context,
-                            hint: 'Click to upload')
+                        SizedBox(height: 10),
+                        CustomWidgets().attachmentStyledField(
+                            context: context, hint: 'Click to upload')
                       ],
                     );
                   }
 
-                  return const SizedBox();
+                  return SizedBox();
                 }),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 CustomWidgets().labelWithAsterisk('Description'),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 CustomWidgets().dropdownStyledTextField(
                     context: context,
                     hint: 'Enter description',
@@ -394,7 +393,7 @@ class MaterialsPage extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     /// 🔥 Your dynamic section
                     Obx(() {
@@ -402,7 +401,7 @@ class MaterialsPage extends StatelessWidget {
                         return Column(
                           children: [
                             CustomWidgets().labelWithAsterisk('Batches'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().dropdownStyledTextField(
                                 context: context, hint: 'Select batches')
                           ],
@@ -414,44 +413,44 @@ class MaterialsPage extends StatelessWidget {
                           children: [
                             CustomWidgets()
                                 .labelWithAsterisk('Packages(Optional)'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().dropdownStyledTextField(
                                 context: context, hint: 'Select Packages'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().labelWithAsterisk('Categories'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().dropdownStyledTextField(
                                 context: context, hint: 'Select Categories'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().labelWithAsterisk('Courses'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().dropdownStyledTextField(
                                 context: context, hint: 'Select Courses'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().labelWithAsterisk('Syllabus'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().dropdownStyledTextField(
                                 context: context, hint: 'Select Syllabus'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().labelWithAsterisk('Standards'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().dropdownStyledTextField(
                                 context: context, hint: 'Select Standards'),
                           ],
                         );
                       }
 
-                      return const SizedBox();
+                      return SizedBox();
                     }),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     CustomWidgets().labelWithAsterisk('Title'),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                         context: context, hint: 'Enter title'),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     /// Material type
                     Obx(
@@ -485,15 +484,14 @@ class MaterialsPage extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
-                    /// dynamic material fields
                     Obx(() {
                       if (c.selectedMaterialType.value == 'drive') {
                         return Column(
                           children: [
                             CustomWidgets().labelWithAsterisk('Drive Link'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().dropdownStyledTextField(
                                 context: context, hint: 'Paste Drive Link')
                           ],
@@ -504,7 +502,7 @@ class MaterialsPage extends StatelessWidget {
                         return Column(
                           children: [
                             CustomWidgets().labelWithAsterisk('YouTube Link'),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             CustomWidgets().dropdownStyledTextField(
                                 context: context, hint: 'Paste YouTube Link')
                           ],
@@ -515,20 +513,20 @@ class MaterialsPage extends StatelessWidget {
                         return Column(
                           children: [
                             CustomWidgets().labelWithAsterisk('Upload file'),
-                            const SizedBox(height: 10),
-                            CustomWidgets().dropdownStyledTextField(
+                            SizedBox(height: 10),
+                            CustomWidgets().attachmentStyledField(
                                 context: context, hint: 'Click to upload')
                           ],
                         );
                       }
 
-                      return const SizedBox();
+                      return SizedBox();
                     }),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     CustomWidgets().labelWithAsterisk('Description'),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter description',

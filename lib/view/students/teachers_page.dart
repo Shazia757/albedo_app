@@ -15,39 +15,30 @@ class StuTeachersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-
+        backgroundColor: Get.theme.colorScheme.surface,
         appBar: CustomAppBar(),
         drawer: DrawerMenu(),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Text(
                     "Teachers",
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "Manage and view assigned teachers",
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 13,
-                    ),
+                    style: Get.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                        color: Theme.of(context).colorScheme.primary),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
@@ -102,28 +93,35 @@ class StuTeachersPage extends StatelessWidget {
         /// ================= HEADER =================
         Row(
           children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundImage: teacher.imageUrl != null
-                  ? NetworkImage(teacher.imageUrl!)
-                  : const AssetImage('assets/images/logo.png') as ImageProvider,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                width: 44,
+                height: 44,
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer
+                    .withOpacity(0.4),
+                child: Image.asset(
+                  "assets/images/logo.png",
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     teacher.name,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: Get.textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     "ID: ${teacher.id}",
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    style: Get.textTheme.bodySmall!
+                        .copyWith(color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -134,13 +132,13 @@ class StuTeachersPage extends StatelessWidget {
                 color: Colors.orange.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(Icons.star, size: 14, color: Colors.orange),
                   SizedBox(width: 4),
                   Text(
                     "4.5",
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    style: Get.textTheme.titleSmall,
                   ),
                 ],
               ),
@@ -148,7 +146,7 @@ class StuTeachersPage extends StatelessWidget {
           ],
         ),
 
-        const SizedBox(height: 18),
+        SizedBox(height: 18),
 
         /// ================= INFO CARDS =================
         _infoTile(Icons.email, teacher.email ?? "-"),
@@ -164,7 +162,7 @@ class StuTeachersPage extends StatelessWidget {
                 color: Colors.blue,
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: _contactCard(
                 title: "Coordinator",
@@ -176,21 +174,18 @@ class StuTeachersPage extends StatelessWidget {
           ],
         ),
 
-        const SizedBox(height: 18),
+        SizedBox(height: 18),
 
         /// ================= SECTION TITLE =================
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
           child: Text(
             "Assigned Packages",
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-            ),
+            style: Get.textTheme.titleMedium,
           ),
         ),
 
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
 
         /// ================= PACKAGES =================
         ...packages.map(
@@ -204,8 +199,8 @@ class StuTeachersPage extends StatelessWidget {
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               title: Text(
-                p.subjectName??'',
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                p.subjectName ?? '',
+                style: Get.textTheme.titleSmall,
               ),
               subtitle: Text("${p.duration} classes"),
               trailing: Container(
@@ -214,9 +209,9 @@ class StuTeachersPage extends StatelessWidget {
                   color: Colors.blue.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text(
+                child: Text(
                   "Active",
-                  style: TextStyle(fontSize: 11, color: Colors.blue),
+                  style: Get.textTheme.labelSmall!.copyWith(color: Colors.blue),
                 ),
               ),
             ),
@@ -245,24 +240,17 @@ class StuTeachersPage extends StatelessWidget {
           Row(
             children: [
               Icon(icon, size: 16, color: color),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
+                style: Get.textTheme.titleSmall!.copyWith(color: color),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
+            style: Get.textTheme.titleSmall,
           ),
         ],
       ),
@@ -280,11 +268,11 @@ class StuTeachersPage extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 18, color: Colors.grey[700]),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 13),
+              style: Get.textTheme.bodySmall,
             ),
           ),
         ],
@@ -309,98 +297,224 @@ class TeacherCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: cs.outline.withOpacity(0.1)),
-          color: cs.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ],
-        ),
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          children: [
-            /// 🔵 Avatar with gradient ring
-            Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    cs.primary,
-                    cs.secondary,
-                  ],
-                ),
-              ),
-              child: CircleAvatar(
-                radius: 28,
-                backgroundImage: teacher.imageUrl != null
-                    ? NetworkImage(teacher.imageUrl!)
-                    : const AssetImage('assets/images/logo.png')
-                        as ImageProvider,
-              ),
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(22),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: cs.onPrimary,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: cs.outline.withOpacity(.15),
             ),
-
-            const SizedBox(width: 12),
-
-            /// 📄 Info
-            Expanded(
-              child: Column(
+            boxShadow: [
+              BoxShadow(
+                color: cs.shadow.withOpacity(.04),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// ── TOP ─────────────────────────────
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    teacher.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                  /// PROFILE
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      color: cs.primaryContainer.withOpacity(0.4),
+                      child: Image.asset(
+                        "assets/images/logo.png",
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    "ID: ${teacher.id}",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
+
+                  const SizedBox(width: 14),
+
+                  /// INFO
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          teacher.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: cs.onSurface,
+                                  ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "ID: ${teacher.id}",
+                          style:
+                              Theme.of(context).textTheme.labelSmall!.copyWith(
+                                    color: cs.outline,
+                                  ),
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _chip(
+                              context,
+                              Icons.mail_outline_rounded,
+                              teacher.email ?? "-",
+                            ),
+                            _chip(
+                              context,
+                              Icons.inventory_2_outlined,
+                              "$packageCount Packages",
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: [
-                      _chip("${teacher.email ?? '-'}"),
-                      _chip("$packageCount packages"),
-                    ],
+
+                  /// ARROW
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: cs.primary.withOpacity(.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 15,
+                      color: cs.primary,
+                    ),
                   ),
                 ],
               ),
-            ),
 
-            const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-          ],
+              const SizedBox(height: 16),
+
+              Divider(
+                color: cs.outline.withOpacity(.12),
+                height: 1,
+              ),
+
+              const SizedBox(height: 14),
+
+              /// ── FOOTER ─────────────────────────
+              Row(
+                children: [
+                  Expanded(
+                    child: _footerInfo(
+                      context,
+                      title: "Tuition Mode",
+                      value: teacher.tuitionMode ?? "-",
+                    ),
+                  ),
+                  Container(
+                    width: 1,
+                    height: 38,
+                    color: cs.outline.withOpacity(.1),
+                  ),
+                  Expanded(
+                    child: _footerInfo(
+                      context,
+                      title: "Mentor",
+                      value: teacher.mentor?.phone ?? "-",
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _chip(String text) {
+  Widget _chip(
+    BuildContext context,
+    IconData icon,
+    String text,
+  ) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 6,
       ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 11),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest.withOpacity(.4),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: cs.primary,
+          ),
+          const SizedBox(width: 6),
+          ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 140,
+            ),
+            child: Text(
+              text,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    color: cs.onSurface,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _footerInfo(
+    BuildContext context, {
+    required String title,
+    required String value,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title.toUpperCase(),
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                  letterSpacing: 1,
+                  color: cs.outline,
+                ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                  color: cs.onSurface,
+                ),
+          ),
+        ],
       ),
     );
   }

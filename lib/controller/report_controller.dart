@@ -1,5 +1,4 @@
 import 'package:albedo_app/controller/auth_controller.dart';
-import 'package:albedo_app/model/report_model.dart';
 import 'package:albedo_app/model/settings/hiring_ad_model.dart';
 import 'package:albedo_app/model/settings/recommendations_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';

@@ -43,177 +43,175 @@ class AdvisorsPage extends StatelessWidget {
         children: [
           if (isDesktop) DrawerMenu(),
           Expanded(
-            child: Column(
-              children: [
-                /// 🔍 Search + Sort
-                HeaderWithSearch(
-                  title: "Advisors",
-                  hint: "Search advisors...",
-                  isSearching: c.isSearching,
-                  searchQuery: c.searchQuery,
-                  onSearchChanged: () => c.applyFilters(),
-                  onSortTap: () => CustomWidgets().showSortSheet<SortType>(
-                    title: "Sort Advisors",
-                    options: [
-                      SortOption(
-                        label: "Newest",
-                        value: SortType.newest,
-                        icon: Icons.schedule,
-                      ),
-                      SortOption(
-                        label: "Oldest",
-                        value: SortType.oldest,
-                        icon: Icons.history,
-                      ),
-                      SortOption(
-                        label: "Name A-Z",
-                        value: SortType.name,
-                        icon: Icons.sort_by_alpha,
-                      ),
-                    ],
-                    selectedValue: c.sortType.value,
-                    onSelected: (val) {
-                      c.sortType.value = val;
-                      c.applyFilters();
-                    },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Column(
+                children: [
+                  /// 🔍 Search + Sort
+                  HeaderWithSearch(
+                    title: "Advisors",
+                    hint: "Search advisors...",
+                    isSearching: c.isSearching,
+                    searchQuery: c.searchQuery,
+                    onSearchChanged: () => c.applyFilters(),
+                    onSortTap: () => CustomWidgets().showSortSheet<SortType>(
+                      title: "Sort Advisors",
+                      options: [
+                        SortOption(
+                          label: "Newest",
+                          value: SortType.newest,
+                          icon: Icons.schedule,
+                        ),
+                        SortOption(
+                          label: "Oldest",
+                          value: SortType.oldest,
+                          icon: Icons.history,
+                        ),
+                        SortOption(
+                          label: "Name A-Z",
+                          value: SortType.name,
+                          icon: Icons.sort_by_alpha,
+                        ),
+                      ],
+                      selectedValue: c.sortType.value,
+                      onSelected: (val) {
+                        c.sortType.value = val;
+                        c.applyFilters();
+                      },
+                    ),
                   ),
-                ),
 
-                /// 🧭 Tabs
-                Obx(
-                  () => CustomWidgets().customTabs(
-                    context,
-                    tabs: c.tabs,
-                    selectedIndex: c.selectedTab.value,
-                    onTap: (index) {
-                      c.selectedTab.value = index;
-                      c.applyFilters();
-                    },
-                    getCount: (index) => c.tabData[index]['count'],
+                  /// 🧭 Tabs
+                  Obx(
+                    () => CustomWidgets().customTabs(
+                      context,
+                      tabs: c.tabs,
+                      selectedIndex: c.selectedTab.value,
+                      onTap: (index) {
+                        c.selectedTab.value = index;
+                        c.applyFilters();
+                      },
+                      getCount: (index) => c.tabData[index]['count'],
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 10),
+                  SizedBox(height: 10),
 
-                /// 📋 List
-                Expanded(
-                  child: Obx(() {
-                    if (c.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (c.filteredAdvisors.isEmpty) {
-                      return const Center(child: Text("No advisors found"));
-                    }
-
-                    return LayoutBuilder(builder: (context, constraints) {
-                      int crossAxisCount = 1;
-
-                      if (constraints.maxWidth > 1200) {
-                        crossAxisCount = 3;
-                      } else if (constraints.maxWidth > 700) {
-                        crossAxisCount = 2;
+                  /// 📋 List
+                  Expanded(
+                    child: Obx(() {
+                      if (c.isLoading.value) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      if (c.filteredAdvisors.isEmpty) {
+                        return Center(child: Text("No advisors found"));
                       }
 
-                      return MasonryGridView.count(
-                          crossAxisCount: crossAxisCount,
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          itemCount: c.filteredAdvisors.length,
-                          itemBuilder: (context, index) {
-                            final advisor = c.filteredAdvisors[index];
-                            final cs = Theme.of(context).colorScheme;
+                      return LayoutBuilder(builder: (context, constraints) {
+                        int crossAxisCount = 1;
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: ConstrainedBox(
-                                  constraints:
-                                      const BoxConstraints(maxWidth: 700),
-                                  child: PremiumInfoCard(
-                                    id: advisor.id ?? "",
-                                    title: advisor?.name ?? "",
-                                    subtitle: advisor?.email ?? "",
-                                    status: advisor?.status,
-                                    statusColor:
-                                        getStatusColor(advisor?.status),
-                                    footerText:
-                                        "Joined • ${advisor?.joinedAt.toString().substring(0, 16)}",
-                                    extraInfo: advisor?.phone != null
-                                        ? "Contact • ${advisor!.phone}"
-                                        : null,
-                                    onTap: () {
-                                      if (advisor != null) {
+                        if (constraints.maxWidth > 1200) {
+                          crossAxisCount = 3;
+                        } else if (constraints.maxWidth > 700) {
+                          crossAxisCount = 2;
+                        }
+
+                        return MasonryGridView.count(
+                            crossAxisCount: crossAxisCount,
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            itemCount: c.filteredAdvisors.length,
+                            itemBuilder: (context, index) {
+                              final advisor = c.filteredAdvisors[index];
+                              final cs = Theme.of(context).colorScheme;
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 700),
+                                    child: PremiumInfoCard(
+                                      id: advisor.id ?? "",
+                                      title: advisor.name ?? "",
+                                      subtitle: advisor.email ?? "",
+                                      status: advisor.status,
+                                      statusColor:
+                                          getStatusColor(advisor.status),
+                                      footerText:
+                                          "Joined • ${advisor.joinedAt.toString().substring(0, 16)}",
+                                      extraInfo: advisor.phone != null
+                                          ? "Contact • ${advisor.phone}"
+                                          : null,
+                                      onTap: () {
                                         {
                                           Get.to(() => AdvisorDetailedPage(
                                               advisor: advisor,
                                               initialIndex: index));
                                         }
-                                      }
-                                    },
-                                    actions: [
-                                      InfoAction(
-                                        icon: Icons.dashboard,
-                                        color: cs.primary,
-                                        onTap: () {
-                                          final auth =
-                                              Get.find<AuthController>();
-                                          final user = advisorToUser(advisor);
+                                      },
+                                      actions: [
+                                        InfoAction(
+                                          icon: Icons.dashboard,
+                                          color: cs.primary,
+                                          onTap: () {
+                                            final auth =
+                                                Get.find<AuthController>();
+                                            final user = advisorToUser(advisor);
 
-                                          auth.startImpersonation(user);
-                                          Get.offAll(() => const Root());
-                                        },
-                                      ),
-                                      InfoAction(
-                                        icon: Icons.edit,
-                                        color: cs.secondary,
-                                        onTap: () {
-                                          if (advisor != null) {
+                                            auth.startImpersonation(user);
+                                            Get.offAll(() => const Root());
+                                          },
+                                        ),
+                                        InfoAction(
+                                          icon: Icons.edit,
+                                          color: cs.secondary,
+                                          onTap: () {
                                             c.loadAdvisors(advisor);
                                             Get.to(() =>
                                                 AddAdvisorPage(isEdit: true));
-                                          }
-                                        },
-                                      ),
-                                      InfoAction(
-                                          icon: Icons.block,
-                                          color: cs.error,
-                                          onTap: () => CustomWidgets()
-                                                  .showDeactivateDialog(
-                                                text:
-                                                    'Are you sure you want to deactivate this advisor permanently?',
-                                                context: context,
-                                                onConfirm: () =>
-                                                    c.deactivate(advisor.id!),
-                                              )),
-                                      InfoAction(
-                                        icon: Icons.delete,
-                                        color: cs.error,
-                                        onTap: () =>
-                                            CustomWidgets().showDeleteDialog(
-                                          title: 'Are you sure?',
-                                          text:
-                                              'Are you sure you want to delete this advisor permanently?',
-                                          context: context,
-                                          onConfirm: () =>
-                                              c.delete(advisor!.id),
+                                          },
                                         ),
-                                      ),
-                                    ],
+                                        InfoAction(
+                                            icon: Icons.block,
+                                            color: cs.error,
+                                            onTap: () => CustomWidgets()
+                                                    .showDeactivateDialog(
+                                                  text:
+                                                      'Are you sure you want to deactivate this advisor permanently?',
+                                                  context: context,
+                                                  onConfirm: () =>
+                                                      c.deactivate(advisor.id),
+                                                )),
+                                        InfoAction(
+                                          icon: Icons.delete,
+                                          color: cs.error,
+                                          onTap: () =>
+                                              CustomWidgets().showDeleteDialog(
+                                            title: 'Are you sure?',
+                                            text:
+                                                'Are you sure you want to delete this advisor permanently?',
+                                            context: context,
+                                            onConfirm: () =>
+                                                c.delete(advisor.id),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          });
-                    });
-                  }),
-                ),
-              ],
+                              );
+                            });
+                      });
+                    }),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
 }

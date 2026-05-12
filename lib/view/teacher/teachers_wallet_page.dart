@@ -12,12 +12,11 @@ class TeacherWalletPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       appBar: CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Get.theme.colorScheme.surface,
       body: Column(
         children: [
           _totalBalance(cs),
@@ -38,8 +37,6 @@ class TeacherWalletPage extends StatelessWidget {
   }
 
   Widget _filters(BuildContext context) {
-
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
@@ -55,8 +52,8 @@ class TeacherWalletPage extends StatelessWidget {
           //     );
           //   }),
           // ),
-        
-          const SizedBox(width: 10),
+
+          SizedBox(width: 10),
           // Expanded(
           //   child: Obx(() {
           //     return CustomWidgets().customDropdownField<String>(
@@ -68,7 +65,6 @@ class TeacherWalletPage extends StatelessWidget {
           //     );
           //   }),
           // ),
-      
         ],
       ),
     );
@@ -82,11 +78,11 @@ class TeacherWalletPage extends StatelessWidget {
         color: cs.primaryContainer,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text("Total Balance"),
-          Text("₹45,000", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text("₹45,000", style: Get.textTheme.titleSmall),
         ],
       ),
     );
@@ -122,17 +118,13 @@ class TeacherWalletPage extends StatelessWidget {
                   children: [
                     Text(
                       "${data.month} ${data.year}",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: Get.textTheme.titleMedium,
                     ),
                     Text(
                       "${data.transactions} transactions",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
+                      style: Get.textTheme
+                          .bodySmall!
+                          .copyWith(color: cs.onSurface.withOpacity(0.6)),
                     ),
                   ],
                 ),
@@ -143,25 +135,22 @@ class TeacherWalletPage extends StatelessWidget {
                   children: [
                     Text(
                       "₹${data.net}",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: cs.primary,
-                      ),
+                      style: Get.textTheme
+                          .titleMedium!
+                          .copyWith(color: cs.primary),
                     ),
                     Text(
                       "Net",
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
+                      style: Get.textTheme
+                          .labelSmall!
+                          .copyWith(color: cs.onSurface.withOpacity(0.6)),
                     ),
                   ],
                 ),
               ],
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             /// 🔥 MINI CARDS
             Row(
@@ -169,17 +158,17 @@ class TeacherWalletPage extends StatelessWidget {
                 Expanded(
                   child: _miniCard(
                     "Earnings",
-                    data.earnings?.amount??0,
-                    data.earnings?.count??0,
+                    data.earnings?.amount ?? 0,
+                    data.earnings?.count ?? 0,
                     Colors.green,
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: _miniCard(
                     "Withdrawals",
-                    data.withdrawals?.amount??0,
-                    data.withdrawals?.count??0,
+                    data.withdrawals?.amount ?? 0,
+                    data.withdrawals?.count ?? 0,
                     Colors.red,
                   ),
                 ),
@@ -197,47 +186,43 @@ class TeacherWalletPage extends StatelessWidget {
     c.selectedStudent.value = null;
 
     CustomWidgets().showCustomDialog(
-      context: context,
+        context: context,
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("${data.month} ${data.year}"),
+            Text(
+              "${data.transactions} transactions",
+              style: Get.textTheme
+                  .bodySmall!
+                  .copyWith(color: Colors.white70),
+            ),
+          ],
+        ),
+        icon: Icons.wallet,
+        formKey: GlobalKey<FormState>(),
+        sections: [
+          Obx(() {
+            final student = c.selectedStudent.value;
 
-      title: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("${data.month} ${data.year}"),
-          Text(
-            "${data.transactions} transactions",
-            style: const TextStyle(fontSize: 12, color: Colors.white70),
-          ),
+            if (student != null) {
+              return _studentDetailsView(c, student);
+            }
+
+            /// 🔁 DEFAULT VIEW
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildSummaryToggle(c, data),
+                SizedBox(height: 12),
+                _buildTabsSection(data),
+              ],
+            );
+          }),
         ],
-      ),
-
-      icon: Icons.wallet,
-
-      formKey: GlobalKey<FormState>(),
-
-      sections: [
-        Obx(() {
-          final student = c.selectedStudent.value;
-
-          if (student != null) {
-            return _studentDetailsView(c, student);
-          }
-
-          /// 🔁 DEFAULT VIEW
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildSummaryToggle(c, data),
-              const SizedBox(height: 12),
-              _buildTabsSection(data),
-            ],
-          );
-        }),
-      ],
-
-      onSubmit: () {},
-      isViewOnly: true
-    );
+        onSubmit: () {},
+        isViewOnly: true);
   }
 
   Widget _studentDetailsView(
@@ -259,19 +244,16 @@ class TeacherWalletPage extends StatelessWidget {
             ),
             Text(
               student["name"],
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: Get.textTheme.titleMedium,
             ),
           ],
         ),
 
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
 
         Text("$tx transactions • ₹$amount"),
 
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
 
         /// 🔥 TRANSACTIONS LIST
         SizedBox(
@@ -302,24 +284,26 @@ class TeacherWalletPage extends StatelessWidget {
                         children: [
                           Text(
                             t.subject,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            style: Get.textTheme.titleSmall,
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: 2),
                           Text(
                             t.subjectCode,
-                            style: const TextStyle(
-                                fontSize: 11, color: Colors.grey),
+                            style: Get.textTheme
+                                .labelSmall!
+                                .copyWith(color: Colors.grey),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             _formatDate(t.dateTime),
-                            style: const TextStyle(
-                                fontSize: 11, color: Colors.grey),
+                            style: Get.textTheme
+                                .labelSmall!
+                                .copyWith(color: Colors.grey),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           Text(
                             "Note: ${t.note}",
-                            style: const TextStyle(fontSize: 12),
+                            style: Get.textTheme.bodySmall,
                           ),
                         ],
                       ),
@@ -335,10 +319,9 @@ class TeacherWalletPage extends StatelessWidget {
                       ),
                       child: Text(
                         "$sign₹${t.amount}",
-                        style: TextStyle(
-                          color: color,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Get.textTheme
+                            .titleSmall!
+                            .copyWith(color: color),
                       ),
                     ),
                   ],
@@ -381,10 +364,12 @@ class TeacherWalletPage extends StatelessWidget {
                   size: 18,
                   color: Colors.blue,
                 ),
-                const SizedBox(width: 4),
-                const Text(
+                SizedBox(width: 4),
+                Text(
                   "View summary",
-                  style: TextStyle(fontSize: 13, color: Colors.blue),
+                  style: Get.textTheme
+                      .bodySmall!
+                      .copyWith(color: Colors.blue),
                 ),
               ],
             ),
@@ -392,7 +377,7 @@ class TeacherWalletPage extends StatelessWidget {
 
           /// 🔽 ONLY SHOW WHEN EXPANDED
           if (isExpanded) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
 
             /// 🔥 SAME HEIGHT CARDS
             IntrinsicHeight(
@@ -401,25 +386,25 @@ class TeacherWalletPage extends StatelessWidget {
                   Expanded(
                     child: _summaryCard(
                       "Earnings",
-                      data.earnings?.amount??0,
+                      data.earnings?.amount ?? 0,
                       _totalEarningTx(), // ✅ dynamic
                       Colors.green,
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Expanded(
                     child: _summaryCard(
                       "Withdrawals",
-                      data.withdrawals?.amount??0,
+                      data.withdrawals?.amount ?? 0,
                       _totalWithdrawalTx(),
                       Colors.red,
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Expanded(
                     child: _summaryCard(
                       "Net",
-                      data.net??0,
+                      data.net ?? 0,
                       null,
                       Colors.blue,
                     ),
@@ -428,7 +413,7 @@ class TeacherWalletPage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             if (data.earnings?.amount != 0) _earningsBreakdown(),
           ],
@@ -504,27 +489,20 @@ class TeacherWalletPage extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontSize: 12,
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
+            style:
+                Get.textTheme.titleSmall!.copyWith(color: color),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             "₹$amount",
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Get.textTheme.titleMedium,
           ),
           if (count != null)
             Text(
               "$count transactions",
-              style: const TextStyle(
-                fontSize: 11,
-                color: Colors.grey,
-              ),
+              style: Get.textTheme
+                  .labelSmall!
+                  .copyWith(color: Colors.grey),
             ),
         ],
       ),
@@ -535,9 +513,9 @@ class TeacherWalletPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Earnings Breakdown",
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
+        Text("Earnings Breakdown",
+            style: Get.textTheme.titleSmall),
+        SizedBox(height: 8),
         IntrinsicHeight(
           child: Row(
             children: [
@@ -562,23 +540,21 @@ class TeacherWalletPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(title,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              )),
+          Text(title, style: Get.textTheme.titleSmall),
 
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
 
           Text(
             "₹$amount",
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: Get.textTheme.titleSmall,
           ),
 
           /// 🔢 TX COUNT UNDER EACH BREAKDOWN
           Text(
             "$count txns",
-            style: const TextStyle(fontSize: 11, color: Colors.grey),
+            style: Get.textTheme
+                .labelSmall!
+                .copyWith(color: Colors.grey),
           ),
         ],
       ),
@@ -642,15 +618,15 @@ class TeacherWalletPage extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         title: Text(
           student["name"],
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: Get.textTheme.titleSmall,
         ),
         subtitle: Text(
           "${student["tx"]} transactions",
-          style: const TextStyle(fontSize: 12),
+          style: Get.textTheme.bodySmall,
         ),
         trailing: Text(
           "₹${student["amount"]}",
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: Get.textTheme.titleSmall,
         ),
         onTap: () {
           final c = Get.find<TeacherWalletController>();
@@ -673,30 +649,22 @@ class TeacherWalletPage extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontSize: 12,
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
+            style:
+                Get.textTheme.titleSmall!.copyWith(color: color),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(
             "₹$amount",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
+            style: Get.textTheme.titleSmall,
           ),
           Text(
             "$count transactions",
-            style: const TextStyle(
-              fontSize: 11,
-              color: Colors.grey,
-            ),
+            style: Get.textTheme
+                .labelSmall!
+                .copyWith(color: Colors.grey),
           ),
         ],
       ),
     );
   }
-
 }

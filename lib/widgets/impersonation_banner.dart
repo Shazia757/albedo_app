@@ -11,7 +11,7 @@ class ImpersonationBanner extends StatelessWidget {
     final auth = Get.find<AuthController>();
 
     return Obx(() {
-      if (!auth.isImpersonating) return const SizedBox();
+      if (!auth.isImpersonating) return SizedBox();
 
       final user = auth.activeUser;
 
@@ -24,14 +24,14 @@ class ImpersonationBanner extends StatelessWidget {
           child: Row(
             children: [
               const Icon(Icons.warning_amber_rounded, color: Colors.white),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: Text(
                   "Impersonating ${user?.name ?? ''}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: Colors.white),
                 ),
               ),
               TextButton(
@@ -39,9 +39,12 @@ class ImpersonationBanner extends StatelessWidget {
                   auth.stopImpersonation();
                   Get.offAll(() => const Root());
                 },
-                child: const Text(
+                child: Text(
                   "Exit",
-                  style: TextStyle(color: Colors.white),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Colors.white),
                 ),
               ),
             ],

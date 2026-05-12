@@ -17,8 +17,7 @@ class SupportController extends GetxController {
 
   int get openCount => allTickets.where((e) => e.status == "Open").length;
 
-  int get closedCount =>
-      allTickets.where((e) => e.status == "Closed").length;
+  int get closedCount => allTickets.where((e) => e.status == "Closed").length;
 
   List<Map<String, dynamic>> get tabData => [
         {"label": "Open", "count": openCount},

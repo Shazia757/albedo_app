@@ -17,6 +17,8 @@ import 'package:get/get.dart';
 class BatchesPage extends StatelessWidget {
   final BatchController c = Get.put(BatchController());
 
+  BatchesPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
@@ -44,145 +46,148 @@ class BatchesPage extends StatelessWidget {
         children: [
           if (isDesktop) DrawerMenu(),
           Expanded(
-            child: Column(
-              children: [
-                /// 🔍 Search + Sort
-                HeaderWithSearch(
-                  title: "Batches",
-                  hint: "Search batches...",
-                  isSearching: c.isSearching,
-                  searchQuery: c.searchQuery,
-                  onSearchChanged: () => c.applyFilters(),
-                  onSortTap: () => CustomWidgets().showSortSheet<SortType>(
-                    title: "Sort Batches",
-                    options: [
-                      SortOption(
-                        label: "Newest",
-                        value: SortType.newest,
-                        icon: Icons.schedule,
-                      ),
-                      SortOption(
-                        label: "Oldest",
-                        value: SortType.oldest,
-                        icon: Icons.history,
-                      ),
-                      SortOption(
-                        label: "Name A-Z",
-                        value: SortType.name,
-                        icon: Icons.sort_by_alpha,
-                      ),
-                    ],
-                    selectedValue: c.sortType.value,
-                    onSelected: (val) {
-                      c.sortType.value = val;
-                      c.applyFilters();
-                    },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Column(
+                children: [
+                  /// 🔍 Search + Sort
+                  HeaderWithSearch(
+                    title: "Batches",
+                    hint: "Search batches...",
+                    isSearching: c.isSearching,
+                    searchQuery: c.searchQuery,
+                    onSearchChanged: () => c.applyFilters(),
+                    onSortTap: () => CustomWidgets().showSortSheet<SortType>(
+                      title: "Sort Batches",
+                      options: [
+                        SortOption(
+                          label: "Newest",
+                          value: SortType.newest,
+                          icon: Icons.schedule,
+                        ),
+                        SortOption(
+                          label: "Oldest",
+                          value: SortType.oldest,
+                          icon: Icons.history,
+                        ),
+                        SortOption(
+                          label: "Name A-Z",
+                          value: SortType.name,
+                          icon: Icons.sort_by_alpha,
+                        ),
+                      ],
+                      selectedValue: c.sortType.value,
+                      onSelected: (val) {
+                        c.sortType.value = val;
+                        c.applyFilters();
+                      },
+                    ),
                   ),
-                ),
 
-                /// 🧭 Tabs
-                Obx(
-                  () => CustomWidgets().customTabs(
-                    context,
-                    tabs: c.tabs,
-                    selectedIndex: c.selectedTab.value,
-                    onTap: (index) {
-                      c.selectedTab.value = index;
-                      c.applyFilters();
-                    },
-                    getCount: (index) => c.tabData[index]['count'],
+                  /// 🧭 Tabs
+                  Obx(
+                    () => CustomWidgets().customTabs(
+                      context,
+                      tabs: c.tabs,
+                      selectedIndex: c.selectedTab.value,
+                      onTap: (index) {
+                        c.selectedTab.value = index;
+                        c.applyFilters();
+                      },
+                      getCount: (index) => c.tabData[index]['count'],
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 10),
+                  SizedBox(height: 10),
 
-                /// 📋 List
-                Expanded(
-                  child: Obx(() {
-                    if (c.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (c.filteredBatches.isEmpty) {
-                      return const Center(child: Text("No batches found"));
-                    }
-
-                    return LayoutBuilder(builder: (context, constraints) {
-                      int crossAxisCount = 1;
-
-                      if (constraints.maxWidth > 1200) {
-                        crossAxisCount = 3;
-                      } else if (constraints.maxWidth > 700) {
-                        crossAxisCount = 2;
+                  /// 📋 List
+                  Expanded(
+                    child: Obx(() {
+                      if (c.isLoading.value) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                      return MasonryGridView.count(
-                          crossAxisCount: crossAxisCount,
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          itemCount: c.filteredBatches.length,
-                          itemBuilder: (context, index) {
-                            final batch = c.filteredBatches[index];
+                      if (c.filteredBatches.isEmpty) {
+                        return Center(child: Text("No batches found"));
+                      }
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: ConstrainedBox(
-                                  constraints:
-                                      const BoxConstraints(maxWidth: 700),
-                                  child: PremiumInfoCard(
-                                    id: batch.id ?? "",
-                                    title: batch?.batchName ?? "",
-                                    subtitle: batch?.batchID ?? "",
-                                    status: batch?.status,
-                                    statusColor: getStatusColor(batch?.status),
-                                    extraInfo: "",
-                                    footerText: "",
-                                    onTap: (!isCustom ||
-                                            PermissionService.can("view_batch"))
-                                        ? () => Get.to(
-                                              () => BatchDetailedPage(
-                                                  batch: batch,
-                                                  initialIndex: index),
-                                              binding: BindingsBuilder(() {
-                                                Get.put(BatchController());
-                                              }),
-                                            )
-                                        : null,
-                                    actions: [
-                                      if ((!isCustom ||
-                                          PermissionService.can("edit_batch")))
-                                        InfoAction(
-                                          icon: Icons.edit,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                          onTap: () {
-                                            if (batch != null) {
-                                              c.loadBatches(batch);
-                                              editBatch(context);
-                                            }
-                                          },
-                                        ),
-                                      if ((!isCustom ||
-                                          PermissionService.can(
-                                              "delete_batch")))
-                                        InfoAction(
-                                            icon: Icons.delete,
+                      return LayoutBuilder(builder: (context, constraints) {
+                        int crossAxisCount = 1;
+
+                        if (constraints.maxWidth > 1200) {
+                          crossAxisCount = 3;
+                        } else if (constraints.maxWidth > 700) {
+                          crossAxisCount = 2;
+                        }
+                        return MasonryGridView.count(
+                            crossAxisCount: crossAxisCount,
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            itemCount: c.filteredBatches.length,
+                            itemBuilder: (context, index) {
+                              final batch = c.filteredBatches[index];
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 700),
+                                    child: PremiumInfoCard(
+                                      id: batch.id ?? "",
+                                      title: batch.batchName ?? "",
+                                      subtitle: batch.batchID ?? "",
+                                      status: batch.status,
+                                      statusColor: getStatusColor(batch.status),
+                                      extraInfo: "",
+                                      footerText: "",
+                                      onTap: (!isCustom ||
+                                              PermissionService.can(
+                                                  "view_batch"))
+                                          ? () => Get.to(
+                                                () => BatchDetailedPage(
+                                                    batch: batch,
+                                                    initialIndex: index),
+                                                binding: BindingsBuilder(() {
+                                                  Get.put(BatchController());
+                                                }),
+                                              )
+                                          : null,
+                                      actions: [
+                                        if ((!isCustom ||
+                                            PermissionService.can(
+                                                "edit_batch")))
+                                          InfoAction(
+                                            icon: Icons.edit,
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .error,
-                                            onTap: () =>
-                                                c.handleDelete(context, batch)),
-                                    ],
+                                                .secondary,
+                                            onTap: () {
+                                              c.loadBatches(batch);
+                                              editBatch(context);
+                                            },
+                                          ),
+                                        if ((!isCustom ||
+                                            PermissionService.can(
+                                                "delete_batch")))
+                                          InfoAction(
+                                              icon: Icons.delete,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .error,
+                                              onTap: () => c.handleDelete(
+                                                  context, batch)),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          });
-                    });
-                  }),
-                ),
-              ],
+                              );
+                            });
+                      });
+                    }),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -203,7 +208,7 @@ class BatchesPage extends StatelessWidget {
               child: Column(
                 children: [
                   Text('Profile Photo (Max: 50 MB)'),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   InkWell(
                     onTap: () {},
                     child: CircleAvatar(
@@ -220,44 +225,44 @@ class BatchesPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets()
                       .labelWithAsterisk('Batch Name', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context,
                       hint: '',
                       controller: c.batchNameController),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets()
                       .labelWithAsterisk('Batch Code', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context,
                       hint: '',
                       controller: c.batchCodeController),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Mode', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context,
                       hint: 'Select modes',
                       controller: c.batchModeController),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Course', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context,
                       hint: 'Select Course',
                       controller: c.courseController),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Mentor', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context,
                       hint: 'Select Mentor',
                       controller: c.mentorController),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                 ],
               ),
             ))
@@ -280,33 +285,33 @@ class BatchesPage extends StatelessWidget {
                   children: [
                     CustomWidgets()
                         .labelWithAsterisk('Batch Name', required: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter batch name',
                         controller: c.batchNameController),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().labelWithAsterisk('Mode', required: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Select modes',
                         controller: c.batchModeController),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().labelWithAsterisk('Course', required: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Select Course',
                         controller: c.courseController),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().labelWithAsterisk('Mentor', required: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Select Mentor',
                         controller: c.mentorController),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                   ],
                 ),
               ))

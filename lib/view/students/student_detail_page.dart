@@ -63,7 +63,7 @@ class StudentDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       appBar: CustomAppBar(),
@@ -76,10 +76,10 @@ class StudentDetailsPage extends StatelessWidget {
             mini: true,
             onPressed: () => Get.to(() => AddPackagePage()),
             backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
         if (c.tabs[index] == 'Wallet') {
@@ -89,22 +89,22 @@ class StudentDetailsPage extends StatelessWidget {
               context,
               onSubmit: (txn) => c.transactions.add(txn),
             ),
-             backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
         if (c.tabs[index] == 'Assessments') {
           return FloatingActionButton(
             mini: true,
             onPressed: () => Get.to(() => AddAssessmentPage()),
-             backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
         if (c.tabs[index] == 'Certificates') {
@@ -113,7 +113,7 @@ class StudentDetailsPage extends StatelessWidget {
             onPressed: () {
               CustomWidgets().showCustomDialog(
                 context: context,
-                title: const Text('Create Certificate'),
+                title: Text('Create Certificate'),
                 formKey: GlobalKey<FormState>(),
                 sections: [
                   Obx(() {
@@ -121,15 +121,15 @@ class StudentDetailsPage extends StatelessWidget {
                       return Column(children: [
                         CustomWidgets().labelWithAsterisk('Certificate Name',
                             required: true),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().dropdownStyledTextField(
                             context: context,
                             hint: 'Certificate of Completion',
                             controller: c.nameController),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().labelWithAsterisk('Select Package',
                             required: true),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         CustomWidgets().customDropdownField<Package>(
                           context: context,
                           hint: 'Choose a package',
@@ -157,14 +157,14 @@ class StudentDetailsPage extends StatelessWidget {
                 },
               );
             },
-             backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
+            backgroundColor: context.theme.colorScheme.primary,
+            child: Icon(
+              Icons.add,
+              color: context.theme.colorScheme.onPrimary,
+            ),
           );
         }
-        return const SizedBox();
+        return SizedBox();
       }),
 
       body: SingleChildScrollView(
@@ -179,7 +179,7 @@ class StudentDetailsPage extends StatelessWidget {
                   selectedIndex: c.selectedIndex.value,
                   onTap: (index) => c.selectedIndex.value = index,
                 )),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // ── Tab bodies (upgraded) ──────────────────────────
             Obx(() {
@@ -293,7 +293,7 @@ class StudentDetailsPage extends StatelessWidget {
                 );
               }
 
-              return const SizedBox();
+              return SizedBox();
             }),
           ],
         ),
@@ -309,7 +309,7 @@ class StudentDetailsPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _profileCard(context),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Personal Information card
         _glassCard(
@@ -325,10 +325,10 @@ class StudentDetailsPage extends StatelessWidget {
                   value1: student.createdBy ?? '-',
                   label2: 'Created At',
                   value2: 'Oct 10, 2024'),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               _contactRow(context, Icons.phone_outlined, 'Mobile',
                   student.phone ?? '-'),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
                   student.whatsapp ?? '-'),
               _divider(cs),
@@ -337,7 +337,7 @@ class StudentDetailsPage extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Academic Details card
         _glassCard(
@@ -353,21 +353,21 @@ class StudentDetailsPage extends StatelessWidget {
                   TextButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.badge_outlined, size: 16),
-                    label: const Text('View ID Card',
-                        style: TextStyle(fontSize: 12)),
+                    label: Text('View ID Card',
+                        style: Get.textTheme.bodySmall),
                   ),
                 ],
               ),
               _divider(cs),
               _labelValue('Current Address', student.address ?? '-'),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               _divider(cs),
               Row(
                 children: [
                   Expanded(
                       child: _statPill(context, 'Category',
                           student.category ?? '-', Icons.category_outlined)),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                       child: _statPill(
                           context,
@@ -380,12 +380,12 @@ class StudentDetailsPage extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Support Staff
         _cardHeader(context, 'Support Staff',
             icon: Icons.support_agent_outlined),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         ...[
           _supportTile(context, 'Coordinator', student.coordinator?.name ?? '-',
               student.coordinator?.id ?? '-', 'Oct 12, 2024',
@@ -399,7 +399,7 @@ class StudentDetailsPage extends StatelessWidget {
         ]
             .map((w) =>
                 Padding(padding: const EdgeInsets.only(bottom: 10), child: w))
-            .toList(),
+            ,
       ],
     );
   }
@@ -413,7 +413,7 @@ class StudentDetailsPage extends StatelessWidget {
       children: [
         CustomWidgets().premiumSearch(context,
             hint: 'Search by package name', onChanged: (p0) {}),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         // Summary button (untouched logic)
         SizedBox(
           width: double.infinity,
@@ -440,7 +440,7 @@ class StudentDetailsPage extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: 4,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, __) => SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final items = [
                         {
@@ -475,10 +475,12 @@ class StudentDetailsPage extends StatelessWidget {
               );
             },
             iconAlignment: IconAlignment.end,
-            label: const Text('Package Summary',
-                style: TextStyle(color: Colors.white, fontSize: 13)),
+            label: Text('Package Summary',
+                style: Get.textTheme
+                    .bodySmall!
+                    .copyWith(color: Colors.white)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Get.theme.colorScheme.primary,
               elevation: 0,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
@@ -486,7 +488,7 @@ class StudentDetailsPage extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -546,38 +548,40 @@ class StudentDetailsPage extends StatelessWidget {
                         Expanded(
                           child: Text(
                             batch.batchName ?? 'No Name',
-                            style: const TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w700),
+                            style: Get.textTheme.titleMedium,
                           ),
                         ),
                         _statusBadge(batch.status ?? '-', statusColor),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text('ID: ${batch.id ?? '-'}',
-                        style: TextStyle(fontSize: 11, color: cs.outline)),
-                    const SizedBox(height: 14),
+                        style: Get.textTheme
+                            .labelSmall!
+                            .copyWith(color: cs.outline)),
+                    SizedBox(height: 14),
                     Divider(height: 1, color: cs.outline.withOpacity(0.15)),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14),
 
                     // Mentor row
                     Row(
                       children: [
                         _squareAvatar(batch.mentor?.imageUrl, 44),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Assigned Mentor',
-                                style:
-                                    TextStyle(fontSize: 11, color: cs.outline)),
-                            const SizedBox(height: 2),
+                                style: Get.textTheme
+                                    .labelSmall!
+                                    .copyWith(color: cs.outline)),
+                            SizedBox(height: 2),
                             Text(batch.mentor?.name ?? '-',
-                                style: const TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight.w600)),
+                                style: Get.textTheme.titleSmall),
                             Text('ID: ${batch.mentor?.id ?? '-'}',
-                                style:
-                                    TextStyle(fontSize: 11, color: cs.outline)),
+                                style: Get.textTheme
+                                    .labelSmall!
+                                    .copyWith(color: cs.outline)),
                           ],
                         ),
                       ],
@@ -631,17 +635,18 @@ class StudentDetailsPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(batch.batchName ?? 'No Name',
-                              style: const TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w700)),
+                              style: Get.textTheme.titleMedium),
                         ),
                         _statusBadge(
                             batch.status ?? '-', _statusColor(batch.status)),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text('Code: ${batch.id ?? '-'}',
-                        style: TextStyle(fontSize: 12, color: cs.outline)),
-                    const SizedBox(height: 14),
+                        style: Get.textTheme
+                            .bodySmall!
+                            .copyWith(color: cs.outline)),
+                    SizedBox(height: 14),
 
                     // Amount pills
                     Row(
@@ -655,7 +660,7 @@ class StudentDetailsPage extends StatelessWidget {
                             icon: Icons.arrow_downward_rounded,
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10),
                         Expanded(
                           child: _amountPill(
                             context: context,
@@ -667,14 +672,16 @@ class StudentDetailsPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     Row(
                       children: [
                         Icon(Icons.calendar_today_outlined,
                             size: 13, color: cs.outline),
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Text('Paid on: ${batch.paidDate ?? '-'}',
-                            style: TextStyle(fontSize: 12, color: cs.outline)),
+                            style: Get.textTheme
+                                .bodySmall!
+                                .copyWith(color: cs.outline)),
                       ],
                     ),
                   ],
@@ -696,7 +703,7 @@ class StudentDetailsPage extends StatelessWidget {
       children: [
         CustomWidgets().premiumSearch(context,
             hint: 'Search by package name', onChanged: (p0) {}),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         // Session summary button (untouched logic)
         SizedBox(
           width: double.infinity,
@@ -727,7 +734,7 @@ class StudentDetailsPage extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: 5,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, __) => SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final items = [
                         {
@@ -767,10 +774,12 @@ class StudentDetailsPage extends StatelessWidget {
               );
             },
             iconAlignment: IconAlignment.end,
-            label: const Text('Session Summary',
-                style: TextStyle(color: Colors.white, fontSize: 13)),
+            label: Text('Session Summary',
+                style: Get.textTheme
+                    .bodySmall!
+                    .copyWith(color: Colors.white)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Get.theme.colorScheme.primary,
               elevation: 0,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
@@ -778,7 +787,7 @@ class StudentDetailsPage extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -803,7 +812,7 @@ class StudentDetailsPage extends StatelessWidget {
               selectedIndex: c.feedbackTabIndex.value,
               onTap: (i) => c.feedbackTabIndex.value = i,
             )),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Obx(() {
           final isTeacher = c.feedbackTabIndex.value == 0;
           final feedbacks = isTeacher ? c.teacherFeedbacks : c.mentorFeedbacks;
@@ -821,7 +830,7 @@ class StudentDetailsPage extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: feedbacks.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, __) => SizedBox(height: 10),
             itemBuilder: (_, i) => feedbackCard(feedbacks[i], context),
           );
         }),
@@ -833,7 +842,7 @@ class StudentDetailsPage extends StatelessWidget {
   //  PROFILE CARD  (upgraded)
   // ══════════════════════════════════════════════════════════
   Widget _profileCard(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       width: double.infinity,
@@ -885,12 +894,13 @@ class StudentDetailsPage extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(student.name,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 4),
+                          style: Get.textTheme.titleLarge),
+                      SizedBox(height: 4),
                       Text(student.email ?? '-',
-                          style: TextStyle(fontSize: 13, color: cs.outline)),
-                      const SizedBox(height: 10),
+                          style: Get.textTheme
+                              .bodySmall!
+                              .copyWith(color: cs.outline)),
+                      SizedBox(height: 10),
 
                       // ID badge
                       Container(
@@ -901,18 +911,17 @@ class StudentDetailsPage extends StatelessWidget {
                           border: Border.all(color: _blue.withOpacity(0.3)),
                         ),
                         child: Text('ID: ${student.studentId}',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: _blue)),
+                            style: Get.textTheme
+                                .titleSmall!
+                                .copyWith(color: _blue)),
                       ),
 
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
 
                       // Fee status chip
                       _feeStatusChip(context, student.isFeePaid),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
 
                       // Dashboard button
                       SizedBox(
@@ -928,9 +937,10 @@ class StudentDetailsPage extends StatelessWidget {
                           icon: const Icon(Icons.arrow_right_alt,
                               size: 15, color: Colors.white),
                           iconAlignment: IconAlignment.end,
-                          label: const Text('Go to Dashboard',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 13)),
+                          label: Text('Go to Dashboard',
+                              style: Get.textTheme
+                                  .bodySmall!
+                                  .copyWith(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: cs.primary,
                             elevation: 0,
@@ -955,7 +965,7 @@ class StudentDetailsPage extends StatelessWidget {
   //  PACKAGE CARD  (upgraded)
   // ══════════════════════════════════════════════════════════
   Widget studentPackageCard(BuildContext context, Package package) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final packageFee = package.packageFee ?? 0;
     final paidFee = package.takenFee ?? 0;
     final balance = package.balance ?? (packageFee - paidFee);
@@ -998,9 +1008,8 @@ class StudentDetailsPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(package.name ?? '-',
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w800)),
-                          const SizedBox(height: 6),
+                              style: Get.textTheme.titleMedium),
+                          SizedBox(height: 6),
                           _statusBadge(package.status ?? '', statusColor),
                         ],
                       ),
@@ -1020,14 +1029,16 @@ class StudentDetailsPage extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Row(
                   children: [
                     Icon(Icons.calendar_today_outlined,
                         size: 12, color: cs.outline),
-                    const SizedBox(width: 5),
+                    SizedBox(width: 5),
                     Text('Enrolled: 12 Oct 2024 • 10:30 AM',
-                        style: TextStyle(color: cs.outline, fontSize: 12)),
+                        style: Get.textTheme
+                            .bodySmall!
+                            .copyWith(color: cs.outline)),
                   ],
                 ),
 
@@ -1043,10 +1054,10 @@ class StudentDetailsPage extends StatelessWidget {
                         children: [
                           _metaChip(context, Icons.menu_book_outlined,
                               'Std ${student.standard}'),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           _metaChip(context, Icons.science_outlined,
                               package.subjectName ?? '-'),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           _metaChip(context, Icons.school_outlined,
                               student.course ?? '-'),
                         ],
@@ -1061,12 +1072,13 @@ class StudentDetailsPage extends StatelessWidget {
                           backgroundImage: const NetworkImage(
                               "https://i.pravatar.cc/150?img=3"),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         Text(package.teacher?.name ?? '',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 13)),
+                            style: Get.textTheme.titleSmall),
                         Text(package.teacher?.id ?? '',
-                            style: TextStyle(fontSize: 11, color: cs.outline)),
+                            style: Get.textTheme
+                                .labelSmall!
+                                .copyWith(color: cs.outline)),
                       ],
                     ),
                   ],
@@ -1093,19 +1105,20 @@ class StudentDetailsPage extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Progress',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 13)),
-                    const SizedBox(height: 10),
+                    Text('Progress',
+                        style: Get.textTheme.titleSmall),
+                    SizedBox(height: 10),
                     _progressRow(
                         context, 'Sessions', sessionProgress, cs.primary),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     _progressRow(
                         context, 'Fees', feeProgress, const Color(0xFF22C55E)),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       '$completedSessions/$totalSessions sessions  •  ${student.totalHour ?? 0} hrs  •  ${(feeProgress * 100).toStringAsFixed(0)}% fee',
-                      style: TextStyle(fontSize: 11, color: cs.outline),
+                      style: Get.textTheme
+                          .labelSmall!
+                          .copyWith(color: cs.outline),
                     ),
                   ],
                 ),
@@ -1127,15 +1140,14 @@ class StudentDetailsPage extends StatelessWidget {
                                   ? const Color(0xFF22C55E)
                                   : cs.error,
                             ),
-                            const SizedBox(width: 6),
+                            SizedBox(width: 6),
                             Text(c.status.value,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: c.isActive.value
-                                      ? const Color(0xFF22C55E)
-                                      : cs.error,
-                                )),
+                                style: Get.textTheme
+                                    .titleSmall!
+                                    .copyWith(
+                                        color: c.isActive.value
+                                            ? const Color(0xFF22C55E)
+                                            : cs.error)),
                           ],
                         )),
                     Obx(() => Switch(
@@ -1168,7 +1180,7 @@ class StudentDetailsPage extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
                 // STUDENT FEES
                 _feesSection(
@@ -1197,8 +1209,8 @@ class StudentDetailsPage extends StatelessWidget {
   //  SESSION CARD
   // ══════════════════════════════════════════════════════════
   Widget studentPackageSessionCard(BuildContext context, Package package) {
-    if ((package.name ?? '').trim().isEmpty) return const SizedBox();
-    final cs = Theme.of(context).colorScheme;
+    if ((package.name ?? '').trim().isEmpty) return SizedBox();
+    final cs = Get.theme.colorScheme;
     final totalSessions = package.sessions?.length ?? 0;
 
     return InkWell(
@@ -1228,11 +1240,10 @@ class StudentDetailsPage extends StatelessWidget {
               ),
               child: Icon(Icons.event_note_outlined, color: _blue, size: 20),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: Text(package.name ?? '-',
-                  style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w600)),
+                  style: Get.textTheme.titleMedium),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1240,8 +1251,9 @@ class StudentDetailsPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   color: _blue.withOpacity(0.2)),
               child: Text('$totalSessions Sessions',
-                  style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w600, color: _blue)),
+                  style: Get.textTheme
+                      .titleSmall!
+                      .copyWith(color: _blue)),
             ),
           ],
         ),
@@ -1253,7 +1265,7 @@ class StudentDetailsPage extends StatelessWidget {
   //  ASSESSMENT CARD
   // ══════════════════════════════════════════════════════════
   Widget studentAssessmentCard(BuildContext context, Assessment assessment) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return InkWell(
       onTap: () => DialogUtils().showAssessmentDialog(context, assessment),
@@ -1294,30 +1306,31 @@ class StudentDetailsPage extends StatelessWidget {
                     ),
                     child: Icon(Icons.quiz_outlined, color: _blue, size: 20),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(assessment.type ?? 'Assessment',
-                            style: const TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 4),
+                            style: Get.textTheme.titleMedium),
+                        SizedBox(height: 4),
                         Row(
                           children: [
                             Icon(Icons.calendar_today_outlined,
                                 size: 12, color: cs.outline),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4),
                             Text(assessment.date ?? '-',
-                                style:
-                                    TextStyle(fontSize: 12, color: cs.outline)),
-                            const SizedBox(width: 12),
+                                style: Get.textTheme
+                                    .bodySmall!
+                                    .copyWith(color: cs.outline)),
+                            SizedBox(width: 12),
                             Icon(Icons.schedule_outlined,
                                 size: 12, color: cs.outline),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4),
                             Text('10:30 AM',
-                                style:
-                                    TextStyle(fontSize: 12, color: cs.outline)),
+                                style: Get.textTheme
+                                    .bodySmall!
+                                    .copyWith(color: cs.outline)),
                           ],
                         ),
                       ],
@@ -1343,7 +1356,7 @@ class StudentDetailsPage extends StatelessWidget {
   //  FEEDBACK CARD
   // ══════════════════════════════════════════════════════════
   Widget feedbackCard(Feedbacks f, BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1357,8 +1370,7 @@ class StudentDetailsPage extends StatelessWidget {
               offset: const Offset(0, 4))
         ],
       ),
-      child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start, children: []),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: []),
     );
   }
 
@@ -1366,14 +1378,14 @@ class StudentDetailsPage extends StatelessWidget {
     if (c.step.value == 1) {
       return Column(children: [
         CustomWidgets().labelWithAsterisk('Certificate Name', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Certificate of Completion',
             controller: c.nameController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Select Package', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDropdownField<Package>(
           context: context,
           hint: 'Choose a package',
@@ -1400,21 +1412,21 @@ class StudentDetailsPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(12)),
         child: Row(children: [
           const Icon(Icons.description),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Text(title),
         ]),
       ),
     );
   }
 
-  Widget CertificateCard({required cert}) => const SizedBox();
+  Widget CertificateCard({required cert}) => SizedBox();
 
   // ══════════════════════════════════════════════════════════
   //  SMALL HELPERS
   // ══════════════════════════════════════════════════════════
 
   Widget _glassCard({required BuildContext context, required Widget child}) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -1435,7 +1447,7 @@ class StudentDetailsPage extends StatelessWidget {
 
   Widget _cardHeader(BuildContext context, String title,
       {required IconData icon}) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Row(
       children: [
         Container(
@@ -1445,9 +1457,8 @@ class StudentDetailsPage extends StatelessWidget {
           ),
           child: Icon(icon, size: 16, color: _blue),
         ),
-        const SizedBox(width: 10),
-        Text(title,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+        SizedBox(width: 10),
+        Text(title, style: Get.textTheme.titleMedium),
       ],
     );
   }
@@ -1477,21 +1488,23 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   Widget _miniStat(BuildContext context, String label, String value) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 11, color: cs.outline)),
-        const SizedBox(height: 3),
-        Text(value,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+        Text(label,
+            style: Get.textTheme
+                .labelSmall!
+                .copyWith(color: cs.outline)),
+        SizedBox(height: 3),
+        Text(value, style: Get.textTheme.titleSmall),
       ],
     );
   }
 
   Widget _contactRow(
       BuildContext context, IconData icon, String label, String value) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Row(
       children: [
         Container(
@@ -1502,14 +1515,15 @@ class StudentDetailsPage extends StatelessWidget {
           ),
           child: Icon(icon, size: 16, color: _blue),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(fontSize: 11, color: cs.outline)),
-            Text(value,
-                style:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            Text(label,
+                style: Get.textTheme
+                    .labelSmall!
+                    .copyWith(color: cs.outline)),
+            Text(value, style: Get.textTheme.titleSmall),
           ],
         ),
       ],
@@ -1517,26 +1531,29 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   Widget _parentSection(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Parent Details',
-            style: TextStyle(
-                fontSize: 11, color: cs.outline, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
+            style: Get.textTheme
+                .titleSmall!
+                .copyWith(color: cs.outline)),
+        SizedBox(height: 4),
         Text(student.parentName ?? '-',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+            style: Get.textTheme.titleSmall),
         if (student.parentOccupation != null)
           Text(student.parentOccupation!,
-              style: TextStyle(fontSize: 12, color: cs.outline)),
+              style: Get.textTheme
+                  .bodySmall!
+                  .copyWith(color: cs.outline)),
       ],
     );
   }
 
   Widget _statPill(
       BuildContext context, String label, String value, IconData icon) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -1547,14 +1564,15 @@ class StudentDetailsPage extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 16, color: _blue),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(fontSize: 10, color: cs.outline)),
-              Text(value,
-                  style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w700)),
+              Text(label,
+                  style: Get.textTheme
+                      .labelSmall!
+                      .copyWith(color: cs.outline)),
+              Text(value, style: Get.textTheme.titleSmall),
             ],
           ),
         ],
@@ -1564,7 +1582,7 @@ class StudentDetailsPage extends StatelessWidget {
 
   Widget _feeStatusChip(BuildContext context, bool paid) {
     final color =
-        paid ? const Color(0xFF22C55E) : Theme.of(context).colorScheme.error;
+        paid ? const Color(0xFF22C55E) : Get.theme.colorScheme.error;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
@@ -1577,10 +1595,11 @@ class StudentDetailsPage extends StatelessWidget {
         children: [
           Icon(paid ? Icons.task_alt : Icons.cancel_outlined,
               size: 15, color: color),
-          const SizedBox(width: 6),
+          SizedBox(width: 6),
           Text(paid ? 'Admission Fee Paid' : 'Admission Fee Unpaid',
-              style: TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+              style: Get.textTheme
+                  .titleSmall!
+                  .copyWith(color: color)),
         ],
       ),
     );
@@ -1595,8 +1614,8 @@ class StudentDetailsPage extends StatelessWidget {
         border: Border.all(color: color.withOpacity(0.4)),
       ),
       child: Text(label,
-          style: TextStyle(
-              fontSize: 11, fontWeight: FontWeight.w600, color: color)),
+          style:
+              Get.textTheme.titleSmall!.copyWith(color: color)),
     );
   }
 
@@ -1618,20 +1637,23 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   Widget _metaChip(BuildContext context, IconData icon, String label) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 13, color: cs.outline),
-        const SizedBox(width: 5),
-        Text(label, style: TextStyle(fontSize: 12, color: cs.onSurface)),
+        SizedBox(width: 5),
+        Text(label,
+            style: Get.textTheme
+                .bodySmall!
+                .copyWith(color: cs.onSurface)),
       ],
     );
   }
 
   Widget _iconStat(
       BuildContext context, IconData icon, String label, String value) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Column(
       children: [
         Container(
@@ -1642,11 +1664,13 @@ class StudentDetailsPage extends StatelessWidget {
           ),
           child: Icon(icon, size: 18, color: _blue),
         ),
-        const SizedBox(height: 5),
-        Text(label, style: TextStyle(fontSize: 10, color: cs.outline)),
-        const SizedBox(height: 2),
-        Text(value,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+        SizedBox(height: 5),
+        Text(label,
+            style: Get.textTheme
+                .labelSmall!
+                .copyWith(color: cs.outline)),
+        SizedBox(height: 2),
+        Text(value, style: Get.textTheme.titleSmall),
       ],
     );
   }
@@ -1659,15 +1683,14 @@ class StudentDetailsPage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label,
-                style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+            Text(label, style: Get.textTheme.labelMedium),
             Text('${(value * 100).toStringAsFixed(0)}%',
-                style: TextStyle(
-                    fontSize: 11, color: color, fontWeight: FontWeight.w700)),
+                style: Get.textTheme
+                    .titleSmall!
+                    .copyWith(color: color)),
           ],
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         ClipRRect(
           borderRadius: BorderRadius.circular(6),
           child: LinearProgressIndicator(
@@ -1699,13 +1722,14 @@ class StudentDetailsPage extends StatelessWidget {
           Row(
             children: [
               Icon(icon, size: 15, color: color),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(title,
-                  style: TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w700, color: color)),
+                  style: Get.textTheme
+                      .titleSmall!
+                      .copyWith(color: color)),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           ...items,
         ],
       ),
@@ -1719,13 +1743,11 @@ class StudentDetailsPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12)),
+          Text(label, style: Get.textTheme.bodySmall),
           Text(value,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
-                color: valueColor,
-              )),
+              style: Get.textTheme.bodySmall!.copyWith(
+                  fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+                  color: valueColor)),
         ],
       ),
     );
@@ -1748,14 +1770,18 @@ class StudentDetailsPage extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 15, color: color),
-          const SizedBox(width: 6),
+          SizedBox(width: 6),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(fontSize: 10, color: color)),
+              Text(label,
+                  style: Get.textTheme
+                      .labelSmall!
+                      .copyWith(color: color)),
               Text(value,
-                  style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w800, color: color)),
+                  style: Get.textTheme
+                      .titleSmall!
+                      .copyWith(color: color)),
             ],
           ),
         ],
@@ -1772,10 +1798,12 @@ Widget _labelValue(String label, String value) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-      const SizedBox(height: 3),
-      Text(value,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+      Text(label,
+          style: Get.textTheme
+              .labelSmall!
+              .copyWith(color: Colors.grey)),
+      SizedBox(height: 3),
+      Text(value, style: Get.textTheme.titleSmall),
     ],
   );
 }
@@ -1802,20 +1830,24 @@ Widget summaryCard({
           ),
           child: Center(
             child: Text(value.substring(0, 1),
-                style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w900, color: color)),
+                style: Get.textTheme
+                    .titleLarge!
+                    .copyWith(color: color)),
           ),
         ),
-        const SizedBox(width: 14),
+        SizedBox(width: 14),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
-            const SizedBox(height: 3),
+                style: Get.textTheme
+                    .labelSmall!
+                    .copyWith(color: color.withOpacity(0.8))),
+            SizedBox(height: 3),
             Text(value,
-                style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w800, color: color)),
+                style: Get.textTheme
+                    .titleLarge!
+                    .copyWith(color: color)),
           ],
         ),
       ],
@@ -1831,7 +1863,7 @@ Widget _supportTile(
   String date, {
   String? imageUrl,
 }) {
-  final cs = Theme.of(context).colorScheme;
+  final cs = Get.theme.colorScheme;
   return Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
@@ -1864,22 +1896,23 @@ Widget _supportTile(
               : null,
         ),
 
-        const SizedBox(width: 14),
+        SizedBox(width: 14),
 
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(role,
-                  style: TextStyle(
-                      fontSize: 11, fontWeight: FontWeight.w600, color: _blue)),
-              const SizedBox(height: 2),
-              Text(name,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 3),
+                  style: Get.textTheme
+                      .titleSmall!
+                      .copyWith(color: _blue)),
+              SizedBox(height: 2),
+              Text(name, style: Get.textTheme.titleSmall),
+              SizedBox(height: 3),
               Text('$id  •  $date',
-                  style: TextStyle(fontSize: 11, color: cs.outline)),
+                  style: Get.textTheme
+                      .labelSmall!
+                      .copyWith(color: cs.outline)),
             ],
           ),
         ),

@@ -26,7 +26,7 @@ SingleChildScrollView studentWalletTab(
               // ── Filter row ─────────────────────────────────────
               _FilterRow(c: c, student: student),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               // ── Wallet Summary button ──────────────
               SizedBox(
@@ -36,8 +36,11 @@ SingleChildScrollView studentWalletTab(
                   iconAlignment: IconAlignment.end,
                   icon: const Icon(Icons.bar_chart_outlined,
                       size: 18, color: Colors.white),
-                  label: const Text('Wallet Summary',
-                      style: TextStyle(color: Colors.white, fontSize: 13)),
+                  label: Text('Wallet Summary',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: cs.primary,
                     elevation: 0,
@@ -48,27 +51,27 @@ SingleChildScrollView studentWalletTab(
                 ),
               ),
 
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               // ── Credit summary ─────────────────────────────────
               _CreditSummaryCard(student: student, cs: cs),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               // ── Deposits ───────────────────────────────────────
               _DepositsCard(student: student, cs: cs),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               // ── Wallet usage ───────────────────────────────────
               _WalletUsageCard(student: student, cs: cs),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               // ── Credit transactions ────────────────────────────
               _CreditTransactionsCard(student: student, cs: cs),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               // ── Registration fee ───────────────────────────────
               _RegistrationFeeCard(student: student, cs: cs),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               // ── Packages ───────────────────────────────────────
               _PackagesCard(student: student, cs: cs),
@@ -104,29 +107,26 @@ class _BalanceCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("WALLET BALANCE",
-              style: TextStyle(
-                  color: cs.onPrimary.withOpacity(0.7),
-                  fontSize: 11,
-                  letterSpacing: 0.6)),
-          const SizedBox(height: 4),
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                  color: cs.onPrimary.withOpacity(0.7), letterSpacing: 0.6)),
+          SizedBox(height: 4),
           Text(
             "₹${balance.toStringAsFixed(0)}",
-            style: TextStyle(
-                color: cs.onPrimary,
-                fontSize: 34,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.5),
+            style: Theme.of(context)
+                .textTheme
+                .headlineLarge!
+                .copyWith(color: cs.onPrimary, letterSpacing: -0.5),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           Row(
             children: [
               _BalanceStat(
                   label: "Available",
-                  value: "₹${wallet.available?.toStringAsFixed(0) ?? '0'}"),
-              const SizedBox(width: 32),
+                  value: "₹${wallet.available.toStringAsFixed(0) ?? '0'}"),
+              SizedBox(width: 32),
               _BalanceStat(
                   label: "On Hold",
-                  value: "₹${wallet.onHold?.toStringAsFixed(0) ?? '0'}"),
+                  value: "₹${wallet.onHold.toStringAsFixed(0) ?? '0'}"),
             ],
           ),
         ],
@@ -146,13 +146,16 @@ class _BalanceStat extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: const TextStyle(color: Colors.white60, fontSize: 11)),
-        const SizedBox(height: 2),
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall!
+                .copyWith(color: Colors.white60)),
+        SizedBox(height: 2),
         Text(value,
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 16)),
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium!
+                .copyWith(color: Colors.white)),
       ],
     );
   }
@@ -184,7 +187,7 @@ class _FilterRow extends StatelessWidget {
             autoSelectFirst: true,
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
 
         // ── Coupon button — old style ──────────────────────────
         Tooltip(
@@ -192,11 +195,11 @@ class _FilterRow extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () => CustomWidgets().showCustomDialog(
               context: context,
-              title: const Text('Apply Coupon'),
+              title: Text('Apply Coupon'),
               formKey: GlobalKey(),
               sections: [
                 CustomWidgets().labelWithAsterisk('Coupon Code'),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 CustomWidgets().dropdownStyledTextField(
                     context: context,
                     hint: 'Enter coupon code',
@@ -216,7 +219,7 @@ class _FilterRow extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
 
         // ── Refund button — old style ──────────────────────────
         Tooltip(
@@ -241,7 +244,7 @@ class _FilterRow extends StatelessWidget {
       StudentController c, ColorScheme cs) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text('Request Refund'),
+      title: Text('Request Refund'),
       formKey: GlobalKey(),
       sections: [
         Row(
@@ -250,12 +253,12 @@ class _FilterRow extends StatelessWidget {
               child: _RefundStatCell(
                 title: "Total Deposit",
                 value:
-                    "₹${student.wallet?.totalDeposited?.toStringAsFixed(0) ?? '0'}",
+                    "₹${student.wallet?.totalDeposited.toStringAsFixed(0) ?? '0'}",
                 color: const Color(0xFF0F6E56),
                 cs: cs,
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: _RefundStatCell(
                 title: "Class Taken",
@@ -266,7 +269,7 @@ class _FilterRow extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -278,44 +281,46 @@ class _FilterRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(Icons.info_outline, size: 16, color: cs.primary),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: Text(
                   "You can request a refund up to your Total Deposit Amount. "
                   "This does not include credits or coupons.",
-                  style: TextStyle(
-                      fontSize: 12, color: cs.onSurface.withOpacity(0.7)),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: cs.onSurface.withOpacity(0.7)),
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         CustomWidgets().labelWithAsterisk('Refund Amount (₹)', required: true),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'e.g. 250 (max: ₹${student.wallet?.totalDeposited})',
           controller: c.refundAmountController,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         CustomWidgets().labelWithAsterisk('Message', required: true),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Reason for refund...',
           controller: c.refundMessageController,
           isMultiline: true,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         CustomWidgets().labelWithAsterisk('Remark'),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Additional internal notes...',
           controller: c.remarkController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
       ],
       submitText: 'Request',
       onSubmit: () {},
@@ -356,10 +361,10 @@ class _WalletSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(title,
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: cs.onSurface)),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: cs.onSurface)),
               if (trailing != null) trailing!,
             ],
           ),
@@ -407,14 +412,14 @@ class _CreditSummaryCard extends StatelessWidget {
                   value: "₹${limit.toStringAsFixed(0)}",
                   color: cs.primary,
                   cs: cs)),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Expanded(
               child: _MetricCell(
                   label: "Used",
                   value: "₹${used.toStringAsFixed(0)}",
                   color: const Color(0xFF854F0B),
                   cs: cs)),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Expanded(
               child: _MetricCell(
                   label: "Balance",
@@ -446,17 +451,17 @@ class _DepositsCard extends StatelessWidget {
             child: _MetricCell(
               label: "Pending",
               value:
-                  "₹${student.wallet?.pendingDeposits?.toStringAsFixed(0) ?? '0'}",
+                  "₹${student.wallet?.pendingDeposits.toStringAsFixed(0) ?? '0'}",
               color: const Color(0xFF854F0B),
               cs: cs,
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Expanded(
             child: _MetricCell(
               label: "Lifetime",
               value:
-                  "₹${student.wallet?.totalDeposited?.toStringAsFixed(0) ?? '0'}",
+                  "₹${student.wallet?.totalDeposited.toStringAsFixed(0) ?? '0'}",
               color: const Color(0xFF0F6E56),
               cs: cs,
             ),
@@ -486,14 +491,14 @@ class _WalletUsageCard extends StatelessWidget {
         children: [
           _UsageRow(
             label: "Wallet Used",
-            value: "₹${student.wallet?.walletUsed?.toStringAsFixed(0) ?? '0'}",
+            value: "₹${student.wallet?.walletUsed.toStringAsFixed(0) ?? '0'}",
             cs: cs,
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           _UsageRow(
             label: "Credit Used",
             value:
-                "₹${student.wallet?.creditUsedAmount?.toStringAsFixed(0) ?? '0'}",
+                "₹${student.wallet?.creditUsedAmount.toStringAsFixed(0) ?? '0'}",
             cs: cs,
           ),
           if (packages.isNotEmpty) ...[
@@ -516,16 +521,18 @@ class _WalletUsageCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(p.name ?? "—",
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: cs.onSurface)),
-                          const SizedBox(height: 2),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall!
+                                  .copyWith(color: cs.onSurface)),
+                          SizedBox(height: 2),
                           Text(
                             "${p.subjectName ?? '—'} · ${p.mode ?? '—'}",
-                            style: TextStyle(
-                                fontSize: 11,
-                                color: cs.onSurface.withOpacity(0.45)),
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall!
+                                .copyWith(
+                                    color: cs.onSurface.withOpacity(0.45)),
                           ),
                         ],
                       ),
@@ -534,10 +541,10 @@ class _WalletUsageCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text("₹${taken.toStringAsFixed(0)}",
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: cs.onSurface)),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall!
+                                .copyWith(color: cs.onSurface)),
                         Container(
                           margin: const EdgeInsets.only(top: 3),
                           padding: const EdgeInsets.symmetric(
@@ -546,11 +553,11 @@ class _WalletUsageCard extends StatelessWidget {
                             color: statusColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: Text(p.status??'-',
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                  color: statusColor)),
+                          child: Text(p.status ?? '-',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall!
+                                  .copyWith(color: statusColor)),
                         ),
                       ],
                     ),
@@ -594,7 +601,7 @@ class _CreditTransactionsCard extends StatelessWidget {
               cs: cs,
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Expanded(
             child: _CreditStatCell(
               title: "Repayments",
@@ -604,7 +611,7 @@ class _CreditTransactionsCard extends StatelessWidget {
               cs: cs,
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Expanded(
             child: _CreditStatCell(
               title: "Class Payments",
@@ -645,19 +652,21 @@ class _RegistrationFeeCard extends StatelessWidget {
               children: [
                 Text(
                   "₹${fee.toStringAsFixed(0)}",
-                  style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      color: cs.onSurface),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall!
+                      .copyWith(color: cs.onSurface),
                 ),
-                const SizedBox(height: 3),
+                SizedBox(height: 3),
                 Text(
                   student.admissionDate != null
                       ? "${student.wallet?.registrationPaidAt?.toLocal()}"
                           .split('.')[0]
                       : "—",
-                  style: TextStyle(
-                      fontSize: 11, color: cs.onSurface.withOpacity(0.4)),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelSmall!
+                      .copyWith(color: cs.onSurface.withOpacity(0.4)),
                 ),
               ],
             ),
@@ -676,12 +685,12 @@ class _RegistrationFeeCard extends StatelessWidget {
                     isPaid ? Icons.check_circle_outline : Icons.cancel_outlined,
                     size: 14,
                     color: paidColor),
-                const SizedBox(width: 5),
+                SizedBox(width: 5),
                 Text(isPaid ? "Paid" : "Unpaid",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: paidColor)),
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelMedium!
+                        .copyWith(color: paidColor)),
               ],
             ),
           ),
@@ -713,13 +722,17 @@ class _PackagesCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text("${packages.length}",
-            style: TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w600, color: cs.primary)),
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall!
+                .copyWith(color: cs.primary)),
       ),
       child: packages.isEmpty
           ? Text("No packages available",
-              style:
-                  TextStyle(fontSize: 13, color: cs.onSurface.withOpacity(0.4)))
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall!
+                  .copyWith(color: cs.onSurface.withOpacity(0.4)))
           : Column(
               children: packages.map((p) {
                 final isActive = p.status == "Active";
@@ -744,16 +757,18 @@ class _PackagesCard extends StatelessWidget {
                           children: [
                             Text(
                               "${p.standard} · ${p.syllabus}",
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: cs.onSurface),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall!
+                                  .copyWith(color: cs.onSurface),
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(height: 2),
                             Text(p.subjectName ?? "—",
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    color: cs.onSurface.withOpacity(0.45))),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall!
+                                    .copyWith(
+                                        color: cs.onSurface.withOpacity(0.45))),
                           ],
                         ),
                       ),
@@ -773,12 +788,12 @@ class _PackagesCard extends StatelessWidget {
                                 decoration: BoxDecoration(
                                     color: statusColor,
                                     shape: BoxShape.circle)),
-                            const SizedBox(width: 5),
-                            Text(p.status??'-',
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: statusColor)),
+                            SizedBox(width: 5),
+                            Text(p.status ?? '-',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall!
+                                    .copyWith(color: statusColor)),
                           ],
                         ),
                       ),
@@ -817,7 +832,7 @@ void _showWalletSummary(
       .where((t) => t.type == "deposit" && t.status == "approved")
       .fold(0.0, (s, t) => s + t.amount);
   final creditRepayments = wallet.creditTransactions
-          ?.where((t) => t.type == "repayment")
+          .where((t) => t.type == "repayment")
           .fold(0, (s, t) => s + t.count) ??
       0;
 
@@ -832,7 +847,7 @@ void _showWalletSummary(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: 6,
-        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        separatorBuilder: (_, __) => SizedBox(height: 8),
         itemBuilder: (ctx, i) {
           final items = [
             _WalletSummaryItem(
@@ -946,8 +961,10 @@ class _ExpandableSummaryCardState extends State<ExpandableSummaryCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(widget.title,
-                  style: TextStyle(
-                      fontSize: 12, color: cs.onSurface.withOpacity(0.6))),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: cs.onSurface.withOpacity(0.6))),
               if (widget.isExpandable)
                 GestureDetector(
                   onTap: () => setState(() => isExpanded = !isExpanded),
@@ -961,31 +978,33 @@ class _ExpandableSummaryCardState extends State<ExpandableSummaryCard> {
                 ),
             ],
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(widget.value,
-              style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w600, color: color)),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium!
+                  .copyWith(color: color)),
           if (widget.isExpandable &&
               isExpanded &&
               widget.breakdown != null) ...[
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Divider(
                 height: 1,
                 thickness: 0.5,
                 color: cs.outlineVariant.withOpacity(0.4)),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             ...widget.breakdown!.map((e) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 3),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(e["label"]!,
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: cs.onSurface.withOpacity(0.6))),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(color: cs.onSurface.withOpacity(0.6))),
                       Text(e["value"]!,
-                          style: const TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w600)),
+                          style: Theme.of(context).textTheme.titleSmall),
                     ],
                   ),
                 )),
@@ -1026,12 +1045,16 @@ class _MetricCell extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: TextStyle(
-                  fontSize: 11, color: cs.onSurface.withOpacity(0.5))),
-          const SizedBox(height: 4),
+              style: Theme.of(context)
+                  .textTheme
+                  .labelSmall!
+                  .copyWith(color: cs.onSurface.withOpacity(0.5))),
+          SizedBox(height: 4),
           Text(value,
-              style: TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w600, color: color)),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall!
+                  .copyWith(color: color)),
         ],
       ),
     );
@@ -1052,13 +1075,15 @@ class _UsageRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label,
-            style:
-                TextStyle(fontSize: 13, color: cs.onSurface.withOpacity(0.6))),
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(color: cs.onSurface.withOpacity(0.6))),
         Text(value,
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: cs.onSurface)),
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall!
+                .copyWith(color: cs.onSurface)),
       ],
     );
   }
@@ -1093,14 +1118,18 @@ class _CreditStatCell extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 16, color: color),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(value,
-              style: TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w600, color: color)),
-          const SizedBox(height: 3),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge!
+                  .copyWith(color: color)),
+          SizedBox(height: 3),
           Text(title,
-              style: TextStyle(
-                  fontSize: 11, color: cs.onSurface.withOpacity(0.5))),
+              style: Theme.of(context)
+                  .textTheme
+                  .labelSmall!
+                  .copyWith(color: cs.onSurface.withOpacity(0.5))),
         ],
       ),
     );
@@ -1134,12 +1163,16 @@ class _RefundStatCell extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title,
-              style: TextStyle(
-                  fontSize: 12, color: cs.onSurface.withOpacity(0.55))),
-          const SizedBox(height: 6),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall!
+                  .copyWith(color: cs.onSurface.withOpacity(0.55))),
+          SizedBox(height: 6),
           Text(value,
-              style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w600, color: color)),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium!
+                  .copyWith(color: color)),
         ],
       ),
     );

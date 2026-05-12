@@ -17,9 +17,9 @@
 //         child: Column(
 //           children: [
 //             _profileHeader(context),
-//             const SizedBox(height: 16),
+//             SizedBox(height: 16),
 //             _financialSummary(context),
-//             const SizedBox(height: 16),
+//             SizedBox(height: 16),
 //             _detailsSection(context),
 //           ],
 //         ),
@@ -33,9 +33,9 @@
 //       child: Column(
 //         children: [
 //           _profileHeader(context),
-//           const SizedBox(height: 16),
+//           SizedBox(height: 16),
 //           _financialSummary(context),
-//           const SizedBox(height: 16),
+//           SizedBox(height: 16),
 //           _detailsSection(context),
 //         ],
 //       ),
@@ -61,44 +61,41 @@
 //             children: [
 //               Text(
 //                 student.name,
-//                 style: TextStyle(
-//                   fontSize: 18,
-//                   fontWeight: FontWeight.w700,
-//                   color: cs.onPrimary,
-//                 ),
+//                 style: Theme.of(context).textTheme.titleLarge!.copyWith(//                   //                   //                   color: cs.onPrimary,
+//),
 //               ),
 //               _statusBadge(context),
 //             ],
 //           ),
 
-//           const SizedBox(height: 6),
+//           SizedBox(height: 6),
 
 //           Text(
 //             student.studentId ?? "",
-//             style: TextStyle(color: cs.onPrimary.withOpacity(0.7)),
+//             style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: cs.onPrimary.withOpacity(0.7)),
 //           ),
 
-//           const SizedBox(height: 12),
+//           SizedBox(height: 12),
 
 //           // CONTACT
 //           Row(
 //             children: [
 //               Icon(Icons.phone, size: 16, color: cs.onPrimary),
-//               const SizedBox(width: 6),
-//               Text(student.phone ?? "", style: TextStyle(color: cs.onPrimary)),
-//               const SizedBox(width: 16),
+//               SizedBox(width: 6),
+//               Text(student.phone ?? "", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: cs.onPrimary)),
+//               SizedBox(width: 16),
 //               Icon(Icons.chat, size: 16, color: cs.onPrimary),
-//               const SizedBox(width: 6),
+//               SizedBox(width: 6),
 //               Text(student.whatsapp ?? "",
-//                   style: TextStyle(color: cs.onPrimary)),
+//                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: cs.onPrimary)),
 //             ],
 //           ),
 
-//           const SizedBox(height: 10),
+//           SizedBox(height: 10),
 
 //           Text(
 //             "Joined: ${student.joinedAt.toString().split(" ")[0]}",
-//             style: TextStyle(color: cs.onPrimary.withOpacity(0.7)),
+//             style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: cs.onPrimary.withOpacity(0.7)),
 //           ),
 //         ],
 //       ),
@@ -118,7 +115,7 @@
 //       ),
 //       child: Text(
 //         isAssigned ? "Assigned" : "Unassigned",
-//         style: const TextStyle(color: Colors.white, fontSize: 12),
+//         style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.white),
 //       ),
 //     );
 //   }
@@ -127,9 +124,9 @@
 //     return Row(
 //       children: [
 //         Expanded(child: _moneyCard(context, "Total", student.totalAmount)),
-//         const SizedBox(width: 10),
+//         SizedBox(width: 10),
 //         Expanded(child: _moneyCard(context, "Paid", student.totalPaid)),
-//         const SizedBox(width: 10),
+//         SizedBox(width: 10),
 //         Expanded(child: _moneyCard(context, "Balance", student.balance)),
 //       ],
 //     );
@@ -153,18 +150,13 @@
 //       child: Column(
 //         children: [
 //           Text(title,
-//               style: TextStyle(
-//                 fontSize: 12,
-//                 color: cs.onSurface.withOpacity(0.6),
-//               )),
-//           const SizedBox(height: 6),
+//               style: Theme.of(context).textTheme.bodySmall!.copyWith(//                 //                 color: cs.onSurface.withOpacity(0.6),
+//)),
+//           SizedBox(height: 6),
 //           Text(
 //             "₹${(value ?? 0).toStringAsFixed(0)}",
-//             style: TextStyle(
-//               fontWeight: FontWeight.w700,
-//               fontSize: 15,
-//               color: cs.primary,
-//             ),
+//             style: Theme.of(context).textTheme.titleMedium!.copyWith(//               //               //               color: cs.primary,
+//),
 //           ),
 //         ],
 //       ),
@@ -180,7 +172,7 @@
 //           _tile("Coordinator", student.coordinatorName),
 //           _tile("Advisor", student.advisorName),
 //         ]),
-//         const SizedBox(height: 16),
+//         SizedBox(height: 16),
 //         _section(context, "Package Info", [
 //           _tile("Reg Fee", "₹${student.regFee}"),
 //           _tile("Class Hours", "${student.classHours}"),
@@ -206,8 +198,8 @@
 //         children: [
 //           Text(title,
 //               style:
-//                   const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-//           const SizedBox(height: 12),
+//                   Theme.of(context).textTheme.titleMedium),
+//           SizedBox(height: 12),
 //           Wrap(
 //             spacing: 10,
 //             runSpacing: 10,
@@ -229,10 +221,10 @@
 //       child: Column(
 //         crossAxisAlignment: CrossAxisAlignment.start,
 //         children: [
-//           Text(title, style: const TextStyle(fontSize: 11)),
-//           const SizedBox(height: 4),
+//           Text(title, style: Theme.of(context).textTheme.labelSmall),
+//           SizedBox(height: 4),
 //           Text(value != null && value.toString().isNotEmpty ? "$value" : "-",
-//               style: const TextStyle(fontWeight: FontWeight.w600)),
+//               style: Theme.of(context).textTheme.titleSmall),
 //         ],
 //       ),
 //     );

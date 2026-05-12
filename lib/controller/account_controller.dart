@@ -194,7 +194,7 @@ class AccountController extends GetxController {
     }
 
     Get.dialog(
-      const Center(child: CircularProgressIndicator()),
+      Center(child: CircularProgressIndicator()),
       barrierDismissible: false,
     );
 

@@ -22,7 +22,7 @@ class TrPackageSessionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final isDesktop = Responsive.isDesktop(context);
 
     if (c.sessions.isEmpty) {
@@ -30,7 +30,7 @@ class TrPackageSessionPage extends StatelessWidget {
     }
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Get.theme.colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -43,9 +43,9 @@ class TrPackageSessionPage extends StatelessWidget {
                 children: [
                   Text(
                     package.name ?? "-",
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Get.textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   // ── STATUS TABS ─────────────────────────────────────
                   Obx(
@@ -65,7 +65,7 @@ class TrPackageSessionPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   // ── SESSION GRID ────────────────────────────────────
                   Expanded(child: Obx(() {
@@ -80,15 +80,15 @@ class TrPackageSessionPage extends StatelessWidget {
                                 icon: const Icon(Icons.arrow_back),
                                 onPressed: () => c.closeMonth(),
                               ),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8),
                               Text(
                                 "Month Sessions",
-                                style: Theme.of(context).textTheme.titleMedium,
+                                style: Get.textTheme.titleMedium,
                               ),
                             ],
                           ),
 
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
 
                           /// 📦 Sessions List
                           Expanded(
@@ -155,8 +155,7 @@ class TrPackageSessionPage extends StatelessWidget {
                                     const EdgeInsets.symmetric(vertical: 8),
                                 child: Text(
                                   "$year • ${(totalMinutes / 60).toStringAsFixed(1)} hrs",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                  style: Get.textTheme.titleSmall,
                                 ),
                               ),
                               ...months.entries.map((monthEntry) {
@@ -219,7 +218,7 @@ class TrPackageSessionPage extends StatelessWidget {
 
                             if (status == 'completed') {
                               // handled above already
-                              return const SizedBox();
+                              return SizedBox();
                             } else {
                               return upcomingSessionCard(session, cs);
                             }
@@ -278,19 +277,16 @@ class TrPackageSessionPage extends StatelessWidget {
                   children: [
                     Text(
                       formatDate(date),
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface,
-                      ),
+                      style: Get.textTheme
+                          .titleMedium!
+                          .copyWith(color: cs.onSurface),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       "${formatTime(date)} • ${getTimeLeft(date)}",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: cs.onSurfaceVariant,
-                      ),
+                      style: Get.textTheme
+                          .bodySmall!
+                          .copyWith(color: cs.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -311,32 +307,29 @@ class TrPackageSessionPage extends StatelessWidget {
                     ),
                     child: Text(
                       (session.status ?? 'Upcoming').toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: cs.primary,
-                      ),
+                      style: Get.textTheme
+                          .titleSmall!
+                          .copyWith(color: cs.primary),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(
                     "${session.duration ?? 0} mins",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: cs.onSurfaceVariant,
-                    ),
+                    style: Get.textTheme
+                        .bodySmall!
+                        .copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           /// 🔹 DIVIDER
           Divider(color: cs.outline.withOpacity(0.3)),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           /// 🔹 MENTOR ROW
           Row(
@@ -350,22 +343,19 @@ class TrPackageSessionPage extends StatelessWidget {
                 child: session.mentor?.imageUrl == null
                     ? Text(
                         (session.mentor?.name ?? 'M')[0],
-                        style: TextStyle(
-                          color: cs.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Get.textTheme
+                            .titleSmall!
+                            .copyWith(color: cs.primary),
                       )
                     : null,
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: Text(
                   session.mentor?.name ?? '-',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: cs.onSurface,
-                  ),
+                  style: Get.textTheme
+                      .titleSmall!
+                      .copyWith(color: cs.onSurface),
                 ),
               ),
             ],

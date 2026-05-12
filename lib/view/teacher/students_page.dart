@@ -16,15 +16,15 @@ class TrStudentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Get.theme.colorScheme.surface,
       appBar: CustomAppBar(),
       drawer: DrawerMenu(),
       body: Obx(() {
         if (c.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
 
         if (c.students.isEmpty) {
@@ -112,7 +112,7 @@ class _StudentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final textTheme = Get.textTheme;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -130,7 +130,7 @@ class _StudentCard extends StatelessWidget {
           Row(
             children: [
               _Avatar(name: student.name, cs: cs),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +141,7 @@ class _StudentCard extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       student.studentId ?? "-",
                       style: textTheme.bodySmall?.copyWith(
@@ -154,14 +154,14 @@ class _StudentCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
 
           /// 🔹 EMAIL
           Row(
             children: [
               Icon(Icons.mail_outline,
                   size: 16, color: cs.onSurface.withOpacity(0.5)),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: Text(
                   student.email ?? "-",
@@ -172,7 +172,7 @@ class _StudentCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           /// 🔹 PACKAGES
           if (packages.isNotEmpty) ...[
@@ -183,7 +183,7 @@ class _StudentCard extends StatelessWidget {
                 color: cs.onSurface.withOpacity(0.7),
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Wrap(
               spacing: 6,
               runSpacing: 6,
@@ -197,7 +197,7 @@ class _StudentCard extends StatelessWidget {
               ),
             ),
 
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
 
           Text(
             "Assigned Mentor",
@@ -207,7 +207,7 @@ class _StudentCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           /// 🔥 MENTOR SUB-CARD
           _MentorCard(
@@ -233,11 +233,7 @@ class _StudentCard extends StatelessWidget {
         ),
         child: Text(
           "${p.subjectName} • ${p.standard}",
-          style: TextStyle(
-            fontSize: 12,
-            color: cs.primary,
-            fontWeight: FontWeight.w500,
-          ),
+          style: Get.textTheme.labelMedium!.copyWith(color: cs.primary),
         ),
       );
     }).toList();
@@ -247,16 +243,13 @@ class _StudentCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: cs.surfaceVariant,
+            color: cs.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
             "+$remaining",
-            style: TextStyle(
-              fontSize: 12,
-              color: cs.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
+            style:
+                Get.textTheme.labelMedium!.copyWith(color: cs.onSurfaceVariant),
           ),
         ),
       );
@@ -279,12 +272,12 @@ class _MentorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final textTheme = Get.textTheme;
 
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: cs.surfaceVariant.withOpacity(0.4),
+        color: cs.surfaceContainerHighest.withOpacity(0.4),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: cs.outline.withOpacity(0.3),
@@ -295,7 +288,7 @@ class _MentorCard extends StatelessWidget {
           /// 🔥 AVATAR (new)
           _MentorAvatar(name: name, cs: cs),
 
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
 
           /// 🔹 TEXT
           Expanded(
@@ -308,7 +301,7 @@ class _MentorCard extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   "ID: $id",
                   style: textTheme.bodySmall?.copyWith(
@@ -347,11 +340,7 @@ class _MentorAvatar extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         initials,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: cs.primary,
-        ),
+        style: Get.textTheme.titleSmall!.copyWith(color: cs.primary),
       ),
     );
   }
@@ -386,10 +375,7 @@ class _Avatar extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         name.isNotEmpty ? name[0].toUpperCase() : "?",
-        style: TextStyle(
-          fontWeight: FontWeight.w700,
-          color: cs.primary,
-        ),
+        style: Get.textTheme.titleSmall!.copyWith(color: cs.primary),
       ),
     );
   }

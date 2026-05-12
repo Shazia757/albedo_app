@@ -41,8 +41,7 @@ class PermissionsPage extends StatelessWidget {
       PermissionItem(key: "show_reports", title: "Show Reports"),
       PermissionItem(
           key: "coordinator_reports", title: "Show Coordinator Reports"),
-      PermissionItem(
-          key: "advisor_reports", title: "Show Advisor Reports"),
+      PermissionItem(key: "advisor_reports", title: "Show Advisor Reports"),
       PermissionItem(
           key: "recommendation_reports", title: "Show Recommendation Reports"),
       PermissionItem(key: "batch_reports", title: "Show Batch Reports"),
@@ -118,26 +117,23 @@ class PermissionsPage extends StatelessWidget {
       appBar: CustomAppBar(),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: ListView(padding: const EdgeInsets.all(12), children: [
-        const SizedBox(height: 8),
-        const Text(
+        SizedBox(height: 8),
+        Text(
           "Permissions Management",
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(context).textTheme.headlineSmall,
         ),
-        const SizedBox(height: 4),
-        const Text(
+        SizedBox(height: 4),
+        Text(
           "Control access for different modules and roles",
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: Colors.grey),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         ...sections.entries.map((entry) {
           return _buildSection(entry.key, entry.value);
-        }).toList(),
+        }),
       ]),
     );
   }
@@ -173,10 +169,7 @@ class PermissionsPage extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
+                  style: Get.textTheme.titleMedium,
                 ),
               ),
 
@@ -192,10 +185,7 @@ class PermissionsPage extends StatelessWidget {
                 ),
                 child: Text(
                   "$enabledCount / ${items.length}",
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Get.textTheme.titleSmall,
                 ),
               ),
             ],
@@ -221,7 +211,7 @@ class PermissionsPage extends StatelessWidget {
                     ),
                     title: Text(
                       item.title,
-                      style: const TextStyle(fontSize: 13),
+                      style: Get.textTheme.bodySmall,
                     ),
                     value: c.get(item.key),
                     activeColor: Colors.green,
@@ -229,7 +219,7 @@ class PermissionsPage extends StatelessWidget {
                   );
                 }),
               );
-            }).toList(),
+            }),
           ],
         ),
       );

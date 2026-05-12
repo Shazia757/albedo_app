@@ -25,7 +25,7 @@ class DownloadsPage extends StatelessWidget {
         appBar: CustomAppBar(),
         body: Column(
           children: [
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Align(
@@ -35,11 +35,12 @@ class DownloadsPage extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.5,
+                        color: cs.primary,
                       ),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Obx(
               () => CustomWidgets().customTabs(
                 context,
@@ -48,7 +49,7 @@ class DownloadsPage extends StatelessWidget {
                 onTap: (index) => c.selectedIndex.value = index,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Obx(() {
               final index = c.selectedIndex.value;
               if (c.tabs[index] == 'Certificates') {
@@ -57,7 +58,7 @@ class DownloadsPage extends StatelessWidget {
               if (c.tabs[index] == 'Assessments') {
                 return AssessmentsTab();
               }
-              return const SizedBox();
+              return SizedBox();
             })
           ],
         ),
@@ -155,35 +156,38 @@ class AssessmentsTab extends StatelessWidget {
                     child:
                         Icon(Icons.quiz_outlined, color: cs.primary, size: 20),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           assessment.type ?? 'Assessment',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Row(
                           children: [
                             Icon(Icons.calendar_today_outlined,
                                 size: 12, color: cs.outline),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4),
                             Text(
                               assessment.date ?? '-',
-                              style: TextStyle(fontSize: 12, color: cs.outline),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(color: cs.outline),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12),
                             Icon(Icons.schedule_outlined,
                                 size: 12, color: cs.outline),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4),
                             Text(
                               '10:30 AM',
-                              style: TextStyle(fontSize: 12, color: cs.outline),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(color: cs.outline),
                             ),
                           ],
                         ),

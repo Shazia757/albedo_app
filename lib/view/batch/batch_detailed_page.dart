@@ -5,7 +5,9 @@ import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/controller/teacher_wallet_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/view/add_batch_package_page.dart';
 import 'package:albedo_app/view/teacher/add_wallet_page.dart';
 import 'package:albedo_app/view/teacher/tr_package_session_page.dart';
 import 'package:albedo_app/view/teacher/tr_wallet_tab.dart';
@@ -32,18 +34,18 @@ class BatchDetailedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       appBar: CustomAppBar(),
-      // ── FAB is untouched ────────────────────────────────────
+      // ── FAB  ────────────────────────────────────
       floatingActionButton: Obx(() {
         final index = c.selectedIndex.value;
 
         if (c.detailedTabs[index] == 'Packages') {
           return FloatingActionButton(
             mini: true,
-            onPressed: () {},
+            onPressed: () => Get.to(() => AddBatchPackagePage()),
             backgroundColor: context.theme.colorScheme.primary,
             child: Icon(
               Icons.add,
@@ -54,7 +56,49 @@ class BatchDetailedPage extends StatelessWidget {
         if (c.detailedTabs[index] == 'Students') {
           return FloatingActionButton(
             mini: true,
-            onPressed: () {},
+            onPressed: () => CustomWidgets().showCustomDialog(
+              context: context,
+              title: Text('Assign Student to Batch'),
+              formKey: GlobalKey(),
+              sections: [
+                CustomWidgets()
+                    .labelWithAsterisk('Select Student', required: true),
+                SizedBox(height: 10),
+                CustomWidgets().customDropdownField<Student>(
+                  context: context,
+                  hint: 'Select Student',
+                  items: c.studentsList,
+                  value: c.selectedStudent.value,
+                  itemLabel: (s) => s.name,
+                  onChanged: (student) {},
+                ),
+                SizedBox(height: 10),
+                CustomWidgets().labelWithAsterisk('Total Fee', required: true),
+                SizedBox(height: 10),
+                CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Enter total Fee',
+                    controller: c.totalFeeController,
+                    isNumber: true),
+                SizedBox(height: 10),
+                CustomWidgets().labelWithAsterisk('Spot Fee', required: true),
+                SizedBox(height: 10),
+                CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Enter spot Fee',
+                    controller: c.spotFeeController,
+                    isNumber: true),
+                SizedBox(height: 10),
+                CustomWidgets().labelWithAsterisk('Upload Payment Receipt'),
+                SizedBox(height: 10),
+                CustomWidgets().attachmentStyledField(
+                  context: context,
+                  hint: 'Upload Payment Receipt',
+                ),
+              ],
+              submitText: 'Assign',
+              onSubmit: () {},
+            ),
             backgroundColor: context.theme.colorScheme.primary,
             child: Icon(
               Icons.add,
@@ -62,21 +106,117 @@ class BatchDetailedPage extends StatelessWidget {
             ),
           );
         }
-        if (c.detailedTabs[index] == 'Payments') {
-          return FloatingActionButton(
-            mini: true,
-            onPressed: () {},
-            backgroundColor: context.theme.colorScheme.primary,
-            child: Icon(
-              Icons.add,
-              color: context.theme.colorScheme.onPrimary,
-            ),
-          );
-        }
+        // if (c.detailedTabs[index] == 'Payments') {
+        //   return FloatingActionButton(
+        //     mini: true,
+        //     onPressed: () {},
+        //     backgroundColor: context.theme.colorScheme.primary,
+        //     child: Icon(
+        //       Icons.add,
+        //       color: context.theme.colorScheme.onPrimary,
+        //     ),
+        //   );
+        // }
         if (c.detailedTabs[index] == 'Materials') {
           return FloatingActionButton(
             mini: true,
-            onPressed: () {},
+            onPressed: () {
+              CustomWidgets().showCustomDialog(
+                context: context,
+                title: Text("Add Material"),
+                formKey: GlobalKey<FormState>(),
+                submitText: 'Add',
+                onSubmit: () {},
+                sections: [
+                  CustomWidgets().labelWithAsterisk('Title'),
+                  SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context, hint: 'Enter title'),
+
+                  SizedBox(height: 10),
+
+                  /// Material type
+                  Obx(
+                    () => Column(
+                      children: [
+                        RadioListTile(
+                          dense: true,
+                          title: Text('Drive'),
+                          value: "drive",
+                          groupValue: c.selectedMaterialType.value,
+                          onChanged: (value) =>
+                              c.selectedMaterialType.value = value!,
+                        ),
+                        RadioListTile(
+                          dense: true,
+                          title: Text('Youtube'),
+                          value: "youtube",
+                          groupValue: c.selectedMaterialType.value,
+                          onChanged: (value) =>
+                              c.selectedMaterialType.value = value!,
+                        ),
+                        RadioListTile(
+                          dense: true,
+                          title: Text('File'),
+                          value: "file",
+                          groupValue: c.selectedMaterialType.value,
+                          onChanged: (value) =>
+                              c.selectedMaterialType.value = value!,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 10),
+
+                  Obx(() {
+                    if (c.selectedMaterialType.value == 'drive') {
+                      return Column(
+                        children: [
+                          CustomWidgets().labelWithAsterisk('Drive Link'),
+                          SizedBox(height: 10),
+                          CustomWidgets().dropdownStyledTextField(
+                              context: context, hint: 'Paste Drive Link')
+                        ],
+                      );
+                    }
+
+                    if (c.selectedMaterialType.value == 'youtube') {
+                      return Column(
+                        children: [
+                          CustomWidgets().labelWithAsterisk('YouTube Link'),
+                          SizedBox(height: 10),
+                          CustomWidgets().dropdownStyledTextField(
+                              context: context, hint: 'Paste YouTube Link')
+                        ],
+                      );
+                    }
+
+                    if (c.selectedMaterialType.value == 'file') {
+                      return Column(
+                        children: [
+                          CustomWidgets().labelWithAsterisk('Upload file'),
+                          SizedBox(height: 10),
+                          CustomWidgets().attachmentStyledField(
+                              context: context, hint: 'Click to upload')
+                        ],
+                      );
+                    }
+
+                    return SizedBox();
+                  }),
+
+                  SizedBox(height: 10),
+
+                  CustomWidgets().labelWithAsterisk('Description'),
+                  SizedBox(height: 10),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: context,
+                      hint: 'Enter description',
+                      isMultiline: true),
+                ],
+              );
+            },
             backgroundColor: context.theme.colorScheme.primary,
             child: Icon(
               Icons.add,
@@ -85,25 +225,24 @@ class BatchDetailedPage extends StatelessWidget {
           );
         }
 
-        return const SizedBox();
+        return SizedBox();
       }),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Tabs  ───────────────────────────────
-            Obx(() => CustomWidgets().customTabs(
-                  context,
-                  tabs: c.detailedTabs,
-                  selectedIndex: c.selectedIndex.value,
-                  onTap: (index) => c.selectedIndex.value = index,
-                )),
-            const SizedBox(height: 16),
+      body: Column(
+        children: [
+          SizedBox(height: 16),
+          // ── Tabs  ───────────────────────────────
+          Obx(() => CustomWidgets().customTabs(
+                context,
+                tabs: c.detailedTabs,
+                selectedIndex: c.selectedIndex.value,
+                onTap: (index) => c.selectedIndex.value = index,
+              )),
+          SizedBox(height: 12),
 
-            // ── Tab bodies ──────────────────────────
-            Obx(() {
+          // ── Tab bodies ──────────────────────────
+          Expanded(
+            child: Obx(() {
               final index = c.selectedIndex.value;
 
               // ─── PROFILE ───────────────────────────────────
@@ -118,7 +257,7 @@ class BatchDetailedPage extends StatelessWidget {
               if (c.detailedTabs[index] == 'Students') {
                 return _studentsTab(context, cs);
               }
-              // ─── STUDENTS  ───────────────────────────────────
+              // ─── MATERIALS  ───────────────────────────────────
               if (c.detailedTabs[index] == 'Materials') {
                 final materials = batch.materials ?? [];
 
@@ -130,6 +269,38 @@ class BatchDetailedPage extends StatelessWidget {
                     subtitle: 'Materials will appear here',
                   );
                 }
+                return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: materials.length,
+                    itemBuilder: (_, i) {
+                      final m = materials[i];
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: cs.onPrimary,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: cs.outline.withOpacity(.3)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              m.title ?? '-',
+                              style: Get.textTheme.titleSmall,
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              m.description ?? '',
+                              style: Get.textTheme
+                                  .bodyMedium!
+                                  .copyWith(color: cs.outline),
+                            ),
+                          ],
+                        ),
+                      );
+                    });
               }
 
               // ─── PAYMENTS ───────────────────────────────────
@@ -149,7 +320,7 @@ class BatchDetailedPage extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: payments.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, __) => SizedBox(height: 12),
                   itemBuilder: (_, i) {
                     final payment = payments[i];
 
@@ -189,7 +360,7 @@ class BatchDetailedPage extends StatelessWidget {
                                 ),
                               ),
 
-                              const SizedBox(width: 14),
+                              SizedBox(width: 14),
 
                               Expanded(
                                 child: Column(
@@ -197,19 +368,16 @@ class BatchDetailedPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       payment.studentName ?? '-',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                        color: cs.onSurface,
-                                      ),
+                                      style: Get.textTheme
+                                          .titleMedium!
+                                          .copyWith(color: cs.onSurface),
                                     ),
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: 4),
                                     Text(
                                       'ID: ${payment.studentId ?? '-'}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: cs.outline,
-                                      ),
+                                      style: Get.textTheme
+                                          .bodySmall!
+                                          .copyWith(color: cs.outline),
                                     ),
                                   ],
                                 ),
@@ -229,18 +397,18 @@ class BatchDetailedPage extends StatelessWidget {
                                 ),
                                 child: Text(
                                   payment.status ?? '-',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color:
-                                        isPaid ? Colors.green : Colors.orange,
-                                  ),
+                                  style: Get.textTheme
+                                      .titleSmall!
+                                      .copyWith(
+                                          color: isPaid
+                                              ? Colors.green
+                                              : Colors.orange),
                                 ),
                               ),
                             ],
                           ),
 
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
 
                           /// ---------------- PAYMENT DETAILS ----------------
                           Container(
@@ -294,7 +462,7 @@ class BatchDetailedPage extends StatelessWidget {
                                     child: _compactPaymentItem(
                                       context,
                                       title: 'Date',
-                                      value: payment.paymentDate?.toString() ??
+                                      value: payment.paymentDate.toString() ??
                                           '-',
                                       icon: Icons.calendar_today_outlined,
                                     ),
@@ -310,10 +478,10 @@ class BatchDetailedPage extends StatelessWidget {
                 );
               }
 
-              return const SizedBox();
+              return SizedBox();
             }),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -324,7 +492,7 @@ class BatchDetailedPage extends StatelessWidget {
     required String value,
     required IconData icon,
   }) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,23 +504,19 @@ class BatchDetailedPage extends StatelessWidget {
               size: 14,
               color: cs.primary,
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: 4),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 10,
-                color: cs.outline,
-              ),
+              style: Get.textTheme
+                  .labelSmall!
+                  .copyWith(color: cs.outline),
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
+          style: Get.textTheme.titleSmall,
           overflow: TextOverflow.ellipsis,
         ),
       ],
@@ -363,13 +527,13 @@ class BatchDetailedPage extends StatelessWidget {
   //  PROFILE TAB
   // ══════════════════════════════════════════════════════════
   Widget _profileTab(BuildContext context, ColorScheme cs) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ListView(
+      padding: const EdgeInsets.all(16),
       children: [
         /// Profile Card
         _profileCard(context),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         /// ---------------- COURSE DETAILS ----------------
         _glassCard(
@@ -393,7 +557,7 @@ class BatchDetailedPage extends StatelessWidget {
                       batch.course ?? '-',
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: _contactRow(
                       context,
@@ -408,7 +572,7 @@ class BatchDetailedPage extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         /// ---------------- BATCH STATISTICS ----------------
         _glassCard(
@@ -432,7 +596,7 @@ class BatchDetailedPage extends StatelessWidget {
                       icon: Icons.people_alt_outlined,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: _statCard(
                       context,
@@ -447,7 +611,7 @@ class BatchDetailedPage extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         /// ---------------- PAYMENT SUMMARY ----------------
         _glassCard(
@@ -471,7 +635,7 @@ class BatchDetailedPage extends StatelessWidget {
                       icon: Icons.currency_rupee,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: _paymentTile(
                       context,
@@ -482,7 +646,7 @@ class BatchDetailedPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
@@ -493,7 +657,7 @@ class BatchDetailedPage extends StatelessWidget {
                       icon: Icons.pending_actions_outlined,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: _paymentTile(
                       context,
@@ -508,7 +672,7 @@ class BatchDetailedPage extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         /// ---------------- ASSIGNED PERSONNEL ----------------
         _cardHeader(
@@ -517,7 +681,7 @@ class BatchDetailedPage extends StatelessWidget {
           icon: Icons.support_agent_outlined,
         ),
 
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
 
         ...[
           _supportTile(
@@ -552,7 +716,7 @@ class BatchDetailedPage extends StatelessWidget {
     required String value,
     required IconData icon,
   }) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -563,21 +727,17 @@ class BatchDetailedPage extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: cs.primary),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
+            style: Get.textTheme.titleLarge,
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 12,
-              color: cs.outline,
-            ),
+            style: Get.textTheme
+                .bodySmall!
+                .copyWith(color: cs.outline),
           ),
         ],
       ),
@@ -590,7 +750,7 @@ class BatchDetailedPage extends StatelessWidget {
     required String value,
     required IconData icon,
   }) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -614,25 +774,21 @@ class BatchDetailedPage extends StatelessWidget {
               color: cs.primary,
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.outline,
-                  ),
+                  style: Get.textTheme
+                      .labelSmall!
+                      .copyWith(color: cs.outline),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Get.textTheme.titleSmall,
                 ),
               ],
             ),
@@ -692,38 +848,40 @@ class BatchDetailedPage extends StatelessWidget {
                         Expanded(
                           child: Text(
                             batch.batchName ?? 'No Name',
-                            style: const TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w700),
+                            style: Get.textTheme.titleMedium,
                           ),
                         ),
                         _statusBadge(status, statusColor),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text('ID: ${batch.id ?? '-'}',
-                        style: TextStyle(fontSize: 11, color: cs.outline)),
-                    const SizedBox(height: 14),
+                        style: Get.textTheme
+                            .labelSmall!
+                            .copyWith(color: cs.outline)),
+                    SizedBox(height: 14),
                     Divider(height: 1, color: cs.outline.withOpacity(0.15)),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14),
 
                     // Mentor row
                     Row(
                       children: [
                         _squareAvatar(batch.mentor?.imageUrl, 44),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Assigned Mentor',
-                                style:
-                                    TextStyle(fontSize: 11, color: cs.outline)),
-                            const SizedBox(height: 2),
+                                style: Get.textTheme
+                                    .labelSmall!
+                                    .copyWith(color: cs.outline)),
+                            SizedBox(height: 2),
                             Text(batch.mentor?.name ?? '-',
-                                style: const TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight.w600)),
+                                style: Get.textTheme.titleSmall),
                             Text('ID: ${batch.mentor?.id ?? '-'}',
-                                style:
-                                    TextStyle(fontSize: 11, color: cs.outline)),
+                                style: Get.textTheme
+                                    .labelSmall!
+                                    .copyWith(color: cs.outline)),
                           ],
                         )
                       ],
@@ -742,7 +900,7 @@ class BatchDetailedPage extends StatelessWidget {
   //  PROFILE CARD
   // ══════════════════════════════════════════════════════════
   Widget _profileCard(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       width: double.infinity,
@@ -794,8 +952,7 @@ class BatchDetailedPage extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(batch.batchName ?? '-',
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w800)),
+                          style: Get.textTheme.titleLarge),
 
                       // ID badge
                       Container(
@@ -806,10 +963,9 @@ class BatchDetailedPage extends StatelessWidget {
                           border: Border.all(color: _blue.withOpacity(0.3)),
                         ),
                         child: Text('CODE: ${batch.id}',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: _blue)),
+                            style: Get.textTheme
+                                .titleSmall!
+                                .copyWith(color: _blue)),
                       ),
                     ],
                   ),
@@ -826,7 +982,7 @@ class BatchDetailedPage extends StatelessWidget {
   //  FEEDBACK CARD
   // ══════════════════════════════════════════════════════════
   Widget feedbackCard(Map<String, dynamic> feedback, BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -851,7 +1007,7 @@ class BatchDetailedPage extends StatelessWidget {
                   size: 18,
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
 
               /// NAME + DATE
               Expanded(
@@ -862,18 +1018,14 @@ class BatchDetailedPage extends StatelessWidget {
                       feedback['student_name'] ??
                           feedback['mentor_name'] ??
                           '-',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
+                      style: Get.textTheme.titleSmall,
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       feedback['date'] ?? '-',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: cs.outline,
-                      ),
+                      style: Get.textTheme
+                          .labelSmall!
+                          .copyWith(color: cs.outline),
                     ),
                   ],
                 ),
@@ -896,27 +1048,22 @@ class BatchDetailedPage extends StatelessWidget {
                       size: 14,
                       color: Colors.amber,
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
                     Text(
                       "${feedback['rating'] ?? 0}",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: Get.textTheme.titleSmall,
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Text(
             feedback['message'] ?? '-',
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.onSurface.withOpacity(.8),
-              height: 1.4,
-            ),
+            style: Get.textTheme
+                .bodySmall!
+                .copyWith(color: cs.onSurface.withOpacity(.8), height: 1.4),
           ),
         ],
       ),
@@ -927,7 +1074,7 @@ class BatchDetailedPage extends StatelessWidget {
   // ══════════════════════════════════════════════════════════
 
   Widget _glassCard({required BuildContext context, required Widget child}) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -957,9 +1104,8 @@ class BatchDetailedPage extends StatelessWidget {
           ),
           child: Icon(icon, size: 16, color: _blue),
         ),
-        const SizedBox(width: 10),
-        Text(title,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+        SizedBox(width: 10),
+        Text(title, style: Get.textTheme.titleMedium),
       ],
     );
   }
@@ -971,7 +1117,7 @@ class BatchDetailedPage extends StatelessWidget {
 
   Widget _contactRow(
       BuildContext context, IconData icon, String label, String value) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Row(
       children: [
         Container(
@@ -982,14 +1128,15 @@ class BatchDetailedPage extends StatelessWidget {
           ),
           child: Icon(icon, size: 16, color: _blue),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(fontSize: 11, color: cs.outline)),
-            Text(value,
-                style:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            Text(label,
+                style: Get.textTheme
+                    .labelSmall!
+                    .copyWith(color: cs.outline)),
+            Text(value, style: Get.textTheme.titleSmall),
           ],
         ),
       ],
@@ -1005,8 +1152,8 @@ class BatchDetailedPage extends StatelessWidget {
         border: Border.all(color: color.withOpacity(0.4)),
       ),
       child: Text(label,
-          style: TextStyle(
-              fontSize: 11, fontWeight: FontWeight.w600, color: color)),
+          style:
+              Get.textTheme.titleSmall!.copyWith(color: color)),
     );
   }
 
@@ -1031,15 +1178,11 @@ class BatchDetailedPage extends StatelessWidget {
     final students = batch.student ?? [];
 
     if (students.isEmpty) {
-      return Center(
-        child: Text(
-          'No students assigned',
-          style: TextStyle(
-            fontSize: 14,
-            color: cs.outline,
-          ),
-        ),
-      );
+       return EmptyState(
+          cs: cs,
+          title: 'No students assigned',
+          subtitle: '',
+          icon: Icons.group);
     }
 
     return Column(
@@ -1051,10 +1194,11 @@ class BatchDetailedPage extends StatelessWidget {
           onChanged: (p0) {},
         ),
 
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
 
         /// Students List
         ListView.builder(
+          padding: const EdgeInsets.all(16),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: students.length,
@@ -1111,7 +1255,7 @@ class BatchDetailedPage extends StatelessWidget {
                             : null,
                       ),
 
-                      const SizedBox(width: 14),
+                      SizedBox(width: 14),
 
                       /// Student Info
                       Expanded(
@@ -1120,27 +1264,23 @@ class BatchDetailedPage extends StatelessWidget {
                           children: [
                             Text(
                               student.name ?? '-',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: cs.onSurface,
-                              ),
+                              style: Get.textTheme
+                                  .titleMedium!
+                                  .copyWith(color: cs.onSurface),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               'ID: ${student.studentId ?? '-'}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: cs.outline,
-                              ),
+                              style: Get.textTheme
+                                  .bodySmall!
+                                  .copyWith(color: cs.outline),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               student.email ?? '-',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: cs.outline,
-                              ),
+                              style: Get.textTheme
+                                  .bodySmall!
+                                  .copyWith(color: cs.outline),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
@@ -1161,19 +1301,19 @@ class BatchDetailedPage extends StatelessWidget {
                         ),
                         child: Text(
                           student.status ?? '-',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: student.status?.toLowerCase() == 'completed'
-                                ? Colors.green
-                                : Colors.red,
-                          ),
+                          style: Get.textTheme
+                              .titleSmall!
+                              .copyWith(
+                                  color: student.status?.toLowerCase() ==
+                                          'completed'
+                                      ? Colors.green
+                                      : Colors.red),
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -1193,18 +1333,14 @@ class BatchDetailedPage extends StatelessWidget {
                             children: [
                               Text(
                                 'Spot Fee',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: cs.outline,
-                                ),
+                                style: Get.textTheme
+                                    .labelSmall!
+                                    .copyWith(color: cs.outline),
                               ),
-                              const SizedBox(height: 4),
+                              SizedBox(height: 4),
                               Text(
                                 '₹${student.spotFee ?? 0}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                                style: Get.textTheme.titleSmall,
                               ),
                             ],
                           ),
@@ -1225,25 +1361,21 @@ class BatchDetailedPage extends StatelessWidget {
                               children: [
                                 Text(
                                   'Total Fee',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: cs.outline,
-                                  ),
+                                  style: Get.textTheme
+                                      .labelSmall!
+                                      .copyWith(color: cs.outline),
                                 ),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 Text(
                                   '₹${student.totalAmount ?? 0}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  style: Get.textTheme.titleSmall,
                                 ),
                               ],
                             ),
                           ),
                         ),
 
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
 
                         /// Edit
                         IconButton(
@@ -1260,7 +1392,7 @@ class BatchDetailedPage extends StatelessWidget {
                           ),
                         ),
 
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
 
                         /// Delete
                         IconButton(
@@ -1303,201 +1435,199 @@ class BatchDetailedPage extends StatelessWidget {
       );
     }
 
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: packages.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (_, i) {
-        final package = packages[i];
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      child: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        shrinkWrap: true,
+        itemCount: packages.length,
+        separatorBuilder: (_, __) => SizedBox(height: 12),
+        itemBuilder: (_, i) {
+          final package = packages[i];
 
-        final completedSessions = package.sessionsCompleted ?? 0;
+          final completedSessions = package.sessionsCompleted ?? 0;
 
-        final totalSessions = package.sessionsTotal ?? 0;
+          final totalSessions = package.sessionsTotal ?? 0;
 
-        return Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: cs.onPrimary,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: cs.outline.withOpacity(.5),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: cs.shadow.withOpacity(.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+          return Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: cs.onPrimary,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: cs.outline.withOpacity(.5),
               ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// ---------------- TOP SECTION ----------------
-              Row(
-                children: [
-                  /// Teacher Image
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: cs.primary.withOpacity(.08),
-                      image: package.teacher?.imageUrl != null &&
-                              package.teacher!.imageUrl!.isNotEmpty
-                          ? DecorationImage(
-                              image: NetworkImage(
-                                package.teacher!.imageUrl!,
-                              ),
-                              fit: BoxFit.cover,
+              boxShadow: [
+                BoxShadow(
+                  color: cs.shadow.withOpacity(.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// ---------------- TOP SECTION ----------------
+                Row(
+                  children: [
+                    /// Teacher Image
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: cs.primary.withOpacity(.08),
+                        image: package.teacher?.imageUrl != null &&
+                                package.teacher!.imageUrl!.isNotEmpty
+                            ? DecorationImage(
+                                image: NetworkImage(
+                                  package.teacher!.imageUrl!,
+                                ),
+                                fit: BoxFit.cover,
+                              )
+                            : null,
+                      ),
+                      child: package.teacher?.imageUrl == null ||
+                              package.teacher!.imageUrl!.isEmpty
+                          ? Icon(
+                              Icons.person_outline,
+                              color: cs.primary,
                             )
                           : null,
                     ),
-                    child: package.teacher?.imageUrl == null ||
-                            package.teacher!.imageUrl!.isEmpty
-                        ? Icon(
-                            Icons.person_outline,
-                            color: cs.primary,
-                          )
-                        : null,
-                  ),
 
-                  const SizedBox(width: 12),
+                    SizedBox(width: 12),
 
-                  /// Teacher + Package Info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// Package Name
-                        Text(
-                          package.name ?? '-',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: cs.onSurface,
-                          ),
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        /// Teacher
-                        Text(
-                          package.teacher?.name ?? '-',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: cs.onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-
-                        const SizedBox(height: 2),
-
-                        Text(
-                          'ID: ${package.teacher?.id ?? '-'}',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: cs.outline,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 14),
-
-              /// ---------------- TAGS ----------------
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _miniTag(
-                    cs,
-                    Icons.book_outlined,
-                    package.name ?? '-',
-                  ),
-                  _miniTag(
-                    cs,
-                    Icons.school_outlined,
-                    package.standard ?? '-',
-                  ),
-                  _miniTag(
-                    cs,
-                    Icons.language_outlined,
-                    package.syllabus ?? '-',
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 14),
-
-              /// ---------------- STATS CARD ----------------
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: cs.primary.withOpacity(.05),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    /// Sessions
+                    /// Teacher + Package Info
                     Expanded(
-                      child: _compactPackageInfo(
-                        context,
-                        title: 'Sessions',
-                        value: '$completedSessions/$totalSessions',
-                        icon: Icons.play_lesson_outlined,
-                      ),
-                    ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// Package Name
+                          Text(
+                            package.name ?? '-',
+                            style: Get.textTheme
+                                .titleMedium!
+                                .copyWith(color: cs.onSurface),
+                          ),
 
-                    Container(
-                      width: 1,
-                      height: 34,
-                      color: cs.outline.withOpacity(.15),
-                    ),
+                          SizedBox(height: 4),
 
-                    /// Time
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: _compactPackageInfo(
-                          context,
-                          title: 'Time',
-                          value:
-                              '${package.timeCompleted}m/${package.timeTotal}m',
-                          icon: Icons.timer_outlined,
-                        ),
-                      ),
-                    ),
+                          /// Teacher
+                          Text(
+                            package.teacher?.name ?? '-',
+                            style: Get.textTheme
+                                .titleSmall!
+                                .copyWith(color: cs.onSurface),
+                          ),
 
-                    Container(
-                      width: 1,
-                      height: 34,
-                      color: cs.outline.withOpacity(.15),
-                    ),
+                          SizedBox(height: 2),
 
-                    /// Salary
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 12),
-                        child: _compactPackageInfo(
-                          context,
-                          title: 'Salary',
-                          value: '₹${package.teacherSalaryPerHour ?? 0}/hr',
-                          icon: Icons.currency_rupee,
-                        ),
+                          Text(
+                            'ID: ${package.teacher?.id ?? '-'}',
+                            style: Get.textTheme
+                                .labelSmall!
+                                .copyWith(color: cs.outline),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+
+                SizedBox(height: 14),
+
+                /// ---------------- TAGS ----------------
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _miniTag(
+                      cs,
+                      Icons.book_outlined,
+                      package.name ?? '-',
+                    ),
+                    _miniTag(
+                      cs,
+                      Icons.school_outlined,
+                      package.standard ?? '-',
+                    ),
+                    _miniTag(
+                      cs,
+                      Icons.language_outlined,
+                      package.syllabus ?? '-',
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 14),
+
+                /// ---------------- STATS CARD ----------------
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: cs.primary.withOpacity(.05),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      /// Sessions
+                      Expanded(
+                        child: _compactPackageInfo(
+                          context,
+                          title: 'Sessions',
+                          value: '$completedSessions/$totalSessions',
+                          icon: Icons.play_lesson_outlined,
+                        ),
+                      ),
+
+                      Container(
+                        width: 1,
+                        height: 34,
+                        color: cs.outline.withOpacity(.15),
+                      ),
+
+                      /// Time
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: _compactPackageInfo(
+                            context,
+                            title: 'Time',
+                            value:
+                                '${package.timeCompleted}m/${package.timeTotal}m',
+                            icon: Icons.timer_outlined,
+                          ),
+                        ),
+                      ),
+
+                      Container(
+                        width: 1,
+                        height: 34,
+                        color: cs.outline.withOpacity(.15),
+                      ),
+
+                      /// Salary
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: _compactPackageInfo(
+                            context,
+                            title: 'Salary',
+                            value: '₹${package.teacherSalaryPerHour ?? 0}/hr',
+                            icon: Icons.currency_rupee,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -1523,14 +1653,12 @@ class BatchDetailedPage extends StatelessWidget {
             size: 14,
             color: cs.primary,
           ),
-          const SizedBox(width: 5),
+          SizedBox(width: 5),
           Text(
             text,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: cs.primary,
-            ),
+            style: Get.textTheme
+                .titleSmall!
+                .copyWith(color: cs.primary),
           ),
         ],
       ),
@@ -1543,7 +1671,7 @@ class BatchDetailedPage extends StatelessWidget {
     required String value,
     required IconData icon,
   }) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1555,23 +1683,19 @@ class BatchDetailedPage extends StatelessWidget {
               size: 14,
               color: cs.primary,
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: 4),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 10,
-                color: cs.outline,
-              ),
+              style: Get.textTheme
+                  .labelSmall!
+                  .copyWith(color: cs.outline),
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
+          style: Get.textTheme.titleSmall,
           overflow: TextOverflow.ellipsis,
         ),
       ],
@@ -1603,21 +1727,24 @@ class BatchDetailedPage extends StatelessWidget {
             ),
             child: Center(
               child: Text(value.substring(0, 1),
-                  style: TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w900, color: color)),
+                  style: Get.textTheme
+                      .titleLarge!
+                      .copyWith(color: color)),
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
-                  style:
-                      TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
-              const SizedBox(height: 3),
+                  style: Get.textTheme
+                      .labelSmall!
+                      .copyWith(color: color.withOpacity(0.8))),
+              SizedBox(height: 3),
               Text(value,
-                  style: TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w800, color: color)),
+                  style: Get.textTheme
+                      .titleLarge!
+                      .copyWith(color: color)),
             ],
           ),
         ],
@@ -1633,7 +1760,7 @@ class BatchDetailedPage extends StatelessWidget {
     String date, {
     String? imageUrl,
   }) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -1666,24 +1793,23 @@ class BatchDetailedPage extends StatelessWidget {
                 : null,
           ),
 
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
 
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(role,
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: _blue)),
-                const SizedBox(height: 2),
-                Text(name,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 3),
+                    style: Get.textTheme
+                        .titleSmall!
+                        .copyWith(color: _blue)),
+                SizedBox(height: 2),
+                Text(name, style: Get.textTheme.titleSmall),
+                SizedBox(height: 3),
                 Text('$id  •  $date',
-                    style: TextStyle(fontSize: 11, color: cs.outline)),
+                    style: Get.textTheme
+                        .labelSmall!
+                        .copyWith(color: cs.outline)),
               ],
             ),
           ),

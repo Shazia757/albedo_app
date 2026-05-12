@@ -37,7 +37,7 @@ class Item {
   String? name;
   int? rating;
 
- Item({
+  Item({
     this.name,
     this.rating,
   });

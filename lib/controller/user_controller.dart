@@ -15,7 +15,6 @@ class UserController extends GetxController {
   RxList<Coordinator> coordinatorsList = <Coordinator>[].obs;
   RxList<Advisor> advisorsList = <Advisor>[].obs;
 
-
   @override
   void onInit() {
     super.onInit();

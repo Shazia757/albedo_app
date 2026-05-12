@@ -30,21 +30,20 @@ class BatchPaymentDetailPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(batchModel.batch.batchName ?? "",
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: Theme.of(context).textTheme.titleLarge),
                 Text(batchModel.batch.batchID ?? ""),
               ],
             ),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           // ── Payments List ─────────────────────
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: batchModel.payments.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, __) => SizedBox(height: 10),
               itemBuilder: (_, i) {
                 final p = batchModel.payments[i];
 
@@ -78,19 +77,22 @@ class PaymentCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(payment.studentName,
-              style: const TextStyle(fontWeight: FontWeight.w600)),
+              style: Theme.of(context).textTheme.titleSmall),
           Text(payment.studentId,
-              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
-          const SizedBox(height: 8),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall!
+                  .copyWith(color: cs.onSurfaceVariant)),
+          SizedBox(height: 8),
           Text("Amount: ₹${payment.amount}"),
           Text("Balance: ₹${payment.balance}"),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 payment.paymentDate.toString().split(" ").first,
-                style: const TextStyle(fontSize: 12),
+                style: Theme.of(context).textTheme.bodySmall,
               ),
               DropdownButton<String>(
                 value: payment.status,

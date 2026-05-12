@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class AddPackagePage extends StatelessWidget {
-  AddPackagePage({super.key});
+class AddBatchPackagePage extends StatelessWidget {
+  AddBatchPackagePage({super.key});
 
   final c = Get.put(PackageController());
 
@@ -34,43 +34,10 @@ class AddPackagePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Add Package',
+                        'Add Batch Package',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       SizedBox(height: 10),
-                      CustomWidgets()
-                          .labelWithAsterisk('Package Type', required: true),
-                      SizedBox(height: 10),
-
-                      /// TYPE SWITCH
-                      Obx(
-                        () => Row(
-                          children: [
-                            Expanded(
-                              child: _buildTypeCard(
-                                context: context,
-                                title: "Package",
-                                icon: Icons.class_,
-                                value: "package",
-                                selectedValue: c.selectedType.value,
-                                onTap: () => c.selectedType.value = 'package',
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: _buildTypeCard(
-                                context: context,
-                                title: "Repackage",
-                                icon: Icons.video_call,
-                                value: "repackage",
-                                selectedValue: c.selectedType.value,
-                                onTap: () => c.selectedType.value = 'repackage',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 16),
 
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,18 +54,7 @@ class AddPackagePage extends StatelessWidget {
                             onChanged: (p0) => c.selectedPackage.value = p0,
                           ),
                           SizedBox(height: 10),
-                          CustomWidgets()
-                              .labelWithAsterisk('Course', required: true),
-                          SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<String>(
-                            context: context,
-                            hint: 'Select Course',
-                            items: c.courseList,
-                            onChanged: (p0) => c.selectedCourse.value = p0,
-                            value: c.selectedCourse.value,
-                            itemLabel: (item) => item,
-                          ),
-                          SizedBox(height: 10),
+
                           CustomWidgets()
                               .labelWithAsterisk('Syllabus', required: true),
                           SizedBox(height: 10),
@@ -162,67 +118,6 @@ class AddPackagePage extends StatelessWidget {
                             items: c.durationOptions,
                             value: c.selectedDuration.value,
                             onChanged: (p0) => c.selectedDuration.value = p0,
-                            itemLabel: (item) => "$item minutes",
-                          ),
-                          SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Duration Days',
-                              required: true),
-                          SizedBox(height: 10),
-                          Obx(() => Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomWidgets().dropdownStyledTextField(
-                                    context: context,
-                                    hint: 'Duration Days',
-                                    controller: c.durationDaysController,
-                                  ),
-                                  if (c.durationError.value.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 6, left: 4),
-                                      child: Text(
-                                        c.durationError.value,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .error),
-                                      ),
-                                    ),
-                                ],
-                              )),
-                          SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk(
-                              'Student Fee (per hour)',
-                              required: true),
-                          SizedBox(height: 10),
-                          CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Student Fee',
-                              controller: c.studentFeeController,
-                              isNumber: true),
-                          SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk(
-                              'Total Package Fee (view only)',
-                              required: true),
-                          SizedBox(height: 10),
-                          CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Total Package Fee',
-                              controller: c.totalPackageFeeController,
-                              readOnly: true),
-                          SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Tuition mode',
-                              required: true),
-                          SizedBox(height: 10),
-                          CustomWidgets().customDropdownField(
-                            context: context,
-                            hint: 'Select Tution Mode',
-                            items: c.tutionOptions,
-                            value: c.selectedTuitionMode.value,
-                            onChanged: (p0) => c.selectedTuitionMode.value = p0,
                             itemLabel: (item) => "$item minutes",
                           ),
                           SizedBox(height: 10),
@@ -293,79 +188,6 @@ class AddPackagePage extends StatelessWidget {
                           }),
 
                           SizedBox(height: 10),
-
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              /// Title + Switch
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Apply Coupon Code",
-                                    style: Get.textTheme.titleSmall?.copyWith(
-                                      color: Get.theme.colorScheme.onSurface,
-                                    ),
-                                  ),
-                                  Obx(() => Switch(
-                                        value: c.applyCoupon.value,
-                                        onChanged: (val) {
-                                          c.applyCoupon.value = val;
-                                        },
-                                      )),
-                                ],
-                              ),
-
-                              /// TextField
-                              Obx(() {
-                                if (!c.applyCoupon.value) {
-                                  return SizedBox();
-                                }
-
-                                return Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: CustomWidgets()
-                                            .dropdownStyledTextField(
-                                          context: context,
-                                          hint: 'Enter coupon code',
-                                          controller: c.couponController,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      ElevatedButton.icon(
-                                        onPressed: () {
-                                          c.verifyCoupon(context);
-                                        },
-                                        label: Text(
-                                          'Verify',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall!
-                                              .copyWith(color: Colors.white),
-                                        ),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          elevation: 0,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            ],
-                          )
                         ],
                       ),
 

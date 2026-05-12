@@ -51,7 +51,7 @@ class SupportsPage extends StatelessWidget {
         child: Column(
           children: [
             _topBar(context, c),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Obx(
               () => CustomWidgets().customTabs(
                 context,
@@ -64,7 +64,7 @@ class SupportsPage extends StatelessWidget {
                 getCount: c.getCount,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Expanded(child: _list(context)),
           ],
         ),
@@ -78,10 +78,10 @@ class SupportsPage extends StatelessWidget {
       final data = c.filteredTickets;
 
       if (c.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return Center(child: CircularProgressIndicator());
       }
       if (data.isEmpty) {
-        return const Center(child: Text("No tickets found"));
+        return Center(child: Text("No tickets found"));
       }
 
       return LayoutBuilder(
@@ -151,8 +151,7 @@ class SupportsPage extends StatelessWidget {
                         icon: Icons.delete,
                         color: Theme.of(context).colorScheme.error,
                         onTap: () => CustomWidgets().showDeleteDialog(
-        title: 'Are you sure?',
-
+                          title: 'Are you sure?',
                           text:
                               'Are you sure you want to delete this ticket permanently?',
                           context: context,
@@ -188,7 +187,7 @@ class SupportsPage extends StatelessWidget {
           Row(
             children: [
               Expanded(child: _filterButton(context)),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(child: _sortButton(context, c)),
             ],
           )
@@ -205,9 +204,9 @@ class SupportsPage extends StatelessWidget {
               hint: "Search tickets...",
               onChanged: (val) => c.searchQuery.value = val,
             )),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         _filterButton(context),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         _sortButton(context, c),
       ],
     );
@@ -242,7 +241,7 @@ class SupportsPage extends StatelessWidget {
             color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
           ),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.sort, size: 18),
@@ -277,10 +276,10 @@ class SupportsPage extends StatelessWidget {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Icon(Icons.filter_list, size: 18),
             SizedBox(width: 6),
-            Text("Filter", style: TextStyle(fontSize: 13)),
+            Text("Filter", style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
       ),
@@ -300,28 +299,28 @@ class SupportsPage extends StatelessWidget {
               child: Column(
                 children: [
                   CustomWidgets().labelWithAsterisk('Title', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context,
                       hint: '',
                       controller: c.titleController),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Category', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context,
                       hint: '',
                       controller: c.categoryController),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('Priority', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context,
                       hint: '',
                       controller: c.priorityController),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().labelWithAsterisk('User', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Obx(
                     () => Row(
                       children: [
@@ -345,7 +344,7 @@ class SupportsPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Obx(() {
                     if (c.selectedType.value == 'student') {
                       return CustomWidgets().dropdownStyledTextField(
@@ -355,12 +354,12 @@ class SupportsPage extends StatelessWidget {
                       return CustomWidgets().dropdownStyledTextField(
                           context: context, hint: 'Select Teacher');
                     }
-                    return const SizedBox();
+                    return SizedBox();
                   }),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets()
                       .labelWithAsterisk('Description', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                     context: context,
                     hint: '',
@@ -399,10 +398,7 @@ class SupportsPage extends StatelessWidget {
           context,
           title: Text(
             "Ticket Info",
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
+            style: Theme.of(context).textTheme.titleSmall,
           ),
           children: [
             infoRow(label: "Status", value: s.status),
@@ -415,18 +411,14 @@ class SupportsPage extends StatelessWidget {
           context,
           title: Text(
             'Description',
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
+            style: Theme.of(context).textTheme.titleSmall,
           ),
           children: [
             Text(
               s.description ?? "-",
-              style: TextStyle(
-                fontSize: 13,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              ),
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
             ),
           ],
         ),
@@ -437,10 +429,7 @@ class SupportsPage extends StatelessWidget {
             context,
             title: Text(
               "Attachment",
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             children: [
               InkWell(
@@ -463,13 +452,10 @@ class SupportsPage extends StatelessWidget {
           context,
           title: Text(
             "Replies (${s.replies.length})",
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
+            style: Theme.of(context).textTheme.titleSmall,
           ),
           children: s.replies.isEmpty
-              ? [const Text("No replies yet")]
+              ? [Text("No replies yet")]
               : s.replies.map<Widget>((r) => _replyItem(r)).toList(),
         ),
 
@@ -492,7 +478,7 @@ class SupportsPage extends StatelessWidget {
                   val == null || val.trim().isEmpty ? "Required" : null,
             ),
 
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
 
             CustomWidgets()
                 .labelWithAsterisk('Quick Response Templates (Optional)'),
@@ -502,7 +488,7 @@ class SupportsPage extends StatelessWidget {
                   value: selectedTemplate.value.isEmpty
                       ? null
                       : selectedTemplate.value,
-                  hint: const Text("Quick response"),
+                  hint: Text("Quick response"),
                   items: [
                     "We are checking this",
                     "Resolved. Please confirm",
@@ -518,7 +504,7 @@ class SupportsPage extends StatelessWidget {
                   },
                 )),
 
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             /// 📎 Attach
             Row(
@@ -532,7 +518,7 @@ class SupportsPage extends StatelessWidget {
                 CustomWidgets().labelWithAsterisk('Attach File (optional)')
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
 
             InkWell(
               borderRadius: BorderRadius.circular(12),
@@ -571,7 +557,7 @@ class SupportsPage extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
 
                     /// 🔹 TEXT
                     Expanded(
@@ -582,7 +568,7 @@ class SupportsPage extends StatelessWidget {
                             "Upload File",
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: 2),
                           Text(
                             "PDF, DOC, Images (max 10MB)",
                             style:
@@ -646,14 +632,10 @@ class SupportsPage extends StatelessWidget {
         children: [
           /// 🔹 TITLE
           DefaultTextStyle(
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
-            child: title,
-          ),
+              style: Theme.of(context).textTheme.titleSmall!,
+              child: title),
 
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
 
           /// 🔹 CONTENT (force vertical)
           ...children.map(
@@ -679,10 +661,10 @@ class SupportsPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(r.message),
-          const SizedBox(height: 2),
+          SizedBox(height: 2),
           Text(
             r.createdAt.toString(),
-            style: const TextStyle(fontSize: 10),
+            style: Get.textTheme.labelSmall,
           ),
         ],
       ),
@@ -702,30 +684,30 @@ class SupportsPage extends StatelessWidget {
                 child: Column(
                   children: [
                     CustomWidgets().labelWithAsterisk('Title', required: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: '',
                         controller: c.titleController),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets()
                         .labelWithAsterisk('Category', required: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: '',
                         controller: c.categoryController),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets()
                         .labelWithAsterisk('Priority', required: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: '',
                         controller: c.priorityController),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().labelWithAsterisk('User', required: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     Obx(
                       () => Row(
                         children: [
@@ -751,7 +733,7 @@ class SupportsPage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     Obx(() {
                       if (c.selectedType.value == 'student') {
                         return CustomWidgets().dropdownStyledTextField(
@@ -761,19 +743,19 @@ class SupportsPage extends StatelessWidget {
                         return CustomWidgets().dropdownStyledTextField(
                             context: context, hint: 'Select Teacher');
                       }
-                      return const SizedBox();
+                      return SizedBox();
                     }),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets()
                         .labelWithAsterisk('Description', required: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     CustomWidgets().dropdownStyledTextField(
                       context: context,
                       hint: '',
                       controller: c.descriptionController,
                       isMultiline: true,
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                   ],
                 ),
               ))

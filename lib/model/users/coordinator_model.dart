@@ -31,7 +31,7 @@ class Coordinator {
   List<Mentor>? mentor;
   Wallet? wallet;
 
-    List<Experience>? experience;
+  List<Experience>? experience;
 
   Coordinator(
       {required this.name,

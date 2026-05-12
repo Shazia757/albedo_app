@@ -1,5 +1,4 @@
 import 'package:albedo_app/controller/settings_controller.dart';
-import 'package:albedo_app/view/settings/banner_ads_page.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
@@ -38,7 +37,7 @@ class CouponsPage extends StatelessWidget {
                         ),
                   ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   /// ── CONTENT ───────────────────────
                   Expanded(
@@ -46,13 +45,13 @@ class CouponsPage extends StatelessWidget {
                       final data = c.coupons;
 
                       if (c.isLoading.value) {
-                        return const Center(
+                        return Center(
                           child: CircularProgressIndicator(),
                         );
                       }
 
                       if (data.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: Text("No coupons found"),
                         );
                       }
@@ -112,7 +111,7 @@ class CouponsPage extends StatelessWidget {
                                             color: cs.primary,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
+                                        SizedBox(width: 12),
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
@@ -122,19 +121,20 @@ class CouponsPage extends StatelessWidget {
                                                 item.name ?? '',
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: cs.onSurface,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium!
+                                                    .copyWith(
+                                                        color: cs.onSurface),
                                               ),
-                                              const SizedBox(height: 4),
+                                              SizedBox(height: 4),
                                               Text(
                                                 item.code ?? '',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: cs.outline,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall!
+                                                    .copyWith(
+                                                        color: cs.outline),
                                               ),
                                             ],
                                           ),
@@ -152,24 +152,23 @@ class CouponsPage extends StatelessWidget {
                                           ),
                                           child: Text(
                                             "${item.discount ?? 0}% OFF",
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w700,
-                                              color: cs.primary,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall!
+                                                .copyWith(color: cs.primary),
                                           ),
                                         ),
                                       ],
                                     ),
 
-                                    const SizedBox(height: 14),
+                                    SizedBox(height: 14),
 
                                     Divider(
                                       height: 1,
                                       color: cs.outline.withOpacity(.12),
                                     ),
 
-                                    const SizedBox(height: 14),
+                                    SizedBox(height: 14),
 
                                     /// ── DATE SECTION ──────────────────────
                                     Container(
@@ -209,7 +208,7 @@ class CouponsPage extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(height: 14),
+                                    SizedBox(height: 14),
 
                                     /// ── ACTIONS ───────────────────────────
                                     Row(
@@ -223,7 +222,7 @@ class CouponsPage extends StatelessWidget {
                                             editCoupon(context);
                                           },
                                         ),
-                                        const SizedBox(width: 10),
+                                        SizedBox(width: 10),
                                         CustomWidgets().iconBtn(
                                           icon: Icons.delete_outline_rounded,
                                           color: cs.error,
@@ -264,15 +263,15 @@ class CouponsPage extends StatelessWidget {
       formKey: GlobalKey<FormState>(),
       sections: [
         CustomWidgets().labelWithAsterisk('Coupon Name'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context, hint: '', controller: c.nameController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Coupon Code'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context, hint: '', controller: c.codeController),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Discount Type', required: true),
         Obx(
           () => Row(
@@ -297,14 +296,14 @@ class CouponsPage extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Obx(() {
           if (c.selectedDiscountType.value == 'percentage') {
             return Column(
               children: [
                 CustomWidgets()
                     .labelWithAsterisk('Discount Percentage', required: true),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 CustomWidgets().dropdownStyledTextField(
                     context: context,
                     hint: 'Enter discount percentage',
@@ -317,29 +316,29 @@ class CouponsPage extends StatelessWidget {
               children: [
                 CustomWidgets()
                     .labelWithAsterisk('Discount Amount', required: true),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 CustomWidgets().dropdownStyledTextField(
                     context: context, hint: 'Enter discount amount'),
               ],
             );
           }
-          return const SizedBox();
+          return SizedBox();
         }),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Start Date'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDatePickerField(
             context: context,
             controller: c.startDateController,
             selectedDate: c.selectedStartDate),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('End Date'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDatePickerField(
             context: context,
             controller: c.endDateController,
             selectedDate: c.selectedEndDate),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
       ],
       onSubmit: () {},
     );
@@ -354,15 +353,15 @@ class CouponsPage extends StatelessWidget {
         onSubmit: () {},
         sections: [
           CustomWidgets().labelWithAsterisk('Coupon Name', required: true),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(
               context: context, hint: 'Enter coupon name'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Coupon Code'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(
               context: context, hint: 'Enter coupon code'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Discount Type', required: true),
           Obx(
             () => Row(
@@ -388,14 +387,14 @@ class CouponsPage extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Obx(() {
             if (c.selectedDiscountType.value == 'percentage') {
               return Column(
                 children: [
                   CustomWidgets()
                       .labelWithAsterisk('Discount Percentage', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context, hint: 'Enter discount percentage'),
                 ],
@@ -406,23 +405,23 @@ class CouponsPage extends StatelessWidget {
                 children: [
                   CustomWidgets()
                       .labelWithAsterisk('Discount Amount', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       context: context, hint: 'Enter discount amount'),
                 ],
               );
             }
-            return const SizedBox();
+            return SizedBox();
           }),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Start Date'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(context: context, hint: ''),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('End Date'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(context: context, hint: ''),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
         ],
       ),
       mini: true,
@@ -456,26 +455,25 @@ class CouponsPage extends StatelessWidget {
             color: cs.primary,
           ),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: cs.outline,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .labelSmall!
+                    .copyWith(color: cs.outline),
               ),
-              const SizedBox(height: 3),
+              SizedBox(height: 3),
               Text(
                 value,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleSmall!
+                    .copyWith(color: cs.onSurface),
               ),
             ],
           ),

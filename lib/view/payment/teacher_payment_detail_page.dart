@@ -69,7 +69,7 @@ class TeacherPaymentDetailsPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
 
                 Expanded(
                   child: Column(
@@ -77,27 +77,26 @@ class TeacherPaymentDetailsPage extends StatelessWidget {
                     children: [
                       Text(
                         teacher.name,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: cs.onSurface,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(color: cs.onSurface),
                       ),
-                      const SizedBox(height: 5),
+                      SizedBox(height: 5),
                       Text(
                         teacher.id,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: cs.outline,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: cs.outline),
                       ),
-                      const SizedBox(height: 3),
+                      SizedBox(height: 3),
                       Text(
                         "+91 9876543210",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: cs.outline,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: cs.outline),
                       ),
                     ],
                   ),
@@ -116,32 +115,28 @@ class TeacherPaymentDetailsPage extends StatelessWidget {
                 //   ),
                 //   child: Text(
                 //     teacher.status.toUpperCase(),
-                //     style: TextStyle(
-                //       fontSize: 11,
-                //       fontWeight: FontWeight.w700,
-                //       color: teacher.status == "approved"
+                //     style: Theme.of(context).textTheme.titleSmall!.copyWith(//       //       //       color: teacher.status == "approved"
                 //           ? Colors.green
                 //           : Colors.orange,
-                //     ),
+                //),
                 //   ),
                 // ),
               ],
             ),
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           /// ───────────────── TITLE ─────────────────
           Text(
             "Monthly Earnings",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: cs.onSurface,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge!
+                .copyWith(color: cs.onSurface),
           ),
 
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
 
           /// ───────────────── EARNINGS LIST ─────────────────
           ...earnings.map(
@@ -174,26 +169,25 @@ class TeacherPaymentDetailsPage extends StatelessWidget {
                               color: Colors.orange,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   item.month,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: cs.onSurface,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(color: cs.onSurface),
                                 ),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 Text(
                                   "${item.status.toUpperCase()} • 12 Transactions",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: cs.outline,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(color: cs.outline),
                                 ),
                               ],
                             ),
@@ -224,13 +218,13 @@ class TeacherPaymentDetailsPage extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
 
                       Divider(
                         color: cs.outline.withOpacity(.12),
                       ),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14),
 
                       /// details
                       Row(
@@ -274,21 +268,18 @@ class TeacherPaymentDetailsPage extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            letterSpacing: 1,
-            fontWeight: FontWeight.w700,
-            color: cs.outline,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(letterSpacing: 1, color: cs.outline),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-            color: cs.onSurface,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium!
+              .copyWith(color: cs.onSurface),
         ),
       ],
     );

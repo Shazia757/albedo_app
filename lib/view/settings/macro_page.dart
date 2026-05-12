@@ -17,7 +17,7 @@ class MacroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       appBar: const CustomAppBar(),
@@ -33,11 +33,11 @@ class MacroPage extends StatelessWidget {
                 final data = c.supports;
 
                 if (c.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 if (data.isEmpty) {
-                  return const Center(child: Text("No supports found"));
+                  return Center(child: Text("No supports found"));
                 }
 
                 return Column(
@@ -46,9 +46,9 @@ class MacroPage extends StatelessWidget {
                     /// TITLE (outside grid)
                     Text(
                       " Macro",
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Get.textTheme.titleLarge,
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     Expanded(
                       child: LayoutBuilder(
@@ -78,23 +78,20 @@ class MacroPage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _label(cs, "Title"),
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: 4),
                                     Text(
                                       item.title ?? '-',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      style: Get.textTheme
+                                          .titleMedium,
                                     ),
-                                    const SizedBox(height: 12),
+                                    SizedBox(height: 12),
                                     _label(cs, "Description"),
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: 4),
                                     Text(
                                       item.description ?? '-',
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        height: 1.4,
-                                      ),
+                                      style: Get.textTheme
+                                          .bodySmall!
+                                          .copyWith(height: 1.4),
                                     ),
                                   ],
                                 ),
@@ -108,7 +105,7 @@ class MacroPage extends StatelessWidget {
                                       editMacro(context);
                                     },
                                   ),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: 10),
                                   CustomWidgets().iconBtn(
                                     icon: Icons.delete,
                                     color: cs.error,
@@ -141,31 +138,29 @@ class MacroPage extends StatelessWidget {
   Widget _label(ColorScheme cs, String text) {
     return Text(
       text,
-      style: TextStyle(
-        fontSize: 11,
-        color: cs.onSurface.withOpacity(0.6),
-        fontWeight: FontWeight.w500,
-      ),
+      style: Get.textTheme
+          .labelSmall!
+          .copyWith(color: cs.onSurface.withOpacity(0.6)),
     );
   }
 
   void editMacro(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text('Edit Support'),
+      title: Text('Edit Support'),
       icon: Icons.edit,
       formKey: GlobalKey<FormState>(),
       sections: [
         CustomWidgets().labelWithAsterisk('Title'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Enter support title',
           controller: c.titleController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Description'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Enter description',
@@ -185,20 +180,20 @@ class MacroPage extends StatelessWidget {
 
         CustomWidgets().showCustomDialog(
           context: context,
-          title: const Text("Add Support"),
+          title: Text("Add Support"),
           formKey: GlobalKey<FormState>(),
           onSubmit: () {},
           sections: [
             CustomWidgets().labelWithAsterisk('Title'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets().dropdownStyledTextField(
               context: context,
               hint: 'Enter support title',
               controller: c.titleController,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets().labelWithAsterisk('Description'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets().dropdownStyledTextField(
               context: context,
               hint: 'Enter description',

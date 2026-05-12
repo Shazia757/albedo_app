@@ -79,6 +79,4 @@ class CommonController extends GetxController {
       return null;
     }
   }
-
-
 }

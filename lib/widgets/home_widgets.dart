@@ -43,7 +43,7 @@ Widget donutChart(BuildContext context) {
                 color: context.theme.colorScheme.outline,
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               formatCurrency(c.totalPackage.value),
               style: context.textTheme.titleLarge?.copyWith(
@@ -81,7 +81,7 @@ Widget packageList(BuildContext context) {
               ),
             ),
 
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
 
             // TEXT + PROGRESS
             Expanded(
@@ -183,7 +183,7 @@ Widget expenseChartCard(BuildContext context) {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     "Expense Ratio",
                     style: context.textTheme.bodySmall?.copyWith(
@@ -224,7 +224,7 @@ Widget expenseChartCard(BuildContext context) {
                         children: [
                           Text(c.expenseRange.value,
                               style: context.textTheme.labelLarge),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           const Icon(Icons.keyboard_arrow_down_rounded,
                               size: 20),
                         ],
@@ -233,7 +233,7 @@ Widget expenseChartCard(BuildContext context) {
                   )),
             ],
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: 2),
 
           Text(
             "${c.totalExpense.value.toStringAsFixed(0)} / ${c.totalIncome.value.toStringAsFixed(0)}",
@@ -242,7 +242,7 @@ Widget expenseChartCard(BuildContext context) {
             ),
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           // 🔹 LEGEND (compact like chart style)
           SingleChildScrollView(
@@ -250,15 +250,15 @@ Widget expenseChartCard(BuildContext context) {
             child: Row(
               children: [
                 legendDot(context, cs.primary, "Total Hours"),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 legendDot(context, cs.secondary, "Class Taken Amount"),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 legendDot(context, cs.tertiary, "Total Salary"),
               ],
             ),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           // 🔹 CHART (same style)
           SizedBox(
@@ -290,7 +290,7 @@ Widget expenseChartCard(BuildContext context) {
                           final index = value.toInt();
 
                           if (index < 0 || index >= c.expenseLabels.length) {
-                            return const SizedBox();
+                            return SizedBox();
                           }
 
                           return Text(
@@ -329,10 +329,8 @@ Widget expenseChartCard(BuildContext context) {
                         return spots.map((spot) {
                           return LineTooltipItem(
                               formatCompact(spot.y),
-                              TextStyle(
-                                color: context.theme.colorScheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                              ));
+                              Theme.of(context).textTheme.titleSmall!.copyWith(
+                                  color: context.theme.colorScheme.onSurface));
                         }).toList();
                       },
                     ),
@@ -381,7 +379,7 @@ Widget studentsAnalyticsCard(BuildContext context) {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     "Students",
                     style: context.textTheme.bodySmall?.copyWith(
@@ -422,7 +420,7 @@ Widget studentsAnalyticsCard(BuildContext context) {
                         children: [
                           Text(c.studentRange.value,
                               style: context.textTheme.labelLarge),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           const Icon(Icons.keyboard_arrow_down_rounded,
                               size: 20),
                         ],
@@ -432,7 +430,7 @@ Widget studentsAnalyticsCard(BuildContext context) {
             ],
           ),
 
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
 
           /// 🔹 LEGEND
           Row(
@@ -444,19 +442,19 @@ Widget studentsAnalyticsCard(BuildContext context) {
                     ? "Total Package Amount"
                     : "Total Salary",
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               legendDot(context, cs.secondary,
                   (isAdvisor || isSales) ? "Total Spot Amount" : "Pending"),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               if (!isAdvisor || !isSales) ...[
                 legendDot(context, cs.tertiary, "Received"),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 legendDot(context, Colors.green, "Hours"),
               ],
             ],
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           /// 🔹 CHART
           Expanded(
@@ -553,7 +551,7 @@ Widget packagesAnalyticsCard(BuildContext context) {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     "Packages",
                     style: context.textTheme.bodySmall?.copyWith(
@@ -598,7 +596,7 @@ Widget packagesAnalyticsCard(BuildContext context) {
                             c.packageRange.value,
                             style: context.textTheme.labelLarge,
                           ),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           const Icon(
                             Icons.keyboard_arrow_down_rounded,
                             size: 20,
@@ -610,22 +608,22 @@ Widget packagesAnalyticsCard(BuildContext context) {
             ],
           ),
 
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
 
           /// 🔹 LEGEND
           Row(
             children: [
               legendDot(context, cs.primary, "Total Fee"),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               legendDot(context, cs.secondary, "Pending Fee"),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               legendDot(context, cs.tertiary, "Total Classes"),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               legendDot(context, Colors.green, "Hours"),
             ],
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           /// 🔹 CHART
           Expanded(
@@ -695,7 +693,7 @@ Widget packagesAnalyticsCard(BuildContext context) {
 Widget hiringSection(BuildContext context) {
   return Obx(() {
     if (c.hiringAds.isEmpty) {
-      return const SizedBox();
+      return SizedBox();
     }
 
     return Container(
@@ -712,7 +710,7 @@ Widget hiringSection(BuildContext context) {
             ),
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           /// 🔹 CAROUSEL
           hiringCarousel(context, c.hiringAds),
@@ -778,7 +776,7 @@ Widget hiringCard(BuildContext context, HiringView item) {
                 ),
               ),
 
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
 
               /// 🔹 TEACHER
               Text(
@@ -788,13 +786,13 @@ Widget hiringCard(BuildContext context, HiringView item) {
                 ),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
 
               /// 🔹 DATE + TIME
               Row(
                 children: [
                   Icon(Icons.calendar_today, size: 14, color: cs.outline),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                   Text(
                     "${ad.startDate ?? "-"} → ${ad.endDate ?? "-"}",
                     style: context.textTheme.labelSmall,
@@ -802,12 +800,12 @@ Widget hiringCard(BuildContext context, HiringView item) {
                 ],
               ),
 
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
 
               Row(
                 children: [
                   Icon(Icons.access_time, size: 14, color: cs.outline),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                   Text(
                     ad.time ?? "-",
                     style: context.textTheme.labelSmall,
@@ -815,7 +813,7 @@ Widget hiringCard(BuildContext context, HiringView item) {
                 ],
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
 
               /// 🔹 DAYS
               if (ad.days != null && ad.days!.isNotEmpty)
@@ -825,7 +823,7 @@ Widget hiringCard(BuildContext context, HiringView item) {
                       ad.days!.map((d) => dayChip(context, d.name)).toList(),
                 ),
 
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               /// 🔹 ACTIONS
               Row(
@@ -838,19 +836,22 @@ Widget hiringCard(BuildContext context, HiringView item) {
                       onPressed: () {
                         // TODO: Interested
                       },
-                      child: const Text(
+                      child: Text(
                         "Interested",
-                        style: TextStyle(color: Colors.white),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
                         // TODO: Not Interested
                       },
-                      child: const Text("Not Interested"),
+                      child: Text("Not Interested"),
                     ),
                   ),
                 ],
@@ -868,7 +869,7 @@ Widget recommendationSection(BuildContext context) {
 
   return Obx(() {
     final isStudent = auth.activeUser?.role == "student";
-    if (!isStudent) return const SizedBox();
+    if (!isStudent) return SizedBox();
 
     if (c.recommendations.isEmpty) {
       final cs = Theme.of(context).colorScheme;
@@ -891,14 +892,14 @@ Widget recommendationSection(BuildContext context) {
                   color: cs.outline,
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Text(
                 "No Recommendations",
                 style: context.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 "Check back soon for new opportunities!",
                 style: context.textTheme.bodySmall?.copyWith(
@@ -926,7 +927,7 @@ Widget recommendationSection(BuildContext context) {
             ),
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           /// 🔹 CAROUSEL
           recommendationCarousel(context, c.recommendations),
@@ -993,7 +994,7 @@ Widget recommendationCard(BuildContext context, RecommendationView item) {
                 ),
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               /// 🔹 ACTIONS ONLY
               Row(
@@ -1006,19 +1007,22 @@ Widget recommendationCard(BuildContext context, RecommendationView item) {
                       onPressed: () {
                         // Interested
                       },
-                      child: const Text(
+                      child: Text(
                         "Interested",
-                        style: TextStyle(color: Colors.white),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
                         // Not Interested
                       },
-                      child: const Text("Not Interested"),
+                      child: Text("Not Interested"),
                     ),
                   ),
                 ],
@@ -1072,12 +1076,12 @@ Widget nextSessionCard(BuildContext context) {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Row(
               children: [
                 Icon(Icons.event_busy,
                     color: context.theme.colorScheme.outline),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Text(
                   "No upcoming sessions",
                   style: context.textTheme.bodyMedium?.copyWith(
@@ -1100,10 +1104,10 @@ Widget nextSessionCard(BuildContext context) {
         children: [
           Text("Next Session"),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           sessionMainCard(context, session, isTeacher),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           /// 🔹 DETAILS
           Wrap(
@@ -1116,7 +1120,7 @@ Widget nextSessionCard(BuildContext context) {
             ],
           ),
 
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
 
           /// 🔹 ACTIONS
           if (isStarted)
@@ -1130,13 +1134,16 @@ Widget nextSessionCard(BuildContext context) {
                     onPressed: () {},
                     icon: const Icon(Icons.arrow_forward_rounded,
                         size: 16, color: Colors.white),
-                    label: const Text(
+                    label: Text(
                       "Join",
-                      style: TextStyle(color: Colors.white),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: Colors.white),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
@@ -1145,9 +1152,12 @@ Widget nextSessionCard(BuildContext context) {
                     onPressed: () {},
                     icon:
                         const Icon(Icons.share, size: 16, color: Colors.white),
-                    label: const Text(
+                    label: Text(
                       "Share",
-                      style: TextStyle(color: Colors.white),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: Colors.white),
                     ),
                   ),
                 ),
@@ -1188,7 +1198,7 @@ Widget sessionMainCard(
                 child: Icon(Icons.person, color: cs.primary),
               ),
 
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
 
               /// Text Info
               Column(
@@ -1203,7 +1213,7 @@ Widget sessionMainCard(
                     ),
                   ),
 
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
 
                   /// Name
                   Text(
@@ -1258,7 +1268,7 @@ Widget sessionMainCard(
                 ),
               ),
 
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
 
               /// Date
               Text(
@@ -1268,7 +1278,7 @@ Widget sessionMainCard(
                 ),
               ),
 
-              const SizedBox(height: 2),
+              SizedBox(height: 2),
 
               /// Time
               Text(
@@ -1328,7 +1338,7 @@ Widget infoCard(
             color: cs.outline,
           ),
         ),
-        const SizedBox(height: 2),
+        SizedBox(height: 2),
         Text(
           value,
           style: context.textTheme.labelLarge?.copyWith(
@@ -1378,7 +1388,7 @@ Widget legendDot(BuildContext context, Color color, String text) {
           shape: BoxShape.circle,
         ),
       ),
-      const SizedBox(width: 4),
+      SizedBox(width: 4),
       Text(
         text,
         style: context.textTheme.labelSmall?.copyWith(
@@ -1456,12 +1466,10 @@ Widget rangeItem(
       ),
       child: Text(
         text,
-        style: TextStyle(
-          fontWeight: FontWeight.w500,
-          color: isSelected
-              ? Theme.of(context).colorScheme.secondary
-              : Theme.of(context).colorScheme.onSurface,
-        ),
+        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+            color: isSelected
+                ? Theme.of(context).colorScheme.secondary
+                : Theme.of(context).colorScheme.onSurface),
       ),
     ),
   );
@@ -1528,7 +1536,7 @@ Widget chartCard(
               children: [
                 if (icon != null) ...[
                   Icon(icon, size: 24, color: iconColor),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                 ],
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1540,7 +1548,7 @@ Widget chartCard(
                         letterSpacing: -0.3,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       title,
                       style: context.textTheme.bodyMedium?.copyWith(
@@ -1580,7 +1588,7 @@ Widget chartCard(
                       children: [
                         Text(selectedRange.value,
                             style: context.textTheme.labelLarge),
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         const Icon(Icons.keyboard_arrow_down_rounded, size: 20)
                       ],
                     ),
@@ -1588,7 +1596,7 @@ Widget chartCard(
                 ))
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Expanded(
           child: LineChart(
             LineChartData(
@@ -1629,7 +1637,7 @@ Widget chartCard(
                       int index = value.toInt();
 
                       if (index < 0 || index >= labels.length) {
-                        return const SizedBox();
+                        return SizedBox();
                       }
 
                       return Text(
@@ -1655,10 +1663,8 @@ Widget chartCard(
                     return spots.map((spot) {
                       return LineTooltipItem(
                           "${spot.y}",
-                          TextStyle(
-                            color: context.theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                          ));
+                          Theme.of(context).textTheme.titleSmall!.copyWith(
+                              color: context.theme.colorScheme.onSurface));
                     }).toList();
                   },
                 ),
@@ -1794,7 +1800,7 @@ Widget summaryCard(BuildContext context) {
                         children: [
                           Text(c.summaryRange.value,
                               style: context.textTheme.labelLarge),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           const Icon(Icons.keyboard_arrow_down_rounded,
                               size: 20)
                         ],
@@ -1803,9 +1809,9 @@ Widget summaryCard(BuildContext context) {
                   )),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           donutChart(context),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           packageList(context),
         ],
       ),

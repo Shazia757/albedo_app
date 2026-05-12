@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 class RequestController {
   var isLoading = true.obs;
   var searchQuery = ''.obs;
-   var selectedTab = 0.obs;
+  var selectedTab = 0.obs;
   final tabs = ["Students", "Teachers"];
-    final statusMap = [
+  final statusMap = [
     "pending",
     "approved",
     "rejected",
@@ -38,9 +38,9 @@ class RequestController {
   });
 
   bool hasAnyStatus(Map<String, dynamic> data) {
-  return (data["pending"] ?? 0) > 0 ||
-      (data["approved"] ?? 0) > 0 ||
-      (data["rejected"] ?? 0) > 0 ||
-      (data["rescheduled"] ?? 0) > 0;
-}
+    return (data["pending"] ?? 0) > 0 ||
+        (data["approved"] ?? 0) > 0 ||
+        (data["rejected"] ?? 0) > 0 ||
+        (data["rescheduled"] ?? 0) > 0;
+  }
 }

@@ -25,7 +25,6 @@ class PackageReportModel {
   DateTime? joinedAt;
   int? totalSession;
 
-
   PackageReportModel({
     required this.studentName,
     required this.studentId,

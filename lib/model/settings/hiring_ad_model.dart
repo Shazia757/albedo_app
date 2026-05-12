@@ -1,6 +1,15 @@
 import 'package:albedo_app/model/users/teacher_model.dart';
 
-enum Days { all, monday, tuesday, wednesday, thursday, friday, saturday, sunday }
+enum Days {
+  all,
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+  sunday
+}
 
 class HiringAd {
   String? image;

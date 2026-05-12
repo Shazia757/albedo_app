@@ -47,8 +47,6 @@ class CustomTextField extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-           
-
               /// 🧊 INPUT FIELD
               AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
@@ -113,7 +111,7 @@ class CustomTextField extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
 
               /// ❌ ERROR TEXT
               if (hasError)

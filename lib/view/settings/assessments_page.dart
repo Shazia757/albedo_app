@@ -33,11 +33,11 @@ class AssessmentsPage extends StatelessWidget {
                 final cs = Theme.of(context).colorScheme;
 
                 if (c.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 if (data.isEmpty) {
-                  return const Center(child: Text("No assessments found"));
+                  return Center(child: Text("No assessments found"));
                 }
 
                 return Column(
@@ -49,7 +49,7 @@ class AssessmentsPage extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
 
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     /// GRID
                     Expanded(
@@ -79,18 +79,19 @@ class AssessmentsPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       "Assessment Type",
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: cs.onSurface.withOpacity(0.6),
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!
+                                          .copyWith(
+                                              color: cs.onSurface
+                                                  .withOpacity(0.6)),
                                     ),
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: 4),
                                     Text(
                                       item.type ?? '-',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
                                     ),
                                   ],
                                 ),
@@ -103,7 +104,7 @@ class AssessmentsPage extends StatelessWidget {
                                       editAssessment(context);
                                     },
                                   ),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: 10),
                                   CustomWidgets().iconBtn(
                                     icon: Icons.delete,
                                     color: cs.error,
@@ -137,29 +138,29 @@ class AssessmentsPage extends StatelessWidget {
   void editAssessment(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text('Edit Assessment'),
+      title: Text('Edit Assessment'),
       icon: Icons.edit,
       formKey: GlobalKey<FormState>(),
       sections: [
         CustomWidgets().labelWithAsterisk('Title'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Enter title',
           controller: c.titleController,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         CustomWidgets().labelWithAsterisk('Select Test Types'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         MultiSelector<String>(
           items: c.testTypes,
           initial: List<String>.from(c.selectedTestType),
           onChanged: (val) => c.selectedTestType.assignAll(val),
           labelBuilder: (v) => v,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         CustomWidgets().labelWithAsterisk('Select Attention Questions'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         MultiSelector<String>(
           items: c.assessmentAttentionQn,
           initial: List<String>.from(c.selectedAttentionQns),
@@ -181,29 +182,29 @@ class AssessmentsPage extends StatelessWidget {
 
         CustomWidgets().showCustomDialog(
           context: context,
-          title: const Text("Add Assessment"),
+          title: Text("Add Assessment"),
           formKey: GlobalKey<FormState>(),
           onSubmit: () {},
           sections: [
             CustomWidgets().labelWithAsterisk('Title'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             CustomWidgets().dropdownStyledTextField(
               context: context,
               hint: 'Enter title',
               controller: c.titleController,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             CustomWidgets().labelWithAsterisk('Select Test Types'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             MultiSelector<String>(
               items: c.testTypes,
               initial: const [],
               onChanged: (val) => c.selectedTestType.assignAll(val),
               labelBuilder: (v) => v,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             CustomWidgets().labelWithAsterisk('Select Attention Questions'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             MultiSelector<String>(
               items: c.assessmentAttentionQn,
               initial: const [],

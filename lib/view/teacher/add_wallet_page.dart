@@ -66,7 +66,7 @@ class AddWalletPage extends StatelessWidget {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// SHOW SWITCH ONLY FOR TEACHERS
                       if (showAdjustment)
@@ -85,7 +85,7 @@ class AddWalletPage extends StatelessWidget {
                                   },
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12),
                               Expanded(
                                 child: _buildTypeCard(
                                   context: context,
@@ -102,7 +102,7 @@ class AddWalletPage extends StatelessWidget {
                           ),
                         ),
 
-                      if (showAdjustment) const SizedBox(height: 16),
+                      if (showAdjustment) SizedBox(height: 16),
 
                       /// CONTENT
                       showAdjustment
@@ -152,7 +152,7 @@ class AddWalletPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomWidgets().labelWithAsterisk('Component Type', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDropdownField(
           context: context,
           hint: 'Select Type',
@@ -161,9 +161,9 @@ class AddWalletPage extends StatelessWidget {
           itemLabel: (s) => s,
           onChanged: (student) {},
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Month', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDropdownField<String>(
           context: context,
           hint: 'Select Month',
@@ -172,14 +172,12 @@ class AddWalletPage extends StatelessWidget {
           initialValue: c.initialMonth.value,
           itemLabel: (month) => month,
           onChanged: (value) {
-            if (value != null) {
-              c.adjSelectedMonth.value = value;
-            }
-          },
+            c.adjSelectedMonth.value = value;
+                    },
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Year', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().customDropdownField<String>(
           context: context,
           hint: 'Select Year',
@@ -188,28 +186,26 @@ class AddWalletPage extends StatelessWidget {
           initialValue: c.initialYear.value,
           itemLabel: (year) => year,
           onChanged: (value) {
-            if (value != null) {
-              c.adjSelectedYear.value = value;
-            }
-          },
+            c.adjSelectedYear.value = value;
+                    },
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Amount (₹)', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Enter adjustment amount',
             controller: c.salaryController,
             isNumber: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Description (optional)'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Performance bonus, commission, etc.',
           controller: c.descriptionController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Row(
           children: [
             Expanded(
@@ -218,9 +214,10 @@ class AddWalletPage extends StatelessWidget {
                 icon: const SizedBox.shrink(),
                 label: Text(
                   'Cancel',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 13),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                 ),
                 style: OutlinedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.surface,
@@ -231,7 +228,7 @@ class AddWalletPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
@@ -239,9 +236,12 @@ class AddWalletPage extends StatelessWidget {
                     c.adjustSalary();
                   }
                 },
-                label: const Text(
+                label: Text(
                   'Adjust Salary',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
@@ -286,23 +286,21 @@ class AddWalletPage extends StatelessWidget {
             children: [
               Text(
                 'Current Balance',
-                style: TextStyle(
-                  color: cs.onSurface.withOpacity(.7),
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: cs.onSurface.withOpacity(.7)),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text(
                 '₹${currentBalance.toStringAsFixed(0)}',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
             ],
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         /// amount field
         CustomWidgets().labelWithAsterisk(
@@ -310,9 +308,9 @@ class AddWalletPage extends StatelessWidget {
           required: true,
         ),
 
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
 
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
 
         CustomWidgets().dropdownStyledTextField(
           context: context,
@@ -333,13 +331,13 @@ class AddWalletPage extends StatelessWidget {
             }
           },
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
 
         CustomWidgets().labelWithAsterisk(
           'Description (optional)',
         ),
 
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
 
         CustomWidgets().dropdownStyledTextField(
           context: context,
@@ -347,11 +345,11 @@ class AddWalletPage extends StatelessWidget {
           controller: c.descriptionController,
         ),
 
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
 
         CustomWidgets().labelWithAsterisk('Attachment'),
 
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
 
         CustomWidgets().attachmentStyledField(
           context: context,
@@ -362,7 +360,7 @@ class AddWalletPage extends StatelessWidget {
           onClear: () {},
         ),
 
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
 
         Row(
           children: [
@@ -372,10 +370,10 @@ class AddWalletPage extends StatelessWidget {
                 icon: const SizedBox.shrink(),
                 label: Text(
                   'Cancel',
-                  style: TextStyle(
-                    color: cs.onSurface,
-                    fontSize: 13,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: cs.onSurface),
                 ),
                 style: OutlinedButton.styleFrom(
                   backgroundColor: cs.surface,
@@ -386,7 +384,7 @@ class AddWalletPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
@@ -394,12 +392,12 @@ class AddWalletPage extends StatelessWidget {
                     c.finalizeWithdrawal();
                   }
                 },
-                label: const Text(
+                label: Text(
                   'Finalize Withdrawal',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: cs.primary,
@@ -446,7 +444,7 @@ class AddWalletPage extends StatelessWidget {
         child: Row(
           children: [
             Icon(icon),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: Text(title),
             ),

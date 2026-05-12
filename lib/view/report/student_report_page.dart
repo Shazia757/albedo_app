@@ -48,14 +48,13 @@
 //                   mainAxisAlignment: MainAxisAlignment.center,
 //                   children: [
 //                     Text(s.name,
-//                         style: const TextStyle(fontWeight: FontWeight.w600)),
+//                         style: Theme.of(context).textTheme.titleSmall),
 //                     Text(s.studentId ?? '',
-//                         style: TextStyle(
-//                             color: Theme.of(context)
+//                         style: Theme.of(context).textTheme.bodySmall!.copyWith(//                             color: Theme.of(context)
 //                                 .colorScheme
 //                                 .onSurface
 //                                 .withOpacity(0.6),
-//                             fontSize: 12)),
+//)),
 //                   ],
 //                 )),
 //                 DataCell(Text(s.course ?? '')),
@@ -85,16 +84,13 @@
 //                             shape: BoxShape.circle,
 //                           ),
 //                         ),
-//                         const SizedBox(width: 6),
+//                         SizedBox(width: 6),
 //                         Text(
 //                           s.status ?? '',
-//                           style: TextStyle(
-//                             fontSize: 12,
-//                             fontWeight: FontWeight.w500,
-//                             color: s.status == "Active"
+//                           style: Theme.of(context).textTheme.labelMedium!.copyWith(//                             //                             //                             color: s.status == "Active"
 //                                 ? const Color(0xFF16A34A)
 //                                 : const Color(0xFFDC2626),
-//                           ),
+//),
 //                         ),
 //                       ],
 //                     ),

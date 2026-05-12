@@ -33,81 +33,83 @@ class AddBatchSessionPage extends StatelessWidget {
                         'Add Batch Session',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      const SizedBox(height: 10),
-                    
+                      SizedBox(height: 10),
 
-                   
-        CustomWidgets().labelWithAsterisk('Select Batch', required: true),
-        const SizedBox(height: 10),
-        CustomWidgets().customDropdownField<Batch>(
-          context: context,
-          hint: 'Select Batch',
-          items: c.batchList,
-          value: c.selectedBatch.value,
-          itemLabel: (s) => s.batchName??'',
-          onChanged: (batch) => c.onBatchSelected(batch),
-        ),
-        const SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Select Package', required: true),
-        const SizedBox(height: 10),
-        CustomWidgets().customDropdownField(
-          context: context,
-          hint: 'Select Package',
-          items: c.packagesList,
-          value: c.selectedPackage.value,
-          itemLabel: (p) => p.subjectName??'',
-          onChanged: (p0) => c.selectedPackage.value = p0,
-        ),
-        const SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Select Teacher', required: true),
-        const SizedBox(height: 10),
-        CustomWidgets().customDropdownField(
-          context: context,
-          hint: 'Select Teacher',
-          items: c.teacherList,
-          onChanged: (p0) => c.selectedTeacher.value = p0,
-          value: c.selectedTeacher.value,
-          itemLabel: (item) => item.name,
-        ),
-        const SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Teacher Salary'),
-        const SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Teacher Salary',
-            controller: c.salaryController,
-            isNumber: true),
-        const SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Session Date', required: true),
-        const SizedBox(height: 10),
-        CustomWidgets().customDatePickerField(
-          context: context,
-          controller: c.dateController,
-          selectedDate: c.selectedDate,
-        ),
-        const SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Session Time', required: true),
-        const SizedBox(height: 10),
-        CustomWidgets().timePickerStyledField(
-          context: context,
-          controller: c.timeController,
-          selectedTime: c.selectedTime,
-        ),
-        const SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Select Duration', required: true),
-        const SizedBox(height: 10),
-        CustomWidgets().customDropdownField(
-          context: context,
-          hint: 'Select Duration',
-          items: c.durationOptions,
-          value: c.selectedDuration.value,
-          onChanged: (p0) => c.selectedDuration.value = p0,
-          itemLabel: (item) => "$item minutes",
-        ),
-      
-    
+                      CustomWidgets()
+                          .labelWithAsterisk('Select Batch', required: true),
+                      SizedBox(height: 10),
+                      CustomWidgets().customDropdownField<Batch>(
+                        context: context,
+                        hint: 'Select Batch',
+                        items: c.batchList,
+                        value: c.selectedBatch.value,
+                        itemLabel: (s) => s.batchName ?? '',
+                        onChanged: (batch) => c.onBatchSelected(batch),
+                      ),
+                      SizedBox(height: 10),
+                      CustomWidgets()
+                          .labelWithAsterisk('Select Package', required: true),
+                      SizedBox(height: 10),
+                      CustomWidgets().customDropdownField(
+                        context: context,
+                        hint: 'Select Package',
+                        items: c.packagesList,
+                        value: c.selectedPackage.value,
+                        itemLabel: (p) => p.subjectName ?? '',
+                        onChanged: (p0) => c.selectedPackage.value = p0,
+                      ),
+                      SizedBox(height: 10),
+                      CustomWidgets()
+                          .labelWithAsterisk('Select Teacher', required: true),
+                      SizedBox(height: 10),
+                      CustomWidgets().customDropdownField(
+                        context: context,
+                        hint: 'Select Teacher',
+                        items: c.teacherList,
+                        onChanged: (p0) => c.selectedTeacher.value = p0,
+                        value: c.selectedTeacher.value,
+                        itemLabel: (item) => item.name,
+                      ),
+                      SizedBox(height: 10),
+                      CustomWidgets().labelWithAsterisk('Teacher Salary'),
+                      SizedBox(height: 10),
+                      CustomWidgets().dropdownStyledTextField(
+                          context: context,
+                          hint: 'Teacher Salary',
+                          controller: c.salaryController,
+                          isNumber: true),
+                      SizedBox(height: 10),
+                      CustomWidgets()
+                          .labelWithAsterisk('Session Date', required: true),
+                      SizedBox(height: 10),
+                      CustomWidgets().customDatePickerField(
+                        context: context,
+                        controller: c.dateController,
+                        selectedDate: c.selectedDate,
+                      ),
+                      SizedBox(height: 10),
+                      CustomWidgets()
+                          .labelWithAsterisk('Session Time', required: true),
+                      SizedBox(height: 10),
+                      CustomWidgets().timePickerStyledField(
+                        context: context,
+                        controller: c.timeController,
+                        selectedTime: c.selectedTime,
+                      ),
+                      SizedBox(height: 10),
+                      CustomWidgets()
+                          .labelWithAsterisk('Select Duration', required: true),
+                      SizedBox(height: 10),
+                      CustomWidgets().customDropdownField(
+                        context: context,
+                        hint: 'Select Duration',
+                        items: c.durationOptions,
+                        value: c.selectedDuration.value,
+                        onChanged: (p0) => c.selectedDuration.value = p0,
+                        itemLabel: (item) => "$item minutes",
+                      ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// SUBMIT BUTTON
                       Row(
@@ -118,10 +120,13 @@ class AddBatchSessionPage extends StatelessWidget {
                               icon: const SizedBox.shrink(),
                               label: Text(
                                 'Cancel',
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
                               ),
                               style: OutlinedButton.styleFrom(
                                 backgroundColor:
@@ -133,7 +138,7 @@ class AddBatchSessionPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
@@ -143,10 +148,12 @@ class AddBatchSessionPage extends StatelessWidget {
                               },
                               icon: const Icon(Icons.add,
                                   size: 15, color: Colors.white),
-                              label: const Text(
+                              label: Text(
                                 'Add',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:

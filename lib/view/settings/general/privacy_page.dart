@@ -30,7 +30,7 @@ class PrivacyPage extends StatelessWidget {
             CustomWidgets().showCustomDialog(
               context: context,
               formKey: GlobalKey<FormState>(),
-              title: const Text('Edit Privacy Policy'),
+              title: Text('Edit Privacy Policy'),
               sections: [
                 CustomWidgets().dropdownStyledTextField(
                   context: context,

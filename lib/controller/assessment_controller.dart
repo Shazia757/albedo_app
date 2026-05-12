@@ -45,31 +45,29 @@ class AssessmentController extends GetxController {
   }
 
   List<AttentionItem> getAttentionData() {
-  final questions = [
-    "Focus",
-    "Listening",
-    "Participation",
-  ];
+    final questions = [
+      "Focus",
+      "Listening",
+      "Participation",
+    ];
 
-  return questions.map((q) {
-    return AttentionItem(
-      question: q,
-      rating: attentionRatings[q] ?? 0,
-      mark: attentionMarkControllers[q]?.text ?? "",
-    );
-  }).toList();
-}
+    return questions.map((q) {
+      return AttentionItem(
+        question: q,
+        rating: attentionRatings[q] ?? 0,
+        mark: attentionMarkControllers[q]?.text ?? "",
+      );
+    }).toList();
+  }
 
   bool validate(BuildContext context) {
     String error = "";
 
-    if (selectedAssessment.value == null) {
-      error = "Please select a assessment";
-    } else if (parentOpinionController.text.trim().isEmpty) {
-      error = "Parent Opinion is required";
-    } else if (assessmentSummaryController.text.trim().isEmpty) {
-      error = "Assessment summary is required";
-    }
+    if (parentOpinionController.text.trim().isEmpty) {
+    error = "Parent Opinion is required";
+  } else if (assessmentSummaryController.text.trim().isEmpty) {
+    error = "Assessment summary is required";
+  }
     if (error.isNotEmpty) {
       Get.snackbar(
         "Error",

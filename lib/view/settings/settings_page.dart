@@ -73,16 +73,16 @@ class SettingsPage extends StatelessWidget {
                             .textTheme
                             .headlineMedium
                             ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary),
                       ),
 
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
 
                       /// CORE SETTINGS
                       _sectionTitle(context, "CORE SETTINGS"),
 
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
 
                       _groupCard(
                         context,
@@ -111,7 +111,7 @@ class SettingsPage extends StatelessWidget {
                             ),
                         ],
                       ),
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28),
 
                       /// MARKETING & ENGAGEMENT
                       _sectionTitle(
@@ -119,7 +119,7 @@ class SettingsPage extends StatelessWidget {
                         "MARKETING & ENGAGEMENT",
                       ),
 
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
 
                       _groupCard(
                         cs: cs,
@@ -149,7 +149,7 @@ class SettingsPage extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28),
 
                       /// LEARNING OPERATIONS
                       _sectionTitle(
@@ -157,7 +157,7 @@ class SettingsPage extends StatelessWidget {
                         "LEARNING OPERATIONS",
                       ),
 
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
 
                       _groupCard(
                         cs: cs,
@@ -187,7 +187,7 @@ class SettingsPage extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28),
 
                       /// ADVANCED & RECRUITMENT
                       _sectionTitle(
@@ -195,7 +195,7 @@ class SettingsPage extends StatelessWidget {
                         "ADVANCED & RECRUITMENT",
                       ),
 
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
 
                       _groupCard(
                         cs: cs,
@@ -238,12 +238,8 @@ class SettingsPage extends StatelessWidget {
   Widget _sectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).colorScheme.primary,
-        letterSpacing: 1.2,
-      ),
+      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+          color: Theme.of(context).colorScheme.primary, letterSpacing: 1.2),
     );
   }
 
@@ -321,25 +317,22 @@ class SettingsPage extends StatelessWidget {
                 size: 24,
               ),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 3),
+                  SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: cs.onSurface.withOpacity(.65),
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(color: cs.onSurface.withOpacity(.65)),
                   ),
                 ],
               ),

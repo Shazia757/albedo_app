@@ -26,31 +26,31 @@ class SessionReportDialogBody extends StatelessWidget {
           // ───────── STUDENT CARD ─────────
           _StudentInfoCard(report: r!),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // ───────── STATUS SECTION ─────────
           _SectionTitle(icon: Icons.flag_outlined, title: "Session Status"),
 
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
 
           _StatusToggle(
             isCompleted: isCompleted,
             onChanged: controller.toggleStatus,
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // ───────── CONDITIONAL FIELDS ─────────
           if (!isCompleted) _NotCompletedSection(controller: controller),
 
           if (isCompleted) _CompletedSection(controller: controller),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // ───────── ATTACHMENTS ─────────
           _SectionTitle(icon: Icons.attach_file, title: "Attachments"),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           CustomWidgets().attachmentStyledField(
             context: context,
@@ -78,13 +78,13 @@ class _SectionTitle extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, size: 18, color: cs.primary),
-        const SizedBox(width: 6),
+        SizedBox(width: 6),
         Text(
           title,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: cs.primary,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: cs.primary),
         ),
       ],
     );
@@ -125,10 +125,8 @@ class _StatusToggle extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   "Completed",
-                  style: TextStyle(
-                    color: isCompleted ? Colors.white : cs.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                      color: isCompleted ? Colors.white : cs.onSurface),
                 ),
               ),
             ),
@@ -145,10 +143,8 @@ class _StatusToggle extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   "Not Completed",
-                  style: TextStyle(
-                    color: !isCompleted ? Colors.white : cs.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                      color: !isCompleted ? Colors.white : cs.onSurface),
                 ),
               ),
             ),
@@ -171,15 +167,15 @@ class _CompletedSection extends StatelessWidget {
         _input("Topics Covered", controller.topicCtrl, context),
         _input("Teacher Notes", controller.notesCtrl, context, multiline: true),
         CustomWidgets().labelWithAsterisk('Start Time'),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         CustomWidgets().timePickerStyledField(
             hint: "Start Time",
             controller: controller.startTimeCtrl,
             context: context,
             selectedTime: controller.selectedTime),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         CustomWidgets().labelWithAsterisk('Duration'),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         // CustomWidgets().customDropdownField(
         //   hint: "Duration",
         //   context: context,
@@ -199,7 +195,7 @@ class _CompletedSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CustomWidgets().labelWithAsterisk(label),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: label,
@@ -223,7 +219,7 @@ class _NotCompletedSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomWidgets().labelWithAsterisk('Reason for not completing'),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: "Enter reason",
@@ -257,19 +253,16 @@ class _StudentInfoCard extends StatelessWidget {
             backgroundColor: cs.primary.withOpacity(0.1),
             child: Icon(Icons.person, color: cs.primary),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   report.studentName,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text("ID: ${report.studentId ?? report.batchId}"),
                 Text("Package: ${report.package.subjectName}"),
                 Text("Duration: ${report.duration}"),

@@ -1,17 +1,10 @@
 import 'package:albedo_app/controller/auth_controller.dart';
-import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/model/settings/hiring_ad_model.dart';
-import 'package:albedo_app/model/settings/recommendations_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/home_widgets.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../controller/home_controller.dart';
 import '../../../../widgets/drawer_menu.dart';
-import 'package:flutter/foundation.dart';
 
 class HomeView extends StatelessWidget {
   HomeView({super.key});
@@ -30,7 +23,7 @@ class HomeView extends StatelessWidget {
           Expanded(
             child: Obx(() {
               if (c.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator());
               }
               final auth = Get.find<AuthController>();
               final role = auth.activeUser?.role;
@@ -90,11 +83,11 @@ class HomeView extends StatelessWidget {
     return Column(
       children: [
         packagesAnalyticsCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         nextSessionCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         recommendationSection(context),
       ],
     );
@@ -104,11 +97,11 @@ class HomeView extends StatelessWidget {
     return Column(
       children: [
         studentsAnalyticsCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         nextSessionCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         hiringSection(context),
       ],
     );
@@ -118,9 +111,9 @@ class HomeView extends StatelessWidget {
     return Column(
       children: [
         expenseChartCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         chartCard(
           context,
           title: "Students Count",
@@ -135,7 +128,7 @@ class HomeView extends StatelessWidget {
             c.updateStudentData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         chartCard(
           context,
           title: "Teachers Count",
@@ -153,7 +146,7 @@ class HomeView extends StatelessWidget {
             c.updateTeacherData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         summaryCard(context),
       ],
     );
@@ -163,9 +156,9 @@ class HomeView extends StatelessWidget {
     return Column(
       children: [
         expenseChartCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         chartCard(
           context,
           title: "Students Count",
@@ -180,7 +173,7 @@ class HomeView extends StatelessWidget {
             c.updateStudentData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         chartCard(
           context,
           title: "Teachers Count",
@@ -198,9 +191,9 @@ class HomeView extends StatelessWidget {
             c.updateTeacherData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         summaryCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         chartCard(
           context,
           title: "Mentors Count",
@@ -218,7 +211,7 @@ class HomeView extends StatelessWidget {
             c.updateMentorData(range: p0);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         chartCard(
           context,
           title: "Coordinators Count",
@@ -236,9 +229,9 @@ class HomeView extends StatelessWidget {
             c.updatecoordinatorData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         hiringSection(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         recommendationSection(context),
       ],
     );
@@ -248,9 +241,9 @@ class HomeView extends StatelessWidget {
     return Column(
       children: [
         studentsAnalyticsCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         chartCard(
           context,
           title: "Students Count",
@@ -274,11 +267,11 @@ class HomeView extends StatelessWidget {
       children: [
         /// 🔹 EXPENSE
         expenseChartCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 VIDEO
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 STUDENTS COUNT
         chartCard(
@@ -295,7 +288,7 @@ class HomeView extends StatelessWidget {
             c.updateStudentData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 TEACHERS COUNT
         chartCard(
@@ -315,11 +308,11 @@ class HomeView extends StatelessWidget {
             c.updateTeacherData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 SUMMARY
         summaryCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 MENTORS COUNT
         chartCard(
@@ -339,7 +332,7 @@ class HomeView extends StatelessWidget {
             c.updateMentorData(range: p0);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 COORDINATORS COUNT
         chartCard(
@@ -359,11 +352,11 @@ class HomeView extends StatelessWidget {
             c.updatecoordinatorData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 RECOMMENDATIONS
         recommendationSection(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 HIRING
         hiringSection(context),
@@ -376,11 +369,11 @@ class HomeView extends StatelessWidget {
       children: [
         /// 🔹 EXPENSE
         expenseChartCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 VIDEO
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 STUDENTS COUNT
         chartCard(
@@ -397,7 +390,7 @@ class HomeView extends StatelessWidget {
             c.updateStudentData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 TEACHERS COUNT
         chartCard(
@@ -417,11 +410,11 @@ class HomeView extends StatelessWidget {
             c.updateTeacherData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 SUMMARY
         summaryCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 MENTORS COUNT
         chartCard(
@@ -441,7 +434,7 @@ class HomeView extends StatelessWidget {
             c.updateMentorData(range: p0);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 COORDINATORS COUNT
         chartCard(
@@ -470,11 +463,11 @@ class HomeView extends StatelessWidget {
       children: [
         /// 🔹 EXPENSE
         expenseChartCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 VIDEO
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 STUDENTS COUNT
         chartCard(
@@ -491,7 +484,7 @@ class HomeView extends StatelessWidget {
             c.updateStudentData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 TEACHERS COUNT
         chartCard(
@@ -520,11 +513,11 @@ class HomeView extends StatelessWidget {
       children: [
         /// 🔹 EXPENSE
         studentsAnalyticsCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 VIDEO
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 STUDENTS COUNT
         chartCard(
@@ -541,7 +534,7 @@ class HomeView extends StatelessWidget {
             c.updateStudentData(range: v);
           },
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         /// 🔹 TEACHERS COUNT
         chartCard(
@@ -570,7 +563,7 @@ class HomeView extends StatelessWidget {
       children: [
         /// 🔹 VIDEO
         youtubeCard(context),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
       ],
     );
   }

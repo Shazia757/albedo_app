@@ -31,9 +31,7 @@ class AddTeacherPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: CustomAppBar(
-     
-      ),
+      appBar: CustomAppBar(),
       body: Row(
         children: [
           if (isDesktop) const DrawerMenu(),
@@ -51,15 +49,15 @@ class AddTeacherPage extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// PROFILE
                       Align(
                         alignment: Alignment.center,
                         child: Column(
                           children: [
-                            const Text('Profile Photo (Max: 50 MB)'),
-                            const SizedBox(height: 10),
+                            Text('Profile Photo (Max: 50 MB)'),
+                            SizedBox(height: 10),
                             InkWell(
                               onTap: () {},
                               child: const CircleAvatar(
@@ -69,7 +67,8 @@ class AddTeacherPage extends StatelessWidget {
                                     width: 70,
                                     height: 70,
                                     child: Image(
-                                      image: AssetImage('assets/images/logo.png'),
+                                      image:
+                                          AssetImage('assets/images/logo.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -80,32 +79,34 @@ class AddTeacherPage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// NAME
                       CustomWidgets().labelWithAsterisk('Name', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter teacher name',
                         controller: c.nameController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// EMAIL
-                      CustomWidgets().labelWithAsterisk('Email', required: true),
-                      const SizedBox(height: 10),
+                      CustomWidgets()
+                          .labelWithAsterisk('Email', required: true),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter email address',
                         controller: c.emailController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// PHONE
-                      CustomWidgets().labelWithAsterisk('Phone Number', required: true),
+                      CustomWidgets()
+                          .labelWithAsterisk('Phone Number', required: true),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: '+1234567890',
@@ -113,11 +114,11 @@ class AddTeacherPage extends StatelessWidget {
                         isNumber: true,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// WHATSAPP
                       CustomWidgets().labelWithAsterisk('WhatsApp Number'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: '+1234567890',
@@ -125,11 +126,11 @@ class AddTeacherPage extends StatelessWidget {
                         isNumber: true,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// GENDER
                       CustomWidgets().labelWithAsterisk('Gender'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().customDropdownField(
                         context: context,
                         hint: 'Select Gender',
@@ -138,7 +139,7 @@ class AddTeacherPage extends StatelessWidget {
                         itemLabel: (item) => item,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// PLACE
                       CustomWidgets().labelWithAsterisk('Place'),
@@ -148,7 +149,7 @@ class AddTeacherPage extends StatelessWidget {
                         controller: c.placeController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// PINCODE
                       CustomWidgets().labelWithAsterisk('Pincode'),
@@ -158,7 +159,7 @@ class AddTeacherPage extends StatelessWidget {
                         controller: c.pincodeController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// ADDRESS
                       CustomWidgets().labelWithAsterisk('Address'),
@@ -168,11 +169,11 @@ class AddTeacherPage extends StatelessWidget {
                         controller: c.addressController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// TIMEZONE
                       CustomWidgets().labelWithAsterisk('Time Zone'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().customDropdownField(
                         context: context,
                         hint: 'Select Time Zone',
@@ -181,7 +182,7 @@ class AddTeacherPage extends StatelessWidget {
                         onChanged: (v) => c.selectedTimezone.value = v,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// DOB
                       CustomWidgets().labelWithAsterisk('Date of Birth'),
@@ -191,7 +192,7 @@ class AddTeacherPage extends StatelessWidget {
                         controller: c.dobController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// QUALIFICATION
                       CustomWidgets().labelWithAsterisk('Qualification'),
@@ -201,28 +202,34 @@ class AddTeacherPage extends StatelessWidget {
                         controller: c.qualificationController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// LANG
                       CustomWidgets().labelWithAsterisk('Preferred Language'),
                       CustomWidgets().customDropdownField(
                         context: context,
                         hint: 'Select language',
-                        items: const ['English', 'Malayalam', 'Hindi', 'Tamil', 'Arabic'],
+                        items: const [
+                          'English',
+                          'Malayalam',
+                          'Hindi',
+                          'Tamil',
+                          'Arabic'
+                        ],
                         itemLabel: (item) => item,
                         onChanged: (value) {
                           c.tutionModeController.text = value;
                         },
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           'Experience',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       Obx(() => Column(
                             children: [
                               Column(
@@ -244,18 +251,17 @@ class AddTeacherPage extends StatelessWidget {
                                             // Title
                                             Text(
                                               "Experience ${index + 1}",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium,
                                             ),
 
-                                            const SizedBox(height: 10),
+                                            SizedBox(height: 10),
 
                                             // Company
                                             CustomWidgets().labelWithAsterisk(
                                                 'Company Name'),
-                                            const SizedBox(height: 8),
+                                            SizedBox(height: 8),
                                             CustomWidgets()
                                                 .dropdownStyledTextField(
                                               context: context,
@@ -263,12 +269,12 @@ class AddTeacherPage extends StatelessWidget {
                                               controller: exp.companyController,
                                             ),
 
-                                            const SizedBox(height: 10),
+                                            SizedBox(height: 10),
 
                                             // Years
                                             CustomWidgets()
                                                 .labelWithAsterisk('Years'),
-                                            const SizedBox(height: 8),
+                                            SizedBox(height: 8),
                                             CustomWidgets()
                                                 .dropdownStyledTextField(
                                               context: context,
@@ -276,12 +282,12 @@ class AddTeacherPage extends StatelessWidget {
                                               controller: exp.yearController,
                                             ),
 
-                                            const SizedBox(height: 10),
+                                            SizedBox(height: 10),
 
                                             // Months
                                             CustomWidgets()
                                                 .labelWithAsterisk('Months'),
-                                            const SizedBox(height: 8),
+                                            SizedBox(height: 8),
                                             CustomWidgets()
                                                 .dropdownStyledTextField(
                                               context: context,
@@ -289,7 +295,7 @@ class AddTeacherPage extends StatelessWidget {
                                               controller: exp.monthController,
                                             ),
 
-                                            const SizedBox(height: 10),
+                                            SizedBox(height: 10),
                                           ],
                                         ),
                                       ),
@@ -298,69 +304,68 @@ class AddTeacherPage extends StatelessWidget {
                                 ),
                               ),
 
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
 
                               // ➕ Add Button at Bottom
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton.icon(
-                                  onPressed: () {
-                                    c.addExperience();
-                                  },
-                                 icon: const Icon(
-                                    Icons.add,
-                                    color: Colors.white,
-                                  ),
-                                  label: const Text(
-                                    "Add Experience",
-                                    style: TextStyle(
+                                    onPressed: () {
+                                      c.addExperience();
+                                    },
+                                    icon: const Icon(
+                                      Icons.add,
                                       color: Colors.white,
-                                      fontSize: 13,
                                     ),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .primary
-                                        .withOpacity(0.8),
-                                    elevation: 0,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                      horizontal: 16,
+                                    label: Text(
+                                      "Add Experience",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall!
+                                          .copyWith(color: Colors.white),
                                     ),
-                                  )
-                                ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.8),
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                        horizontal: 16,
+                                      ),
+                                    )),
                               ),
 
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets()
                                   .labelWithAsterisk('Account Number'),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
 
                               CustomWidgets().dropdownStyledTextField(
                                   context: context,
                                   hint: 'Enter Account Number',
                                   controller: c.accountNumberController),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets()
                                   .labelWithAsterisk('Account Holder Name'),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
 
                               CustomWidgets().dropdownStyledTextField(
                                   context: context,
                                   hint: 'Enter Account Holder Name',
                                   controller: c.accountHolderNameController),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().labelWithAsterisk('UPI ID'),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
 
                               CustomWidgets().dropdownStyledTextField(
                                   context: context,
                                   hint: 'Enter UPI ID',
                                   controller: c.upiIdController),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().labelWithAsterisk('Account Type'),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
 
                               CustomWidgets().customDropdownField(
                                 context: context,
@@ -369,9 +374,9 @@ class AddTeacherPage extends StatelessWidget {
                                 items: ['Savings', 'Current'],
                                 onChanged: (p0) {},
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().labelWithAsterisk('Bank Name'),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().customDropdownField<String>(
                                 context: context,
                                 hint: 'Select bank',
@@ -381,9 +386,9 @@ class AddTeacherPage extends StatelessWidget {
                                 },
                                 itemLabel: (item) => item,
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().labelWithAsterisk('Branch Name'),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               Obx(
                                 () =>
                                     CustomWidgets().customDropdownField<String>(
@@ -397,33 +402,33 @@ class AddTeacherPage extends StatelessWidget {
                                   itemLabel: (item) => item,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().labelWithAsterisk('IFSC Code'),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().dropdownStyledTextField(
                                   context: context,
                                   hint: 'Auto-filled',
                                   controller: c.ifscController),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().labelWithAsterisk('Resume'),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().dropdownStyledTextField(
                                   context: context,
                                   hint: 'Enter Resume URL',
                                   controller: c.resumeController),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets()
                                   .labelWithAsterisk('Demo Video (Optional)'),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().dropdownStyledTextField(
                                   context: context,
                                   hint: 'Enter Demo URL',
                                   controller: c.demoController),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
                             ],
                           )),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// BUTTONS
                       Row(
@@ -434,10 +439,13 @@ class AddTeacherPage extends StatelessWidget {
                               icon: const SizedBox.shrink(),
                               label: Text(
                                 'Cancel',
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
                               ),
                               style: OutlinedButton.styleFrom(
                                 backgroundColor:
@@ -449,8 +457,7 @@ class AddTeacherPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
-
+                          SizedBox(width: 10),
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
@@ -460,10 +467,12 @@ class AddTeacherPage extends StatelessWidget {
                               },
                               icon: const Icon(Icons.add,
                                   size: 15, color: Colors.white),
-                              label: const Text(
+                              label: Text(
                                 'Add',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
@@ -490,6 +499,7 @@ class AddTeacherPage extends StatelessWidget {
     );
   }
 }
+
 class ExperienceFormData {
   final companyController = TextEditingController();
   final yearController = TextEditingController();

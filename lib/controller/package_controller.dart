@@ -36,10 +36,8 @@ class PackageController extends GetxController {
   var selectedDuration = Rxn<int>();
   var selectedTab = 0.obs;
 
-
   final durationOptions = [30, 45, 60, 75, 90, 105, 120];
   final tutionOptions = ['Online Tuition'];
-
 
   TextEditingController classCountController = TextEditingController();
   TextEditingController timeController = TextEditingController();
@@ -76,16 +74,15 @@ class PackageController extends GetxController {
     durationDaysController.addListener(validateDuration);
   }
 
+  void openMonth(List<Session> sessions) {
+    monthSessions.value = sessions;
+    isMonthView.value = true;
+  }
 
-void openMonth(List<Session> sessions) {
-  monthSessions.value = sessions;
-  isMonthView.value = true;
-}
-
-void closeMonth() {
-  isMonthView.value = false;
-  monthSessions.clear();
-}
+  void closeMonth() {
+    isMonthView.value = false;
+    monthSessions.clear();
+  }
 
   Future<void> fetchData() async {
     try {

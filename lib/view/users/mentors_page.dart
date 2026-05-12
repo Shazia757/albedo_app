@@ -10,6 +10,7 @@ import 'package:albedo_app/view/users/add_mentor_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -62,11 +63,11 @@ class MentorsPage extends StatelessWidget {
           if (isDesktop) const DrawerMenu(),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: Column(
                 children: [
                   _topBar(context),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Obx(
                     () => CustomWidgets().customTabs(
                       context,
@@ -79,7 +80,7 @@ class MentorsPage extends StatelessWidget {
                       getCount: (index) => c.getCount(index),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Expanded(
                     child: Obx(() {
                       final data = c.filteredMentors;
@@ -87,7 +88,7 @@ class MentorsPage extends StatelessWidget {
                       int crossAxisCount = 1;
 
                       if (c.isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
+                        return Center(child: CircularProgressIndicator());
                       }
                       if (data.isEmpty) {
                         return Center(
@@ -119,67 +120,74 @@ class MentorsPage extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final mentor = c.filteredMentors[index];
 
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
-                                child: PremiumInfoCard(
-                                  id: mentor.id ?? "-",
-                                  title: mentor?.name ?? "-",
-                                  subtitle: mentor?.email ?? "-",
-                                  status: mentor?.status,
-                                  statusColor: getStatusColor(mentor?.status),
-                                  footerText:
-                                      "Joined • ${mentor?.joinedAt.toString().substring(0, 16)}",
-                                  extraInfo: mentor?.phone != null
-                                      ? "Contact • ${mentor!.phone}"
-                                      : null,
-                                  onTap: (!isCustom ||
-                                          PermissionService.can("view_mentors"))
-                                      ? () => Get.to(() => MentorDetailsPage(
-                                          mentor: mentor, initialIndex: index))
-                                      : null,
-                                  actions: [
-                                    InfoAction(
-                                      icon: Icons.dashboard,
-                                      color: cs.primary,
-                                      onTap: () {
-                                        final auth = Get.find<AuthController>();
-                                        final user = mentorToUser(mentor);
-
-                                        auth.startImpersonation(user);
-                                        Get.offAll(() => const Root());
-                                      },
-                                    ),
-                                    if ((!isCustom ||
-                                        PermissionService.can("edit_mentors")))
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  child: PremiumInfoCard(
+                                    id: mentor.id ?? "-",
+                                    title: mentor?.name ?? "-",
+                                    subtitle: mentor?.email ?? "-",
+                                    status: mentor?.status,
+                                    statusColor: getStatusColor(mentor?.status),
+                                    footerText:
+                                        "Joined • ${mentor?.joinedAt.toString().substring(0, 16)}",
+                                    extraInfo: mentor?.phone != null
+                                        ? "Contact • ${mentor!.phone}"
+                                        : null,
+                                    onTap: (!isCustom ||
+                                            PermissionService.can(
+                                                "view_mentors"))
+                                        ? () => Get.to(() => MentorDetailsPage(
+                                            mentor: mentor,
+                                            initialIndex: index))
+                                        : null,
+                                    actions: [
                                       InfoAction(
-                                        icon: Icons.edit,
-                                        color: cs.secondary,
+                                        icon: Icons.dashboard,
+                                        color: cs.primary,
                                         onTap: () {
-                                          if (mentor != null) {
-                                            c.loadMentors(mentor);
-                                            Get.to(() =>
-                                                AddMentorPage(isEdit: true));
-                                          }
+                                          final auth =
+                                              Get.find<AuthController>();
+                                          final user = mentorToUser(mentor);
+                                          auth.startImpersonation(user);
+                                          Get.offAll(() => const Root());
                                         },
                                       ),
-                                    if ((!isCustom ||
-                                        PermissionService.can(
-                                            "resign_mentors")))
-                                      InfoAction(
+                                      if (!isCustom ||
+                                          PermissionService.can("edit_mentors"))
+                                        InfoAction(
+                                          icon: Icons.edit,
+                                          color: cs.secondary,
+                                          onTap: () {
+                                            if (mentor != null) {
+                                              c.loadMentors(mentor);
+                                              Get.to(() =>
+                                                  AddMentorPage(isEdit: true));
+                                            }
+                                          },
+                                        ),
+                                      if (!isCustom ||
+                                          PermissionService.can(
+                                              "resign_mentors"))
+                                        InfoAction(
                                           icon: Icons.block,
                                           color: cs.error,
                                           onTap: () =>
-                                              c.handleResign(context, mentor)),
-                                    if ((!isCustom ||
-                                        PermissionService.can(
-                                            "delete_mentors")))
-                                      InfoAction(
+                                              c.handleResign(context, mentor),
+                                        ),
+                                      if (!isCustom ||
+                                          PermissionService.can(
+                                              "delete_mentors"))
+                                        InfoAction(
                                           icon: Icons.delete,
                                           color: cs.error,
                                           onTap: () =>
-                                              c.handleDelete(context, mentor)),
-                                  ],
+                                              c.handleDelete(context, mentor),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               );
                             });
@@ -199,6 +207,7 @@ class MentorsPage extends StatelessWidget {
     final isMobile = Responsive.isMobile(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final cs = Theme.of(context).colorScheme;
 
     final isCustom = ![
       "admin",
@@ -213,83 +222,50 @@ class MentorsPage extends StatelessWidget {
     ].contains(role);
 
     if (isMobile) {
-      return Obx(() {
-        final searching = c.isSearching.value;
-
-        return Column(
-          children: [
-            /// 🔹 TITLE + SEARCH TOGGLE (same row)
-            Row(
-              children: [
-                if (!searching)
-                  Expanded(
-                    child: Text(
-                      "Mentors",
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  )
-                else
-                  Expanded(
-                    child: CustomWidgets().premiumSearch(
-                      context,
-                      hint: "Search mentors by name, ID or email...",
-                      onChanged: (val) {
-                        c.searchQuery.value = val;
-                        c.applyFilters();
-                      },
-                    ),
-                  ),
-
-                /// 🔍 SEARCH ICON
-                InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () {
-                    c.isSearching.value = !searching;
-
-                    if (searching) {
-                      c.searchQuery.value = "";
-                      c.applyFilters();
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Icon(
-                      searching ? Icons.close : Icons.search,
-                      size: 20,
-                    ),
-                  ),
+      return Column(
+        children: [
+          /// 🔹 TITLE + SEARCH TOGGLE (same row)
+          HeaderWithSearch(
+            title: "Mentors",
+            hint: "Search mentors...",
+            isSearching: c.isSearching,
+            searchQuery: c.searchQuery,
+            onSearchChanged: () => c.applyFilters(),
+            actions: [
+              IconButton(
+                iconSize: 20,
+                icon: Icon(
+                  Icons.feedback_outlined,
+                  color: cs.primary,
                 ),
-                IconButton(
-                  iconSize: 20,
-                  icon: const Icon(Icons.feedback_outlined),
-                  tooltip: "Feedbacks",
-                  onPressed:
-                      (!isCustom || PermissionService.can("mentor_feedbacks"))
-                          ? () => Get.to(() => MentorFeedbackPage(
-                              title: 'Mentor Feedback', role: 'mentor'))
-                          : null,
+                tooltip: "Feedbacks",
+                onPressed:
+                    (!isCustom || PermissionService.can("mentor_feedbacks"))
+                        ? () => Get.to(() => MentorFeedbackPage(
+                            title: 'Mentor Feedback', role: 'mentor'))
+                        : null,
+              ),
+              IconButton(
+                iconSize: 20,
+                icon: Icon(
+                  Icons.upload_file_outlined,
+                  color: cs.primary,
                 ),
-                IconButton(
-                  iconSize: 20,
-                  icon: const Icon(Icons.upload_file_outlined),
-                  tooltip: "Bulk Upload",
-                  onPressed: () => Get.to(() => BulkUploadPage()),
-                ),
-              ],
-            ),
+                tooltip: "Bulk Upload",
+                onPressed: () => Get.to(() => BulkUploadPage()),
+              ),
+            ],
+          ),
 
-            const SizedBox(height: 10),
-
-            Row(
-              children: [
-                Expanded(child: _filterButton(context)),
-                const SizedBox(width: 10),
-                Expanded(child: _sortButton(context, c)),
-              ],
-            )
-          ],
-        );
-      });
+          Row(
+            children: [
+              Expanded(child: _filterButton(context)),
+              const SizedBox(width: 10),
+              Expanded(child: _sortButton(context, c)),
+            ],
+          )
+        ],
+      );
     }
 
     /// DESKTOP (unchanged)
@@ -362,14 +338,14 @@ class MentorsPage extends StatelessWidget {
         border: Border.all(
             color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
       ),
-      child: InkWell(
+      child: GestureDetector(
         onTap: () => CustomWidgets().showFilterSheet(
           title: "Filter Sessions",
           options: c.ratingFilters,
           selectedValue: c.selectedRating.value,
           onSelected: (val) {
             c.selectedRating.value = val;
-            c.applyFilters(); // 👈 re-filter
+            c.applyFilters();
           },
         ),
         child: Row(

@@ -65,7 +65,7 @@ class TransactionItem {
 }
 
 class TransactionModel {
-   String? status;
+  String? status;
   final String? type;
   final String? title;
   final String? addedBy;

@@ -24,8 +24,7 @@ class HrFeedbackPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-           backgroundColor: Theme.of(context).colorScheme.surface,
-
+      backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Row(
         children: [
@@ -37,7 +36,7 @@ class HrFeedbackPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _TopBar(c: c),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   // ── STATUS TABS ─────────────────────────────────────
                   Obx(
@@ -55,7 +54,7 @@ class HrFeedbackPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   // ── SESSION GRID ────────────────────────────────────
                   Expanded(
@@ -159,16 +158,16 @@ class _TopBar extends StatelessWidget {
                 ] else ...[
                   Expanded(child: searchField),
                 ],
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 searchToggle,
               ],
             ),
             if (!searching) ...[
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               // Row(
               //   children: [
               //     Expanded(child: filterBtn),
-              //     const SizedBox(width: 8),
+              //     SizedBox(width: 8),
               //     Expanded(child: sortBtn),
               //   ],
               // ),
@@ -185,7 +184,7 @@ class _TopBar extends StatelessWidget {
           ] else ...[
             Expanded(flex: 3, child: searchField),
           ],
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           searchToggle,
         ],
       );

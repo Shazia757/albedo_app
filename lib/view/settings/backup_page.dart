@@ -55,31 +55,28 @@ class BackupPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 /// ── TITLE ────────────────────────
                 Text(
                   "Get Backup",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: cs.onSurface,
-                    height: 1.1,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineMedium!
+                      .copyWith(color: cs.onSurface, height: 1.1),
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 Text(
                   "Receive your latest backup securely through email.",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: cs.outline,
-                    height: 1.5,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: cs.outline, height: 1.5),
                 ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 /// ── EMAIL FIELD ─────────────────
                 CustomWidgets().dropdownStyledTextField(
@@ -88,7 +85,7 @@ class BackupPage extends StatelessWidget {
                   hint: "Enter your email",
                 ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 /// ── BUTTON ──────────────────────
                 SizedBox(
@@ -110,13 +107,12 @@ class BackupPage extends StatelessWidget {
                       Icons.cloud_upload_rounded,
                       color: Colors.white,
                     ),
-                    label: const Text(
+                    label: Text(
                       "Backup Now",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(color: Colors.white),
                     ),
                   ),
                 ),

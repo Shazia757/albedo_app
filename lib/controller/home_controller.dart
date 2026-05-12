@@ -145,8 +145,12 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-                   teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -194,8 +198,12 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-                    teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -233,8 +241,12 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-                  teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -272,8 +284,12 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-                  teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -311,8 +327,12 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-                    teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -350,8 +370,12 @@ class HomeController extends GetxController {
           joinedAt: DateTime.now(),
         ),
         package: Package(
-                     teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',
@@ -389,8 +413,12 @@ class HomeController extends GetxController {
             joinedAt: DateTime.now(),
             packages: [
               Package(
-                           teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
-
+                  teacher: Teacher(
+                      id: '',
+                      name: '',
+                      status: '',
+                      joinedAt: DateTime.now(),
+                      gender: ''),
                   subjectId: 'subjectId',
                   subjectName: 'subjectName',
                   standard: 'standard',
@@ -405,7 +433,12 @@ class HomeController extends GetxController {
                   note: 'no')
             ]),
         package: Package(
-          teacher: Teacher(id: '', name: '', status: '', joinedAt: DateTime.now(), gender: ''),
+            teacher: Teacher(
+                id: '',
+                name: '',
+                status: '',
+                joinedAt: DateTime.now(),
+                gender: ''),
             subjectId: '',
             subjectName: '',
             standard: '',

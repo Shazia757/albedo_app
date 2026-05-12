@@ -21,34 +21,35 @@ class DialogUtils {
       context: context,
       formKey: formKey,
       icon: Icons.account_balance_wallet,
-      title: const Text("Deposit Funds"),
+      submitText: 'Deposit',
+      title: Text("Deposit Funds"),
       sections: [
         CustomWidgets().labelWithAsterisk('Amount(₹)', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Enter deposit amount',
           controller: amountController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Description (Optional)'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Bank transfer, cash deposit, etc.',
           controller: descController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Deposit Date', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: 'Select date',
           controller: dateController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Attachment'),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().attachmentStyledField(
           context: context,
           hint: 'Select Screenshot',
@@ -79,7 +80,7 @@ class DialogUtils {
       formKey: GlobalKey(),
       onSubmit: () {},
       isViewOnly: true,
-      title: const Text("Assessment Report"),
+      title: Text("Assessment Report"),
       sections: [
         SingleChildScrollView(
           child: Column(
@@ -87,44 +88,44 @@ class DialogUtils {
             children: [
               /// ✅ Always show header
               _reportCard(child: _header(a)),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               /// ✅ Attention (only if data exists)
               if ((a.attentionData ?? []).isNotEmpty) ...[
                 attentionReportCard(context, a),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
               ],
 
               /// ✅ Academics
               if ((a.academicData ?? []).isNotEmpty) ...[
                 academicReportCard(context, a.academicData!),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
               ],
 
               /// ✅ Maths
               if ((a.mathsData ?? []).isNotEmpty) ...[
                 mathReportCard(context, a.mathsData!),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
               ],
 
               /// ✅ Subjects
               if ((a.subjectsData ?? []).isNotEmpty) ...[
                 subjectsReportCard(context, a.subjectsData!),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
               ],
 
               /// ✅ Key Points
               if ((a.keypoints ?? []).isNotEmpty) ...[
                 keyPointsReportCard(context, a.keypoints!),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
               ],
 
               /// ✅ ALWAYS SHOW
               parentOpinionReportCard(context, a.parentOpinion),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               assessmentSummaryReportCard(context, a.summary),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               _reportCard(
                 child: isAdmin
@@ -148,7 +149,7 @@ class DialogUtils {
                           ),
                           IconButton(
                             icon: Icon(Icons.delete_outline,
-                                color: Theme.of(context).colorScheme.error),
+                                color: Get.theme.colorScheme.error),
                             onPressed: () => CustomWidgets().showDeleteDialog(
                               title: 'Are you sure?',
                               context: context,
@@ -169,16 +170,16 @@ class DialogUtils {
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
+                            backgroundColor: Get.theme.colorScheme.primary,
                           ),
                           onPressed: () {
                             _downloadAssessmentReport(a);
                           },
                           icon: const Icon(Icons.download),
-                          label: const Text(
+                          label: Text(
                             "Download Report",
-                            style: TextStyle(color: Colors.white),
+                            style: Get.textTheme.bodyMedium!
+                                .copyWith(color: Colors.white),
                           ),
                         ),
                       ),
@@ -197,12 +198,10 @@ class DialogUtils {
         (opinion == null || opinion.trim().isEmpty)
             ? "No parent opinion recorded"
             : opinion,
-        style: TextStyle(
-          fontSize: 13,
-          color: opinion == null || opinion.trim().isEmpty
-              ? Colors.grey
-              : Theme.of(context).colorScheme.onSurface,
-        ),
+        style: Get.textTheme.bodySmall!.copyWith(
+            color: opinion == null || opinion.trim().isEmpty
+                ? Colors.grey
+                : Get.theme.colorScheme.onSurface),
       ),
     );
   }
@@ -214,12 +213,10 @@ class DialogUtils {
         (summary == null || summary.trim().isEmpty)
             ? "No assessment summary available"
             : summary,
-        style: TextStyle(
-          fontSize: 13,
-          color: summary == null || summary.trim().isEmpty
-              ? Colors.grey
-              : Theme.of(context).colorScheme.onSurface,
-        ),
+        style: Get.textTheme.bodySmall!.copyWith(
+            color: summary == null || summary.trim().isEmpty
+                ? Colors.grey
+                : Get.theme.colorScheme.onSurface),
       ),
     );
   }
@@ -240,12 +237,9 @@ class DialogUtils {
       children: [
         Text(
           a.type ?? "Assessment",
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-          ),
+          style: Get.textTheme.titleLarge,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Row(
           children: [
             Row(
@@ -278,15 +272,14 @@ class DialogUtils {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: Get.theme.colorScheme.outline.withOpacity(0.2),
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item["name"],
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
+                Text(item["name"], style: Get.textTheme.titleSmall),
+                SizedBox(height: 8),
                 Wrap(
                   spacing: 10,
                   children: [
@@ -295,14 +288,14 @@ class DialogUtils {
                     if (item["creativity"] == true) _tag("Creativity"),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Row(
                   children: [
-                    const Text("Mark: "),
+                    Text("Mark: "),
                     Text(item["mark"] ?? "-"),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 _displayStars(item["rating"]),
               ],
             ),
@@ -319,7 +312,7 @@ class DialogUtils {
         borderRadius: BorderRadius.circular(6),
         color: Colors.grey.shade200,
       ),
-      child: Text(text, style: const TextStyle(fontSize: 11)),
+      child: Text(text, style: Get.textTheme.labelSmall),
     );
   }
 
@@ -340,11 +333,11 @@ class DialogUtils {
       child: validSubjects.isEmpty
 
           /// ❌ EMPTY STATE
-          ? const Padding(
+          ? Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
               child: Text(
                 "No academic subjects recorded",
-                style: TextStyle(color: Colors.grey),
+                style: Get.textTheme.bodyMedium!.copyWith(color: Colors.grey),
               ),
             )
 
@@ -357,10 +350,7 @@ class DialogUtils {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .outline
-                          .withOpacity(0.2),
+                      color: Get.theme.colorScheme.outline.withOpacity(0.2),
                     ),
                   ),
                   child: Column(
@@ -370,17 +360,17 @@ class DialogUtils {
                         (item.name ?? "-").toString().isEmpty
                             ? "-"
                             : item.name ?? '-',
-                        style: const TextStyle(fontWeight: FontWeight.w600),
+                        style: Get.textTheme.titleSmall,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// ⭐ Current (only if exists)
                       if (item.current != null)
                         _displayRating("Current Grade", item.current ?? 0),
 
                       if (item.current != null && item.expected != null)
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
 
                       /// ⭐ Expected (only if exists)
                       if (item.expected != null)
@@ -404,16 +394,16 @@ class DialogUtils {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: Get.theme.colorScheme.outline.withOpacity(0.2),
               ),
             ),
             child: Column(
               children: [
                 Text(
                   item["name"],
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: Get.textTheme.titleSmall,
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 _displayStars(item["rating"]),
               ],
             ),
@@ -434,16 +424,16 @@ class DialogUtils {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: Get.theme.colorScheme.outline.withOpacity(0.2),
               ),
             ),
             child: Column(
               children: [
                 Text(
                   item["name"],
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: Get.textTheme.titleSmall,
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 _displayStars(item["rating"]),
               ],
             ),
@@ -464,16 +454,16 @@ class DialogUtils {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: Get.theme.colorScheme.outline.withOpacity(0.2),
               ),
             ),
             child: Column(
               children: [
                 Text(
                   item["name"],
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: Get.textTheme.titleSmall,
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 _displayStars(item["rating"]),
               ],
             ),
@@ -487,9 +477,9 @@ class DialogUtils {
     return _card(
       title: "Voice Notes",
       child: notes.isEmpty
-          ? const Text(
+          ? Text(
               "No voice notes added",
-              style: TextStyle(color: Colors.grey),
+              style: Get.textTheme.bodyMedium!.copyWith(color: Colors.grey),
             )
           : Column(
               children: notes.map<Widget>((n) {
@@ -519,8 +509,8 @@ class DialogUtils {
   Widget _displayRating(String label, int? rating) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-        const SizedBox(height: 4),
+        Text(label, style: Get.textTheme.titleSmall),
+        SizedBox(height: 4),
         _displayStars(rating),
       ],
     );
@@ -550,7 +540,7 @@ class DialogUtils {
     BuildContext context,
     Assessment assessment,
   ) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     final items = assessment.attentionData ?? [];
 
@@ -573,7 +563,7 @@ class DialogUtils {
                 Expanded(
                   child: Text(
                     q.question,
-                    style: const TextStyle(fontWeight: FontWeight.w500),
+                    style: Get.textTheme.titleSmall,
                   ),
                 ),
 
@@ -588,7 +578,7 @@ class DialogUtils {
                   }),
                 ),
 
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
 
                 /// 📝 Mark
                 Container(
@@ -596,11 +586,11 @@ class DialogUtils {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: cs.surfaceVariant,
+                    color: cs.surfaceContainerHighest,
                   ),
                   child: Text(
                     q.mark.isEmpty ? '-' : q.mark,
-                    style: const TextStyle(fontWeight: FontWeight.w500),
+                    style: Get.textTheme.titleSmall,
                   ),
                 ),
               ],
@@ -624,12 +614,11 @@ class DialogUtils {
         ),
         child: Column(
           children: [
-            Text(title.toUpperCase(),
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            Text(title.toUpperCase(), style: Get.textTheme.titleSmall),
+            SizedBox(height: 10),
             if (subtitle != null) ...[
-              Text(subtitle, style: const TextStyle(fontSize: 12)),
-              const SizedBox(height: 20),
+              Text(subtitle, style: Get.textTheme.bodySmall),
+              SizedBox(height: 20),
             ],
             child
           ],

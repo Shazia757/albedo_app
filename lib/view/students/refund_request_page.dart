@@ -122,11 +122,10 @@ class RefundRequestCard extends StatelessWidget {
                   ),
                   child: Text(
                     "${data["refundCount"] ?? 0} refunds",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: cs.primary,
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall!
+                        .copyWith(color: cs.primary),
                   ),
                 ),
               ),
@@ -138,7 +137,7 @@ class RefundRequestCard extends StatelessWidget {
                 cs: cs,
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               /// 🟣 MENTOR (SECONDARY CARD)
               _SubUserCard(
@@ -184,25 +183,22 @@ class _MainUserCard extends StatelessWidget {
               fit: BoxFit.contain,
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   id,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: cs.onSurfaceVariant,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: cs.onSurfaceVariant),
                 ),
               ],
             ),
@@ -248,24 +244,21 @@ class _SubUserCard extends StatelessWidget {
               fit: BoxFit.contain,
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
                 Text(
                   id,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.onSurfaceVariant,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelSmall!
+                      .copyWith(color: cs.onSurfaceVariant),
                 ),
               ],
             ),

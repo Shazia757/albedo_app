@@ -8,16 +8,16 @@ class Meet {
   final DateTime? date;
   final String? startTime;
   final String? endTime;
-   final List<Users> members;
+  final List<Users> members;
 
   Meet({
     required this.id,
     required this.title,
-     this.date,
+    this.date,
     this.startTime,
     this.endTime,
-   this.status='completed',
-   this.members = const [],
+    this.status = 'completed',
+    this.members = const [],
   });
 
   factory Meet.fromJson(Map<String, dynamic> json) {
@@ -25,12 +25,10 @@ class Meet {
       id: json['id'] ?? '',
       title: json['title'] ?? '',
       status: json['status'] ?? '',
-      date: json['date'] != null
-          ? DateTime.tryParse(json['date'])
-          : null,
+      date: json['date'] != null ? DateTime.tryParse(json['date']) : null,
       startTime: json['start_time'],
       endTime: json['end_time'],
-       members: (json['members'] as List<dynamic>? ?? [])
+      members: (json['members'] as List<dynamic>? ?? [])
           .map((e) => Users(
                 id: e['id'],
                 name: e['name'],
@@ -45,9 +43,9 @@ class Meet {
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "title":title,
-        "status":status,
-            "date": date?.toIso8601String(),
+        "title": title,
+        "status": status,
+        "date": date?.toIso8601String(),
         "start_time": startTime,
         "end_time": endTime,
         "members": members
@@ -60,6 +58,5 @@ class Meet {
                   "profileImage": e.profileImage,
                 })
             .toList(),
-    
       };
 }

@@ -17,7 +17,7 @@ class HiringPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       appBar: const CustomAppBar(),
@@ -33,11 +33,11 @@ class HiringPage extends StatelessWidget {
                 final data = c.hiringAd;
 
                 if (c.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 if (data.isEmpty) {
-                  return const Center(child: Text("No hiring ads found"));
+                  return Center(child: Text("No hiring ads found"));
                 }
 
                 return Column(
@@ -46,10 +46,10 @@ class HiringPage extends StatelessWidget {
                     /// TITLE (outside cards)
                     Text(
                       "Hiring Ads",
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Get.textTheme.titleLarge,
                     ),
 
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     /// GRID
                     Expanded(
@@ -80,9 +80,9 @@ class HiringPage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _info(cs, "Package", item.package),
-                                    const SizedBox(height: 10),
+                                    SizedBox(height: 10),
                                     _info(cs, "Time", item.time),
-                                    const SizedBox(height: 10),
+                                    SizedBox(height: 10),
                                     Row(
                                       children: [
                                         Expanded(
@@ -92,7 +92,7 @@ class HiringPage extends StatelessWidget {
                                             item.startDate,
                                           ),
                                         ),
-                                        const SizedBox(width: 10),
+                                        SizedBox(width: 10),
                                         Expanded(
                                           child: _dateBox(
                                             context,
@@ -102,15 +102,16 @@ class HiringPage extends StatelessWidget {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 12),
+                                    SizedBox(height: 12),
                                     Text(
                                       "Regular Days",
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: cs.onSurface.withOpacity(0.6),
-                                      ),
+                                      style: Get.textTheme
+                                          .labelSmall!
+                                          .copyWith(
+                                              color: cs.onSurface
+                                                  .withOpacity(0.6)),
                                     ),
-                                    const SizedBox(height: 6),
+                                    SizedBox(height: 6),
                                     Wrap(
                                       spacing: 6,
                                       runSpacing: 6,
@@ -129,10 +130,11 @@ class HiringPage extends StatelessWidget {
                                                 ? v.name[0].toUpperCase() +
                                                     v.name.substring(1)
                                                 : v.name,
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: cs.onPrimaryContainer,
-                                            ),
+                                            style: Get.textTheme
+                                                .labelSmall!
+                                                .copyWith(
+                                                    color:
+                                                        cs.onPrimaryContainer),
                                           ),
                                         );
                                       }).toList(),
@@ -150,7 +152,7 @@ class HiringPage extends StatelessWidget {
                                       editHiringAd(context);
                                     },
                                   ),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: 10),
                                   CustomWidgets().iconBtn(
                                     icon: Icons.delete,
                                     color: cs.error,
@@ -184,16 +186,14 @@ class HiringPage extends StatelessWidget {
   Widget _info(ColorScheme cs, String label, String? value) {
     return Text(
       "$label: ${value ?? '-'}",
-      style: TextStyle(
-        fontSize: 12,
-        color: cs.onSurface.withOpacity(0.7),
-        fontWeight: FontWeight.w500,
-      ),
+      style: Get.textTheme
+          .labelMedium!
+          .copyWith(color: cs.onSurface.withOpacity(0.7)),
     );
   }
 
   Widget _dateBox(BuildContext context, String label, String? value) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -206,15 +206,14 @@ class HiringPage extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
-              color: cs.onSurface.withOpacity(0.6),
-            ),
+            style: Get.textTheme
+                .labelSmall!
+                .copyWith(color: cs.onSurface.withOpacity(0.6)),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             value ?? '-',
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: Get.textTheme.titleSmall,
           ),
         ],
       ),
@@ -229,41 +228,41 @@ class HiringPage extends StatelessWidget {
       formKey: GlobalKey<FormState>(),
       sections: [
         Container(),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Package', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: '',
           controller: c.nameController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Time', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: '',
           controller: c.timeController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('From Date', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: '',
           controller: c.startDateController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('To Date', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().dropdownStyledTextField(
           context: context,
           hint: '',
           controller: c.endDateController,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Regular Days', required: true),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         MultiSelector<Days>(
           items: Days.values.where((e) => e != Days.all).toList(),
           allValue: Days.all,
@@ -289,25 +288,25 @@ class HiringPage extends StatelessWidget {
         onSubmit: () {},
         sections: [
           Container(),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Package', required: true),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(context: context, hint: ''),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Time', required: true),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(context: context, hint: ''),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('From Date', required: true),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(context: context, hint: ''),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('To Date', required: true),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(context: context, hint: ''),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Regular Days', required: true),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           MultiSelector<Days>(
             items: Days.values.where((e) => e != Days.all).toList(),
             allValue: Days.all,

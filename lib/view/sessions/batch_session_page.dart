@@ -7,6 +7,7 @@ import 'package:albedo_app/view/batch/batch_detailed_page.dart';
 import 'package:albedo_app/view/sessions/add_batch_session_page.dart';
 import 'package:albedo_app/view/teacher/tr_detailed_page.dart';
 import 'package:albedo_app/widgets/batch_widgets.dart';
+import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -49,8 +50,14 @@ class BatchesListPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  BatchTopBar(c: c),
-                  const SizedBox(height: 12),
+                  HeaderWithSearch(
+                    title: "Batches",
+                    hint: "Search batches...",
+                    isSearching: c.isSearching,
+                    searchQuery: c.searchQuery,
+                    onSearchChanged: () => c.applyFilters(),
+                  ),
+                  SizedBox(height: 12),
                   Obx(
                     () => CustomWidgets().customTabs(context,
                         tabs: c.tabs,
@@ -62,13 +69,13 @@ class BatchesListPage extends StatelessWidget {
                           c.selectedTab.value = index;
                         }),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Expanded(
                     child: Obx(() {
                       final data = c.filteredSessions;
 
                       if (c.isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
+                        return Center(child: CircularProgressIndicator());
                       }
                       if (data.isEmpty) {
                         return EmptyState(
@@ -127,9 +134,12 @@ class BatchesListPage extends StatelessWidget {
 
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text(
+      title: Text(
         "Session Details",
-        style: TextStyle(color: Colors.white),
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
       ),
       icon: Icons.schedule,
       formKey: GlobalKey<FormState>(),
@@ -173,7 +183,7 @@ class BatchesListPage extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
 
                   Expanded(
                     child: SingleChildScrollView(
@@ -213,7 +223,7 @@ class BatchesListPage extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
 
                           /// SCHEDULE
                           EditableInfoCard(
@@ -278,7 +288,7 @@ class BatchesListPage extends StatelessWidget {
                             ],
                           ),
 
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
 
                           /// REPORT
                           infoCard(
@@ -295,10 +305,10 @@ class BatchesListPage extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
+                                      Text(
                                         "No session report available yet.",
                                       ),
-                                      const SizedBox(height: 8),
+                                      SizedBox(height: 8),
                                       ElevatedButton.icon(
                                         onPressed: () {
                                           c.openSessionReportDialog(
@@ -307,12 +317,12 @@ class BatchesListPage extends StatelessWidget {
                                         },
                                         icon: const Icon(Icons.add,
                                             color: Colors.white),
-                                        label: const Text(
+                                        label: Text(
                                           "Add Report",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 13,
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .copyWith(color: Colors.white),
                                         ),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
@@ -355,7 +365,7 @@ class BatchesListPage extends StatelessWidget {
                                           Icons.edit,
                                           size: 18,
                                         ),
-                                        label: const Text("Edit"),
+                                        label: Text("Edit"),
                                       ),
                                     ),
                                     if (!report.isCompleted &&
@@ -369,9 +379,10 @@ class BatchesListPage extends StatelessWidget {
                                         ),
                                         child: Text(
                                           "Reason: ${report.reason}",
-                                          style: const TextStyle(
-                                            color: Colors.red,
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .copyWith(color: Colors.red),
                                         ),
                                       ),
                                     if (report.isCompleted) ...[
@@ -390,7 +401,7 @@ class BatchesListPage extends StatelessWidget {
                             ],
                           ),
 
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
 
                           /// ACTIONS
                           if (session.status != 'completed')
@@ -412,7 +423,7 @@ class BatchesListPage extends StatelessWidget {
                                     },
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Expanded(
                                   child: _DetailActionButton(
                                     label: "Delete",
@@ -433,7 +444,7 @@ class BatchesListPage extends StatelessWidget {
                                     },
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Expanded(
                                   child: _DetailActionButton(
                                     label: "Support",
@@ -480,28 +491,28 @@ class BatchesListPage extends StatelessWidget {
   void _markSessionCompleted(BuildContext context, DateTime date) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text('Mark Session as Completed'),
+      title: Text('Mark Session as Completed'),
       formKey: GlobalKey<FormState>(),
       sections: [
         Column(
           children: [
             CustomWidgets().labelWithAsterisk('Session Date', required: true),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             CustomWidgets().customDatePickerField(
                 context: context,
                 selectedDate: c.selectedDate,
                 controller: c.dateController),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             CustomWidgets().labelWithAsterisk('Start Time', required: true),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             CustomWidgets().timePickerStyledField(
                 selectedTime: c.selectedTime,
                 context: context,
                 hint: 'Time',
                 controller: c.timeController),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             CustomWidgets().labelWithAsterisk('Duration', required: true),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             // CustomWidgets().customDropdownField(
             //   context: context,
             //   hint: 'Select Duration',
@@ -518,7 +529,7 @@ class BatchesListPage extends StatelessWidget {
   void _addSupport(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text('Add New Ticket'),
+      title: Text('Add New Ticket'),
       icon: Icons.support_agent_outlined,
       formKey: GlobalKey<FormState>(),
       sections: [
@@ -529,38 +540,40 @@ class BatchesListPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomWidgets().labelWithAsterisk('Title', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                     context: context,
                     hint: 'Enter ticket title',
                     controller: c.titleController),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Category', required: true),
-                const SizedBox(height: 8),
-                // CustomWidgets().customDropdownField(
-                //   context: context,
-                //   hint: 'Select category',
-                //   items: c.categoryList,
-                //   onChanged: (p0) {},
-                // ),
-                const SizedBox(height: 12),
+                SizedBox(height: 8),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  itemLabel: (item) => item,
+                  hint: 'Select category',
+                  items: c.categoryList,
+                  onChanged: (p0) {},
+                ),
+                SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Priority', required: true),
-                const SizedBox(height: 8),
-                // CustomWidgets().customDropdownField(
-                //   context: context,
-                //   hint: 'Select priority',
-                //   items: ['High', 'Medium', 'Low'],
-                //   onChanged: (p0) {},
-                // ),
-                const SizedBox(height: 12),
+                SizedBox(height: 8),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select priority',
+                  itemLabel: (item) => item,
+                  items: ['High', 'Medium', 'Low'],
+                  onChanged: (p0) {},
+                ),
+                SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('User', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Obx(() => Row(
                       children: [
                         Expanded(
                           child: RadioListTile(
                             dense: true,
-                            title: const Text('Student'),
+                            title: Text('Student'),
                             value: "student",
                             groupValue: c.selectedType.value,
                             onChanged: (value) => c.selectedType.value = value!,
@@ -569,7 +582,7 @@ class BatchesListPage extends StatelessWidget {
                         Expanded(
                           child: RadioListTile(
                             dense: true,
-                            title: const Text('Teacher'),
+                            title: Text('Teacher'),
                             value: "teacher",
                             groupValue: c.selectedType.value,
                             onChanged: (value) => c.selectedType.value = value!,
@@ -577,7 +590,7 @@ class BatchesListPage extends StatelessWidget {
                         ),
                       ],
                     )),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Obx(() {
                   // if (c.selectedType.value == 'student') {
                   //   return CustomWidgets().customDropdownField(
@@ -593,11 +606,11 @@ class BatchesListPage extends StatelessWidget {
                   //       context: context,
                   //       hint: 'Select teacher');
                   // }
-                  return const SizedBox();
+                  return SizedBox();
                 }),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Attachment'),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().attachmentStyledField(
                   context: context,
                   label: "Attachment",
@@ -606,17 +619,17 @@ class BatchesListPage extends StatelessWidget {
                   onTap: () {},
                   onClear: () {},
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 CustomWidgets()
                     .labelWithAsterisk('Description', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Describe the issue...',
                   controller: c.descriptionController,
                   isMultiline: true,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
               ],
             ),
           ),
@@ -674,7 +687,7 @@ class BatchesListPage extends StatelessWidget {
                     children: [
                       CustomWidgets()
                           .labelWithAsterisk('Session Date', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       SizedBox(
                           width: 150,
                           child: CustomWidgets().dropdownStyledTextField(
@@ -684,13 +697,13 @@ class BatchesListPage extends StatelessWidget {
                           )),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomWidgets()
                           .labelWithAsterisk('Session Time', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       SizedBox(
                           width: 150,
                           child: CustomWidgets().dropdownStyledTextField(
@@ -703,7 +716,7 @@ class BatchesListPage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
 
             /// 🔹 SECTION: SESSION DETAILS
             _sectionCard(
@@ -712,7 +725,7 @@ class BatchesListPage extends StatelessWidget {
               child: Column(
                 children: [
                   CustomWidgets().labelWithAsterisk('Duration', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().customDropdownField(
                       context: context,
                       hint: 'Select Duration',
@@ -720,9 +733,9 @@ class BatchesListPage extends StatelessWidget {
                       items: [],
                       itemLabel: (item) => "$item mins",
                       onChanged: (p0) => c.selectedDuration.value = p0),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   CustomWidgets().labelWithAsterisk('Teacher', required: true),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   //         CustomWidgets().customDropdownField(
 
                   //             context: context,
@@ -736,7 +749,7 @@ class BatchesListPage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
 
             /// 🔹 SECTION: PAYMENT
             _sectionCard(
@@ -747,7 +760,7 @@ class BatchesListPage extends StatelessWidget {
                   CustomWidgets().labelWithAsterisk(
                     'Teacher Salary (per hour - optional)',
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   CustomWidgets().dropdownStyledTextField(
                       isNumber: true,
                       context: context,
@@ -781,14 +794,14 @@ class BatchesListPage extends StatelessWidget {
           Row(
             children: [
               Icon(icon, size: 18),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: Get.textTheme.titleSmall,
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           child,
         ],
       ),
@@ -802,16 +815,15 @@ class BatchesListPage extends StatelessWidget {
       children: [
         Text(
           label ?? '',
-          style: TextStyle(
-              fontSize: 10, color: Theme.of(context).colorScheme.outline),
+          style: Theme.of(context)
+              .textTheme
+              .labelSmall!
+              .copyWith(color: Theme.of(context).colorScheme.outline),
         ),
-        const SizedBox(height: 2),
+        SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
+          style: Theme.of(context).textTheme.labelMedium,
         ),
       ],
     );
@@ -824,22 +836,23 @@ class BatchesListPage extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
-              fontSize: 10, color: Theme.of(context).colorScheme.outline),
+          style: Theme.of(context)
+              .textTheme
+              .labelSmall!
+              .copyWith(color: Theme.of(context).colorScheme.outline),
         ),
-        const SizedBox(height: 2),
+        SizedBox(height: 2),
         Text(
           name,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(context).textTheme.titleSmall,
           overflow: TextOverflow.ellipsis,
         ),
         Text(
           id,
-          style: TextStyle(
-              fontSize: 11, color: Theme.of(context).colorScheme.outline),
+          style: Theme.of(context)
+              .textTheme
+              .labelSmall!
+              .copyWith(color: Theme.of(context).colorScheme.outline),
         ),
       ],
     );
@@ -886,7 +899,10 @@ class _DetailActionButton extends StatelessWidget {
       onPressed: onTap,
       icon: Icon(icon, size: 15, color: Colors.white),
       label: Text(label,
-          style: const TextStyle(color: Colors.white, fontSize: 13)),
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: Colors.white)),
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         elevation: 0,

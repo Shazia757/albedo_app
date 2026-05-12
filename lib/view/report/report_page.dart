@@ -98,9 +98,9 @@
 //                 crossAxisAlignment: CrossAxisAlignment.start,
 //                 children: [
 //                   _filters(context),
-//                   const SizedBox(height: 16),
+//                   SizedBox(height: 16),
 //                   _tabs(context),
-//                   const SizedBox(height: 16),
+//                   SizedBox(height: 16),
 //                   Expanded(child: Obx(() => _tabView(context))),
 //                 ],
 //               ),
@@ -157,15 +157,13 @@
 //                   onTap: () => c.selectedTab.value = tabs[index],
 //                   child: Text(
 //                     tabs[index],
-//                     style: TextStyle(
-//                       fontWeight: FontWeight.w500,
-//                       color: isSelected
+//                     style: Theme.of(context).textTheme.titleSmall!.copyWith(//                       //                       color: isSelected
 //                           ? Theme.of(context).colorScheme.onPrimary
 //                           : Theme.of(context)
 //                               .colorScheme
 //                               .onSurface
 //                               .withOpacity(0.6),
-//                     ),
+//),
 //                   ),
 //                 ),
 //               );
@@ -217,9 +215,9 @@
 //                   children: [
 //                     Text(
 //                       c.selectedRange.value,
-//                       style: const TextStyle(fontWeight: FontWeight.w500),
+//                       style: Theme.of(context).textTheme.titleSmall,
 //                     ),
-//                     const SizedBox(width: 6),
+//                     SizedBox(width: 6),
 //                     const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
 //                   ],
 //                 ),
@@ -277,7 +275,7 @@
 //                   return AlertDialog(
 //                     shape: RoundedRectangleBorder(
 //                         borderRadius: BorderRadius.circular(16)),
-//                     title: const Text("Select Date Range"),
+//                     title: Text("Select Date Range"),
 //                     content: SizedBox(
 //                       width: 340,
 //                       child: Column(
@@ -300,7 +298,7 @@
 //                               }
 //                             },
 //                           ),
-//                           const SizedBox(height: 12),
+//                           SizedBox(height: 12),
 
 //                           // END DATE
 //                           _dateField(
@@ -325,7 +323,7 @@
 //                     actions: [
 //                       TextButton(
 //                         onPressed: () => Navigator.pop(context),
-//                         child: const Text("Cancel"),
+//                         child: Text("Cancel"),
 //                       ),
 //                       ElevatedButton(
 //                         onPressed: (startDate != null && endDate != null)
@@ -335,7 +333,7 @@
 //                                       start: startDate!, end: endDate!),
 //                                 )
 //                             : null,
-//                         child: const Text("Apply"),
+//                         child: Text("Apply"),
 //                       ),
 //                     ],
 //                   );
@@ -368,12 +366,10 @@
 //         ),
 //         child: Text(
 //           text,
-//           style: TextStyle(
-//             fontWeight: FontWeight.w500,
-//             color: isSelected
+//           style: Theme.of(context).textTheme.titleSmall!.copyWith(//             //             color: isSelected
 //                 ? Theme.of(context).colorScheme.secondary
 //                 : Theme.of(context).colorScheme.onSurface,
-//           ),
+//),
 //         ),
 //       ),
 //     );
@@ -400,11 +396,10 @@
 //               value == null
 //                   ? label
 //                   : "${value.day}/${value.month}/${value.year}",
-//               style: TextStyle(
-//                 color: value == null
+//               style: Theme.of(context).textTheme.bodyMedium!.copyWith(//                 color: value == null
 //                     ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
 //                     : Theme.of(context).colorScheme.onSurface,
-//               ),
+//),
 //             ),
 //             const Icon(Icons.calendar_today, size: 18),
 //           ],
@@ -474,11 +469,8 @@
 //     return Center(
 //       child: Text(
 //         title,
-//         style: TextStyle(
-//           fontSize: 16,
-//           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-//           fontWeight: FontWeight.w500,
-//         ),
+//         style: Theme.of(context).textTheme.titleMedium!.copyWith(//           //           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+//           //),
 //       ),
 //     );
 //   }

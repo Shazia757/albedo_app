@@ -27,7 +27,7 @@ Widget starOfMonthTab(BuildContext context) {
           columnSpacing: 26,
           headingRowHeight: 50,
           dataRowHeight: 68,
-          headingRowColor: MaterialStateProperty.all(const Color(0xFFF4F6FB)),
+          headingRowColor: WidgetStateProperty.all(const Color(0xFFF4F6FB)),
           columns: const [
             DataColumn(label: Text("Mentor")),
             DataColumn(label: Text("M1")),
@@ -45,15 +45,13 @@ Widget starOfMonthTab(BuildContext context) {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(s.name,
-                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Text(s.name, style: Theme.of(context).textTheme.titleSmall),
                     Text(s.id ?? '',
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.6),
-                            fontSize: 12)),
+                                .withOpacity(0.6))),
                   ],
                 )),
 

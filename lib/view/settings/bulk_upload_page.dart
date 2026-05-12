@@ -11,7 +11,7 @@ class BulkUploadPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final isDesktop = Responsive.isDesktop(context);
     final c = Get.put(SettingsController());
 
@@ -31,9 +31,9 @@ class BulkUploadPage extends StatelessWidget {
                     /// TITLE (outside card)
                     Text(
                       "Bulk Upload",
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Get.textTheme.titleLarge,
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     /// MAIN CARD
                     CustomCard(
@@ -43,14 +43,14 @@ class BulkUploadPage extends StatelessWidget {
                         children: [
                           Text(
                             "Download sample CSV templates or upload bulk data for students, teachers, and mentors.",
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cs.onSurface.withOpacity(0.6),
-                              height: 1.4,
-                            ),
+                            style: Get.textTheme
+                                .bodySmall!
+                                .copyWith(
+                                    color: cs.onSurface.withOpacity(0.6),
+                                    height: 1.4),
                           ),
 
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
 
                           /// TEMPLATE BUTTONS
                           _actionButton(
@@ -60,7 +60,7 @@ class BulkUploadPage extends StatelessWidget {
                             color: cs.primary,
                             onTap: () {},
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
 
                           _actionButton(
                             context,
@@ -69,7 +69,7 @@ class BulkUploadPage extends StatelessWidget {
                             color: Colors.green,
                             onTap: () {},
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
 
                           _actionButton(
                             context,
@@ -79,9 +79,9 @@ class BulkUploadPage extends StatelessWidget {
                             onTap: () {},
                           ),
 
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           Divider(color: cs.outline.withOpacity(0.2)),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
 
                           /// PRIMARY UPLOAD BUTTON
                           SizedBox(
@@ -90,7 +90,7 @@ class BulkUploadPage extends StatelessWidget {
                             child: ElevatedButton.icon(
                               onPressed: () {},
                               icon: const Icon(Icons.cloud_upload),
-                              label: const Text("Bulk Upload"),
+                              label: Text("Bulk Upload"),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: cs.primary,
                                 foregroundColor: cs.onPrimary,
@@ -116,11 +116,9 @@ class BulkUploadPage extends StatelessWidget {
   Widget _label(ColorScheme cs, String text) {
     return Text(
       text,
-      style: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-        color: cs.onSurface.withOpacity(0.6),
-      ),
+      style: Get.textTheme
+          .titleSmall!
+          .copyWith(color: cs.onSurface.withOpacity(0.6)),
     );
   }
 
@@ -131,7 +129,7 @@ class BulkUploadPage extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
   }) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return SizedBox(
       width: double.infinity,
@@ -141,10 +139,9 @@ class BulkUploadPage extends StatelessWidget {
         icon: Icon(icon, size: 18, color: color),
         label: Text(
           label,
-          style: TextStyle(
-            color: cs.onSurface,
-            fontWeight: FontWeight.w500,
-          ),
+          style: Get.textTheme
+              .titleSmall!
+              .copyWith(color: cs.onSurface),
         ),
         style: OutlinedButton.styleFrom(
           side: BorderSide(color: cs.outline.withOpacity(0.3)),

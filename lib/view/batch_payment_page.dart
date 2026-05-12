@@ -1,6 +1,5 @@
 import 'package:albedo_app/controller/payment_controller.dart';
 import 'package:albedo_app/model/payment_model.dart';
-import 'package:albedo_app/view/batch_payment_detailed.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -56,7 +55,7 @@ class BatchPaymentPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
                 // ── List ──────────────────────────────────────────────
                 Expanded(
@@ -156,7 +155,7 @@ class BatchPaymentCard extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(width: 14),
+              SizedBox(width: 14),
 
               /// Batch Info
               Expanded(
@@ -167,19 +166,18 @@ class BatchPaymentCard extends StatelessWidget {
                       model.batch.batchName ?? "-",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: cs.onSurface,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge!
+                          .copyWith(color: cs.onSurface),
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(height: 5),
                     Text(
                       model.batch.batchID ?? "",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: cs.outline,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: cs.outline),
                     ),
                   ],
                 ),
@@ -187,14 +185,14 @@ class BatchPaymentCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           Divider(
             height: 1,
             color: cs.outline.withOpacity(.15),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           /// ── MENTOR SECTION ──────────────────
           Container(
@@ -217,30 +215,27 @@ class BatchPaymentCard extends StatelessWidget {
                     color: cs.primary,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         "MENTOR",
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1,
-                          color: cs.primary,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelMedium!
+                            .copyWith(letterSpacing: 1, color: cs.primary),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         model.batch.mentor?.name ?? "No mentor assigned",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: cs.onSurface,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(color: cs.onSurface),
                       ),
                     ],
                   ),
@@ -249,7 +244,7 @@ class BatchPaymentCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           /// ── FOOTER ──────────────────────────
           Row(
@@ -259,14 +254,13 @@ class BatchPaymentCard extends StatelessWidget {
                 size: 18,
                 color: cs.primary,
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(
                 "${model.payments.length} Payments",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleSmall!
+                    .copyWith(color: cs.onSurface),
               ),
               const Spacer(),
               Container(
@@ -282,13 +276,10 @@ class BatchPaymentCard extends StatelessWidget {
                 ),
                 child: Text(
                   (model.status ?? "").toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: model.status == "approved"
-                        ? Colors.green
-                        : Colors.orange,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                      color: model.status == "approved"
+                          ? Colors.green
+                          : Colors.orange),
                 ),
               ),
             ],

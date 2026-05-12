@@ -1,11 +1,4 @@
-import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
-import 'package:albedo_app/model/users/advisor_model.dart';
-import 'package:albedo_app/model/users/coordinator_model.dart';
-import 'package:albedo_app/model/users/mentor_model.dart';
-import 'package:albedo_app/model/users/other_users_model.dart';
-import 'package:albedo_app/model/users/student_model.dart';
-import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -57,15 +50,15 @@ class AddStudentPage extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// PROFILE
                       Align(
                         alignment: Alignment.center,
                         child: Column(
                           children: [
-                            const Text('Profile Photo (Max: 50 MB)'),
-                            const SizedBox(height: 10),
+                            Text('Profile Photo (Max: 50 MB)'),
+                            SizedBox(height: 10),
                             InkWell(
                               onTap: () {},
                               child: const CircleAvatar(
@@ -87,30 +80,30 @@ class AddStudentPage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// NAME
                       CustomWidgets().labelWithAsterisk('Name', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter student name',
                         controller: c.nameController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// EMAIL
                       CustomWidgets()
                           .labelWithAsterisk('Email', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter email address',
                         controller: c.emailController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// PHONE
                       CustomWidgets()
@@ -122,10 +115,10 @@ class AddStudentPage extends StatelessWidget {
                         isNumber: true,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().labelWithAsterisk('WhatsApp Number'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: '+1234567890',
@@ -133,30 +126,30 @@ class AddStudentPage extends StatelessWidget {
                         isNumber: true,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Parent Name'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Enter parent name',
                           controller: c.parentNameController),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Parent Occupation'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                           context: context,
                           hint: 'Enter parent occupation',
                           controller: c.parentOccupationController),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Gender'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       // CustomWidgets().customDropdownField(
                       //   context: context,
                       //   hint: 'Select Gender',
                       //   items: ['Male', 'Female'],
                       //   onChanged: (p0) {},
                       // ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Place'),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
@@ -164,30 +157,30 @@ class AddStudentPage extends StatelessWidget {
                         controller: c.placeController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().labelWithAsterisk('Pincode'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter pincode',
                         controller: c.pincodeController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().labelWithAsterisk('Address'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter address',
                         controller: c.addressController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().labelWithAsterisk('Time Zone'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().customDropdownField(
                         context: context,
                         hint: 'Select Time Zone',
@@ -196,10 +189,10 @@ class AddStudentPage extends StatelessWidget {
                         itemLabel: (item) => item,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().labelWithAsterisk('Mentor'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().customDropdownField(
                         context: context,
                         hint: 'Select Mentor',
@@ -208,10 +201,10 @@ class AddStudentPage extends StatelessWidget {
                         itemLabel: (item) => item,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().labelWithAsterisk('Advisor'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().customDropdownField(
                         context: context,
                         hint: 'Select Advisor',
@@ -220,7 +213,7 @@ class AddStudentPage extends StatelessWidget {
                         itemLabel: (item) => item,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// CHECKBOX
                       Row(
@@ -232,20 +225,20 @@ class AddStudentPage extends StatelessWidget {
                                   c.isAdmissionFeePaid.value = value ?? false,
                             ),
                           ),
-                          const Text('Admission Fee Paid'),
+                          Text('Admission Fee Paid'),
                         ],
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       CustomWidgets().labelWithAsterisk('Comment'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: 'Enter comments',
-                        controller: c.commentController,
+                          context: context,
+                          hint: 'Enter comments',
+                          controller: c.commentController,
                           isMultiline: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Referred By'),
                       Obx(() {
                         final role = c.selectedRole.value;
@@ -257,7 +250,7 @@ class AddStudentPage extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: RadioListTile<String>(
-                                    title: const Text("Mentor"),
+                                    title: Text("Mentor"),
                                     value: "mentor",
                                     groupValue: role,
                                     onChanged: (value) =>
@@ -268,7 +261,7 @@ class AddStudentPage extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: RadioListTile<String>(
-                                    title: const Text("Advisor"),
+                                    title: Text("Advisor"),
                                     value: "advisor",
                                     groupValue: role,
                                     onChanged: (value) =>
@@ -279,7 +272,7 @@ class AddStudentPage extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: RadioListTile<String>(
-                                    title: const Text("Others"),
+                                    title: Text("Others"),
                                     value: "others",
                                     groupValue: role,
                                     onChanged: (value) =>
@@ -290,11 +283,11 @@ class AddStudentPage extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             if (role.isNotEmpty) ...[
                               CustomWidgets().labelWithAsterisk(
                                   role[0].toUpperCase() + role.substring(1)),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               CustomWidgets().customDropdownField<String>(
                                 context: context,
                                 hint: 'Select referral source',
@@ -310,7 +303,7 @@ class AddStudentPage extends StatelessWidget {
                           ],
                         );
                       }),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// BUTTONS
                       Row(
@@ -321,10 +314,13 @@ class AddStudentPage extends StatelessWidget {
                               icon: const SizedBox.shrink(),
                               label: Text(
                                 'Cancel',
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
                               ),
                               style: OutlinedButton.styleFrom(
                                 backgroundColor:
@@ -336,7 +332,7 @@ class AddStudentPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
 
                           /// ADD / UPDATE BUTTON
                           Expanded(
@@ -353,8 +349,10 @@ class AddStudentPage extends StatelessWidget {
                               ),
                               label: Text(
                                 isEdit ? 'Update' : 'Add',
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:

@@ -1,6 +1,5 @@
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
-import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/view/users/add_teacher_page.dart';
 import 'package:flutter/material.dart';

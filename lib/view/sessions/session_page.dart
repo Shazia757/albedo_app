@@ -13,7 +13,6 @@ import 'package:albedo_app/view/coordinator_detailed_page.dart';
 import 'package:albedo_app/view/mentor_detailed_page.dart';
 import 'package:albedo_app/view/sessions/add_session_page.dart';
 import 'package:albedo_app/view/sessions/reschedule_request_page.dart';
-import 'package:albedo_app/view/sessions/session_details_page.dart';
 import 'package:albedo_app/view/students/student_detail_page.dart';
 import 'package:albedo_app/view/teacher/tr_detailed_page.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
@@ -38,7 +37,7 @@ class SessionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final isDesktop = Responsive.isDesktop(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
@@ -57,7 +56,7 @@ class SessionPage extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Get.theme.colorScheme.surface,
       drawer: isDesktop ? null : const DrawerMenu(),
       floatingActionButton: (!isCustom || PermissionService.can("add_sessions"))
           ? FloatingActionButton(
@@ -82,7 +81,7 @@ class SessionPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _TopBar(c: c),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 5),
 
                   // ── STATUS TABS ─────────────────────────────────────
                   Obx(
@@ -108,7 +107,7 @@ class SessionPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   // ── SESSION GRID ────────────────────────────────────
                   Expanded(
@@ -128,7 +127,6 @@ class SessionPage extends StatelessWidget {
                         );
                       }
 
-                      // ✅ EMPTY STATE BASED ON TAB
                       if (isMeetTab ? meets.isEmpty : sessions.isEmpty) {
                         return EmptyState(
                           cs: cs,
@@ -149,59 +147,61 @@ class SessionPage extends StatelessWidget {
                             crossAxisCount = 2;
                           }
 
-                          return MasonryGridView.count(
-                            padding: const EdgeInsets.only(bottom: 80),
-                            crossAxisCount: crossAxisCount,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
+                          return ClipRect(
+                            child: ScrollConfiguration(
+                              behavior: const ScrollBehavior()
+                                  .copyWith(scrollbars: false),
+                              child: MasonryGridView.count(
+                                padding: const EdgeInsets.only(bottom: 80),
+                                crossAxisCount: crossAxisCount,
+                                mainAxisSpacing: 8,
+                                crossAxisSpacing: 8,
+                                itemCount:
+                                    isMeetTab ? meets.length : sessions.length,
+                                itemBuilder: (_, i) {
+                                  if (isMeetTab) {
+                                    final meet = meets[i];
 
-                            // ✅ SWITCH COUNT
-                            itemCount:
-                                isMeetTab ? meets.length : sessions.length,
+                                    return PremiumInfoCard(
+                                      id: meet.id ?? "-",
+                                      title: meet.title ?? "Untitled Meet",
 
-                            itemBuilder: (_, i) {
-                              // ✅ SWITCH DATA SOURCE
-                              if (isMeetTab) {
-                                final meet = meets[i];
+                                      subtitle: _formatDate(meet.date),
 
-                                return PremiumInfoCard(
-                                  id: meet.id ?? "-",
-                                  title: meet.title ?? "Untitled Meet",
+                                      // 👉 Status
+                                      status: meet.status,
+                                      statusColor:
+                                          _getStatusColor(meet.status, context),
 
-                                  // 👉 Subtitle = date
-                                  subtitle: _formatDate(meet.date),
+                                      // 👉 Extra Info (time + members)
+                                      extraInfo:
+                                          "${meet.startTime} - ${meet.endTime}",
+                                      extraWidget:
+                                          _buildMembersChips(meet, context),
 
-                                  // 👉 Status
-                                  status: meet.status,
-                                  statusColor:
-                                      _getStatusColor(meet.status, context),
+                                      footerText: "",
 
-                                  // 👉 Extra Info (time + members)
-                                  extraInfo:
-                                      "${meet.startTime} - ${meet.endTime}",
-                                  extraWidget:
-                                      _buildMembersChips(meet, context),
+                                      onTap: () => showMeetDetails(meet),
 
-                                  footerText: "",
+                                      actions: [],
+                                    );
+                                  }
 
-                                  onTap: () => showMeetDetails(meet),
+                                  final session = sessions[i];
 
-                                  actions: [],
-                                );
-                              }
-
-                              final session = sessions[i];
-
-                              return _SessionCard(
-                                session: session,
-                                statusColor:
-                                    getStatusColor(context, session.status),
-                                onTap: () =>
-                                    // Get.to(() => SessionDetailsPage(
-                                    //     sessions: sessions, initialIndex: i))
-                                    _openSessionDetails(context, sessions, i),
-                              );
-                            },
+                                  return _SessionCard(
+                                    session: session,
+                                    statusColor:
+                                        getStatusColor(context, session.status),
+                                    onTap: () =>
+                                        // Get.to(() => SessionDetailsPage(
+                                        //     sessions: sessions, initialIndex: i))
+                                        _openSessionDetails(
+                                            context, sessions, i),
+                                  );
+                                },
+                              ),
+                            ),
                           );
                         },
                       );
@@ -222,7 +222,7 @@ class SessionPage extends StatelessWidget {
   }
 
   Widget _buildMembersChips(Meet meet, BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     final roles = meet.members.map((m) => m.role).toSet().toList();
 
@@ -238,11 +238,7 @@ class SessionPage extends StatelessWidget {
           ),
           child: Text(
             role ?? "-",
-            style: TextStyle(
-              fontSize: 11,
-              color: cs.secondary,
-              fontWeight: FontWeight.w500,
-            ),
+            style: Get.textTheme.labelSmall!.copyWith(color: cs.secondary),
           ),
         );
       }).toList(),
@@ -251,7 +247,7 @@ class SessionPage extends StatelessWidget {
 
   // 🎨 STATUS COLOR
   Color _getStatusColor(String? status, BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     switch (status) {
       case "finished":
@@ -295,7 +291,7 @@ class SessionPage extends StatelessWidget {
     CustomWidgets().showCustomDialog(
       isViewOnly: true,
       context: context,
-      title: const Text("Session Details"),
+      title: Text("Session Details"),
       icon: Icons.visibility_outlined,
       formKey: GlobalKey<FormState>(),
       submitText: "Close",
@@ -304,7 +300,7 @@ class SessionPage extends StatelessWidget {
         Obx(() {
           final index = c.currentSessionIndex.value;
           final data = sessions[index];
-          final cs = Theme.of(context).colorScheme;
+          final cs = Get.theme.colorScheme;
 
           return SizedBox(
             height: MediaQuery.of(context).size.height * 0.75,
@@ -324,9 +320,9 @@ class SessionPage extends StatelessWidget {
                       children: [
                         Text(
                           "Session ${index + 1} of ${sessions.length}",
-                          style: Theme.of(context).textTheme.labelMedium,
+                          style: Get.textTheme.labelMedium,
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(
@@ -430,14 +426,14 @@ class SessionPage extends StatelessWidget {
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16),
 
                         DetailSectionLabel(
                           label: "Schedule & Info",
                           icon: Icons.event_outlined,
                         ),
 
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
 
                         EditableInfoCard(
                           type: "schedule",
@@ -466,14 +462,14 @@ class SessionPage extends StatelessWidget {
                           ],
                         ),
 
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16),
 
                         DetailSectionLabel(
                           label: "Status",
                           icon: Icons.flag_outlined,
                         ),
 
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
 
                         infoCard(
                           context,
@@ -488,7 +484,7 @@ class SessionPage extends StatelessWidget {
                           ],
                         ),
 
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
 
                         // ───────── REPORT SECTION ─────────
                         if (data.status == 'pending')
@@ -506,21 +502,18 @@ class SessionPage extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                          "No session report available yet."),
-                                      const SizedBox(height: 8),
+                                      Text("No session report available yet."),
+                                      SizedBox(height: 8),
                                       ElevatedButton.icon(
                                         onPressed: () {
                                           c.openSessionReportDialog(data);
                                         },
                                         icon: const Icon(Icons.add,
                                             color: Colors.white),
-                                        label: const Text(
+                                        label: Text(
                                           "Add Report",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 13,
-                                          ),
+                                          style: Get.textTheme.bodySmall!
+                                              .copyWith(color: Colors.white),
                                         ),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
@@ -556,11 +549,11 @@ class SessionPage extends StatelessWidget {
                                         onPressed: () =>
                                             c.openSessionReportDialog(data),
                                         icon: const Icon(Icons.edit, size: 18),
-                                        label: const Text("Edit"),
+                                        label: Text("Edit"),
                                       ),
                                     ),
 
-                                    const SizedBox(height: 8),
+                                    SizedBox(height: 8),
 
                                     if (!report.isCompleted &&
                                         report.reason != null)
@@ -573,8 +566,8 @@ class SessionPage extends StatelessWidget {
                                         ),
                                         child: Text(
                                           "Reason: ${report.reason}",
-                                          style: const TextStyle(
-                                              color: Colors.red),
+                                          style: Get.textTheme.bodyMedium!
+                                              .copyWith(color: Colors.red),
                                         ),
                                       ),
 
@@ -601,7 +594,7 @@ class SessionPage extends StatelessWidget {
                                 final report = c.reportRx.value;
 
                                 if (report == null) {
-                                  return const Text("No report available");
+                                  return Text("No report available");
                                 }
 
                                 return Column(
@@ -611,16 +604,16 @@ class SessionPage extends StatelessWidget {
                                     ListTile(
                                       contentPadding: EdgeInsets.zero,
                                       title: Text(report.studentName),
-                                      subtitle: const Text("Session Report"),
+                                      subtitle: Text("Session Report"),
                                       trailing: TextButton.icon(
                                         onPressed: () =>
                                             c.openSessionReportDialog(data),
                                         icon: const Icon(Icons.edit, size: 18),
-                                        label: const Text("Edit Report"),
+                                        label: Text("Edit Report"),
                                       ),
                                     ),
 
-                                    const SizedBox(height: 8),
+                                    SizedBox(height: 8),
 
                                     // 🎯 ALWAYS SHOW FOR COMPLETED
                                     _infoRow(
@@ -669,7 +662,7 @@ class SessionPage extends StatelessWidget {
                               },
                             ),
                           ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Expanded(
                           child: DetailActionButton(
                             label: "Support",
@@ -679,7 +672,7 @@ class SessionPage extends StatelessWidget {
                           ),
                         ),
                         if (data.status == 'pending') ...[
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Expanded(
                             child: DetailActionButton(
                               label: "Complete",
@@ -693,7 +686,7 @@ class SessionPage extends StatelessWidget {
                           ),
                         ],
                         if (!isCoordinator) ...[
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Expanded(
                             child: DetailActionButton(
                               label: "Delete",
@@ -713,7 +706,7 @@ class SessionPage extends StatelessWidget {
                     ),
                   ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 if (data.status == 'started')
                   Row(
@@ -726,7 +719,7 @@ class SessionPage extends StatelessWidget {
                           color: cs.primary,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(
                         child: DetailActionButton(
                           color: cs.secondary,
@@ -754,16 +747,14 @@ class SessionPage extends StatelessWidget {
             width: 90,
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Get.theme.colorScheme.onSurface.withOpacity(0.6),
-              ),
+              style: Get.textTheme.bodySmall!.copyWith(
+                  color: Get.theme.colorScheme.onSurface.withOpacity(0.6)),
             ),
           ),
           Expanded(
             child: Text(
               value ?? "-",
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: Get.textTheme.titleSmall,
             ),
           ),
         ],
@@ -775,10 +766,10 @@ class SessionPage extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, size: 16),
-        const SizedBox(width: 6),
+        SizedBox(width: 6),
         Text(
           text,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: Get.textTheme.titleSmall,
         ),
       ],
     );
@@ -788,7 +779,7 @@ class SessionPage extends StatelessWidget {
   void _addSupport(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text('Add New Ticket'),
+      title: Text('Add New Ticket'),
       icon: Icons.support_agent_outlined,
       formKey: GlobalKey<FormState>(),
       sections: [
@@ -799,38 +790,40 @@ class SessionPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomWidgets().labelWithAsterisk('Title', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                     context: context,
                     hint: 'Enter ticket title',
                     controller: c.titleController),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Category', required: true),
-                const SizedBox(height: 8),
-                // CustomWidgets().customDropdownField(
-                //   context: context,
-                //   hint: 'Select category',
-                //   items: c.categoryList,
-                //   onChanged: (p0) {},
-                // ),
-                const SizedBox(height: 12),
+                SizedBox(height: 8),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select category',
+                  itemLabel: (item) => item,
+                  items: c.categoryList,
+                  onChanged: (p0) {},
+                ),
+                SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Priority', required: true),
-                const SizedBox(height: 8),
-                // CustomWidgets().customDropdownField(
-                //   context: context,
-                //   hint: 'Select priority',
-                //   items: ['High', 'Medium', 'Low'],
-                //   onChanged: (p0) {},
-                // ),
-                const SizedBox(height: 12),
+                SizedBox(height: 8),
+                CustomWidgets().customDropdownField(
+                  context: context,
+                  hint: 'Select priority',
+                  itemLabel: (item) => item,
+                  items: ['High', 'Medium', 'Low'],
+                  onChanged: (p0) {},
+                ),
+                SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('User', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Obx(() => Row(
                       children: [
                         Expanded(
                           child: RadioListTile(
                             dense: true,
-                            title: const Text('Student'),
+                            title: Text('Student'),
                             value: "student",
                             groupValue: c.selectedType.value,
                             onChanged: (value) => c.selectedType.value = value!,
@@ -839,7 +832,7 @@ class SessionPage extends StatelessWidget {
                         Expanded(
                           child: RadioListTile(
                             dense: true,
-                            title: const Text('Teacher'),
+                            title: Text('Teacher'),
                             value: "teacher",
                             groupValue: c.selectedType.value,
                             onChanged: (value) => c.selectedType.value = value!,
@@ -847,7 +840,7 @@ class SessionPage extends StatelessWidget {
                         ),
                       ],
                     )),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Obx(() {
                   if (c.selectedType.value == 'student') {
                     return CustomWidgets().customDropdownField(
@@ -865,11 +858,11 @@ class SessionPage extends StatelessWidget {
                         itemLabel: (item) => item.name,
                         hint: 'Select teacher');
                   }
-                  return const SizedBox();
+                  return SizedBox();
                 }),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Attachment'),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().attachmentStyledField(
                   context: context,
                   label: "Attachment",
@@ -878,17 +871,17 @@ class SessionPage extends StatelessWidget {
                   onTap: () {},
                   onClear: () {},
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 CustomWidgets()
                     .labelWithAsterisk('Description', required: true),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
                   hint: 'Describe the issue...',
                   controller: c.descriptionController,
                   isMultiline: true,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
               ],
             ),
           ),
@@ -902,7 +895,7 @@ class SessionPage extends StatelessWidget {
   void editSession(BuildContext context) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text('Edit Session'),
+      title: Text('Edit Session'),
       icon: Icons.edit_outlined,
       formKey: GlobalKey<FormState>(),
       sections: [
@@ -919,7 +912,7 @@ class SessionPage extends StatelessWidget {
                       children: [
                         CustomWidgets()
                             .labelWithAsterisk('Session Date', required: true),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         CustomWidgets().customDatePickerField(
                             context: context,
                             selectedDate: c.selectedDate,
@@ -927,14 +920,14 @@ class SessionPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CustomWidgets()
                             .labelWithAsterisk('Session Time', required: true),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         CustomWidgets().timePickerStyledField(
                             selectedTime: c.selectedTime,
                             context: context,
@@ -946,7 +939,7 @@ class SessionPage extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _DialogSectionCard(
               icon: Icons.school_outlined,
               title: "Session Details",
@@ -954,7 +947,7 @@ class SessionPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomWidgets().labelWithAsterisk('Duration', required: true),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   // CustomWidgets().customDropdownField(
                   //   context: context,
                   //   hint: 'Select Duration',
@@ -962,9 +955,9 @@ class SessionPage extends StatelessWidget {
                   //       c.durationOptions.map((e) => "${(e)} minutes").toList(),
                   //   onChanged: (p0) {},
                   // ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   CustomWidgets().labelWithAsterisk('Teacher', required: true),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   // CustomWidgets().customDropdownField(
                   //     context: context,
                   //     hint: 'Select Teacher',
@@ -974,7 +967,7 @@ class SessionPage extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _DialogSectionCard(
               icon: Icons.payments_outlined,
               title: "Payment",
@@ -983,7 +976,7 @@ class SessionPage extends StatelessWidget {
                 children: [
                   CustomWidgets().labelWithAsterisk(
                       'Teacher Salary (per hour — optional)'),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   CustomWidgets().dropdownStyledTextField(
                       isNumber: true,
                       context: context,
@@ -1000,7 +993,7 @@ class SessionPage extends StatelessWidget {
   }
 
   Color getStatusColor(BuildContext context, String status) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     switch (status) {
       case "started":
         return const Color(0xFF1D9E75); // teal — active/live
@@ -1024,28 +1017,28 @@ class SessionPage extends StatelessWidget {
   void _markSessionCompleted(BuildContext context, DateTime date) {
     CustomWidgets().showCustomDialog(
       context: context,
-      title: const Text('Mark Session as Completed'),
+      title: Text('Mark Session as Completed'),
       formKey: GlobalKey<FormState>(),
       sections: [
         Column(
           children: [
             CustomWidgets().labelWithAsterisk('Session Date', required: true),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             CustomWidgets().customDatePickerField(
                 context: context,
                 selectedDate: c.selectedDate,
                 controller: c.dateController),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             CustomWidgets().labelWithAsterisk('Start Time', required: true),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             CustomWidgets().timePickerStyledField(
                 selectedTime: c.selectedTime,
                 context: context,
                 hint: 'Time',
                 controller: c.timeController),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             CustomWidgets().labelWithAsterisk('Duration', required: true),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             // CustomWidgets().customDropdownField(
             //   context: context,
             //   hint: 'Select Duration',
@@ -1093,12 +1086,12 @@ class SessionPage extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         // 👥 MEMBERS HEADER
         _sectionLabel("Members", Icons.group_outlined),
 
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
 
         // 👥 MEMBERS LIST
         ...meet.members.map((m) {
@@ -1120,7 +1113,7 @@ class SessionPage extends StatelessWidget {
                     (m.name ?? "-").substring(0, 1).toUpperCase(),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
 
                 // NAME + EMAIL
                 Expanded(
@@ -1129,17 +1122,13 @@ class SessionPage extends StatelessWidget {
                     children: [
                       Text(
                         m.name ?? "-",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Get.textTheme.titleSmall,
                       ),
                       Text(
                         m.email ?? "-",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color:
-                              Get.theme.colorScheme.onSurface.withOpacity(0.6),
-                        ),
+                        style: Get.textTheme.bodySmall!.copyWith(
+                            color: Get.theme.colorScheme.onSurface
+                                .withOpacity(0.6)),
                       ),
                     ],
                   ),
@@ -1155,16 +1144,14 @@ class SessionPage extends StatelessWidget {
                   ),
                   child: Text(
                     m.role ?? "-",
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Get.theme.colorScheme.secondary,
-                    ),
+                    style: Get.textTheme.labelSmall!
+                        .copyWith(color: Get.theme.colorScheme.secondary),
                   ),
                 ),
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -1186,7 +1173,7 @@ class _SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final textPrimary = cs.onSurface;
     final textSecondary = cs.onSurface.withOpacity(0.5);
     final auth = Get.find<AuthController>();
@@ -1228,12 +1215,10 @@ class _SessionCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               session.id ?? "—",
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontFamily: 'monospace',
-                                color: textSecondary,
-                                letterSpacing: 0.3,
-                              ),
+                              style: Get.textTheme.labelSmall!.copyWith(
+                                  fontFamily: 'monospace',
+                                  color: textSecondary,
+                                  letterSpacing: 0.3),
                             ),
                           ),
                           StatusBadge(
@@ -1241,7 +1226,7 @@ class _SessionCard extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
 
                       Divider(
                         height: 16,
@@ -1249,7 +1234,7 @@ class _SessionCard extends StatelessWidget {
                         color: cs.outline.withOpacity(0.12),
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       // ── Row 2: Student / Teacher with profile pictures ────────────
                       Row(
@@ -1267,7 +1252,7 @@ class _SessionCard extends StatelessWidget {
                                     fit: BoxFit.contain,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -1275,21 +1260,17 @@ class _SessionCard extends StatelessWidget {
                                     children: [
                                       Text(
                                         session.student?.name ?? "—",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500,
-                                          color: textPrimary,
-                                        ),
+                                        style: Get.textTheme.titleSmall!
+                                            .copyWith(color: textPrimary),
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      const SizedBox(height: 2),
+                                      SizedBox(height: 2),
                                       Text(
                                         "ID: ${session.student?.studentId ?? '—'}",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: textSecondary,
-                                          fontFamily: 'monospace',
-                                        ),
+                                        style: Get.textTheme.labelSmall!
+                                            .copyWith(
+                                                color: textSecondary,
+                                                fontFamily: 'monospace'),
                                       ),
                                     ],
                                   ),
@@ -1298,7 +1279,7 @@ class _SessionCard extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12),
 
                           // ── Teacher ─────────────────────────────
                           Expanded(
@@ -1314,7 +1295,7 @@ class _SessionCard extends StatelessWidget {
                                     fit: BoxFit.contain,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -1322,22 +1303,18 @@ class _SessionCard extends StatelessWidget {
                                     children: [
                                       Text(
                                         session.teacher?.name ?? "—",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500,
-                                          color: textPrimary,
-                                        ),
+                                        style: Get.textTheme.titleSmall!
+                                            .copyWith(color: textPrimary),
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.right,
                                       ),
-                                      const SizedBox(height: 2),
+                                      SizedBox(height: 2),
                                       Text(
                                         "ID: ${session.teacher?.id ?? '—'}",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: textSecondary,
-                                          fontFamily: 'monospace',
-                                        ),
+                                        style: Get.textTheme.labelSmall!
+                                            .copyWith(
+                                                color: textSecondary,
+                                                fontFamily: 'monospace'),
                                       ),
                                     ],
                                   ),
@@ -1367,7 +1344,7 @@ class _SessionCard extends StatelessWidget {
                                     label: "Subject",
                                     value: session.package?.subjectName ?? "—",
                                     textSecondary: textSecondary),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 MetaItem(
                                     label: "Class",
                                     value: session.className ?? "—",
@@ -1375,7 +1352,7 @@ class _SessionCard extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1385,7 +1362,7 @@ class _SessionCard extends StatelessWidget {
                                     value: formatDate(
                                         session.date ?? DateTime.now()),
                                     textSecondary: textSecondary),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 MetaItem(
                                     label: "Time",
                                     value: formatTime(
@@ -1397,7 +1374,7 @@ class _SessionCard extends StatelessWidget {
                         ],
                       ),
                       if (isStudent || isTeacher) ...[
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10),
                         TextButton.icon(
                           onPressed: () =>
                               _openRescheduleDialog(context, session),
@@ -1406,12 +1383,10 @@ class _SessionCard extends StatelessWidget {
                             size: 18,
                             color: Colors.white,
                           ),
-                          label: const Text(
+                          label: Text(
                             "Reschedule",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                            ),
+                            style: Get.textTheme.bodySmall!
+                                .copyWith(color: Colors.white),
                           ),
                           style: TextButton.styleFrom(
                             backgroundColor: cs.primary.withOpacity(0.8),
@@ -1445,7 +1420,7 @@ class _SessionCard extends StatelessWidget {
     CustomWidgets().showCustomDialog(
       context: context,
       formKey: GlobalKey<FormState>(),
-      title: const Text("Reschedule Session"),
+      title: Text("Reschedule Session"),
       isViewOnly: false,
       onSubmit: () {
         // TODO: submit logic
@@ -1465,30 +1440,30 @@ class _SessionCard extends StatelessWidget {
             CustomWidgets()
                 .labelWithAsterisk("Reason for Rescheduling", required: true),
 
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             CustomWidgets().dropdownStyledTextField(
                 context: context,
                 hint: 'Enter reason...',
                 controller: reasonController,
                 isMultiline: true),
 
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // 📅 New Date
             CustomWidgets().labelWithAsterisk("New Date", required: true),
 
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             CustomWidgets().dropdownStyledTextField(
               context: context,
               hint: "Select date",
               controller: dateController,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // ⏰ New Time
             CustomWidgets().labelWithAsterisk("New Time", required: true),
 
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             CustomWidgets().dropdownStyledTextField(
                 context: context,
                 hint: "Select time",
@@ -1511,6 +1486,7 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final isStudent = role == 'student';
 
     final isCustom = ![
       "admin",
@@ -1559,7 +1535,8 @@ class _TopBar extends StatelessWidget {
           c.applyFilters();
         },
       ),
-      onRequestTap: (!isCustom || PermissionService.can("reschedule_requests"))
+      onRequestTap: (!isStudent &&
+              (!isCustom || PermissionService.can("reschedule_requests")))
           ? () => Get.to(() => RescheduleRequestsPage())
           : null,
     );
@@ -1570,7 +1547,6 @@ class _TopBar extends StatelessWidget {
 // DIALOG HELPERS
 // ═══════════════════════════════════════════════════════════════════════
 
-/// Styled section card used inside dialogs
 class _DialogSectionCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -1584,7 +1560,7 @@ class _DialogSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -1599,18 +1575,14 @@ class _DialogSectionCard extends StatelessWidget {
           Row(
             children: [
               Icon(icon, size: 16, color: cs.primary),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
-                ),
+                style: Get.textTheme.titleSmall!.copyWith(color: cs.onSurface),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           child,
         ],
       ),

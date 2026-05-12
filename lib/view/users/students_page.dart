@@ -62,426 +62,230 @@ class StudentsPage extends StatelessWidget {
         children: [
           if (isDesktop) DrawerMenu(),
           Expanded(
-            child: Column(
-              children: [
-                HeaderWithSearch(
-                  title: "Students",
-                  hint: "Search students by name, ID or email...",
-                  isSearching: c.isSearching,
-                  searchQuery: c.searchQuery,
-                  onSearchChanged: () => c.applyFilters(),
-
-                  onSortTap: () =>
-                      CustomWidgets().showSortSheet<StudentSortType>(
-                    title: "Sort Students",
-                    options: [
-                      SortOption(
-                          label: "Newest",
-                          value: StudentSortType.newest,
-                          icon: Icons.schedule),
-                      SortOption(
-                          label: "Oldest",
-                          value: StudentSortType.oldest,
-                          icon: Icons.history),
-                      SortOption(
-                          label: "Name A-Z",
-                          value: StudentSortType.name,
-                          icon: Icons.sort_by_alpha),
-                    ],
-                    selectedValue: c.sortType.value,
-                    onSelected: (val) {
-                      c.sortType.value = val;
-                      c.applyFilters();
-                    },
-                  ),
-
-                  /// 🔥 NEW ACTION MENU
-                  actions: [
-                    PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      offset: const Offset(0, 45),
-                      color: Theme.of(context).colorScheme.surface,
-                      elevation: 6,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      onSelected: (value) {
-                        switch (value) {
-                          case "request":
-                            if (canSeeRequests) {
-                              Get.to(() => RefundRequestsPage());
-                            }
-                            break;
-
-                          case "bulk_upload":
-                            Get.to(() => const BulkUploadPage());
-                            break;
-                        }
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Column(
+                children: [
+                  HeaderWithSearch(
+                    title: "Students",
+                    hint: "Search students by name, ID or email...",
+                    isSearching: c.isSearching,
+                    searchQuery: c.searchQuery,
+                    onSearchChanged: () => c.applyFilters(),
+                    onSortTap: () =>
+                        CustomWidgets().showSortSheet<StudentSortType>(
+                      title: "Sort Students",
+                      options: [
+                        SortOption(
+                            label: "Newest",
+                            value: StudentSortType.newest,
+                            icon: Icons.schedule),
+                        SortOption(
+                            label: "Oldest",
+                            value: StudentSortType.oldest,
+                            icon: Icons.history),
+                        SortOption(
+                            label: "Name A-Z",
+                            value: StudentSortType.name,
+                            icon: Icons.sort_by_alpha),
+                      ],
+                      selectedValue: c.sortType.value,
+                      onSelected: (val) {
+                        c.sortType.value = val;
+                        c.applyFilters();
                       },
-                      itemBuilder: (context) => [
-                        if (canSeeRequests)
+                    ),
+                    actions: [
+                      PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        offset: const Offset(0, 45),
+                        color: Theme.of(context).colorScheme.surface,
+                        elevation: 6,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        onSelected: (value) {
+                          switch (value) {
+                            case "request":
+                              if (canSeeRequests) {
+                                Get.to(() => RefundRequestsPage());
+                              }
+                              break;
+
+                            case "bulk_upload":
+                              Get.to(() => const BulkUploadPage());
+                              break;
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          if (canSeeRequests)
+                            PopupMenuItem(
+                              value: "request",
+                              child: MenuItem(
+                                icon: Icons.inbox_outlined,
+                                title: "Requests",
+                              ),
+                            ),
                           PopupMenuItem(
-                            value: "request",
+                            value: "bulk_upload",
                             child: MenuItem(
-                              icon: Icons.inbox_outlined,
-                              title: "Requests",
+                              icon: Icons.upload_file,
+                              title: "Bulk Upload",
                             ),
                           ),
-                        PopupMenuItem(
-                          value: "bulk_upload",
-                          child: MenuItem(
-                            icon: Icons.upload_file,
-                            title: "Bulk Upload",
-                          ),
+                        ],
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Icon(Icons.more_vert,
+                              color: Theme.of(context).colorScheme.primary),
                         ),
-                      ],
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Icon(Icons.more_vert),
-                      ),
-                    )
-                  ],
-                ),
-
-                /// 🧭 Tabs
-                Obx(
-                  () => CustomWidgets().customTabs(
-                    context,
-                    tabs: tabs,
-                    selectedIndex: c.selectedTab.value,
-                    onTap: (index) {
-                      c.selectedTab.value = index;
-                      c.applyFilters();
-                    },
-                    getCount: (index) {
-                      switch (index) {
-                        case 0:
-                          return c.allCount;
-                        case 1:
-                          return c.activeCount;
-                        case 2:
-                          return c.batchCount;
-                        case 3:
-                          return c.tbaCount;
-                        case 4:
-                          return c.inactiveCount;
-                        default:
-                          return 0;
-                      }
-                    },
+                      )
+                    ],
                   ),
-                ),
+                  SizedBox(height: 5),
 
-                const SizedBox(height: 10),
+                  /// 🧭 Tabs
+                  Obx(
+                    () => CustomWidgets().customTabs(
+                      context,
+                      tabs: tabs,
+                      selectedIndex: c.selectedTab.value,
+                      onTap: (index) {
+                        c.selectedTab.value = index;
+                        c.applyFilters();
+                      },
+                      getCount: (index) {
+                        switch (index) {
+                          case 0:
+                            return c.allCount;
+                          case 1:
+                            return c.activeCount;
+                          case 2:
+                            return c.batchCount;
+                          case 3:
+                            return c.tbaCount;
+                          case 4:
+                            return c.inactiveCount;
+                          default:
+                            return 0;
+                        }
+                      },
+                    ),
+                  ),
 
-                /// 📋 List
-                Expanded(
-                  child: Obx(() {
-                    if (c.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (c.filteredStudents.isEmpty) {
-                      return const Center(child: Text("No students found"));
-                    }
+                  SizedBox(height: 10),
 
-                    return LayoutBuilder(builder: (context, constraints) {
-                      int crossAxisCount = 1;
-
-                      if (constraints.maxWidth > 1200) {
-                        crossAxisCount = 3;
-                      } else if (constraints.maxWidth > 700) {
-                        crossAxisCount = 2;
+                  /// 📋 List
+                  Expanded(
+                    child: Obx(() {
+                      if (c.isLoading.value) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      if (c.filteredStudents.isEmpty) {
+                        return EmptyState(
+                            cs: Theme.of(context).colorScheme,
+                            title: 'No students found',
+                            subtitle: '',
+                            icon: Icons.group);
                       }
 
-                      return MasonryGridView.count(
-                          crossAxisCount: crossAxisCount,
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          itemCount: c.filteredStudents.length,
-                          itemBuilder: (context, index) {
-                            final student = c.filteredStudents[index];
-                            final isActive = student?.status == "Active";
-                            final cs = Theme.of(context).colorScheme;
+                      return LayoutBuilder(builder: (context, constraints) {
+                        int crossAxisCount = 1;
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: PremiumInfoCard(
-                                extraInfo: '',
-                                id: student.studentId ?? "NULL",
-                                title: student.name ?? "NULL",
-                                subtitle: student.email ?? "NULL",
-                                status: student.status,
-                                statusColor: isActive ? cs.primary : cs.error,
-                                onTap: () => (!isCustom ||
-                                        PermissionService.can("view_students"))
-                                    ? Get.to(() => StudentDetailsPage(
-                                        student: student, initialIndex: index))
-                                    : null,
-                                footerText:
-                                    "Joined • ${student.joinedAt.toString().substring(0, 16)}",
-                                actions: [
-                                  InfoAction(
-                                    icon: Icons.dashboard,
-                                    color: cs.primary,
-                                    onTap: () {
-                                      final auth = Get.find<AuthController>();
-                                      final user = studentToUser(student);
+                        if (constraints.maxWidth > 1200) {
+                          crossAxisCount = 3;
+                        } else if (constraints.maxWidth > 700) {
+                          crossAxisCount = 2;
+                        }
 
-                                      auth.startImpersonation(user);
-                                      Get.offAll(() => const Root());
-                                    },
-                                  ),
-                                  if ((!isCustom ||
+                        return MasonryGridView.count(
+                            crossAxisCount: crossAxisCount,
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            itemCount: c.filteredStudents.length,
+                            itemBuilder: (context, index) {
+                              final student = c.filteredStudents[index];
+                              final isActive = student.status == "Active";
+                              final cs = Theme.of(context).colorScheme;
+
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  child: PremiumInfoCard(
+                                    extraInfo: '',
+                                    id: student.studentId ?? "NULL",
+                                    title: student.name ?? "NULL",
+                                    subtitle: student.email ?? "NULL",
+                                    status: student.status,
+                                    statusColor:
+                                        isActive ? cs.primary : cs.error,
+                                    onTap: () => (!isCustom ||
+                                            PermissionService.can(
+                                                "view_students"))
+                                        ? Get.to(() => StudentDetailsPage(
+                                            student: student,
+                                            initialIndex: index))
+                                        : null,
+                                    footerText:
+                                        "Joined • ${student.joinedAt.toString().substring(0, 16)}",
+                                    actions: [
+                                      InfoAction(
+                                        icon: Icons.dashboard,
+                                        color: cs.primary,
+                                        onTap: () {
+                                          final auth =
+                                              Get.find<AuthController>();
+                                          final user = studentToUser(student);
+
+                                          auth.startImpersonation(user);
+                                          Get.offAll(() => const Root());
+                                        },
+                                      ),
+                                      if ((!isCustom ||
+                                              PermissionService.can(
+                                                  "edit_students")) &&
+                                          student.status != 'Inactive')
+                                        InfoAction(
+                                          icon: Icons.edit,
+                                          color: cs.secondary,
+                                          onTap: () {
+                                            c.loadStudents(student);
+                                            Get.to(() =>
+                                                AddStudentPage(isEdit: true));
+                                          },
+                                        ),
+                                      if (!isCustom ||
                                           PermissionService.can(
-                                              "edit_students")) &&
-                                      student?.status != 'Inactive')
-                                    InfoAction(
-                                      icon: Icons.edit,
-                                      color: cs.secondary,
-                                      onTap: () {
-                                        c.loadStudents(student!);
-                                        Get.to(
-                                            () => AddStudentPage(isEdit: true));
-                                      },
-                                    ),
-                                  if (!isCustom ||
-                                      PermissionService.can(
-                                          "deactivate_students"))
-                                    InfoAction(
-                                      icon: Icons.block,
-                                      color: cs.error,
-                                      onTap: () =>
-                                          c.handleDeactivate(context, student),
-                                    ),
-                                  if (!isCustom ||
-                                      (PermissionService.can(
-                                          "delete_students")))
-                                    InfoAction(
-                                        icon: Icons.delete,
-                                        color: cs.error,
-                                        onTap: () =>
-                                            c.handleDelete(context, student)),
-                                ],
-                              ),
-                            );
-                          });
-                    });
-                  }),
-                ),
-              ],
+                                              "deactivate_students"))
+                                        InfoAction(
+                                          icon: Icons.block,
+                                          color: cs.error,
+                                          onTap: () => c.handleDeactivate(
+                                              context, student),
+                                        ),
+                                      if (!isCustom ||
+                                          (PermissionService.can(
+                                              "delete_students")))
+                                        InfoAction(
+                                            icon: Icons.delete,
+                                            color: cs.error,
+                                            onTap: () => c.handleDelete(
+                                                context, student)),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            });
+                      });
+                    }),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  void editStudent(BuildContext context) {
-    CustomWidgets().showCustomDialog(
-      context: context,
-      title: Text('Edit Student'),
-      icon: Icons.edit,
-      formKey: GlobalKey<FormState>(),
-      sections: [
-        SizedBox(
-            height: MediaQuery.of(context).size.height * 0.5,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Text('Profile Photo (Max: 50 MB)'),
-                  const SizedBox(height: 10),
-                  InkWell(
-                    onTap: () {},
-                    child: CircleAvatar(
-                      radius: 35,
-                      child: ClipOval(
-                        child: SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Name', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context, hint: '', controller: c.nameController),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Email', required: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.emailController),
-                  const SizedBox(height: 10),
-                  CustomWidgets()
-                      .labelWithAsterisk('Phone Number', required: true),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.phoneController,
-                      isNumber: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('WhatsApp Number'),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.whatsappController,
-                      isNumber: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Parent Name'),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.parentNameController),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Parent Occupation'),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.parentOccupationController),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Gender'),
-                  const SizedBox(height: 10),
-                  // CustomWidgets().customDropdownField(
-                  //   context: context,
-                  //   hint: 'Select Gender',
-                  //   items: ['Male', 'Female'],
-                  //   onChanged: (p0) {},
-                  // ),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Place'),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.placeController),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Pincode'),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.pincodeController),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Address'),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.addressController),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Time Zone'),
-                  const SizedBox(height: 10),
-                  // CustomWidgets().customDropdownField(
-                  //   context: context,
-                  //   hint: 'Select Time Zone',
-                  //   items: [],
-                  //   onChanged: (p0) {},
-                  // ),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Mentor'),
-                  const SizedBox(height: 10),
-                  // CustomWidgets().customDropdownField(
-                  //   context: context,
-                  //   hint: 'Select Mentor',
-                  //   items: c.mentorsList,
-                  //   onChanged: (p0) {},
-                  // ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Obx(
-                        () => Checkbox(
-                          value: c.isAdmissionFeePaid.value,
-                          onChanged: (value) => c.isAdmissionFeePaid.value =
-                              !c.isAdmissionFeePaid.value,
-                        ),
-                      ),
-                      Text('Admission Fee Paid'),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Comment'),
-                  const SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: 'Enter any additional comments',
-                      controller: c.commentController,
-                      isMultiline: true),
-                  const SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Referred By'),
-                  Obx(() {
-                    final role = c.selectedRole.value;
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: RadioListTile<String>(
-                                title: const Text("Mentor"),
-                                value: "mentor",
-                                groupValue: role,
-                                onChanged: (value) =>
-                                    c.selectedRole.value = value!,
-                                dense: true,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            Expanded(
-                              child: RadioListTile<String>(
-                                title: const Text("Advisor"),
-                                value: "advisor",
-                                groupValue: role,
-                                onChanged: (value) =>
-                                    c.selectedRole.value = value!,
-                                dense: true,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            Expanded(
-                              child: RadioListTile<String>(
-                                title: const Text("Others"),
-                                value: "others",
-                                groupValue: role,
-                                onChanged: (value) =>
-                                    c.selectedRole.value = value!,
-                                dense: true,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        if (role.isNotEmpty) ...[
-                          CustomWidgets().labelWithAsterisk(
-                              role[0].toUpperCase() + role.substring(1)),
-                          const SizedBox(height: 10),
-                          // CustomWidgets().customDropdownField(
-                          //   context: context,
-                          //   hint: 'Select',
-                          //   items: [],
-                          //   onChanged: (p0) {},
-                          // ),
-                        ]
-                      ],
-                    );
-                  }),
-                ],
-              ),
-            ))
-      ],
-      onSubmit: () {},
-    );
-  }
 }
-

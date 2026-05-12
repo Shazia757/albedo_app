@@ -414,7 +414,7 @@ class TeacherController extends GetxController {
     }
 
     // Sort
-   if (sortType.value == SortType.newest) {
+    if (sortType.value == SortType.newest) {
       temp.sort(
         (a, b) => (b.joinedAt ?? DateTime(1900))
             .compareTo(a.joinedAt ?? DateTime(1900)),
@@ -499,14 +499,14 @@ class TeacherController extends GetxController {
         title: 'Are you sure?',
         context: context,
         text: "Do you want to request deletion of this teacher?",
-        onConfirm: () => requestDelete(teacher.id!),
+        onConfirm: () => requestDelete(teacher.id),
       );
     } else {
       CustomWidgets().showDeleteDialog(
         title: 'Are you sure?',
         context: context,
         text: "Are you sure you want to delete this teacher permanently?",
-        onConfirm: () => delete(teacher.id!),
+        onConfirm: () => delete(teacher.id),
       );
     }
   }
@@ -518,13 +518,13 @@ class TeacherController extends GetxController {
       CustomWidgets().showDeactivateDialog(
         context: context,
         text: "Do you want to request inactivation for this teacher?",
-        onConfirm: () => requestDeactivate(teacher.id!),
+        onConfirm: () => requestDeactivate(teacher.id),
       );
     } else {
       CustomWidgets().showDeactivateDialog(
         context: context,
         text: "Are you sure you want to deactivate this teacher permanently?",
-        onConfirm: () => deactivate(teacher.id!),
+        onConfirm: () => deactivate(teacher.id),
       );
     }
   }

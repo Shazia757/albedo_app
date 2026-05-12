@@ -2,7 +2,6 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
-import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/users/add_teacher_page.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -346,7 +345,6 @@ class MentorController extends GetxController {
     if (user?.role == "coordinator") {
       CustomWidgets().showDeleteDialog(
         title: 'Are you sure?',
-
         context: context,
         text: "Do you want to request deletion of this mentor?",
         onConfirm: () => requestDelete(mentor.id!),
@@ -354,7 +352,6 @@ class MentorController extends GetxController {
     } else {
       CustomWidgets().showDeleteDialog(
         title: 'Are you sure?',
-
         context: context,
         text: "Are you sure you want to delete this mentor permanently?",
         onConfirm: () => delete(mentor.id!),

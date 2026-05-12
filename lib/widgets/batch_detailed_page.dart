@@ -47,7 +47,7 @@ class BatchDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       appBar: CustomAppBar(),
@@ -98,7 +98,7 @@ class BatchDetailsPage extends StatelessWidget {
             onPressed: () {
               CustomWidgets().showCustomDialog(
                 context: context,
-                title: const Text('Create Certificate'),
+                title: Text('Create Certificate'),
                 formKey: GlobalKey<FormState>(),
                 sections: [
                   Obx(() {
@@ -107,16 +107,16 @@ class BatchDetailsPage extends StatelessWidget {
                         children: [
                           CustomWidgets().labelWithAsterisk('Certificate Name',
                               required: true),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().dropdownStyledTextField(
                             context: context,
                             hint: 'Certificate of Completion',
                             controller: c.nameController,
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Select Package',
                               required: true),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           CustomWidgets().customDropdownField<Package>(
                             context: context,
                             hint: 'Choose a package',
@@ -163,7 +163,7 @@ class BatchDetailsPage extends StatelessWidget {
           );
         }
 
-        return const SizedBox();
+        return SizedBox();
       }),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -180,7 +180,7 @@ class BatchDetailsPage extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Obx(() {
               final index = c.selectedIndex.value;
               final packages = student.packages ?? [];
@@ -191,7 +191,7 @@ class BatchDetailsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _profileCard(context),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     _sectionCard(
                       context: context,
                       title: 'Personal Information',
@@ -204,7 +204,7 @@ class BatchDetailsPage extends StatelessWidget {
                           ),
                           _infoRow('Created By', student.createdBy ?? "-",
                               'Created At', 'Oct 10, 2024'),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           Row(
                             children: [
                               Icon(Icons.phone_outlined),
@@ -216,7 +216,7 @@ class BatchDetailsPage extends StatelessWidget {
                               )
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           Row(
                             children: [
                               Icon(Icons.message_outlined),
@@ -244,14 +244,14 @@ class BatchDetailsPage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     _sectionCard(
                       context: context,
                       title: 'Academic Details',
                       trailing: TextButton.icon(
                         onPressed: () {},
                         icon: const Icon(Icons.badge_outlined, size: 18),
-                        label: const Text('View ID Card'),
+                        label: Text('View ID Card'),
                       ),
                       child: Column(
                         children: [
@@ -262,7 +262,7 @@ class BatchDetailsPage extends StatelessWidget {
                           ),
                           _labelValue(
                               'Current Address', student.address ?? '-'),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           Divider(
                             height: 16,
                             thickness: 0.8,
@@ -286,7 +286,7 @@ class BatchDetailsPage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     Column(
                       children: [
                         _supportTile(
@@ -329,7 +329,7 @@ class BatchDetailsPage extends StatelessWidget {
 
               if (c.tabs[index] == 'Packages') {
                 if (packages.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text("No packages available"),
                   );
                 }
@@ -340,7 +340,7 @@ class BatchDetailsPage extends StatelessWidget {
                       hint: 'Search by package name',
                       onChanged: (p0) {},
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
@@ -371,7 +371,7 @@ class BatchDetailsPage extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: 4,
                                 separatorBuilder: (_, __) =>
-                                    const SizedBox(height: 10),
+                                    SizedBox(height: 10),
                                 itemBuilder: (context, index) {
                                   final items = [
                                     {
@@ -412,13 +412,15 @@ class BatchDetailsPage extends StatelessWidget {
                           );
                         },
                         iconAlignment: IconAlignment.end,
-                        label: const Text(
+                        label: Text(
                           'Package Summary',
-                          style: TextStyle(color: Colors.white, fontSize: 13),
+                          style: Get.textTheme
+                              .bodySmall!
+                              .copyWith(color: Colors.white),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              Theme.of(context).colorScheme.primary,
+                              Get.theme.colorScheme.primary,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -427,7 +429,7 @@ class BatchDetailsPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -442,17 +444,17 @@ class BatchDetailsPage extends StatelessWidget {
               }
 
               if (c.tabs[index] == 'Batches') {
-                return const Text("Batches UI here");
+                return Text("Batches UI here");
               }
               if (c.tabs[index] == 'Wallet') {
                 return studentWalletTab(context, student, c);
               }
               if (c.tabs[index] == 'Batch Payments') {
-                return const Text("Batches UI here");
+                return Text("Batches UI here");
               }
               if (c.tabs[index] == 'Assessments') {
                 if (assessments.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text("No assessments available"),
                   );
                 }
@@ -468,7 +470,7 @@ class BatchDetailsPage extends StatelessWidget {
               }
               if (c.tabs[index] == 'Sessions') {
                 if (packages.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text("No packages available"),
                   );
                 }
@@ -479,7 +481,7 @@ class BatchDetailsPage extends StatelessWidget {
                       hint: 'Search by package name',
                       onChanged: (p0) {},
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
@@ -521,7 +523,7 @@ class BatchDetailsPage extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: 5,
                                 separatorBuilder: (_, __) =>
-                                    const SizedBox(height: 10),
+                                    SizedBox(height: 10),
                                 itemBuilder: (context, index) {
                                   final items = [
                                     {
@@ -566,13 +568,15 @@ class BatchDetailsPage extends StatelessWidget {
                           );
                         },
                         iconAlignment: IconAlignment.end,
-                        label: const Text(
+                        label: Text(
                           'Session Summary',
-                          style: TextStyle(color: Colors.white, fontSize: 13),
+                          style: Get.textTheme
+                              .bodySmall!
+                              .copyWith(color: Colors.white),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              Theme.of(context).colorScheme.primary,
+                              Get.theme.colorScheme.primary,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -581,7 +585,7 @@ class BatchDetailsPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -610,7 +614,7 @@ class BatchDetailsPage extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     /// 🔹 Content
                     Obx(() {
@@ -623,7 +627,7 @@ class BatchDetailsPage extends StatelessWidget {
 
                       if (feedbacks.isEmpty) {
                         return EmptyState(
-                          cs: Theme.of(context).colorScheme,
+                          cs: Get.theme.colorScheme,
                           icon: Icons.feedback_outlined,
                           title: "No feedback from $label yet",
                           subtitle: "Feedback added by $label will appear here",
@@ -635,7 +639,7 @@ class BatchDetailsPage extends StatelessWidget {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: feedbacks.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        separatorBuilder: (_, __) => SizedBox(height: 10),
                         itemBuilder: (_, i) {
                           final f = feedbacks[i];
 
@@ -654,10 +658,9 @@ class BatchDetailsPage extends StatelessWidget {
                     child: Text(
                       'No certificates are available for this student',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                      style: Get.textTheme
+                          .bodyMedium!
+                          .copyWith(color: Colors.grey),
                     ),
                   );
                 }
@@ -672,7 +675,7 @@ class BatchDetailsPage extends StatelessWidget {
                 );
               }
 
-              return const SizedBox();
+              return SizedBox();
             }),
           ],
         ),
@@ -695,7 +698,7 @@ class BatchDetailsPage extends StatelessWidget {
         child: Row(
           children: [
             const Icon(Icons.description),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Text(title),
           ],
         ),
@@ -708,15 +711,15 @@ class BatchDetailsPage extends StatelessWidget {
       return Column(
         children: [
           CustomWidgets().labelWithAsterisk('Certificate Name', required: true),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().dropdownStyledTextField(
             context: context,
             hint: 'Certificate of Completion',
             controller: c.nameController,
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().labelWithAsterisk('Select Package', required: true),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           CustomWidgets().customDropdownField<Package>(
             context: context,
             hint: 'Choose a package',
@@ -737,7 +740,7 @@ class BatchDetailsPage extends StatelessWidget {
   }
 
   Widget feedbackCard(Feedbacks f, BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -755,21 +758,21 @@ class BatchDetailsPage extends StatelessWidget {
           //   children: [
           //     Text(
           //       f. ?? '-',
-          //       style: const TextStyle(fontWeight: FontWeight.w600),
+          //       style: Get.textTheme.titleSmall,
           //     ),
           //     Text(
           //       formatDate(f.date),
-          //       style: TextStyle(fontSize: 12, color: cs.outline),
+          //       style: Get.textTheme.bodySmall!.copyWith(color: cs.outline),
           //     ),
           //   ],
           // ),
 
-          // const SizedBox(height: 6),
+          // SizedBox(height: 6),
 
           // /// 💬 Message
           // Text(
           //   f.message ?? '-',
-          //   style: TextStyle(color: cs.onSurface),
+          //   style: Get.textTheme.bodyMedium!.copyWith(color: cs.onSurface),
           // ),
         ],
       ),
@@ -777,7 +780,7 @@ class BatchDetailsPage extends StatelessWidget {
   }
 
   Widget studentPackageCard(BuildContext context, Package package) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final totalSessions = student.totalSession ?? 0;
     final completedSessions = student.classesTaken ?? 0;
 
@@ -820,16 +823,13 @@ class BatchDetailsPage extends StatelessWidget {
                 children: [
                   Text(
                     package.name ?? '-',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Get.textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Chip(
                     label: Text(
-                      package?.status ?? '',
-                      style: TextStyle(fontSize: 11),
+                      package.status ?? '',
+                      style: Get.textTheme.labelSmall,
                     ),
                     backgroundColor: (student.status == 'active')
                         ? Colors.green.withOpacity(0.12)
@@ -865,14 +865,16 @@ class BatchDetailsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
 
-          const Text(
+          Text(
             "Enrolled: 12 Oct 2024 • 10:30 AM",
-            style: TextStyle(color: Colors.grey, fontSize: 12),
+            style: Get.textTheme
+                .bodySmall!
+                .copyWith(color: Colors.grey),
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Divider(
             height: 16,
             thickness: 1,
@@ -906,17 +908,19 @@ class BatchDetailsPage extends StatelessWidget {
                       "https://i.pravatar.cc/150?img=3",
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         package.teacher?.name ?? '',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: Get.textTheme.titleSmall,
                       ),
                       Text(
                         package.teacher?.id ?? '',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: Get.textTheme
+                            .bodySmall!
+                            .copyWith(color: Colors.grey),
                       ),
                     ],
                   ),
@@ -925,7 +929,7 @@ class BatchDetailsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Divider(
             height: 16,
             thickness: 1,
@@ -940,27 +944,27 @@ class BatchDetailsPage extends StatelessWidget {
                 children: [
                   Text("Mode"),
                   Text(package.mode ?? '-',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: Get.textTheme.titleSmall),
                 ],
               ),
               Column(
                 children: [
                   Text("Time"),
                   Text(package.time ?? '-',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: Get.textTheme.titleSmall),
                 ],
               ),
               Column(
                 children: [
                   Text("Duration"),
                   Text(package.duration ?? '-',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: Get.textTheme.titleSmall),
                 ],
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Divider(
             height: 16,
             thickness: 1,
@@ -971,18 +975,18 @@ class BatchDetailsPage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Progress",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: Get.textTheme.titleSmall,
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
 
               /// Progress bar (based on sessions)
               LinearProgressIndicator(
                 value: sessionProgress.clamp(0.0, 1.0),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
 
               /// Dynamic text
               Text(
@@ -992,7 +996,7 @@ class BatchDetailsPage extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           /// Status toggle
           Row(
@@ -1016,7 +1020,7 @@ class BatchDetailsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Divider(
             height: 16,
             thickness: 1,
@@ -1027,11 +1031,11 @@ class BatchDetailsPage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Teacher Fees",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: Get.textTheme.titleSmall,
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text(
                   "Hourly Salary: ₹${(package.hourlyRate ?? 0).toStringAsFixed(0)}"),
               Text("Expense Ratio: ${(package.expenseRatio ?? 0)}%"),
@@ -1040,7 +1044,7 @@ class BatchDetailsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Divider(
             height: 16,
             thickness: 1,
@@ -1051,11 +1055,11 @@ class BatchDetailsPage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Student Fees",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: Get.textTheme.titleSmall,
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text("Hourly: ₹${hourly.toStringAsFixed(0)}"),
               Text("Package: ₹${packageFee.toStringAsFixed(0)}"),
               Text("Completed: ₹${paidFee.toStringAsFixed(0)}"),
@@ -1069,9 +1073,9 @@ class BatchDetailsPage extends StatelessWidget {
 
   Widget studentPackageSessionCard(BuildContext context, Package package) {
     if ((package.name ?? '').trim().isEmpty) {
-      return const SizedBox();
+      return SizedBox();
     }
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     final totalSessions = package.sessions?.length ?? 0;
 
@@ -1092,11 +1096,9 @@ class BatchDetailsPage extends StatelessWidget {
             Expanded(
               child: Text(
                 package.name ?? '-',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
-                ),
+                style: Get.textTheme
+                    .titleMedium!
+                    .copyWith(color: cs.onSurface),
               ),
             ),
 
@@ -1112,11 +1114,9 @@ class BatchDetailsPage extends StatelessWidget {
               ),
               child: Text(
                 '$totalSessions Sessions',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: cs.primary,
-                ),
+                style: Get.textTheme
+                    .titleSmall!
+                    .copyWith(color: cs.primary),
               ),
             ),
           ],
@@ -1126,7 +1126,7 @@ class BatchDetailsPage extends StatelessWidget {
   }
 
   Widget studentAssessmentCard(BuildContext context, Assessment assessment) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return InkWell(
       onTap: () {
@@ -1150,10 +1150,7 @@ class BatchDetailsPage extends StatelessWidget {
                   Expanded(
                     child: Text(
                       assessment.type ?? "Assessment",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Get.textTheme.titleMedium,
                     ),
                   ),
                   IconButton(
@@ -1184,30 +1181,24 @@ class BatchDetailsPage extends StatelessWidget {
                   Row(
                     children: [
                       Icon(Icons.calendar_today, size: 16, color: cs.primary),
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                       Text(
                         assessment.date ?? "-",
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: Get.textTheme.titleSmall,
                       ),
                     ],
                   ),
 
-                  const SizedBox(width: 20),
+                  SizedBox(width: 20),
 
                   /// ⏰ Time
                   Row(
                     children: [
                       Icon(Icons.schedule, size: 16, color: cs.primary),
-                      const SizedBox(width: 6),
-                      const Text(
+                      SizedBox(width: 6),
+                      Text(
                         "10:30 AM",
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: Get.textTheme.titleSmall,
                       ),
                     ],
                   ),
@@ -1221,7 +1212,7 @@ class BatchDetailsPage extends StatelessWidget {
   }
 
   Widget _profileCard(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -1252,11 +1243,13 @@ class BatchDetailsPage extends StatelessWidget {
                 ? const Icon(Icons.person, size: 30, color: Colors.white70)
                 : null,
           ),
-          const SizedBox(height: 10),
-          Text(student.name,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          Text(student.email ?? '-', style: TextStyle(color: Colors.grey)),
-          const SizedBox(height: 8),
+          SizedBox(height: 10),
+          Text(student.name, style: Get.textTheme.titleLarge),
+          Text(student.email ?? '-',
+              style: Get.textTheme
+                  .bodyMedium!
+                  .copyWith(color: Colors.grey)),
+          SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
@@ -1265,7 +1258,7 @@ class BatchDetailsPage extends StatelessWidget {
             ),
             child: Text('ID:${student.studentId} '),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Chip(
             avatar: Icon(
               student.isFeePaid ? Icons.task_alt : Icons.cancel_outlined,
@@ -1274,11 +1267,9 @@ class BatchDetailsPage extends StatelessWidget {
             ),
             label: Text(
               student.isFeePaid ? 'Admission Fee Paid' : 'Admission Fee Unpaid',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: student.isFeePaid ? Colors.green : cs.error,
-              ),
+              style: Get.textTheme
+                  .labelSmall!
+                  .copyWith(color: student.isFeePaid ? Colors.green : cs.error),
             ),
             backgroundColor: student.isFeePaid
                 ? Colors.green.withOpacity(0.12)
@@ -1292,7 +1283,7 @@ class BatchDetailsPage extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -1300,12 +1291,14 @@ class BatchDetailsPage extends StatelessWidget {
               icon: const Icon(Icons.arrow_right_alt,
                   size: 15, color: Colors.white),
               iconAlignment: IconAlignment.end,
-              label: const Text(
+              label: Text(
                 'Go to Dashboard',
-                style: TextStyle(color: Colors.white, fontSize: 13),
+                style: Get.textTheme
+                    .bodySmall!
+                    .copyWith(color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                backgroundColor: Get.theme.colorScheme.primary,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -1324,7 +1317,7 @@ class BatchDetailsPage extends StatelessWidget {
       required BuildContext context,
       required Widget child,
       Widget? trailing}) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1337,13 +1330,11 @@ class BatchDetailsPage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(title, style: Get.textTheme.titleMedium),
               if (trailing != null) trailing,
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           child,
         ],
       ),
@@ -1356,11 +1347,11 @@ class BatchDetailsPage extends StatelessWidget {
       children: [
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(l1),
-          Text(v1, style: const TextStyle(fontWeight: FontWeight.bold))
+          Text(v1, style: Get.textTheme.titleSmall)
         ]),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(l2),
-          Text(v2, style: const TextStyle(fontWeight: FontWeight.bold))
+          Text(v2, style: Get.textTheme.titleSmall)
         ]),
       ],
     );
@@ -1375,8 +1366,11 @@ Widget _labelValue(String label, String value) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: const TextStyle(color: Colors.grey)),
-      Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+      Text(label,
+          style: Get.textTheme
+              .bodyMedium!
+              .copyWith(color: Colors.grey)),
+      Text(value, style: Get.textTheme.titleSmall),
     ],
   );
 }
@@ -1401,19 +1395,13 @@ Widget summaryCard({
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontSize: 12,
-            color: color,
-          ),
+          style: Get.textTheme.bodySmall!.copyWith(color: color),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+          style:
+              Get.textTheme.titleMedium!.copyWith(color: color),
         ),
       ],
     ),
@@ -1431,7 +1419,7 @@ Widget _supportTile(
   return Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.onPrimary,
+      color: Get.theme.colorScheme.onPrimary,
       border: Border.all(color: Colors.grey.shade200),
       borderRadius: BorderRadius.circular(12),
     ),
@@ -1457,7 +1445,7 @@ Widget _supportTile(
               : null,
         ),
 
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
 
         // Text content
         Expanded(
@@ -1467,33 +1455,27 @@ Widget _supportTile(
               // Line 1: Role
               Text(
                 role,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey,
-                ),
+                style: Get.textTheme
+                    .titleSmall!
+                    .copyWith(color: Colors.grey),
               ),
 
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
 
               // Line 2: Name
               Text(
                 name,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Get.textTheme.titleMedium,
               ),
 
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
 
               // Line 3: ID + Date
               Text(
                 "$id • $date",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
+                style: Get.textTheme
+                    .bodySmall!
+                    .copyWith(color: Colors.grey.shade600),
               ),
             ],
           ),

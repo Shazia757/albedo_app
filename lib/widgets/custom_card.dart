@@ -1,4 +1,3 @@
-import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +67,7 @@ class InfoCard extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
 
               Expanded(
                 child: Column(
@@ -98,7 +97,7 @@ class InfoCard extends StatelessWidget {
                               );
                       },
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     /// 🔥 INFO COLUMNS
                     if (infoColumns != null && infoColumns!.isNotEmpty)
@@ -148,7 +147,7 @@ class InfoCard extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
 
                     /// 🔥 ACTIONS
                     if (actions != null && actions!.isNotEmpty)
@@ -162,7 +161,7 @@ class InfoCard extends StatelessWidget {
                         ),
                       ),
 
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                   ],
                 ),
               ),
@@ -184,17 +183,15 @@ class InfoCard extends StatelessWidget {
       ),
       child: Text(
         "ID: $id",
-        style: TextStyle(
-          fontSize: Responsive.isMobile(context) ? 11 : 13,
-          fontWeight: FontWeight.w600,
-          color: cs.onSurface.withOpacity(0.8),
-        ),
+        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+            fontSize: Responsive.isMobile(context) ? 11 : 13,
+            color: cs.onSurface.withOpacity(0.8)),
       ),
     );
   }
 
   Widget _buildStatus(BuildContext context) {
-    if (status == null || status!.isEmpty) return const SizedBox();
+    if (status == null || status!.isEmpty) return SizedBox();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -216,15 +213,13 @@ class InfoCard extends StatelessWidget {
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 6),
+          SizedBox(width: 6),
           Text(
             status!.toUpperCase(),
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.6,
-              color: statusColor,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall!
+                .copyWith(letterSpacing: 0.6, color: statusColor),
           ),
         ],
       ),
@@ -241,23 +236,20 @@ class InfoCard extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
-            fontSize: isMobile ? 10 : 11,
-            letterSpacing: 0.8,
-            color: cs.onSurface.withOpacity(0.45),
-            fontWeight: FontWeight.w500,
-          ),
+          style: Theme.of(context).textTheme.titleSmall!.copyWith(
+              fontSize: isMobile ? 10 : 11,
+              letterSpacing: 0.8,
+              color: cs.onSurface.withOpacity(0.45)),
         ),
-        const SizedBox(height: 2),
+        SizedBox(height: 2),
         Text(
           value,
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
-          style: TextStyle(
-            fontSize: isMobile ? 12 : 13,
-            fontWeight: FontWeight.w600,
-            color: cs.onSurface,
-          ),
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(fontSize: isMobile ? 12 : 13, color: cs.onSurface),
         ),
       ],
     );
@@ -300,16 +292,23 @@ class PremiumInfoCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 15),
+        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: cs.onPrimary,
           borderRadius: BorderRadius.circular(16),
-
           border: Border.all(
             color: cs.outline.withOpacity(0.5),
             width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: cs.shadow.withOpacity(0.06),
+              blurRadius: 12,
+              spreadRadius: 0,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,7 +331,7 @@ class PremiumInfoCard extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
 
                 /// NAME + ID COLUMN
                 Expanded(
@@ -342,23 +341,21 @@ class PremiumInfoCard extends StatelessWidget {
                       /// NAME
                       Text(
                         title,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: cs.onSurface,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelLarge!
+                            .copyWith(color: cs.onSurface),
                       ),
 
-                      const SizedBox(height: 2),
+                      SizedBox(height: 2),
 
                       /// ID
                       Text(
                         id,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: cs.onSurface.withOpacity(0.6),
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelSmall!
+                            .copyWith(color: cs.onSurface.withOpacity(0.6)),
                       ),
                     ],
                   ),
@@ -373,45 +370,45 @@ class PremiumInfoCard extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             /// 📧 EMAIL ROW
             Row(
               children: [
                 Icon(Icons.email_outlined,
                     size: 14, color: cs.onSurface.withOpacity(0.6)),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: cs.onSurface.withOpacity(0.7),
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(color: cs.onSurface.withOpacity(0.7)),
                   ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
 
             /// 📅 DATE ROW
             Row(
               children: [
                 Icon(Icons.calendar_today_outlined,
                     size: 14, color: cs.onSurface.withOpacity(0.6)),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Text(
                   footerText,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.6),
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelSmall!
+                      .copyWith(color: cs.onSurface.withOpacity(0.6)),
                 ),
               ],
             ),
 
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             /// 🔻 DIVIDER
             Divider(

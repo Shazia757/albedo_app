@@ -36,15 +36,15 @@ class AddAdvisorPage extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// PROFILE PHOTO
                       Align(
                         alignment: Alignment.center,
                         child: Column(
                           children: [
-                            const Text('Profile Photo (Max: 50 MB)'),
-                            const SizedBox(height: 10),
+                            Text('Profile Photo (Max: 50 MB)'),
+                            SizedBox(height: 10),
                             InkWell(
                               onTap: () {},
                               child: CircleAvatar(
@@ -65,35 +65,35 @@ class AddAdvisorPage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// NAME
                       CustomWidgets().labelWithAsterisk('Name', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter advisor name',
                         controller: c.nameController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// EMAIL
                       CustomWidgets()
                           .labelWithAsterisk('Email', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter email',
                         controller: c.emailController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// PHONE
                       CustomWidgets()
                           .labelWithAsterisk('Phone Number', required: true),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter phone number',
@@ -101,11 +101,11 @@ class AddAdvisorPage extends StatelessWidget {
                         isNumber: true,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// WHATSAPP
                       CustomWidgets().labelWithAsterisk('WhatsApp Number'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Enter WhatsApp Number',
@@ -113,33 +113,33 @@ class AddAdvisorPage extends StatelessWidget {
                         isNumber: true,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// JOINING DATE
                       CustomWidgets().labelWithAsterisk('Joining Date'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Select Date',
                         controller: c.dobController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// QUALIFICATION
                       CustomWidgets().labelWithAsterisk('Qualification'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Qualification',
                         controller: c.qualificationController,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       /// ADDRESS
                       CustomWidgets().labelWithAsterisk('Address'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       CustomWidgets().dropdownStyledTextField(
                         context: context,
                         hint: 'Address',
@@ -147,18 +147,15 @@ class AddAdvisorPage extends StatelessWidget {
                         isMultiline: true,
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// EXPERIENCE
-                      const Text(
+                      Text(
                         'Experience',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
 
                       Obx(
                         () => Column(
@@ -188,10 +185,9 @@ class AddAdvisorPage extends StatelessWidget {
                                           children: [
                                             Text(
                                               "Experience ${index + 1}",
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium,
                                             ),
                                             if (c.experiences.length > 1)
                                               IconButton(
@@ -205,29 +201,29 @@ class AddAdvisorPage extends StatelessWidget {
                                               ),
                                           ],
                                         ),
-                                        const SizedBox(height: 10),
+                                        SizedBox(height: 10),
                                         CustomWidgets()
                                             .labelWithAsterisk('Company Name'),
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: 8),
                                         CustomWidgets().dropdownStyledTextField(
                                           context: context,
                                           hint: 'Enter company name',
                                           controller: exp.companyController,
                                         ),
-                                        const SizedBox(height: 10),
+                                        SizedBox(height: 10),
                                         CustomWidgets()
                                             .labelWithAsterisk('Years'),
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: 8),
                                         CustomWidgets().dropdownStyledTextField(
                                           context: context,
                                           hint: 'Years',
                                           controller: exp.yearController,
                                           isNumber: true,
                                         ),
-                                        const SizedBox(height: 10),
+                                        SizedBox(height: 10),
                                         CustomWidgets()
                                             .labelWithAsterisk('Months'),
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: 8),
                                         CustomWidgets().dropdownStyledTextField(
                                           context: context,
                                           hint: 'Months',
@@ -240,7 +236,7 @@ class AddAdvisorPage extends StatelessWidget {
                                 );
                               },
                             ),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton.icon(
@@ -249,12 +245,12 @@ class AddAdvisorPage extends StatelessWidget {
                                     Icons.add,
                                     color: Colors.white,
                                   ),
-                                  label: const Text(
+                                  label: Text(
                                     "Add Experience",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .copyWith(color: Colors.white),
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Theme.of(context)
@@ -272,7 +268,7 @@ class AddAdvisorPage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       /// BUTTONS
                       Row(
@@ -283,10 +279,13 @@ class AddAdvisorPage extends StatelessWidget {
                               icon: const SizedBox.shrink(),
                               label: Text(
                                 'Cancel',
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 13),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
                               ),
                               style: OutlinedButton.styleFrom(
                                 backgroundColor:
@@ -298,7 +297,7 @@ class AddAdvisorPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
@@ -313,10 +312,10 @@ class AddAdvisorPage extends StatelessWidget {
                               ),
                               label: Text(
                                 isEdit ? 'Update' : 'Add',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
@@ -333,7 +332,7 @@ class AddAdvisorPage extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 30),
+                      SizedBox(height: 30),
                     ],
                   ),
                 ),

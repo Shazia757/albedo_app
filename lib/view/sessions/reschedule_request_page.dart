@@ -3,7 +3,6 @@ import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class RescheduleRequestsPage extends StatelessWidget {
@@ -21,64 +20,64 @@ class RescheduleRequestsPage extends StatelessWidget {
         children: [
           if (isDesktop) const DrawerMenu(),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 12),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
+                  Text(
                     "Reschedule Requests",
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: Theme.of(context).colorScheme.primary),
                   ),
-                ),
 
-                const SizedBox(height: 10),
-
-                /// 🔹 TABS
-                Align(
-                  alignment: Alignment.center,
-                  child: Obx(
-                    () => CustomWidgets().customTabs(
-                      context,
-                      tabs: c.tabs,
-                      selectedIndex: c.selectedTab.value,
-                      onTap: (index) => c.selectedTab.value = index,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CustomWidgets().premiumSearch(
+                  SizedBox(height: 12),
+                  CustomWidgets().premiumSearch(
                     context,
                     hint: 'Search requests...',
                     onChanged: (v) => c.searchQuery.value = v,
                   ),
-                ),
-                const SizedBox(height: 10),
+                  SizedBox(height: 10),
 
-                /// 🔹 LIST
-                Expanded(
-                  child: Obx(() {
-                    final list =
-                        c.selectedTab.value == 0 ? c.students : c.teachers;
+                  /// 🔹 TABS
+                  Align(
+                    alignment: Alignment.center,
+                    child: Obx(
+                      () => CustomWidgets().customTabs(
+                        context,
+                        tabs: c.tabs,
+                        selectedIndex: c.selectedTab.value,
+                        onTap: (index) => c.selectedTab.value = index,
+                      ),
+                    ),
+                  ),
 
-                    final filteredList =
-                        list.where((item) => c.hasAnyStatus(item)).toList();
+                  SizedBox(height: 12),
 
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(12),
-                      itemCount: filteredList.length,
-                      itemBuilder: (context, index) {
-                        return RescheduleCard(data: filteredList[index]);
-                      },
-                    );
-                  }),
-                ),
-              ],
+                  /// 🔹 LIST
+                  Expanded(
+                    child: Obx(() {
+                      final list =
+                          c.selectedTab.value == 0 ? c.students : c.teachers;
+
+                      final filteredList =
+                          list.where((item) => c.hasAnyStatus(item)).toList();
+
+                      return ListView.builder(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: filteredList.length,
+                        itemBuilder: (context, index) {
+                          return RescheduleCard(data: filteredList[index]);
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -90,37 +89,52 @@ class RescheduleRequestsPage extends StatelessWidget {
 class RescheduleCard extends StatelessWidget {
   final Map<String, dynamic> data;
 
-  const RescheduleCard({super.key, required this.data});
+  const RescheduleCard({
+    super.key,
+    required this.data,
+  });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Stack(
-      children: [
-        /// MAIN CARD
-        Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: cs.onPrimary,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: cs.outline.withOpacity(0.5)),
-          ),
-          child: Row(
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: cs.onPrimary,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: cs.outline.withOpacity(0.35),
+        ),
+      ),
+      child: Column(
+        children: [
+          /// TOP SECTION
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// PROFILE
+              /// PROFILE IMAGE (SQUARED)
               Container(
-                width: 48,
-                height: 48,
+                width: 42,
+                height: 42,
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  image: const DecorationImage(
-                    image: AssetImage('assets/images/logo.png'),
+                  color: cs.surfaceContainerHighest.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: cs.outline.withOpacity(0.2),
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    'assets/images/logo.png',
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
+
               const SizedBox(width: 12),
 
               /// NAME + ID
@@ -129,65 +143,111 @@ class RescheduleCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data["name"],
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      data["name"] ?? "",
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
+
+                    const SizedBox(height: 3),
+
+                    /// SUBTITLE
                     Text(
-                      data["id"],
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: cs.onSurfaceVariant,
-                      ),
+                      data["id"] ?? "",
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: cs.outline,
+                            fontWeight: FontWeight.w500,
+                          ),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-        ),
 
-        /// 🔥 STATUS CHIPS (TOP RIGHT ROW)
-        Positioned(
-          top: 8,
-          right: 8,
-          child: Row(
-            spacing: 5,
-            children: [
-              if ((data["pending"] ?? 0) > 0)
-                _statusChip("Pending", data["pending"], Colors.orange),
-              if ((data["approved"] ?? 0) > 0)
-                _statusChip("Approved", data["approved"], Colors.green),
-              if ((data["rejected"] ?? 0) > 0)
-                _statusChip("Rejected", data["rejected"], Colors.red),
-              if ((data["rescheduled"] ?? 0) > 0)
-                _statusChip("Rescheduled", data["rescheduled"], Colors.blue),
-            ],
+          const SizedBox(height: 12),
+
+          /// STATUS CHIPS
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                if ((data["pending"] ?? 0) > 0)
+                  _statusChip(
+                    context,
+                    "Pending",
+                    data["pending"],
+                    Colors.orange,
+                  ),
+                if ((data["approved"] ?? 0) > 0)
+                  _statusChip(
+                    context,
+                    "Approved",
+                    data["approved"],
+                    Colors.green,
+                  ),
+                if ((data["rejected"] ?? 0) > 0)
+                  _statusChip(
+                    context,
+                    "Rejected",
+                    data["rejected"],
+                    Colors.red,
+                  ),
+                if ((data["rescheduled"] ?? 0) > 0)
+                  _statusChip(
+                    context,
+                    "Rescheduled",
+                    data["rescheduled"],
+                    Colors.blue,
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  /// 🔻 SMALLER CHIP
-  Widget _statusChip(String label, int count, Color color) {
+  /// SMALL STATUS CHIP
+  Widget _statusChip(
+    BuildContext context,
+    String label,
+    int count,
+    Color color,
+  ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(color: color.withOpacity(0.4)),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
       ),
-      child: Text(
-        "$label: $count",
-        style: TextStyle(
-          fontSize: 10, // smaller
-          fontWeight: FontWeight.w600,
-          color: color,
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: color.withOpacity(0.25),
         ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 5,
+            height: 5,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            "$label • $count",
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 10.5,
+                ),
+          ),
+        ],
       ),
     );
   }
