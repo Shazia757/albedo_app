@@ -353,8 +353,7 @@ class StudentDetailsPage extends StatelessWidget {
                   TextButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.badge_outlined, size: 16),
-                    label: Text('View ID Card',
-                        style: Get.textTheme.bodySmall),
+                    label: Text('View ID Card', style: Get.textTheme.bodySmall),
                   ),
                 ],
               ),
@@ -372,7 +371,7 @@ class StudentDetailsPage extends StatelessWidget {
                       child: _statPill(
                           context,
                           'Standard',
-                          student.standard.toString(),
+                          student.standard?.toString() ?? '-',
                           Icons.menu_book_outlined)),
                 ],
               ),
@@ -396,10 +395,8 @@ class StudentDetailsPage extends StatelessWidget {
               student.advisorId ?? '-', 'Oct 11, 2024 - 10:00 AM'),
           _supportTile(context, 'Referral', student.referralName ?? '-', '',
               'Oct 05, 2024 - 09:00 AM'),
-        ]
-            .map((w) =>
-                Padding(padding: const EdgeInsets.only(bottom: 10), child: w))
-            ,
+        ].map((w) =>
+            Padding(padding: const EdgeInsets.only(bottom: 10), child: w)),
       ],
     );
   }
@@ -449,7 +446,7 @@ class StudentDetailsPage extends StatelessWidget {
                           "color": Colors.blue
                         },
                         {
-                          "title": "Collected",
+                          "title": "Class Taken Amount",
                           "value": "₹${totalPaid.toStringAsFixed(0)}",
                           "color": Colors.green
                         },
@@ -462,6 +459,11 @@ class StudentDetailsPage extends StatelessWidget {
                           "title": "Teacher Salary",
                           "value": "₹${totalTeacherSalary.toStringAsFixed(0)}",
                           "color": Colors.purple
+                        },
+                        {
+                          "title": "Expense Ratio",
+                          "value": "26.7%",
+                          "color": Colors.red,
                         },
                       ];
                       final item = items[index];
@@ -476,9 +478,7 @@ class StudentDetailsPage extends StatelessWidget {
             },
             iconAlignment: IconAlignment.end,
             label: Text('Package Summary',
-                style: Get.textTheme
-                    .bodySmall!
-                    .copyWith(color: Colors.white)),
+                style: Get.textTheme.bodySmall!.copyWith(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Get.theme.colorScheme.primary,
               elevation: 0,
@@ -556,8 +556,7 @@ class StudentDetailsPage extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text('ID: ${batch.id ?? '-'}',
-                        style: Get.textTheme
-                            .labelSmall!
+                        style: Get.textTheme.labelSmall!
                             .copyWith(color: cs.outline)),
                     SizedBox(height: 14),
                     Divider(height: 1, color: cs.outline.withOpacity(0.15)),
@@ -566,21 +565,20 @@ class StudentDetailsPage extends StatelessWidget {
                     // Mentor row
                     Row(
                       children: [
-                        _squareAvatar(batch.mentor?.imageUrl, 44),
+                        CustomWidgets()
+                            .squareAvatar(batch.mentor?.imageUrl, 44),
                         SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Assigned Mentor',
-                                style: Get.textTheme
-                                    .labelSmall!
+                                style: Get.textTheme.labelSmall!
                                     .copyWith(color: cs.outline)),
                             SizedBox(height: 2),
                             Text(batch.mentor?.name ?? '-',
                                 style: Get.textTheme.titleSmall),
                             Text('ID: ${batch.mentor?.id ?? '-'}',
-                                style: Get.textTheme
-                                    .labelSmall!
+                                style: Get.textTheme.labelSmall!
                                     .copyWith(color: cs.outline)),
                           ],
                         ),
@@ -643,8 +641,7 @@ class StudentDetailsPage extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text('Code: ${batch.id ?? '-'}',
-                        style: Get.textTheme
-                            .bodySmall!
+                        style: Get.textTheme.bodySmall!
                             .copyWith(color: cs.outline)),
                     SizedBox(height: 14),
 
@@ -679,8 +676,7 @@ class StudentDetailsPage extends StatelessWidget {
                             size: 13, color: cs.outline),
                         SizedBox(width: 6),
                         Text('Paid on: ${batch.paidDate ?? '-'}',
-                            style: Get.textTheme
-                                .bodySmall!
+                            style: Get.textTheme.bodySmall!
                                 .copyWith(color: cs.outline)),
                       ],
                     ),
@@ -775,9 +771,7 @@ class StudentDetailsPage extends StatelessWidget {
             },
             iconAlignment: IconAlignment.end,
             label: Text('Session Summary',
-                style: Get.textTheme
-                    .bodySmall!
-                    .copyWith(color: Colors.white)),
+                style: Get.textTheme.bodySmall!.copyWith(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Get.theme.colorScheme.primary,
               elevation: 0,
@@ -885,7 +879,7 @@ class StudentDetailsPage extends StatelessWidget {
                             color: cs.shadow.withOpacity(0.1), blurRadius: 8)
                       ],
                     ),
-                    child: _squareAvatar(student.imageUrl, 64, radius: 12),
+                    child: CustomWidgets(). squareAvatar(student.imageUrl, 64, radius: 12),
                   ),
                 ),
 
@@ -893,12 +887,10 @@ class StudentDetailsPage extends StatelessWidget {
                   offset: const Offset(0, -20),
                   child: Column(
                     children: [
-                      Text(student.name,
-                          style: Get.textTheme.titleLarge),
+                      Text(student.name, style: Get.textTheme.titleLarge),
                       SizedBox(height: 4),
                       Text(student.email ?? '-',
-                          style: Get.textTheme
-                              .bodySmall!
+                          style: Get.textTheme.bodySmall!
                               .copyWith(color: cs.outline)),
                       SizedBox(height: 10),
 
@@ -911,8 +903,7 @@ class StudentDetailsPage extends StatelessWidget {
                           border: Border.all(color: _blue.withOpacity(0.3)),
                         ),
                         child: Text('ID: ${student.studentId}',
-                            style: Get.textTheme
-                                .titleSmall!
+                            style: Get.textTheme.titleSmall!
                                 .copyWith(color: _blue)),
                       ),
 
@@ -938,8 +929,7 @@ class StudentDetailsPage extends StatelessWidget {
                               size: 15, color: Colors.white),
                           iconAlignment: IconAlignment.end,
                           label: Text('Go to Dashboard',
-                              style: Get.textTheme
-                                  .bodySmall!
+                              style: Get.textTheme.bodySmall!
                                   .copyWith(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: cs.primary,
@@ -1036,8 +1026,7 @@ class StudentDetailsPage extends StatelessWidget {
                         size: 12, color: cs.outline),
                     SizedBox(width: 5),
                     Text('Enrolled: 12 Oct 2024 • 10:30 AM',
-                        style: Get.textTheme
-                            .bodySmall!
+                        style: Get.textTheme.bodySmall!
                             .copyWith(color: cs.outline)),
                   ],
                 ),
@@ -1076,8 +1065,7 @@ class StudentDetailsPage extends StatelessWidget {
                         Text(package.teacher?.name ?? '',
                             style: Get.textTheme.titleSmall),
                         Text(package.teacher?.id ?? '',
-                            style: Get.textTheme
-                                .labelSmall!
+                            style: Get.textTheme.labelSmall!
                                 .copyWith(color: cs.outline)),
                       ],
                     ),
@@ -1105,8 +1093,7 @@ class StudentDetailsPage extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Progress',
-                        style: Get.textTheme.titleSmall),
+                    Text('Progress', style: Get.textTheme.titleSmall),
                     SizedBox(height: 10),
                     _progressRow(
                         context, 'Sessions', sessionProgress, cs.primary),
@@ -1116,9 +1103,8 @@ class StudentDetailsPage extends StatelessWidget {
                     SizedBox(height: 8),
                     Text(
                       '$completedSessions/$totalSessions sessions  •  ${student.totalHour ?? 0} hrs  •  ${(feeProgress * 100).toStringAsFixed(0)}% fee',
-                      style: Get.textTheme
-                          .labelSmall!
-                          .copyWith(color: cs.outline),
+                      style:
+                          Get.textTheme.labelSmall!.copyWith(color: cs.outline),
                     ),
                   ],
                 ),
@@ -1142,12 +1128,10 @@ class StudentDetailsPage extends StatelessWidget {
                             ),
                             SizedBox(width: 6),
                             Text(c.status.value,
-                                style: Get.textTheme
-                                    .titleSmall!
-                                    .copyWith(
-                                        color: c.isActive.value
-                                            ? const Color(0xFF22C55E)
-                                            : cs.error)),
+                                style: Get.textTheme.titleSmall!.copyWith(
+                                    color: c.isActive.value
+                                        ? const Color(0xFF22C55E)
+                                        : cs.error)),
                           ],
                         )),
                     Obx(() => Switch(
@@ -1242,8 +1226,8 @@ class StudentDetailsPage extends StatelessWidget {
             ),
             SizedBox(width: 12),
             Expanded(
-              child: Text(package.name ?? '-',
-                  style: Get.textTheme.titleMedium),
+              child:
+                  Text(package.name ?? '-', style: Get.textTheme.titleMedium),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1251,9 +1235,7 @@ class StudentDetailsPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   color: _blue.withOpacity(0.2)),
               child: Text('$totalSessions Sessions',
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: _blue)),
+                  style: Get.textTheme.titleSmall!.copyWith(color: _blue)),
             ),
           ],
         ),
@@ -1320,16 +1302,14 @@ class StudentDetailsPage extends StatelessWidget {
                                 size: 12, color: cs.outline),
                             SizedBox(width: 4),
                             Text(assessment.date ?? '-',
-                                style: Get.textTheme
-                                    .bodySmall!
+                                style: Get.textTheme.bodySmall!
                                     .copyWith(color: cs.outline)),
                             SizedBox(width: 12),
                             Icon(Icons.schedule_outlined,
                                 size: 12, color: cs.outline),
                             SizedBox(width: 4),
                             Text('10:30 AM',
-                                style: Get.textTheme
-                                    .bodySmall!
+                                style: Get.textTheme.bodySmall!
                                     .copyWith(color: cs.outline)),
                           ],
                         ),
@@ -1493,9 +1473,7 @@ class StudentDetailsPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: Get.textTheme
-                .labelSmall!
-                .copyWith(color: cs.outline)),
+            style: Get.textTheme.labelSmall!.copyWith(color: cs.outline)),
         SizedBox(height: 3),
         Text(value, style: Get.textTheme.titleSmall),
       ],
@@ -1520,9 +1498,7 @@ class StudentDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label,
-                style: Get.textTheme
-                    .labelSmall!
-                    .copyWith(color: cs.outline)),
+                style: Get.textTheme.labelSmall!.copyWith(color: cs.outline)),
             Text(value, style: Get.textTheme.titleSmall),
           ],
         ),
@@ -1536,17 +1512,12 @@ class StudentDetailsPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Parent Details',
-            style: Get.textTheme
-                .titleSmall!
-                .copyWith(color: cs.outline)),
+            style: Get.textTheme.titleSmall!.copyWith(color: cs.outline)),
         SizedBox(height: 4),
-        Text(student.parentName ?? '-',
-            style: Get.textTheme.titleSmall),
+        Text(student.parentName ?? '-', style: Get.textTheme.titleSmall),
         if (student.parentOccupation != null)
           Text(student.parentOccupation!,
-              style: Get.textTheme
-                  .bodySmall!
-                  .copyWith(color: cs.outline)),
+              style: Get.textTheme.bodySmall!.copyWith(color: cs.outline)),
       ],
     );
   }
@@ -1569,9 +1540,7 @@ class StudentDetailsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: Get.textTheme
-                      .labelSmall!
-                      .copyWith(color: cs.outline)),
+                  style: Get.textTheme.labelSmall!.copyWith(color: cs.outline)),
               Text(value, style: Get.textTheme.titleSmall),
             ],
           ),
@@ -1581,8 +1550,7 @@ class StudentDetailsPage extends StatelessWidget {
   }
 
   Widget _feeStatusChip(BuildContext context, bool paid) {
-    final color =
-        paid ? const Color(0xFF22C55E) : Get.theme.colorScheme.error;
+    final color = paid ? const Color(0xFF22C55E) : Get.theme.colorScheme.error;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
@@ -1597,9 +1565,7 @@ class StudentDetailsPage extends StatelessWidget {
               size: 15, color: color),
           SizedBox(width: 6),
           Text(paid ? 'Admission Fee Paid' : 'Admission Fee Unpaid',
-              style: Get.textTheme
-                  .titleSmall!
-                  .copyWith(color: color)),
+              style: Get.textTheme.titleSmall!.copyWith(color: color)),
         ],
       ),
     );
@@ -1613,26 +1579,8 @@ class StudentDetailsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withOpacity(0.4)),
       ),
-      child: Text(label,
-          style:
-              Get.textTheme.titleSmall!.copyWith(color: color)),
-    );
-  }
-
-  Widget _squareAvatar(String? imageUrl, double size, {double radius = 8}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(radius),
-        color: Colors.grey.shade200,
-        image: imageUrl != null
-            ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover)
-            : null,
-      ),
-      child: imageUrl == null
-          ? Icon(Icons.person, size: size * 0.4, color: Colors.white70)
-          : null,
+      child:
+          Text(label, style: Get.textTheme.titleSmall!.copyWith(color: color)),
     );
   }
 
@@ -1644,9 +1592,7 @@ class StudentDetailsPage extends StatelessWidget {
         Icon(icon, size: 13, color: cs.outline),
         SizedBox(width: 5),
         Text(label,
-            style: Get.textTheme
-                .bodySmall!
-                .copyWith(color: cs.onSurface)),
+            style: Get.textTheme.bodySmall!.copyWith(color: cs.onSurface)),
       ],
     );
   }
@@ -1666,9 +1612,7 @@ class StudentDetailsPage extends StatelessWidget {
         ),
         SizedBox(height: 5),
         Text(label,
-            style: Get.textTheme
-                .labelSmall!
-                .copyWith(color: cs.outline)),
+            style: Get.textTheme.labelSmall!.copyWith(color: cs.outline)),
         SizedBox(height: 2),
         Text(value, style: Get.textTheme.titleSmall),
       ],
@@ -1685,9 +1629,7 @@ class StudentDetailsPage extends StatelessWidget {
           children: [
             Text(label, style: Get.textTheme.labelMedium),
             Text('${(value * 100).toStringAsFixed(0)}%',
-                style: Get.textTheme
-                    .titleSmall!
-                    .copyWith(color: color)),
+                style: Get.textTheme.titleSmall!.copyWith(color: color)),
           ],
         ),
         SizedBox(height: 4),
@@ -1724,9 +1666,7 @@ class StudentDetailsPage extends StatelessWidget {
               Icon(icon, size: 15, color: color),
               SizedBox(width: 6),
               Text(title,
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: color)),
+                  style: Get.textTheme.titleSmall!.copyWith(color: color)),
             ],
           ),
           SizedBox(height: 10),
@@ -1775,13 +1715,9 @@ class StudentDetailsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: Get.textTheme
-                      .labelSmall!
-                      .copyWith(color: color)),
+                  style: Get.textTheme.labelSmall!.copyWith(color: color)),
               Text(value,
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: color)),
+                  style: Get.textTheme.titleSmall!.copyWith(color: color)),
             ],
           ),
         ],
@@ -1799,9 +1735,7 @@ Widget _labelValue(String label, String value) {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(label,
-          style: Get.textTheme
-              .labelSmall!
-              .copyWith(color: Colors.grey)),
+          style: Get.textTheme.labelSmall!.copyWith(color: Colors.grey)),
       SizedBox(height: 3),
       Text(value, style: Get.textTheme.titleSmall),
     ],
@@ -1830,9 +1764,7 @@ Widget summaryCard({
           ),
           child: Center(
             child: Text(value.substring(0, 1),
-                style: Get.textTheme
-                    .titleLarge!
-                    .copyWith(color: color)),
+                style: Get.textTheme.titleLarge!.copyWith(color: color)),
           ),
         ),
         SizedBox(width: 14),
@@ -1840,14 +1772,11 @@ Widget summaryCard({
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: Get.textTheme
-                    .labelSmall!
+                style: Get.textTheme.labelSmall!
                     .copyWith(color: color.withOpacity(0.8))),
             SizedBox(height: 3),
             Text(value,
-                style: Get.textTheme
-                    .titleLarge!
-                    .copyWith(color: color)),
+                style: Get.textTheme.titleLarge!.copyWith(color: color)),
           ],
         ),
       ],
@@ -1903,16 +1832,12 @@ Widget _supportTile(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(role,
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: _blue)),
+                  style: Get.textTheme.titleSmall!.copyWith(color: _blue)),
               SizedBox(height: 2),
               Text(name, style: Get.textTheme.titleSmall),
               SizedBox(height: 3),
               Text('$id  •  $date',
-                  style: Get.textTheme
-                      .labelSmall!
-                      .copyWith(color: cs.outline)),
+                  style: Get.textTheme.labelSmall!.copyWith(color: cs.outline)),
             ],
           ),
         ),

@@ -214,9 +214,9 @@ class StudentsPage extends StatelessWidget {
                                       horizontal: 12),
                                   child: PremiumInfoCard(
                                     extraInfo: '',
-                                    id: student.studentId ?? "NULL",
-                                    title: student.name ?? "NULL",
-                                    subtitle: student.email ?? "NULL",
+                                    id: student.studentId ?? "-",
+                                    title: student.name ?? "-",
+                                    subtitle: student.email ?? "-",
                                     status: student.status,
                                     statusColor:
                                         isActive ? cs.primary : cs.error,

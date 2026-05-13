@@ -160,25 +160,6 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
     );
   }
 
-  // Widget infoRow(String label, String value) {
-  //   return Padding(
-  //     padding: const EdgeInsets.only(bottom: 6),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: [
-  //         Text(
-  //           label,
-  //           style: Get.textTheme.bodySmall,
-  //         ),
-  //         Text(
-  //           value,
-  //           style: Get.textTheme.labelMedium!.copyWith(//             //             //),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Color _getRoleColor(BuildContext context, String type) {
     switch (type) {
       case "student":
@@ -380,7 +361,7 @@ Widget detailCard(
   final cs = Get.theme.colorScheme;
   final textTheme = Get.textTheme;
 
-  final imageUrl = getImageUrl?.call();
+  final imageUrl = "assets/images/logo.png";
 
   final isMissing =
       (name == null || name.isEmpty) && (id == null || id.isEmpty);
@@ -398,13 +379,9 @@ Widget detailCard(
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: color.withOpacity(0.15),
-            backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
-            child: imageUrl == null
-                ? Icon(Icons.person, size: 18, color: color)
-                : null,
+          CustomWidgets().squareAvatar(
+            imageUrl,
+            32,
           ),
           SizedBox(width: 10),
           Expanded(
@@ -555,26 +532,6 @@ Widget infoRow({
     ),
   );
 }
-
-// FloatingActionButton buildAddTicketFAB({
-//   required BuildContext context,
-//   required TextEditingController titleController,
-//   required TextEditingController categoryController,
-//   required TextEditingController priorityController,
-//   required TextEditingController descriptionController,
-//   required RxString selectedType,
-//   required VoidCallback onSubmit,
-// }) {
-//   return FloatingActionButton(
-//     onPressed: () {},
-//     mini: true,
-//     backgroundColor: context.theme.colorScheme.primary,
-//     child: Icon(
-//       Icons.add,
-//       color: context.theme.colorScheme.onPrimary,
-//     ),
-//   );
-// }
 
 // ── Icon chip (search toggle) ─────────────────────────────────────────
 class IconChip extends StatelessWidget {
@@ -1413,8 +1370,18 @@ String formatDate(DateTime date) {
   return DateFormat('dd MMM yyyy').format(date);
 }
 
-String formatTime(DateTime time) {
-  return DateFormat('hh:mm a').format(time);
+String formatTime(TimeOfDay time) {
+  final now = DateTime.now();
+
+  final dateTime = DateTime(
+    now.year,
+    now.month,
+    now.day,
+    time.hour,
+    time.minute,
+  );
+
+  return DateFormat('hh:mm a').format(dateTime);
 }
 
 String getMonthName(int month) {

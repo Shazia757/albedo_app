@@ -8,6 +8,7 @@ import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/advisor_detailed_page.dart';
 import 'package:albedo_app/view/coordinator_detailed_page.dart';
 import 'package:albedo_app/view/mentor_detailed_page.dart';
@@ -25,10 +26,7 @@ import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-
-extension TextThemeExt on BuildContext {
-  TextTheme get tt => Theme.of(this).textTheme;
-}
+import 'package:intl/intl.dart';
 
 class SessionPage extends StatelessWidget {
   final c = Get.put(SessionController(), permanent: true);
@@ -292,18 +290,26 @@ class SessionPage extends StatelessWidget {
       isViewOnly: true,
       context: context,
       title: Text("Session Details"),
-      icon: Icons.visibility_outlined,
       formKey: GlobalKey<FormState>(),
-      submitText: "Close",
       onSubmit: () {},
       sections: [
         Obx(() {
-          final index = c.currentSessionIndex.value;
+          if (sessions.isEmpty) {
+            return const Center(
+              child: Text("No sessions available"),
+            );
+          }
+
+          final index = c.currentSessionIndex.value.clamp(
+            0,
+            sessions.length - 1,
+          );
+
           final data = sessions[index];
           final cs = Get.theme.colorScheme;
 
           return SizedBox(
-            height: MediaQuery.of(context).size.height * 0.75,
+            height: MediaQuery.of(context).size.height * 0.70,
             child: Column(
               children: [
                 // ───────── HEADER NAVIGATION ─────────
@@ -440,7 +446,9 @@ class SessionPage extends StatelessWidget {
                           icon: Icons.schedule_outlined,
                           title: "Schedule",
                           date: formatDate(data.date ?? DateTime.now()),
-                          time: formatTime(data.date ?? DateTime.now()),
+                          time: formatTime(
+                            TimeOfDay.fromDateTime(data.date ?? DateTime.now()),
+                          ),
                           duration: data.duration?.toString() ?? "-",
                           onSave: (date, time) {},
                         ),
@@ -463,13 +471,6 @@ class SessionPage extends StatelessWidget {
                         ),
 
                         SizedBox(height: 16),
-
-                        DetailSectionLabel(
-                          label: "Status",
-                          icon: Icons.flag_outlined,
-                        ),
-
-                        SizedBox(height: 8),
 
                         infoCard(
                           context,
@@ -656,10 +657,7 @@ class SessionPage extends StatelessWidget {
                               label: "Edit",
                               icon: Icons.edit_outlined,
                               color: cs.secondary,
-                              onTap: () {
-                                c.loadSession(data);
-                                editSession(context);
-                              },
+                              onTap: () => editSession(context, data),
                             ),
                           ),
                         SizedBox(width: 8),
@@ -780,6 +778,7 @@ class SessionPage extends StatelessWidget {
     CustomWidgets().showCustomDialog(
       context: context,
       title: Text('Add New Ticket'),
+      submitText: 'Add',
       icon: Icons.support_agent_outlined,
       formKey: GlobalKey<FormState>(),
       sections: [
@@ -826,7 +825,11 @@ class SessionPage extends StatelessWidget {
                             title: Text('Student'),
                             value: "student",
                             groupValue: c.selectedType.value,
-                            onChanged: (value) => c.selectedType.value = value!,
+                            onChanged: (value) {
+                              if (value != null) {
+                                c.selectedType.value = value;
+                              }
+                            },
                           ),
                         ),
                         Expanded(
@@ -851,7 +854,7 @@ class SessionPage extends StatelessWidget {
                         hint: 'Select student');
                   }
                   if (c.selectedType.value == 'teacher') {
-                    return CustomWidgets().customDropdownField(
+                    return CustomWidgets().customDropdownField<Teacher>(
                         items: c.teacherList,
                         onChanged: (p0) {},
                         context: context,
@@ -892,103 +895,135 @@ class SessionPage extends StatelessWidget {
   }
 
   // ── EDIT SESSION DIALOG ───────────────────────────────────────────────
-  void editSession(BuildContext context) {
+  void editSession(BuildContext context, Session data) {
+    // Local values for edit form only
+    final selectedTeacher = Rxn<Teacher>(data.teacher);
+    final selectedDate = Rxn<DateTime>(data.date);
+    final selectedTime = Rxn<TimeOfDay>();
+    final selectedDuration = RxInt(data.duration ?? 0);
+
+    // Controllers
+    c.dateController.text = DateFormat('dd/MM/yyyy').format(data.date!);
+
+    c.salaryController.text = data.teacherSalary?.toString() ?? '';
+
     CustomWidgets().showCustomDialog(
       context: context,
       title: Text('Edit Session'),
       icon: Icons.edit_outlined,
+      submitText: 'Update',
       formKey: GlobalKey<FormState>(),
       sections: [
-        Column(
-          children: [
-            _DialogSectionCard(
-              icon: Icons.schedule_outlined,
-              title: "Schedule",
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CustomWidgets()
-                            .labelWithAsterisk('Session Date', required: true),
-                        SizedBox(height: 8),
-                        CustomWidgets().customDatePickerField(
-                            context: context,
-                            selectedDate: c.selectedDate,
-                            controller: c.dateController),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CustomWidgets()
-                            .labelWithAsterisk('Session Time', required: true),
-                        SizedBox(height: 8),
-                        CustomWidgets().timePickerStyledField(
-                            selectedTime: c.selectedTime,
-                            context: context,
-                            hint: 'Time',
-                            controller: c.timeController),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 12),
-            _DialogSectionCard(
-              icon: Icons.school_outlined,
-              title: "Session Details",
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomWidgets().labelWithAsterisk('Duration', required: true),
-                  SizedBox(height: 8),
-                  // CustomWidgets().customDropdownField(
-                  //   context: context,
-                  //   hint: 'Select Duration',
-                  //   items:
-                  //       c.durationOptions.map((e) => "${(e)} minutes").toList(),
-                  //   onChanged: (p0) {},
-                  // ),
-                  SizedBox(height: 12),
-                  CustomWidgets().labelWithAsterisk('Teacher', required: true),
-                  SizedBox(height: 8),
-                  // CustomWidgets().customDropdownField(
-                  //     context: context,
-                  //     hint: 'Select Teacher',
-                  //     items: [],
-                  //     value: c.selectedTeacher.value,
-                  //     onChanged: (p0) => c.selectedTeacher.value = p0),
-                ],
-              ),
-            ),
-            SizedBox(height: 12),
-            _DialogSectionCard(
-              icon: Icons.payments_outlined,
-              title: "Payment",
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomWidgets().labelWithAsterisk(
-                      'Teacher Salary (per hour — optional)'),
-                  SizedBox(height: 8),
-                  CustomWidgets().dropdownStyledTextField(
-                      isNumber: true,
+        _DialogSectionCard(
+          icon: Icons.schedule_outlined,
+          title: "Schedule",
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomWidgets()
+                        .labelWithAsterisk('Session Date', required: true),
+                    SizedBox(height: 8),
+                    CustomWidgets().customStyledDatePickerField(
                       context: context,
-                      hint: 'Enter teacher salary',
-                      controller: c.salaryController),
-                ],
+                      controller: c.dateController,
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2030),
+                      onDateSelected: (date) {
+                        selectedDate.value = date;
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomWidgets()
+                        .labelWithAsterisk('Session Time', required: true),
+                    SizedBox(height: 8),
+                    CustomWidgets().timePickerStyledField(
+                      selectedTime: selectedTime,
+                      context: context,
+                      hint: 'Time',
+                      controller: c.timeController,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 12),
+        _DialogSectionCard(
+          icon: Icons.school_outlined,
+          title: "Session Details",
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomWidgets().labelWithAsterisk('Duration', required: true),
+              SizedBox(height: 8),
+              CustomWidgets().customDropdownField<String>(
+                context: context,
+                hint: 'Select Duration',
+                itemLabel: (item) => item,
+                items: c.durationOptions.map((e) => "$e minutes").toList(),
+                value: "${data.duration} minutes",
+                onChanged: (p0) {
+                  selectedDuration.value = int.tryParse(
+                        p0?.split(" ").first ?? "0",
+                      ) ??
+                      0;
+                },
+              ),
+              SizedBox(height: 12),
+              CustomWidgets().labelWithAsterisk('Teacher', required: true),
+              SizedBox(height: 8),
+              Obx(
+                () => CustomWidgets().customDropdownField<Teacher>(
+                  context: context,
+                  hint: 'Select Teacher',
+                  itemLabel: (item) => item.name,
+                  items: c.teacherList,
+                  value: selectedTeacher.value,
+                  onChanged: (p0) {
+                    selectedTeacher.value = p0;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 12),
+        _DialogSectionCard(
+          icon: Icons.payments_outlined,
+          title: "Payment",
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomWidgets().labelWithAsterisk(
+                'Teacher Salary (per hour — optional)',
+              ),
+              SizedBox(height: 8),
+              CustomWidgets().dropdownStyledTextField(
+                isNumber: true,
+                context: context,
+                hint: 'Enter teacher salary',
+                controller: c.salaryController,
+              ),
+            ],
+          ),
         ),
       ],
-      onSubmit: () {},
+      onSubmit: () {
+        // use selectedTeacher.value
+        // use selectedDate.value
+        // use selectedDuration.value
+      },
     );
   }
 
@@ -1039,12 +1074,13 @@ class SessionPage extends StatelessWidget {
             SizedBox(height: 12),
             CustomWidgets().labelWithAsterisk('Duration', required: true),
             SizedBox(height: 8),
-            // CustomWidgets().customDropdownField(
-            //   context: context,
-            //   hint: 'Select Duration',
-            //   items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
-            //   onChanged: (p0) {},
-            // ),
+            CustomWidgets().customDropdownField(
+              itemLabel: (item) => item,
+              context: context,
+              hint: 'Select Duration',
+              items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
+              onChanged: (p0) {},
+            ),
           ],
         ),
       ],
@@ -1158,7 +1194,7 @@ class SessionPage extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// SESSION CARD  — clean, professional, data-dense
+// SESSION CARD
 // ═══════════════════════════════════════════════════════════════════════
 class _SessionCard extends StatelessWidget {
   final Session session;
@@ -1366,7 +1402,9 @@ class _SessionCard extends StatelessWidget {
                                 MetaItem(
                                     label: "Time",
                                     value: formatTime(
-                                        session.date ?? DateTime.now()),
+                                      TimeOfDay.fromDateTime(
+                                          session.date ?? DateTime.now()),
+                                    ),
                                     textSecondary: textSecondary),
                               ],
                             ),
@@ -1421,6 +1459,7 @@ class _SessionCard extends StatelessWidget {
       context: context,
       formKey: GlobalKey<FormState>(),
       title: Text("Reschedule Session"),
+      submitText: 'Reschedule',
       isViewOnly: false,
       onSubmit: () {
         // TODO: submit logic
@@ -1535,6 +1574,7 @@ class _TopBar extends StatelessWidget {
           c.applyFilters();
         },
       ),
+      requestCount: 15,
       onRequestTap: (!isStudent &&
               (!isCustom || PermissionService.can("reschedule_requests")))
           ? () => Get.to(() => RescheduleRequestsPage())

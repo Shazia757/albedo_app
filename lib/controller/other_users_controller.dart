@@ -95,7 +95,7 @@ class OtherUsersController extends GetxController {
     if (selectedRole.value != "all") {
       temp = temp
           .where((t) =>
-              (t.role ?? "").toLowerCase().trim() ==
+              (t.role ?? "-").toLowerCase().trim() ==
               selectedRole.value.toLowerCase().trim())
           .toList();
     }

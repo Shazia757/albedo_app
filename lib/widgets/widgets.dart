@@ -1680,6 +1680,60 @@ class CustomWidgets {
     );
   }
 
+  Widget customStyledDatePickerField({
+    required BuildContext context,
+    required TextEditingController controller,
+    required DateTime firstDate,
+    required DateTime lastDate,
+    required Function(DateTime) onDateSelected,
+    DateTime? initialDate,
+    DateTime? currentDate,
+    bool disablePastDates = false,
+    String hint = "Select Date",
+  }) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      onTap: () async {
+        final now = DateTime.now();
+
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: initialDate ?? now,
+          currentDate: currentDate,
+          firstDate: disablePastDates
+              ? DateTime(now.year, now.month, now.day)
+              : firstDate,
+          lastDate: lastDate,
+
+          /// optional theme
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: Theme.of(context).colorScheme,
+              ),
+              child: child!,
+            );
+          },
+        );
+
+        if (picked != null) {
+          controller.text = DateFormat('dd MMM yyyy').format(picked);
+
+          onDateSelected(picked);
+        }
+      },
+      decoration: appInputDecoration(
+        context: context,
+        hint: hint,
+        suffixIcon: const Icon(
+          Icons.calendar_today,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
   Widget customDatePickerField({
     required BuildContext context,
     required TextEditingController controller,
@@ -1688,74 +1742,96 @@ class CustomWidgets {
     final LayerLink layerLink = LayerLink();
     OverlayEntry? overlayEntry;
 
-    void showOverlay() {
-      final renderBox = context.findRenderObject() as RenderBox;
-      final size = renderBox.size;
-      final offset = renderBox.localToGlobal(Offset.zero);
+    return Builder(
+      builder: (fieldContext) {
+        void showOverlay() {
+          final renderBox = fieldContext.findRenderObject() as RenderBox;
 
-      final screenHeight = MediaQuery.of(context).size.height;
-      const popupHeight = 320;
+          final size = renderBox.size;
+          final offset = renderBox.localToGlobal(Offset.zero);
 
-      final showAbove = (offset.dy + size.height + popupHeight > screenHeight);
+          final screenHeight = MediaQuery.of(fieldContext).size.height;
 
-      overlayEntry = OverlayEntry(
-        builder: (context) => Stack(
-          children: [
-            /// 🔴 Background
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => overlayEntry?.remove(),
-                behavior: HitTestBehavior.translucent,
-                child: SizedBox(),
-              ),
-            ),
+          const desiredHeight = 320.0;
+          const margin = 12.0;
 
-            /// 🟢 Calendar
-            Positioned(
-              width: 280,
-              child: CompositedTransformFollower(
-                link: layerLink,
-                offset: Offset(
-                  0,
-                  showAbove ? -popupHeight - 10 : 55,
-                ),
-                child: Material(
-                  elevation: 8,
-                  borderRadius: BorderRadius.circular(12),
-                  child: calendarPopupWidget(
-                    context: context,
-                    selectedDate: selectedDate.value,
-                    onDateSelected: (date) {
-                      controller.text = DateFormat('dd MMM yyyy').format(date);
-                      selectedDate.value = date;
+          final spaceBelow = screenHeight - offset.dy - size.height - margin;
+
+          final spaceAbove = offset.dy - margin;
+
+          final showAbove =
+              spaceBelow < desiredHeight && spaceAbove > spaceBelow;
+
+          final availableHeight = showAbove ? spaceAbove : spaceBelow;
+
+          final popupHeight = availableHeight.clamp(150.0, desiredHeight);
+
+          overlayEntry = OverlayEntry(
+            builder: (_) => Stack(
+              children: [
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () {
                       overlayEntry?.remove();
+                      overlayEntry = null;
                     },
+                    behavior: HitTestBehavior.translucent,
+                    child: const SizedBox(),
                   ),
                 ),
-              ),
-            ),
-          ],
-        ),
-      );
+                CompositedTransformFollower(
+                  link: layerLink,
+                  showWhenUnlinked: false,
+                  offset: Offset(
+                    0,
+                    showAbove ? -(popupHeight + 10) : size.height + 10,
+                  ),
+                  child: Material(
+                    elevation: 8,
+                    borderRadius: BorderRadius.circular(12),
+                    clipBehavior: Clip.antiAlias,
+                    child: SizedBox(
+                      width: size.width,
+                      height: popupHeight,
+                      child: calendarPopupWidget(
+                        context: fieldContext,
+                        selectedDate: selectedDate.value,
+                        onDateSelected: (date) {
+                          controller.text =
+                              DateFormat('dd MMM yyyy').format(date);
 
-      Overlay.of(context).insert(overlayEntry!);
-    }
+                          selectedDate.value = date;
 
-    return CompositedTransformTarget(
-      link: layerLink,
-      child: TextFormField(
-        controller: controller,
-        readOnly: true,
-        onTap: showOverlay,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
+                          overlayEntry?.remove();
+                          overlayEntry = null;
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-        decoration: appInputDecoration(
-          context: context,
-          hint: "Select Date",
-          suffixIcon: const Icon(Icons.calendar_today, size: 18),
-        ),
-      ),
+          );
+
+          final overlay = Overlay.of(fieldContext);
+
+          overlay.insert(overlayEntry!);
+        }
+
+        return CompositedTransformTarget(
+          link: layerLink,
+          child: TextFormField(
+            controller: controller,
+            readOnly: true,
+            onTap: showOverlay,
+            decoration: appInputDecoration(
+              context: fieldContext,
+              hint: "Select Date",
+              suffixIcon: const Icon(Icons.calendar_today, size: 18),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -2045,13 +2121,15 @@ class CustomWidgets {
     final cs = Theme.of(context).colorScheme;
 
     Future<void> pickTime() async {
-      final TimeOfDay? picked = await showTimePicker(
-        context: context,
+      final rootContext = Navigator.of(context, rootNavigator: true).context;
+
+      final picked = await showTimePicker(
+        context: rootContext,
         initialTime: selectedTime.value ?? TimeOfDay.now(),
         initialEntryMode: TimePickerEntryMode.input,
-        builder: (context, child) {
+        builder: (dialogContext, child) {
           return Theme(
-            data: Theme.of(context).copyWith(
+            data: Theme.of(dialogContext).copyWith(
               timePickerTheme: TimePickerThemeData(
                 dayPeriodColor: cs.primary,
               ),
@@ -2063,7 +2141,9 @@ class CustomWidgets {
 
       if (picked != null) {
         selectedTime.value = picked;
+
         final now = DateTime.now();
+
         final dt = DateTime(
           now.year,
           now.month,
@@ -2087,6 +2167,24 @@ class CustomWidgets {
         label: label,
         suffixIcon: const Icon(Icons.access_time),
       ),
+    );
+  }
+
+  Widget squareAvatar(String? imageUrl, double size, {double radius = 8}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(radius),
+        color: Colors.grey.shade200,
+        image: imageUrl != null && imageUrl.isNotEmpty
+            ? DecorationImage(
+                image: NetworkImage(imageUrl), fit: BoxFit.contain)
+            : null,
+      ),
+      child: imageUrl == null || imageUrl.isEmpty
+          ? Icon(Icons.person, size: size * 0.4, color: Colors.white70)
+          : null,
     );
   }
 }

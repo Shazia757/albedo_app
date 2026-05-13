@@ -9,6 +9,7 @@ class HeaderWithSearch extends StatelessWidget {
   final RxString searchQuery;
   final VoidCallback onSearchChanged;
   final VoidCallback? onSortTap;
+  final int? requestCount;
   final VoidCallback? onRequestTap;
   final List<Widget>? actions;
 
@@ -16,6 +17,7 @@ class HeaderWithSearch extends StatelessWidget {
     super.key,
     required this.title,
     this.onRequestTap,
+    this.requestCount,
     required this.hint,
     required this.isSearching,
     required this.searchQuery,
@@ -82,15 +84,46 @@ class HeaderWithSearch extends StatelessWidget {
               ),
 
             if (onRequestTap != null)
-              IconButton(
-                icon: Icon(
-                  Icons.inbox_outlined,
-                  color: cs.primary,
-                ),
-                tooltip: "Requests",
-                onPressed: onRequestTap,
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.inbox_outlined,
+                      color: cs.primary,
+                    ),
+                    tooltip: "Requests",
+                    onPressed: onRequestTap,
+                  ),
+                  if ((requestCount ?? 0) > 0)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        height: 18,
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: cs.surface,
+                            width: 1.5,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          requestCount! > 99 ? '99+' : requestCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-
             if (actions != null) ...actions!,
           ],
         );

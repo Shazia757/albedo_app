@@ -6,7 +6,7 @@ import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/student_wallet_controller.dart';
 import 'package:albedo_app/controller/user_controller.dart';
-import 'package:albedo_app/login_page.dart';
+import 'package:albedo_app/view/login_page.dart';
 import 'package:albedo_app/view/sessions/session_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

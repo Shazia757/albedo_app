@@ -50,7 +50,7 @@ class AddSessionPage extends StatelessWidget {
                             Expanded(
                               child: _buildTypeCard(
                                 context: context,
-                                title: "Class Session",
+                                title: "Class",
                                 icon: Icons.class_,
                                 value: "session",
                                 selectedValue: c.selectedType.value,

@@ -15,6 +15,7 @@ import 'package:albedo_app/view/sessions/session_report_dialog.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 enum SessionSortType { newest, oldest, student, teacher }
 
@@ -41,6 +42,9 @@ class SessionController extends GetxController {
   RxList<SessionReport> reports = <SessionReport>[].obs;
   Rx<Student?> selectedStudent = Rx<Student?>(null);
   Rx<Teacher?> selectedTeacher = Rx<Teacher?>(null);
+  final editSelectedTeacher = Rxn<Teacher>();
+  final editSelectedDuration = Rxn<int>();
+  final editSelectedDate = Rxn<DateTime>();
 
   Rx<Package?> selectedPackage = Rx<Package?>(null);
 
@@ -136,7 +140,7 @@ class SessionController extends GetxController {
     }).toList();
 
     // ✅ Step 2: Teacher filter
-    if (selectedTeacher.value != null && selectedTeacher.value != null) {
+    if (selectedTeacher.value != null) {
       filtered = filtered
           .where((s) => s.teacher?.name == selectedTeacher.value)
           .toList();
@@ -1151,8 +1155,8 @@ class SessionController extends GetxController {
   }
 
   void loadSession(Session session) {
-    dateController.text = session.date.toString();
-
+    dateController.text = DateFormat('dd/MM/yyyy').format(session.date!);
+    selectedDate.value = session.date!;
     selectedDuration.value = session.duration;
     selectedTeacher.value = session.teacher;
 

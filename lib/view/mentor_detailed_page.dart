@@ -857,7 +857,7 @@ class MentorDetailsPage extends StatelessWidget {
                     // Mentor row
                     Row(
                       children: [
-                        _squareAvatar(batch.mentor?.imageUrl, 44),
+                        CustomWidgets().squareAvatar(batch.mentor?.imageUrl, 44),
                         SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -973,7 +973,7 @@ class MentorDetailsPage extends StatelessWidget {
                             color: cs.shadow.withOpacity(0.1), blurRadius: 8)
                       ],
                     ),
-                    child: _squareAvatar(mentor.imageUrl, 64, radius: 12),
+                    child: CustomWidgets().squareAvatar(mentor.imageUrl, 64, radius: 12),
                   ),
                 ),
 
@@ -1220,23 +1220,6 @@ class MentorDetailsPage extends StatelessWidget {
       child: Text(label,
           style:
               Get.textTheme.titleSmall!.copyWith(color: color)),
-    );
-  }
-
-  Widget _squareAvatar(String? imageUrl, double size, {double radius = 8}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(radius),
-        color: Colors.grey.shade200,
-        image: imageUrl != null && imageUrl.isNotEmpty
-            ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover)
-            : null,
-      ),
-      child: imageUrl == null || imageUrl.isEmpty
-          ? Icon(Icons.person, size: size * 0.4, color: Colors.white70)
-          : null,
     );
   }
 
