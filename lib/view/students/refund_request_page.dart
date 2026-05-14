@@ -1,9 +1,12 @@
 import 'package:albedo_app/controller/request_controller.dart';
+import 'package:albedo_app/model/request_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:get/get.dart';
 
 class RefundRequestsPage extends StatelessWidget {
   RefundRequestsPage({super.key});
@@ -42,7 +45,10 @@ class RefundRequestsPage extends StatelessWidget {
                       horizontal: 15.0, vertical: 12),
                   child: Text(
                     'Refund Requests',
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
                 Padding(
@@ -56,19 +62,34 @@ class RefundRequestsPage extends StatelessWidget {
 
                 /// 🔹 LIST
                 Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      int crossAxisCount = constraints.maxWidth > 1200 ? 3 : 1;
+                  child: Obx(
+                    () {
+                      final data = c.filteredStudents;
+                      if (data.isEmpty) {
+                        return EmptyState(
+                          cs: Theme.of(context).colorScheme,
+                          title: 'No requests found',
+                          subtitle:
+                              "Try searching with student or mentor details",
+                          icon: Icons.search_off_rounded,
+                        );
+                      }
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          int crossAxisCount =
+                              constraints.maxWidth > 1200 ? 3 : 1;
 
-                      return MasonryGridView.count(
-                        padding: const EdgeInsets.all(12),
-                        crossAxisCount: crossAxisCount,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        itemCount: requests.length,
-                        itemBuilder: (context, index) {
-                          final r = requests[index];
-                          return RefundRequestCard(data: r);
+                          return MasonryGridView.count(
+                            padding: const EdgeInsets.all(12),
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            itemCount: data.length,
+                            itemBuilder: (context, index) {
+                              final r = data[index];
+                              return RefundRequestCard(data: r);
+                            },
+                          );
                         },
                       );
                     },
@@ -84,7 +105,7 @@ class RefundRequestsPage extends StatelessWidget {
 }
 
 class RefundRequestCard extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final StudentRequest data;
 
   const RefundRequestCard({super.key, required this.data});
 
@@ -111,38 +132,44 @@ class RefundRequestCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: cs.primaryContainer,
-                    borderRadius: BorderRadius.circular(20),
+              /// 🔵 STUDENT (MAIN CARD + STATUS)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _MainUserCard(
+                      name: data.student.name ?? "-",
+                      id: data.student.studentId ?? "-",
+                      cs: cs,
+                    ),
                   ),
-                  child: Text(
-                    "${data["refundCount"] ?? 0} refunds",
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall!
-                        .copyWith(color: cs.primary),
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: cs.primaryContainer,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      "${data.requests.length ?? 0} refunds",
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelSmall!
+                          .copyWith(color: cs.primary),
+                    ),
                   ),
-                ),
-              ),
-
-              /// 🔵 STUDENT (MAIN CARD)
-              _MainUserCard(
-                name: data["studentName"] ?? "-",
-                id: data["studentId"] ?? "-",
-                cs: cs,
+                ],
               ),
 
               SizedBox(height: 12),
 
               /// 🟣 MENTOR (SECONDARY CARD)
               _SubUserCard(
-                name: data["mentorName"] ?? "-",
-                id: data["mentorId"] ?? "-",
+                name: data.student.mentor?.name ?? "-",
+                id: data.student.mentor?.id ?? "-",
                 cs: cs,
               ),
             ],

@@ -27,6 +27,7 @@ class Package {
   String? subjectName;
   String? standard;
   String? syllabus;
+  String? category;
 
   String? status; // Active / Completed / Pending
 
@@ -51,6 +52,7 @@ class Package {
     this.sessions,
     this.course,
     this.days,
+    this.category,
     this.date,
     this.duration,
     this.couponCode,

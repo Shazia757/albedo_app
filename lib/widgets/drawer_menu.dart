@@ -144,6 +144,13 @@ class DrawerMenu extends StatelessWidget {
       index: 0,
       onPressed: () => Get.offAll(() => HomeView()),
     );
+    Widget chat = _menuItem(
+      context,
+      Icons.chat_outlined,
+      "Chat",
+      index: 2,
+      onPressed: () {},
+    );
 
     Widget sessions;
 
@@ -224,7 +231,7 @@ class DrawerMenu extends StatelessWidget {
       context,
       Icons.layers_outlined,
       "Batch",
-      index: 2,
+      index: 3,
       onPressed: () => Get.offAll(() => BatchesPage()),
     );
 
@@ -317,6 +324,7 @@ class DrawerMenu extends StatelessWidget {
       items = [
         home,
         sessions,
+        chat,
         _menuItem(context, Icons.school, "Students",
             index: 20, onPressed: () => Get.offAll(TrStudentsPage())),
         payments,
@@ -327,6 +335,7 @@ class DrawerMenu extends StatelessWidget {
       items = [
         home,
         sessions,
+        chat,
         materials,
         packages,
         _menuItem(context, Icons.school, "Teachers",
@@ -339,6 +348,7 @@ class DrawerMenu extends StatelessWidget {
       items = [
         home,
         sessions,
+        chat,
         _menuItem(context, Icons.school, "Students",
             index: 20, onPressed: () => Get.offAll(StudentsPage())),
         _menuItem(context, Icons.person, "Teachers",
@@ -352,6 +362,7 @@ class DrawerMenu extends StatelessWidget {
       items = [
         home,
         sessions,
+        chat,
         users,
         batch,
         // reports,
@@ -360,6 +371,7 @@ class DrawerMenu extends StatelessWidget {
     } else if (isAdvisor) {
       items = [
         home,
+        chat,
         _menuItem(context, Icons.school, "Students",
             index: 20, onPressed: () => Get.offAll(StudentsPage())),
         // reports,
@@ -368,6 +380,7 @@ class DrawerMenu extends StatelessWidget {
     } else if (isAdmin) {
       items = [
         home,
+        chat,
         sessions,
         users,
         batch,

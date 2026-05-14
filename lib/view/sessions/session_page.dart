@@ -914,7 +914,7 @@ class SessionPage extends StatelessWidget {
       submitText: 'Update',
       formKey: GlobalKey<FormState>(),
       sections: [
-        _DialogSectionCard(
+        DialogSectionCard(
           icon: Icons.schedule_outlined,
           title: "Schedule",
           child: Row(
@@ -959,7 +959,7 @@ class SessionPage extends StatelessWidget {
           ),
         ),
         SizedBox(height: 12),
-        _DialogSectionCard(
+        DialogSectionCard(
           icon: Icons.school_outlined,
           title: "Session Details",
           child: Column(
@@ -999,7 +999,7 @@ class SessionPage extends StatelessWidget {
           ),
         ),
         SizedBox(height: 12),
-        _DialogSectionCard(
+        DialogSectionCard(
           icon: Icons.payments_outlined,
           title: "Payment",
           child: Column(
@@ -1583,49 +1583,3 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// DIALOG HELPERS
-// ═══════════════════════════════════════════════════════════════════════
-
-class _DialogSectionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Widget child;
-
-  const _DialogSectionCard({
-    required this.icon,
-    required this.title,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withOpacity(0.5), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 16, color: cs.primary),
-              SizedBox(width: 6),
-              Text(
-                title,
-                style: Get.textTheme.titleSmall!.copyWith(color: cs.onSurface),
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          child,
-        ],
-      ),
-    );
-  }
-}

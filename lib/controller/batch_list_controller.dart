@@ -148,18 +148,17 @@ class BatchListController extends GetxController {
 
       final query = searchQuery.value.toLowerCase();
 
-      final matchesSearch = (s.batch?.batchName
-                  ?.toLowerCase()
-                  .contains(query) ??
-              false) ||
-          (s.batch?.batchID?.toLowerCase().contains(query) ?? false) ||
-          (s.id.toLowerCase().contains(query)) ||
-          (s.package?.name?.toLowerCase().contains(query) ?? false) ||
-          (s.package?.teacher?.name.toLowerCase().contains(query) ?? false) ||
-          (s.package?.teacher?.id.toLowerCase().contains(query) ?? false) ||
-          (s.package?.standard?.toLowerCase().contains(query) ?? false) ||
-          (s.package?.syllabus?.toLowerCase().contains(query) ?? false) ||
-          (s.date?.toString().toLowerCase().contains(query) ?? false);
+      final matchesSearch =
+          (s.batch?.batchName?.toLowerCase().contains(query) ?? false) ||
+              (s.batch?.batchID?.toLowerCase().contains(query) ?? false) ||
+              (s.id.toLowerCase().contains(query)) ||
+              (s.package?.name?.toLowerCase().contains(query) ?? false) ||
+              (s.package?.teacher?.name.toLowerCase().contains(query) ??
+                  false) ||
+              (s.package?.teacher?.id.toLowerCase().contains(query) ?? false) ||
+              (s.package?.standard?.toLowerCase().contains(query) ?? false) ||
+              (s.package?.syllabus?.toLowerCase().contains(query) ?? false) ||
+              (s.date?.toString().toLowerCase().contains(query) ?? false);
 
       return matchesStatus && matchesSearch;
     }).toList();
@@ -200,8 +199,7 @@ class BatchListController extends GetxController {
             (s.batch?.batchID?.toLowerCase().contains(query) ?? false) ||
             s.id.toLowerCase().contains(query) ||
             (s.package?.name?.toLowerCase().contains(query) ?? false) ||
-            (s.package?.teacher?.name.toLowerCase().contains(query) ??
-                false) ||
+            (s.package?.teacher?.name.toLowerCase().contains(query) ?? false) ||
             (s.package?.teacher?.id.toLowerCase().contains(query) ?? false) ||
             (s.package?.standard?.toLowerCase().contains(query) ?? false) ||
             (s.package?.syllabus?.toLowerCase().contains(query) ?? false);
@@ -409,7 +407,9 @@ class BatchListController extends GetxController {
 
   bool validateSession(BuildContext context) {
     String error = "";
-
+    if (selectedBatch.value == null) {
+      error = "Please select a batch";
+    }
     if (selectedPackage.value == null) {
       error = "Please select a package";
     } else if (selectedTeacher.value == null) {

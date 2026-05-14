@@ -1,5 +1,5 @@
 import 'package:albedo_app/controller/assessment_controller.dart';
-
+import 'package:albedo_app/model/settings/assessment_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -8,13 +8,24 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AddAssessmentPage extends StatelessWidget {
-  AddAssessmentPage({super.key});
+  final Assessment? assessment;
+  AddAssessmentPage({super.key, this.assessment});
 
   final c = Get.put(AssessmentController(), permanent: true);
+
+  bool get isEdit => assessment != null;
 
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+    bool _initialized = false;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_initialized) {
+        c.initForEdit(assessment);
+        _initialized = true;
+      }
+    });
 
     return Scaffold(
       appBar: CustomAppBar(),
@@ -31,7 +42,7 @@ class AddAssessmentPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Add Assessment',
+                        isEdit ? 'Edit Assessment' : 'Add Assessment',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       SizedBox(height: 10),
@@ -99,13 +110,15 @@ class AddAssessmentPage extends StatelessWidget {
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 if (c.validate(context)) {
-                                  c.addAssessment();
+                                  isEdit
+                                      ? c.updateAssessment()
+                                      : c.addAssessment();
                                 }
                               },
                               icon: const Icon(Icons.add,
                                   size: 15, color: Colors.white),
                               label: Text(
-                                'Add',
+                                isEdit ? 'Update' : 'Add',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
@@ -204,7 +217,7 @@ class AddAssessmentPage extends StatelessWidget {
                 children: [
                   Expanded(child: Text(q)),
                   _starRating(
-                    initial: c.attentionRatings[q] ?? 0,
+                    // initial: c.attentionRatings[q] ?? 0,
                     onChanged: (val) => c.attentionRatings[q] = val,
                   ),
                   SizedBox(width: 8),
@@ -324,7 +337,7 @@ class AddAssessmentPage extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
                           _ratingRow((v) {
-                            item["current"] = v;
+                            item.current = v;
                           }),
                           SizedBox(height: 5)
                         ],
@@ -336,7 +349,7 @@ class AddAssessmentPage extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
                           _ratingRow((v) {
-                            item["expected"] = v;
+                            item.expected = v;
                           }),
                         ],
                       ),
@@ -350,8 +363,13 @@ class AddAssessmentPage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    c.academicSubjects
-                        .add({"name": "", "current": 0, "expected": 0});
+                    c.academicSubjects.add(
+                      AcademicData(
+                        name: "",
+                        current: 0,
+                        expected: 0,
+                      ),
+                    );
                   },
                   icon: const Icon(Icons.add, size: 18, color: Colors.white),
                   label: Text(
@@ -428,14 +446,11 @@ class AddAssessmentPage extends StatelessWidget {
                       onPressed: () {
                         if (c.languageController.text.trim().isEmpty) return;
 
-                        c.languages.add({
-                          "name": c.languageController.text.trim(),
-                          "rating": 0,
-                          "reading": false,
-                          "writing": false,
-                          "creativity": false,
-                          "mark": "",
-                        });
+                        c.languages.add(
+                          LanguageData(
+                            name: c.languageController.text.trim(),
+                          ),
+                        );
 
                         c.languageController.clear();
                         c.isAddingLanguage.value = false;
@@ -486,7 +501,7 @@ class AddAssessmentPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          item["name"],
+                          item.name,
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                         IconButton(
@@ -504,25 +519,25 @@ class AddAssessmentPage extends StatelessWidget {
                       children: [
                         _checkBox(
                           label: "Reading",
-                          value: item["reading"] ?? false,
+                          value: item.reading ?? false,
                           onChanged: (v) {
-                            item["reading"] = v;
+                            item.reading = v;
                             c.languages.refresh();
                           },
                         ),
                         _checkBox(
                           label: "Writing",
-                          value: item["writing"] ?? false,
+                          value: item.writing ?? false,
                           onChanged: (v) {
-                            item["writing"] = v;
+                            item.writing = v;
                             c.languages.refresh();
                           },
                         ),
                         _checkBox(
                           label: "Creativity",
-                          value: item["creativity"] ?? false,
+                          value: item.creativity ?? false,
                           onChanged: (v) {
-                            item["creativity"] = v;
+                            item.creativity = v;
                             c.languages.refresh();
                           },
                         ),
@@ -551,9 +566,9 @@ class AddAssessmentPage extends StatelessWidget {
 
                     /// Rating
                     _starRating(
-                      initial: item["rating"] ?? 0,
+                      initial: item.rating ?? 0,
                       onChanged: (v) {
-                        item["rating"] = v;
+                        item.rating = v;
                         c.languages.refresh();
                       },
                     ),
@@ -689,13 +704,13 @@ class AddAssessmentPage extends StatelessWidget {
                         children: [
                           Center(
                             child: Text(
-                              item["name"] ?? "",
+                              item.name ?? "",
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                           ),
                           SizedBox(height: 8),
                           _starRating(onChanged: (v) {
-                            item["rating"] = v;
+                            item.rating = v;
                           }),
                         ],
                       ),
@@ -759,10 +774,10 @@ class AddAssessmentPage extends StatelessWidget {
                         onPressed: () {
                           if (c.mathController.text.trim().isEmpty) return;
 
-                          c.mathTopics.add({
-                            "name": c.mathController.text.trim(),
-                            "rating": 0,
-                          });
+                          c.mathTopics.add(Item(
+                            name: c.mathController.text.trim(),
+                            rating: 0,
+                          ));
 
                           c.mathController.clear();
                           c.isAddingMath.value = false;
@@ -883,13 +898,13 @@ class AddAssessmentPage extends StatelessWidget {
                       children: [
                         Center(
                           child: Text(
-                            item["name"] ?? "",
+                            item.name ?? "",
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         SizedBox(height: 8),
                         _starRating(onChanged: (v) {
-                          item["rating"] = v;
+                          item.rating = v;
                           c.subjects.refresh();
                         }),
                       ],
@@ -949,10 +964,8 @@ class AddAssessmentPage extends StatelessWidget {
                       onPressed: () {
                         if (c.subjectController.text.trim().isEmpty) return;
 
-                        c.subjects.add({
-                          "name": c.subjectController.text.trim(),
-                          "rating": 0,
-                        });
+                        c.subjects.add(Item(
+                            name: c.subjectController.text.trim(), rating: 0));
 
                         c.subjectController.clear();
                         c.isAddingSubject.value = false;
@@ -1075,13 +1088,13 @@ class AddAssessmentPage extends StatelessWidget {
                         children: [
                           Center(
                             child: Text(
-                              item["name"] ?? "",
+                              item.name ?? "",
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                           ),
                           SizedBox(height: 8),
                           _starRating(onChanged: (v) {
-                            item["rating"] = v;
+                            item.rating = v;
                           }),
                         ],
                       ),
@@ -1145,10 +1158,10 @@ class AddAssessmentPage extends StatelessWidget {
                         onPressed: () {
                           if (c.keypointController.text.trim().isEmpty) return;
 
-                          c.keypoints.add({
-                            "name": c.keypointController.text.trim(),
-                            "rating": 0,
-                          });
+                          c.keypoints.add(Item(
+                            name: c.keypointController.text.trim(),
+                            rating: 0,
+                          ));
 
                           c.keypointController.clear();
                           c.isAddingKeypoints.value = false;
@@ -1241,8 +1254,7 @@ class AddAssessmentPage extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(title.toUpperCase(),
-                style: Get.textTheme.titleSmall),
+            Text(title.toUpperCase(), style: Get.textTheme.titleSmall),
             SizedBox(height: 10),
             if (subtitle != null) ...[
               Text(subtitle, style: Get.textTheme.bodySmall),

@@ -10,17 +10,14 @@ class AssessmentController extends GetxController {
   RxBool isAddingSubject = false.obs;
   RxBool isAddingKeypoints = false.obs;
 
-  RxList<Map<String, dynamic>> languages = <Map<String, dynamic>>[].obs;
-  RxList<Map<String, dynamic>> mathTopics = <Map<String, dynamic>>[].obs;
-  RxList<Map<String, dynamic>> subjects = <Map<String, dynamic>>[].obs;
-  RxList<Map<String, dynamic>> keypoints = <Map<String, dynamic>>[].obs;
+  RxList<LanguageData> languages = <LanguageData>[].obs;
+  RxList<Item> mathTopics = <Item>[].obs;
+  RxList<Item> subjects = <Item>[].obs;
+  RxList<Item> keypoints = <Item>[].obs;
 
   final attentionRatings = <String, int>{}.obs;
 
-  final academicSubjects = <Map<String, dynamic>>[
-    {"name": "", "current": 0, "expected": 0},
-    {"name": "", "current": 0, "expected": 0},
-  ].obs;
+final academicSubjects = <AcademicData>[].obs;
 
   TextEditingController subjectController = TextEditingController();
   TextEditingController languageController = TextEditingController();
@@ -37,6 +34,13 @@ class AssessmentController extends GetxController {
       attentionMarkControllers[q] = TextEditingController();
     }
   }
+
+  void initAcademicDefaults() {
+  academicSubjects.assignAll([
+     AcademicData(name: "", current: 0, expected: 0),
+    AcademicData(name: "", current: 0, expected: 0),
+  ]);
+}
 
   void disposeAttention() {
     for (final c in attentionMarkControllers.values) {
@@ -81,4 +85,25 @@ class AssessmentController extends GetxController {
   }
 
   void addAssessment() {}
+
+  void initForEdit(Assessment? assessment) {
+  if (assessment == null) return;
+
+  selectedAssessment.value = assessment.type??'';
+
+  parentOpinionController.text = assessment.parentOpinion ?? "";
+  assessmentSummaryController.text = assessment.summary ?? "";
+
+  // Load dynamic lists safely
+  academicSubjects.assignAll(assessment.academicData ?? []);
+  languages.assignAll(assessment.languages ?? []);
+  mathTopics.assignAll(assessment.mathsData ?? []);
+  subjects.assignAll(assessment.subjectsData ?? []);
+  keypoints.assignAll(assessment.keypoints ?? []);
+
+  // attention
+  // attentionRatings.addAll(assessment.attentionRatings ?? {});
+}
+
+  updateAssessment() {}
 }

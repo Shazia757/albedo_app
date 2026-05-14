@@ -3,6 +3,7 @@ import 'package:albedo_app/controller/batch_list_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/batch/batch_detailed_page.dart';
 import 'package:albedo_app/view/sessions/add_batch_session_page.dart';
 import 'package:albedo_app/view/teacher/tr_detailed_page.dart';
@@ -16,6 +17,7 @@ import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class BatchesListPage extends StatelessWidget {
   final c = Get.put(BatchListController(), permanent: true);
@@ -158,7 +160,7 @@ class BatchesListPage extends StatelessWidget {
             final cs = Theme.of(context).colorScheme;
 
             return SizedBox(
-              height: MediaQuery.of(context).size.height * 0.75,
+              height: MediaQuery.of(context).size.height * 0.70,
               child: Column(
                 children: [
                   /// NAVIGATION
@@ -400,129 +402,70 @@ class BatchesListPage extends StatelessWidget {
                               }),
                             ],
                           ),
-
-                          SizedBox(height: 12),
-
-                          /// ACTIONS
-                          if (session.status != 'completed')
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _DetailActionButton(
-                                    label: "Edit",
-                                    icon: Icons.edit_outlined,
-                                    color: cs.secondary,
-                                    onTap: () {
-                                      c.loadSession(
-                                        session,
-                                      );
-
-                                      editSession(
-                                        context,
-                                      );
-                                    },
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: _DetailActionButton(
-                                    label: "Delete",
-                                    icon: Icons.delete_outline,
-                                    color: cs.error,
-                                    onTap: () {
-                                      CustomWidgets().showDeleteDialog(
-                                        title: 'Are you sure?',
-                                        text:
-                                            'Delete this session permanently?',
-                                        context: context,
-                                        onConfirm: () {
-                                          c.delete(
-                                            session.id,
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: _DetailActionButton(
-                                    label: "Support",
-                                    icon: Icons.support_agent_outlined,
-                                    color: cs.tertiary,
-                                    onTap: () => _addSupport(
-                                      context,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
                         ],
                       ),
                     ),
                   ),
+                  SizedBox(height: 12),
+
+                  /// ACTIONS
+                  if (session.status != 'completed')
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _DetailActionButton(
+                            label: "Edit",
+                            icon: Icons.edit_outlined,
+                            color: cs.secondary,
+                            onTap: () {
+                              c.loadSession(
+                                session,
+                              );
+
+                              editSession(context, session);
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: _DetailActionButton(
+                            label: "Delete",
+                            icon: Icons.delete_outline,
+                            color: cs.error,
+                            onTap: () {
+                              CustomWidgets().showDeleteDialog(
+                                title: 'Are you sure?',
+                                text:
+                                    'Are you sure you want to delete this session permanently?',
+                                context: context,
+                                onConfirm: () {
+                                  c.delete(
+                                    session.id,
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: _DetailActionButton(
+                            label: "Support",
+                            icon: Icons.support_agent_outlined,
+                            color: cs.tertiary,
+                            onTap: () => _addSupport(
+                              context,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             );
           },
         ),
       ],
-    );
-  }
-
-  FloatingActionButton addSessionBtn(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () => CustomWidgets().showCustomDialog(
-        context: context,
-        title: Text("Add Session"),
-        formKey: GlobalKey<FormState>(),
-        onSubmit: () {},
-        sections: [],
-      ),
-      mini: true,
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
-      ),
-    );
-  }
-
-  void _markSessionCompleted(BuildContext context, DateTime date) {
-    CustomWidgets().showCustomDialog(
-      context: context,
-      title: Text('Mark Session as Completed'),
-      formKey: GlobalKey<FormState>(),
-      sections: [
-        Column(
-          children: [
-            CustomWidgets().labelWithAsterisk('Session Date', required: true),
-            SizedBox(height: 8),
-            CustomWidgets().customDatePickerField(
-                context: context,
-                selectedDate: c.selectedDate,
-                controller: c.dateController),
-            SizedBox(width: 12),
-            CustomWidgets().labelWithAsterisk('Start Time', required: true),
-            SizedBox(height: 8),
-            CustomWidgets().timePickerStyledField(
-                selectedTime: c.selectedTime,
-                context: context,
-                hint: 'Time',
-                controller: c.timeController),
-            SizedBox(height: 12),
-            CustomWidgets().labelWithAsterisk('Duration', required: true),
-            SizedBox(height: 8),
-            // CustomWidgets().customDropdownField(
-            //   context: context,
-            //   hint: 'Select Duration',
-            //   items: c.durationOptions.map((e) => "${(e)} minutes").toList(),
-            //   onChanged: (p0) {},
-            // ),
-          ],
-        ),
-      ],
-      onSubmit: () {},
     );
   }
 
@@ -592,20 +535,22 @@ class BatchesListPage extends StatelessWidget {
                     )),
                 SizedBox(height: 8),
                 Obx(() {
-                  // if (c.selectedType.value == 'student') {
-                  //   return CustomWidgets().customDropdownField(
-                  //       items: c.studentsList,
-                  //       onChanged: (p0) {},
-                  //       context: context,
-                  //       hint: 'Select student');
-                  // }
-                  // if (c.selectedType.value == 'teacher') {
-                  //   return CustomWidgets().customDropdownField(
-                  //       items: c.teacherList,
-                  //       onChanged: (p0) {},
-                  //       context: context,
-                  //       hint: 'Select teacher');
-                  // }
+                  if (c.selectedType.value == 'student') {
+                    return CustomWidgets().customDropdownField(
+                        itemLabel: (item) => item.name,
+                        items: c.studentsList,
+                        onChanged: (p0) {},
+                        context: context,
+                        hint: 'Select student');
+                  }
+                  if (c.selectedType.value == 'teacher') {
+                    return CustomWidgets().customDropdownField(
+                        itemLabel: (item) => item.name,
+                        items: c.teacherList,
+                        onChanged: (p0) {},
+                        context: context,
+                        hint: 'Select teacher');
+                  }
                   return SizedBox();
                 }),
                 SizedBox(height: 12),
@@ -666,195 +611,135 @@ class BatchesListPage extends StatelessWidget {
     }
   }
 
-  void editSession(BuildContext context) {
+  void editSession(BuildContext context, Session data) {
+    // Local values for edit form only
+    final selectedTeacher = Rxn<Teacher>(data.teacher);
+    final selectedDate = Rxn<DateTime>(data.date);
+    final selectedTime = Rxn<TimeOfDay>();
+    final selectedDuration = RxInt(data.duration ?? 0);
+
+    // Controllers
+    c.dateController.text = DateFormat('dd/MM/yyyy').format(data.date!);
+
+    c.salaryController.text = data.teacherSalary?.toString() ?? '';
+
     CustomWidgets().showCustomDialog(
       context: context,
       title: Text('Edit Batch Session'),
-      icon: Icons.edit,
+      icon: Icons.edit_outlined,
+      submitText: 'Update',
       formKey: GlobalKey<FormState>(),
       sections: [
-        Column(
-          children: [
-            /// 🔹 SECTION: DATE & TIME
-            _sectionCard(
-              icon: Icons.schedule,
-              title: "Schedule",
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomWidgets()
-                          .labelWithAsterisk('Session Date', required: true),
-                      SizedBox(height: 10),
-                      SizedBox(
-                          width: 150,
-                          child: CustomWidgets().dropdownStyledTextField(
-                            context: context,
-                            hint: 'Date',
-                            controller: c.dateController,
-                          )),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomWidgets()
-                          .labelWithAsterisk('Session Time', required: true),
-                      SizedBox(height: 10),
-                      SizedBox(
-                          width: 150,
-                          child: CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Enter Time',
-                              controller: c.timeController)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 14),
-
-            /// 🔹 SECTION: SESSION DETAILS
-            _sectionCard(
-              icon: Icons.school,
-              title: "Session Details",
-              child: Column(
-                children: [
-                  CustomWidgets().labelWithAsterisk('Duration', required: true),
-                  SizedBox(height: 10),
-                  CustomWidgets().customDropdownField(
-                      context: context,
-                      hint: 'Select Duration',
-                      value: c.selectedDuration.value,
-                      items: [],
-                      itemLabel: (item) => "$item mins",
-                      onChanged: (p0) => c.selectedDuration.value = p0),
-                  SizedBox(height: 12),
-                  CustomWidgets().labelWithAsterisk('Teacher', required: true),
-                  SizedBox(height: 10),
-                  //         CustomWidgets().customDropdownField(
-
-                  //             context: context,
-                  //             hint: 'Select Teacher',
-                  //             items: c.teacherList,
-                  //             value: c.selectedTeacher.value,
-                  //             onChanged: (p0) => c.selectedTeacher.value = p0,
-                  // itemLabel: (item) => item.toString()
-                  //             ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 14),
-
-            /// 🔹 SECTION: PAYMENT
-            _sectionCard(
-              icon: Icons.payments_outlined,
-              title: "Payment",
-              child: Column(
-                children: [
-                  CustomWidgets().labelWithAsterisk(
-                    'Teacher Salary (per hour - optional)',
-                  ),
-                  SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      isNumber: true,
-                      context: context,
-                      hint: 'Enter Teacher Salary',
-                      controller: c.salaryController),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-      onSubmit: () {},
-    );
-  }
-
-  Widget _sectionCard({
-    required IconData icon,
-    required String title,
-    required Widget child,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.transparent),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+        DialogSectionCard(
+          icon: Icons.schedule_outlined,
+          title: "Schedule",
+          child: Row(
             children: [
-              Icon(icon, size: 18),
-              SizedBox(width: 6),
-              Text(
-                title,
-                style: Get.textTheme.titleSmall,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomWidgets()
+                        .labelWithAsterisk('Session Date', required: true),
+                    SizedBox(height: 8),
+                    CustomWidgets().customStyledDatePickerField(
+                      context: context,
+                      controller: c.dateController,
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2030),
+                      onDateSelected: (date) {
+                        selectedDate.value = date;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomWidgets()
+                        .labelWithAsterisk('Session Time', required: true),
+                    SizedBox(height: 8),
+                    CustomWidgets().timePickerStyledField(
+                      selectedTime: selectedTime,
+                      context: context,
+                      hint: 'Time',
+                      controller: c.timeController,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          SizedBox(height: 10),
-          child,
-        ],
-      ),
-    );
-  }
-
-  Widget _miniInfo(
-      {required BuildContext context, String? label, required String value}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label ?? '',
-          style: Theme.of(context)
-              .textTheme
-              .labelSmall!
-              .copyWith(color: Theme.of(context).colorScheme.outline),
         ),
-        SizedBox(height: 2),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.labelMedium,
+        SizedBox(height: 12),
+        DialogSectionCard(
+          icon: Icons.school_outlined,
+          title: "Session Details",
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomWidgets().labelWithAsterisk('Duration', required: true),
+              SizedBox(height: 8),
+              CustomWidgets().customDropdownField<String>(
+                context: context,
+                hint: 'Select Duration',
+                itemLabel: (item) => item,
+                items: c.durationOptions.map((e) => "$e minutes").toList(),
+                value: "${data.duration} minutes",
+                onChanged: (p0) {
+                  selectedDuration.value = int.tryParse(
+                        p0?.split(" ").first ?? "0",
+                      ) ??
+                      0;
+                },
+              ),
+              SizedBox(height: 12),
+              CustomWidgets().labelWithAsterisk('Teacher', required: true),
+              SizedBox(height: 8),
+              Obx(
+                () => CustomWidgets().customDropdownField<Teacher>(
+                  context: context,
+                  hint: 'Select Teacher',
+                  itemLabel: (item) => item.name,
+                  items: c.teacherList,
+                  value: selectedTeacher.value,
+                  onChanged: (p0) {
+                    selectedTeacher.value = p0;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 12),
+        DialogSectionCard(
+          icon: Icons.payments_outlined,
+          title: "Payment",
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomWidgets().labelWithAsterisk(
+                'Teacher Salary (per hour — optional)',
+              ),
+              SizedBox(height: 8),
+              CustomWidgets().dropdownStyledTextField(
+                isNumber: true,
+                context: context,
+                hint: 'Enter teacher salary',
+                controller: c.salaryController,
+              ),
+            ],
+          ),
         ),
       ],
-    );
-  }
-
-  Widget _personCompact(
-      BuildContext context, String label, String name, String id) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label.toUpperCase(),
-          style: Theme.of(context)
-              .textTheme
-              .labelSmall!
-              .copyWith(color: Theme.of(context).colorScheme.outline),
-        ),
-        SizedBox(height: 2),
-        Text(
-          name,
-          style: Theme.of(context).textTheme.titleSmall,
-          overflow: TextOverflow.ellipsis,
-        ),
-        Text(
-          id,
-          style: Theme.of(context)
-              .textTheme
-              .labelSmall!
-              .copyWith(color: Theme.of(context).colorScheme.outline),
-        ),
-      ],
+      onSubmit: () {
+        // use selectedTeacher.value
+        // use selectedDate.value
+        // use selectedDuration.value
+      },
     );
   }
 

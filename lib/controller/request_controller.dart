@@ -1,3 +1,7 @@
+import 'package:albedo_app/model/request_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class RequestController {
@@ -12,43 +16,69 @@ class RequestController {
     "rescheduled",
   ];
 
-  /// MOCK DATA (replace with API)
-  final students = List.generate(10, (i) {
-    return {
-      "name": "Student $i",
-      "id": "STU00$i",
-      "image": "https://i.pravatar.cc/150?img=${i + 1}",
+  final students = List.generate(
+    10,
+    (i) => StudentRequest(
+      student: Student(
+        name: "Student $i",
+        studentId: "STU00$i",
+        imageUrl: "https://i.pravatar.cc/150?img=${i + 1}",
+      ),
+      pending: i % 3,
+      approved: i % 2,
+      rejected: i % 2 == 0 ? 1 : 0,
+      rescheduled: i % 4,
+      requests: List.generate(
+        4,
+        (j) {
+          final statuses = [
+            "Pending",
+            "Approved",
+            "Rejected",
+            "Rescheduled",
+          ];
 
-      "pending": i % 3,
-      "approved": i % 2,
-      "rejected": i % 2 == 0 ? 1 : 0,
-      "rescheduled": i % 4,
+          return Requests(
+            requestId: "REQ-${i + 1}${j + 1}",
+            status: statuses[j % statuses.length],
+            currentDate: "12 May 2026",
+            currentTime: "${10 + j}:00 AM",
+            suggestedDate: "14 May 2026",
+            suggestedTime: "${2 + j}:30 PM",
+            subject: j % 2 == 0 ? "Mathematics" : "Physics",
+            standard: "${8 + j}",
+            syllabus: j % 2 == 0 ? "CBSE" : "State",
+            reason: j % 2 == 0 ? "School examination" : "Medical appointment",
+            createdAt: "${10 + j} May 2026",
+          );
+        },
+      ),
+    ),
+  );
 
-      /// REQUESTS
-      "requests": List.generate(4, (j) {
-        final statuses = [
-          "Pending",
-          "Approved",
-          "Rejected",
-          "Rescheduled",
-        ];
+  List<StudentRequest> get filteredStudents {
+  final query = searchQuery.value.toLowerCase().trim();
 
-        return {
-          "requestId": "REQ-${i + 1}${j + 1}",
-          "status": statuses[j % statuses.length],
-          "currentDate": "12 May 2026",
-          "currentTime": "${10 + j}:00 AM",
-          "suggestedDate": "14 May 2026",
-          "suggestedTime": "${2 + j}:30 PM",
-          "subject": j % 2 == 0 ? "Mathematics" : "Physics",
-          "standard": "${8 + j}",
-          "syllabus": j % 2 == 0 ? "CBSE" : "State",
-          "reason": j % 2 == 0 ? "School examination" : "Medical appointment",
-          "createdAt": "${10 + j} May 2026",
-        };
-      }),
-    };
-  });
+  if (query.isEmpty) return students;
+
+  return students.where((item) {
+    final studentName = item.student.name.toLowerCase();
+    final studentId = item.student.studentId?.toLowerCase()??'';
+
+    // Optional mentor fields
+    final mentorName =
+        item.student.mentor?.name.toLowerCase() ?? "";
+
+    final mentorId =
+        item.student.mentor?.id?.toLowerCase() ?? "";
+
+    return studentName.contains(query) ||
+        studentId.contains(query) ||
+        mentorName.contains(query) ||
+        mentorId.contains(query);
+  }).toList();
+}
+
   int getCount(int index) {
     if (tabs.isEmpty || index >= tabs.length) return 0;
 
@@ -62,47 +92,63 @@ class RequestController {
     return students.length;
   }
 
-  final teachers = List.generate(10, (i) {
-    return {
-      "name": "Teacher $i",
-      "id": "TCH00$i",
-      "image": "https://i.pravatar.cc/150?img=${i + 20}",
+  List<StudentRequest> get filteredRequests {
+    final q = searchQuery.value.toLowerCase();
 
-      "pending": i % 2,
-      "approved": i % 3,
-      "rejected": i % 2 == 1 ? 1 : 0,
-      "rescheduled": i % 5,
+    if (q.isEmpty) return students;
 
-      /// REQUESTS
-      "requests": List.generate(4, (j) {
-        final statuses = [
-          "Pending",
-          "Approved",
-          "Rejected",
-          "Rescheduled",
-        ];
+    return students.where((e) {
+      return (e.student.name ?? '').toLowerCase().contains(q) ||
+          (e.student.mentor?.name ?? '').toLowerCase().contains(q);
+    }).toList();
+  }
 
-        return {
-          "requestId": "TREQ-${i + 1}${j + 1}",
-          "status": statuses[j % statuses.length],
-          "currentDate": "15 May 2026",
-          "currentTime": "${9 + j}:00 AM",
-          "suggestedDate": "18 May 2026",
-          "suggestedTime": "${1 + j}:30 PM",
-          "subject": j % 2 == 0 ? "Chemistry" : "Biology",
-          "standard": "${9 + j}",
-          "syllabus": j % 2 == 0 ? "CBSE" : "ICSE",
-          "reason": j % 2 == 0 ? "Personal emergency" : "Medical leave",
-          "createdAt": "${11 + j} May 2026",
-        };
-      }),
-    };
-  });
-  
-  bool hasAnyStatus(Map<String, dynamic> data) {
-    return (data["pending"] ?? 0) > 0 ||
-        (data["approved"] ?? 0) > 0 ||
-        (data["rejected"] ?? 0) > 0 ||
-        (data["rescheduled"] ?? 0) > 0;
+  final teachers = List.generate(
+    10,
+    (i) => TeacherRequest(
+      teacher: Teacher(
+        name: "Teacher $i",
+        id: "TCH00$i",
+        imageUrl: "https://i.pravatar.cc/150?img=${i + 20}",
+      ),
+      pending: i % 2,
+      approved: i % 3,
+      rejected: i % 2 == 1 ? 1 : 0,
+      rescheduled: i % 5,
+      requests: List.generate(
+        4,
+        (j) {
+          final statuses = [
+            "Pending",
+            "Approved",
+            "Rejected",
+            "Rescheduled",
+          ];
+
+          return Requests(
+            requestId: "TREQ-${i + 1}${j + 1}",
+            status: statuses[j % statuses.length],
+            currentDate: "15 May 2026",
+            currentTime: "${9 + j}:00 AM",
+            suggestedDate: "18 May 2026",
+            suggestedTime: "${1 + j}:30 PM",
+            subject: j % 2 == 0 ? "Chemistry" : "Biology",
+            standard: "${9 + j}",
+            syllabus: j % 2 == 0 ? "CBSE" : "ICSE",
+            reason: j % 2 == 0 ? "Personal emergency" : "Medical leave",
+            createdAt: "${11 + j} May 2026",
+          );
+        },
+      ),
+    ),
+  );
+
+  bool hasAnyStatus(BaseRequestUser item) {
+    return item.pending > 0 ||
+        item.approved > 0 ||
+        item.rejected > 0 ||
+        item.rescheduled > 0;
   }
 }
+
+class RefundController extends GetxController {}

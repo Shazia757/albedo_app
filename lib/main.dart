@@ -4,10 +4,14 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/home_controller.dart';
 import 'package:albedo_app/controller/mentor_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
+import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/controller/student_wallet_controller.dart';
+import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/controller/user_controller.dart';
 import 'package:albedo_app/view/login_page.dart';
+import 'package:albedo_app/view/sessions/batch_session_page.dart';
 import 'package:albedo_app/view/sessions/session_page.dart';
+import 'package:albedo_app/view/users/students_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -20,6 +24,8 @@ Future<void> main() async {
   Get.put(UserController(), permanent: true);
   Get.put(HomeController(), permanent: true);
   Get.put(PermissionsController(), permanent: true);
+  Get.put(StudentController(), permanent: true);
+  Get.put(TeacherController(), permanent: true);
   Get.put(MentorController(), permanent: true);
   Get.put(StudentWalletController(), permanent: true);
   runApp(MyApp());
@@ -63,7 +69,7 @@ class MyApp extends StatelessWidget {
 
       themeMode: ThemeMode.light,
 
-      home: isLoggedIn ? SessionPage() : LoginView(),
+      home: isLoggedIn ? StudentsPage() : LoginView(),
     );
   }
 }

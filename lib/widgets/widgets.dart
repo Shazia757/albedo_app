@@ -839,7 +839,10 @@ class CustomWidgets {
                       ),
                       child: Text(
                         "Deactivate",
-                        style: Theme.of(context).textTheme.titleSmall,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ),
@@ -1594,6 +1597,7 @@ class CustomWidgets {
     VoidCallback? onTogglePassword,
     bool readOnly = false,
     VoidCallback? onTap,
+    int? maxLength,
   }) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
@@ -1606,7 +1610,11 @@ class CustomWidgets {
         color: cs.onSurface,
       ),
       inputFormatters: isNumber
-          ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))]
+          ? [
+              FilteringTextInputFormatter.allow(
+                RegExp(r'[0-9.]'),
+              ),
+            ]
           : null,
       readOnly: readOnly,
       onTap: onTap,
@@ -1616,21 +1624,22 @@ class CustomWidgets {
           : isMultiline
               ? null
               : 1,
+      maxLength: maxLength,
       keyboardType: isMultiline
           ? TextInputType.multiline
           : isNumber
-              ? TextInputType.number
+              ? const TextInputType.numberWithOptions(
+                  decimal: true,
+                )
               : TextInputType.text,
       textInputAction:
           isMultiline ? TextInputAction.newline : TextInputAction.done,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-
         hintStyle: textTheme.bodySmall?.copyWith(
           color: cs.outline.withOpacity(0.6),
         ),
-
         suffixIcon: isPassword
             ? IconButton(
                 splashRadius: 20,
@@ -1644,31 +1653,24 @@ class CustomWidgets {
                 ),
               )
             : null,
-
-        /// BACKGROUND
         filled: true,
         fillColor: cs.onPrimary.withOpacity(0.8),
-
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 12,
         ),
-
-        /// BORDER
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: cs.outline.withOpacity(0.5),
           ),
         ),
-
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: cs.outline.withOpacity(0.5),
           ),
         ),
-
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
@@ -1710,8 +1712,10 @@ class CustomWidgets {
           builder: (context, child) {
             return Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: Theme.of(context).colorScheme,
-              ),
+                  colorScheme: Theme.of(context).colorScheme,
+                  textTheme: const TextTheme(
+                    titleMedium: TextStyle(fontSize: 6.0),
+                  )),
               child: child!,
             );
           },

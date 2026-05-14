@@ -4,14 +4,23 @@ class Assessment {
   List<String>? testType;
   String? date;
   String? time;
+
   String? parentOpinion;
   String? summary;
+
   List<String>? attentionQuestions;
   List<AttentionItem>? attentionData;
+
   List<AcademicData>? academicData;
+
+  List<LanguageData>? languages;
+
   List<Item>? mathsData;
+
   List<Item>? subjectsData;
-  List? keypoints;
+
+  List<Item>? keypoints;
+
   String? createdBy;
   String? approvedBy;
 
@@ -21,15 +30,34 @@ class Assessment {
     required this.testType,
     this.date,
     this.time,
-    this.createdBy,
-    this.approvedBy,
+    this.parentOpinion,
     this.summary,
-    this.keypoints,
-    this.mathsData,
-    this.subjectsData,
     this.attentionQuestions,
     this.attentionData,
-    this.parentOpinion,
+    this.academicData,
+    this.languages,
+    this.mathsData,
+    this.subjectsData,
+    this.keypoints,
+    this.createdBy,
+    this.approvedBy,
+  });
+}
+class LanguageData {
+  String name;
+  int rating;
+  bool reading;
+  bool writing;
+  bool creativity;
+  String mark;
+
+  LanguageData({
+    required this.name,
+    this.rating = 0,
+    this.reading = false,
+    this.writing = false,
+    this.creativity = false,
+    this.mark = "",
   });
 }
 

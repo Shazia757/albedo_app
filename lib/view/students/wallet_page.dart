@@ -205,7 +205,11 @@ class _FilterRow extends StatelessWidget {
                     hint: 'Enter coupon code',
                     controller: c.couponcodeController),
               ],
-              onSubmit: () {},
+              onSubmit: () {
+                if (c.validateCouponCode(context)) {
+                  c.applyCoupon();
+                }
+              },
               submitText: 'Validate & Apply',
             ),
             style: ElevatedButton.styleFrom(
@@ -323,7 +327,9 @@ class _FilterRow extends StatelessWidget {
         SizedBox(height: 10),
       ],
       submitText: 'Request',
-      onSubmit: () {},
+      onSubmit: () {if (c.validateRequest(context)) {
+        c.requestRefund();
+      }},
     );
   }
 }
@@ -881,6 +887,9 @@ void _showWalletSummary(
               ],
             ),
             _WalletSummaryItem(
+                title: "Total Consumed Credit",
+                value: "₹${creditUsedAmount.toStringAsFixed(0)}"),
+            _WalletSummaryItem(
                 title: "Coupon Amount",
                 value: "₹${totalCoupons.toStringAsFixed(0)}"),
             _WalletSummaryItem(
@@ -890,7 +899,7 @@ void _showWalletSummary(
                 title: "Approved Deposits",
                 value: "₹${totalDeposits.toStringAsFixed(0)}"),
             _WalletSummaryItem(
-                title: "Credit Repayments", value: creditRepayments.toString()),
+                title: "Approved Credit Repayments", value: creditRepayments.toString()),
           ];
           return ExpandableSummaryCard(
             title: items[i].title,

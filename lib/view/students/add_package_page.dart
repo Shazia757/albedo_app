@@ -11,13 +11,24 @@ import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class AddPackagePage extends StatelessWidget {
-  AddPackagePage({super.key});
+  final Package? package;
+  AddPackagePage({super.key, this.package});
 
   final c = Get.put(PackageController());
+
+  bool get isEdit => package != null;
 
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isEdit) {
+        c.loadPackage(package!);
+      } else {
+        c.clearForm();
+      }
+    });
 
     return Scaffold(
       appBar: CustomAppBar(),
@@ -34,8 +45,9 @@ class AddPackagePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Add Package',
-                        style: Theme.of(context).textTheme.titleLarge,
+                        isEdit ? 'Edit Package' : 'Add Package',
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.primary),
                       ),
                       SizedBox(height: 10),
                       CustomWidgets()
@@ -403,13 +415,17 @@ class AddPackagePage extends StatelessWidget {
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 if (c.validateSession(context)) {
-                                  c.addPackage();
+                                  if (isEdit) {
+                                    c.updatePackage(package!);
+                                  } else {
+                                    c.addPackage();
+                                  }
                                 }
                               },
-                              icon: const Icon(Icons.add,
+                              icon: Icon(isEdit ? Icons.edit : Icons.add,
                                   size: 15, color: Colors.white),
                               label: Text(
-                                'Add',
+                                isEdit ? 'Update' : 'Add',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!

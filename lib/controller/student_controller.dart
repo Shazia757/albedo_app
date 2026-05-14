@@ -17,6 +17,31 @@ import 'package:get/get.dart';
 
 enum StudentSortType { newest, oldest, name }
 
+enum StudentStatus {
+  demoPending,
+  demoCompleted,
+  askedRefund,
+  firstCallCompleted,
+  joinedClass,
+}
+
+extension StudentStatusLabel on StudentStatus {
+  String get label {
+    switch (this) {
+      case StudentStatus.demoPending:
+        return "Demo Pending";
+      case StudentStatus.demoCompleted:
+        return "Demo Completed";
+      case StudentStatus.askedRefund:
+        return "Asked Refund";
+      case StudentStatus.firstCallCompleted:
+        return "First Call Completed";
+      case StudentStatus.joinedClass:
+        return "Joined Class";
+    }
+  }
+}
+
 class StudentController extends GetxController {
   final AuthController auth = Get.find();
 
@@ -33,7 +58,7 @@ class StudentController extends GetxController {
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
   RxBool isActive = false.obs;
-  RxString status = "Demo Pending".obs;
+  Rx<StudentStatus> status = StudentStatus.demoPending.obs;
   var selectedIndex = 0.obs;
   RxString selectedFilter = "All".obs;
   Rx<Package?> selectedPackage = Rx<Package?>(null);
@@ -41,6 +66,7 @@ class StudentController extends GetxController {
   final RxString selectedMentor = ''.obs;
   final RxString selectedAdvisor = ''.obs;
   final RxString selectedReferralSource = ''.obs;
+  final certificateFormKey = GlobalKey<FormState>();
 
   RxInt feedbackTabIndex = 0.obs;
 
@@ -99,6 +125,7 @@ class StudentController extends GetxController {
   void onInit() {
     super.onInit();
     fetchStudents();
+    refundedC.addListener(_updateConvenience);
   }
 
   List<String> tabs = [
@@ -258,6 +285,7 @@ class StudentController extends GetxController {
               standard: '10',
               duration: '50',
               packageFee: 15000,
+              takenFee: 5000,
               sessions: [
                 Session(
                     id: '1',
@@ -572,4 +600,149 @@ class StudentController extends GetxController {
   void addStudent() {}
 
   void updateStudent() {}
+
+  final packageRefundC = TextEditingController();
+  final refundableC = TextEditingController();
+  final refundedC = TextEditingController();
+  final convenienceC = TextEditingController();
+  final reasonC = TextEditingController();
+
+  double packageFee = 0;
+  double takenFee = 0;
+  double totalPaid = 0;
+
+  double refundable = 0;
+
+  void init({
+    required double packageFee,
+    required double takenFee,
+    required double totalPaid,
+  }) {
+    this.packageFee = packageFee;
+    this.takenFee = takenFee;
+    this.totalPaid = totalPaid;
+
+    refundedC.removeListener(_updateConvenience);
+    refundedC.addListener(_updateConvenience);
+
+    _recalculateAll();
+  }
+
+  void _recalculateAll() {
+    final packageRefund = packageFee - takenFee;
+    refundable = totalPaid - takenFee;
+
+    packageRefundC.text = packageRefund.toStringAsFixed(2);
+    refundableC.text = refundable.toStringAsFixed(2);
+
+    // default refunded = refundable initially
+    if (refundedC.text.isEmpty) {
+      refundedC.text = refundable.toStringAsFixed(2);
+    }
+
+    _updateConvenience();
+  }
+
+  void onRefundedChanged(String value) {
+    final refunded = double.tryParse(value) ?? 0;
+
+    if (refunded > refundable) {
+      refundedC.text = refundable.toStringAsFixed(2);
+      return;
+    }
+
+    _updateConvenience();
+  }
+
+  void submitRefund(Map<String, Object> payload) {}
+
+  void _updateConvenience() {
+    final refunded = double.tryParse(refundedC.text) ?? 0;
+
+    final conv = (refundable - refunded).clamp(0, double.infinity);
+
+    convenienceC.text = conv.toStringAsFixed(2);
+  }
+
+  @override
+  void onClose() {
+    refundedC.removeListener(_updateConvenience);
+
+    packageRefundC.dispose();
+    refundableC.dispose();
+    refundedC.dispose();
+    convenienceC.dispose();
+    reasonC.dispose();
+
+    super.onClose();
+  }
+
+  bool validateCouponCode(BuildContext context) {
+    String error = "";
+
+    if (couponcodeController.text.trim().isEmpty) {
+      error = "Coupon Code is required";
+    }
+
+    if (error.isNotEmpty) {
+      Get.snackbar(
+        "Error",
+        error,
+        snackPosition: SnackPosition.TOP,
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  void applyCoupon() {}
+
+  bool validateRequest(BuildContext context) {
+    String error = "";
+
+    if (refundAmountController.text.trim().isEmpty) {
+      error = "Coupon Code is required";
+    } else if (refundMessageController.text.trim().isEmpty) {
+      error = "Reason is required";
+    }
+
+    if (error.isNotEmpty) {
+      Get.snackbar(
+        "Error",
+        error,
+        snackPosition: SnackPosition.TOP,
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  void requestRefund() {}
+
+  bool validateCertificate(BuildContext context) {
+    String error = "";
+
+    if (step.value == 1) {
+      if (nameController.text.trim().isEmpty) {
+        error = "Certificate name is required";
+      } else if (selectedPackage.value == null) {
+        error = "Please select a package";
+      }
+    }
+
+    if (error.isNotEmpty) {
+      Get.snackbar(
+        "Error",
+        error,
+        snackPosition: SnackPosition.TOP,
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
 }

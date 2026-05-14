@@ -33,10 +33,10 @@ class PackageController extends GetxController {
   RxList<Session> monthSessions = <Session>[].obs;
 
   var selectedTime = Rxn<TimeOfDay>();
-  var selectedDuration = Rxn<int>();
+  var selectedDuration = Rxn<String>();
   var selectedTab = 0.obs;
 
-  final durationOptions = [30, 45, 60, 75, 90, 105, 120];
+  final durationOptions = ['30', '45', '60', '75', '90', '105', '120'];
   final tutionOptions = ['Online Tuition'];
 
   TextEditingController classCountController = TextEditingController();
@@ -103,15 +103,57 @@ class PackageController extends GetxController {
     }
   }
 
-  void loadPackage(Package package) {
-    isLoading.value = true;
+ void loadPackage(Package package) {
+  selectedType.value =  'package';
 
-    sessions.value = package.sessions ?? [];
+  selectedPackage.value = package;
+  selectedCourse.value = package.course;
+  selectedSyllabus.value = package.syllabus;
+  selectedCategory.value = package.category;
+  selectedStandard.value = package.standard;
 
-    applyFilters();
+  classCountController.text =
+      package.numberOfClasses?.toString() ?? '';
 
-    isLoading.value = false;
+  timeController.text = package.time ?? '';
+
+  selectedDuration.value = package.duration;
+
+  durationDaysController.text =
+      package.durationDays?.toString() ?? '';
+
+  studentFeeController.text =
+      package.studentFeePerHour?.toString() ?? '';
+
+  totalPackageFeeController.text =
+      package.packageFee?.toString() ?? '';
+
+  selectedTuitionMode.value = package.mode;
+
+  selectedTeacher.value = package.teacher;
+
+  salaryController.text =
+      package.teacherSalaryPerHour?.toString() ?? '';
+
+  if (package.days != null) {
+    selectedDateType.value = 'regular';
+
+    selectedDays.clear();
+
+    /// if single enum
+    selectedDays.add(package.days!);
+
+    /// if ALL selected
+    if (package.days == Days.all) {
+      selectedDays.assignAll(Days.values);
+    }
   }
+
+  if ((package.couponCode ?? '').isNotEmpty) {
+    applyCoupon.value = true;
+    couponController.text = package.couponCode!;
+  }
+}
 
   void applyFilters() {
     final status = statusMap[selectedTab.value];
@@ -537,5 +579,46 @@ class PackageController extends GetxController {
     return true;
 
     ///TODO
+  }
+
+  void updatePackage(id) {}
+
+  void clearForm() {
+    selectedType.value = 'package';
+
+    selectedPackage.value = null;
+    selectedCourse.value = null;
+    selectedSyllabus.value = null;
+    selectedCategory.value = null;
+    selectedStandard.value = null;
+
+    classCountController.clear();
+
+    timeController.clear();
+    selectedTime.value = null;
+
+    selectedDuration.value = null;
+
+    durationDaysController.clear();
+    durationError.value = '';
+
+    studentFeeController.clear();
+    totalPackageFeeController.clear();
+
+    selectedTuitionMode.value = null;
+
+    selectedTeacher.value = null;
+
+    salaryController.clear();
+
+    selectedDateType.value = 'regular';
+
+    selectedDays.clear();
+    selectedDates.clear();
+
+    dateError.value = '';
+
+    applyCoupon.value = false;
+    couponController.clear();
   }
 }

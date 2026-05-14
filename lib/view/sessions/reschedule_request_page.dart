@@ -1,4 +1,6 @@
 import 'package:albedo_app/controller/request_controller.dart';
+import 'package:albedo_app/model/request_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/view/sessions/reshedule_detailed_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -63,7 +65,7 @@ class RescheduleRequestsPage extends StatelessWidget {
                   /// 🔹 LIST
                   Expanded(
                     child: Obx(() {
-                      final list =
+                      final List<BaseRequestUser> list =
                           c.selectedTab.value == 0 ? c.students : c.teachers;
 
                       final filteredList =
@@ -89,7 +91,7 @@ class RescheduleRequestsPage extends StatelessWidget {
 }
 
 class RescheduleCard extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final BaseRequestUser data;
 
   const RescheduleCard({
     super.key,
@@ -100,12 +102,27 @@ class RescheduleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
+    final bool isStudent = data is StudentRequest;
+
+    final name = isStudent
+        ? (data as StudentRequest).student.name
+        : (data as TeacherRequest).teacher.name;
+
+    final id = isStudent
+        ? (data as StudentRequest).student.studentId
+        : (data as TeacherRequest).teacher.id;
+
+    final image = isStudent
+        ? (data as StudentRequest).student.imageUrl
+        : (data as TeacherRequest).teacher.imageUrl;
+
     return InkWell(
       borderRadius: BorderRadius.circular(14),
       onTap: () {
         Get.to(
           () => RescheduleRequestsDetailedPage(
-            studentData: data,
+            student: isStudent ? data as StudentRequest : null,
+            teacher: !isStudent ? data as TeacherRequest : null,
           ),
         );
       },
@@ -125,24 +142,20 @@ class RescheduleCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// PROFILE IMAGE (SQUARED)
+                /// PROFILE IMAGE
                 Container(
                   width: 42,
                   height: 42,
-                  padding: const EdgeInsets.all(8),
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: cs.surfaceContainerHighest.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: cs.outline.withOpacity(0.2),
                     ),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      fit: BoxFit.contain,
-                    ),
+                  child: Image.asset(
+                    "assets/images/logo.png",
+                    fit: BoxFit.contain,
                   ),
                 ),
 
@@ -154,15 +167,12 @@ class RescheduleCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        data["name"] ?? "",
+                        name,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-
                       const SizedBox(height: 3),
-
-                      /// SUBTITLE
                       Text(
-                        data["id"] ?? "",
+                        id ?? '-',
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: cs.outline,
                               fontWeight: FontWeight.w500,
@@ -183,32 +193,32 @@ class RescheduleCard extends StatelessWidget {
                 spacing: 6,
                 runSpacing: 6,
                 children: [
-                  if ((data["pending"] ?? 0) > 0)
+                  if (data.pending > 0)
                     _statusChip(
                       context,
                       "Pending",
-                      data["pending"],
+                      data.pending,
                       Colors.orange,
                     ),
-                  if ((data["approved"] ?? 0) > 0)
+                  if (data.approved > 0)
                     _statusChip(
                       context,
                       "Approved",
-                      data["approved"],
+                      data.approved,
                       Colors.green,
                     ),
-                  if ((data["rejected"] ?? 0) > 0)
+                  if (data.rejected > 0)
                     _statusChip(
                       context,
                       "Rejected",
-                      data["rejected"],
+                      data.rejected,
                       Colors.red,
                     ),
-                  if ((data["rescheduled"] ?? 0) > 0)
+                  if (data.rescheduled > 0)
                     _statusChip(
                       context,
                       "Rescheduled",
-                      data["rescheduled"],
+                      data.rescheduled,
                       Colors.blue,
                     ),
                 ],
@@ -220,7 +230,6 @@ class RescheduleCard extends StatelessWidget {
     );
   }
 
-  /// SMALL STATUS CHIP
   Widget _statusChip(
     BuildContext context,
     String label,

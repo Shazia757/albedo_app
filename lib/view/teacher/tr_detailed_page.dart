@@ -55,96 +55,102 @@ class TeacherDetailsPage extends StatelessWidget {
         return SizedBox();
       }),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Tabs  ───────────────────────────────
-            Obx(() => CustomWidgets().customTabs(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Tabs  ───────────────────────────────
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Obx(() => CustomWidgets().customTabs(
                   context,
                   tabs: c.detailedTabs,
                   selectedIndex: c.selectedIndex.value,
                   onTap: (index) => c.selectedIndex.value = index,
                 )),
-            SizedBox(height: 16),
+          ),
+          SizedBox(height: 16),
 
-            // ── Tab bodies ──────────────────────────
-            Obx(() {
-              final index = c.selectedIndex.value;
-              final walletController = Get.put(TeacherWalletController());
+          // ── Tab bodies ──────────────────────────
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Obx(() {
+                final index = c.selectedIndex.value;
+                final walletController = Get.put(TeacherWalletController());
 
-              // ─── PROFILE ───────────────────────────────────
-              if (c.detailedTabs[index] == 'Profile') {
-                return _profileTab(context, cs);
-              }
-              // ─── PROFESSIONAL  ───────────────────────────────────
-              if (c.detailedTabs[index] == 'Professional') {
-                return _professionalTab(context, cs);
-              }
-              // ─── STUDENTS  ───────────────────────────────────
-              if (c.detailedTabs[index] == 'Students') {
-                return _studentsTab(context, cs);
-              }
-
-              // ─── BATCHES ───────────────────────────────────
-              if (c.detailedTabs[index] == 'Batches') {
-                final batches = teacher.batch ?? [];
-
-                if (batches.isEmpty) {
-                  return EmptyState(
-                      cs: cs,
-                      subtitle: '',
-                      icon: Icons.groups_outlined,
-                      title: 'No batches assigned');
+                // ─── PROFILE ───────────────────────────────────
+                if (c.detailedTabs[index] == 'Profile') {
+                  return _profileTab(context, cs);
                 }
-                return _batchesTab(context, cs, batches);
-              }
+                // ─── PROFESSIONAL  ───────────────────────────────────
+                if (c.detailedTabs[index] == 'Professional') {
+                  return _professionalTab(context, cs);
+                }
+                // ─── STUDENTS  ───────────────────────────────────
+                if (c.detailedTabs[index] == 'Students') {
+                  return _studentsTab(context, cs);
+                }
 
-              // ─── WALLET ────────────────────────────────────
-              if (c.detailedTabs[index] == 'Wallet') {
-                return walletTab(context,
-                    teacher: teacher,
-                    teacherController: c,
-                    wallet: walletController);
-              }
+                // ─── BATCHES ───────────────────────────────────
+                if (c.detailedTabs[index] == 'Batches') {
+                  final batches = teacher.batch ?? [];
 
-              // ─── FEEDBACKS ─────────────────────────────────
-              if (c.detailedTabs[index] == 'Feedback') {
-                return _feedbacksTab(context, cs);
-              }
-              // ─── ACCESS ─────────────────────────────────
-              if (c.detailedTabs[index] == 'Access') {
-                final overrides = c.accessOverrides;
-
-                return Column(
-                  children: [
-                    if (overrides.isEmpty)
-                      EmptyState(
+                  if (batches.isEmpty) {
+                    return EmptyState(
                         cs: cs,
-                        icon: Icons.lock_open_outlined,
-                        title: "No overrides found",
-                        subtitle: "Add unlock to grant temporary access",
-                      )
-                    else
-                      ListView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: overrides
-                            .map((e) => _accessCard(e, context))
-                            .toList(),
-                      ),
-                    SizedBox(height: 12),
-                    _unlockButton(context),
-                    _unlockForm(context),
-                  ],
-                );
-              }
+                        subtitle: '',
+                        icon: Icons.groups_outlined,
+                        title: 'No batches assigned');
+                  }
+                  return _batchesTab(context, cs, batches);
+                }
 
-              return SizedBox();
-            }),
-          ],
-        ),
+                // ─── WALLET ────────────────────────────────────
+                if (c.detailedTabs[index] == 'Wallet') {
+                  return walletTab(context,
+                      teacher: teacher,
+                      teacherController: c,
+                      wallet: walletController);
+                }
+
+                // ─── FEEDBACKS ─────────────────────────────────
+                if (c.detailedTabs[index] == 'Feedback') {
+                  return _feedbacksTab(context, cs);
+                }
+                // ─── ACCESS ─────────────────────────────────
+                if (c.detailedTabs[index] == 'Access') {
+                  final overrides = c.accessOverrides;
+
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        if (overrides.isEmpty)
+                          EmptyState(
+                            cs: cs,
+                            icon: Icons.lock_open_outlined,
+                            title: "No overrides found",
+                            subtitle: "Add unlock to grant temporary access",
+                          )
+                        else
+                          ListView(
+                            shrinkWrap: true,
+                            children: overrides
+                                .map((e) => _accessCard(e, context))
+                                .toList(),
+                          ),
+                        SizedBox(height: 12),
+                        _unlockButton(context),
+                        _unlockForm(context),
+                      ],
+                    ),
+                  );
+                }
+
+                return SizedBox();
+              }),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -153,88 +159,86 @@ class TeacherDetailsPage extends StatelessWidget {
   //  PROFILE TAB
   // ══════════════════════════════════════════════════════════
   Widget _profileTab(BuildContext context, ColorScheme cs) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _profileCard(context),
-        SizedBox(height: 16),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _profileCard(context),
+          SizedBox(height: 16),
 
-        // Personal Information card
-        _glassCard(
-          context: context,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _cardHeader(context, 'Personal Information',
-                  icon: Icons.person_outline),
-              _divider(cs),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _contactRow(context, Icons.phone_outlined, 'Mobile',
-                      teacher.phone ?? '-'),
-                  SizedBox(height: 10),
-                  _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
-                      teacher.whatsapp ?? '-'),
-                ],
-              ),
-              _divider(cs),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _contactRow(
-                      context, Icons.place, 'Place', teacher.place ?? "-"),
-                  SizedBox(height: 10),
-                  _contactRow(context, Icons.calendar_today_outlined,
-                      'Date Of Birth', teacher.dob ?? "-"),
-                ],
-              ),
-            ],
+          // Personal Information card
+          _glassCard(
+            context: context,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _cardHeader(context, 'Personal Information',
+                    icon: Icons.person_outline),
+                _divider(cs),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _contactRow(context, Icons.phone_outlined, 'Mobile',
+                        teacher.phone ?? '-'),
+                    SizedBox(height: 10),
+                    _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
+                        teacher.whatsapp ?? '-'),
+                  ],
+                ),
+                _divider(cs),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _contactRow(
+                        context, Icons.place, 'Place', teacher.place ?? "-"),
+                    SizedBox(height: 10),
+                    _contactRow(context, Icons.calendar_today_outlined,
+                        'Date Of Birth', teacher.dob ?? "-"),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
 
-        SizedBox(height: 16),
+          SizedBox(height: 16),
 
-        // Academic Details card
-        _glassCard(
-          context: context,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _cardHeader(context, 'Payment Details', icon: Icons.payment),
-              _divider(cs),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('UPI ID',
-                      style: Get.textTheme
-                          .titleSmall!
-                          .copyWith(color: cs.outline)),
-                  SizedBox(height: 4),
-                  Text(teacher.upiId ?? '-',
-                      style: Get.textTheme.titleSmall),
-                  SizedBox(height: 8),
-                  Text('Account No.',
-                      style: Get.textTheme
-                          .titleSmall!
-                          .copyWith(color: cs.outline)),
-                  SizedBox(height: 4),
-                  Text(teacher.accountNumber ?? '-',
-                      style: Get.textTheme.titleSmall),
-                  SizedBox(height: 8),
-                  Text('IFSC Code',
-                      style: Get.textTheme
-                          .titleSmall!
-                          .copyWith(color: cs.outline)),
-                  SizedBox(height: 4),
-                  Text(teacher.ifscCode ?? '-',
-                      style: Get.textTheme.titleSmall),
-                ],
-              )
-            ],
+          // Academic Details card
+          _glassCard(
+            context: context,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _cardHeader(context, 'Payment Details', icon: Icons.payment),
+                _divider(cs),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('UPI ID',
+                        style: Get.textTheme.titleSmall!
+                            .copyWith(color: cs.outline)),
+                    SizedBox(height: 4),
+                    Text(teacher.upiId ?? '-', style: Get.textTheme.titleSmall),
+                    SizedBox(height: 8),
+                    Text('Account No.',
+                        style: Get.textTheme.titleSmall!
+                            .copyWith(color: cs.outline)),
+                    SizedBox(height: 4),
+                    Text(teacher.accountNumber ?? '-',
+                        style: Get.textTheme.titleSmall),
+                    SizedBox(height: 8),
+                    Text('IFSC Code',
+                        style: Get.textTheme.titleSmall!
+                            .copyWith(color: cs.outline)),
+                    SizedBox(height: 4),
+                    Text(teacher.ifscCode ?? '-',
+                        style: Get.textTheme.titleSmall),
+                  ],
+                )
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -260,330 +264,330 @@ class TeacherDetailsPage extends StatelessWidget {
     /// 🔹 Final formatted text
     final experienceText = '$totalYears Years $totalMonths Months';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        /// 🔹 Professional Details
-        _glassCard(
-          context: context,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _cardHeader(
-                context,
-                'Professional Details',
-                icon: Icons.work_outline,
-              ),
-
-              _divider(cs),
-
-              SizedBox(height: 14),
-
-              /// Qualification + Experience
-              Row(
-                children: [
-                  Expanded(
-                    child: _infoTile(
-                      context,
-                      title: 'Qualification',
-                      value: teacher.qualification ?? '-',
-                      icon: Icons.school_outlined,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: _infoTile(
-                      context,
-                      title: 'Experience',
-                      value: experienceText,
-                      icon: Icons.workspace_premium_outlined,
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 14),
-
-              /// Preferred Language
-              _infoTile(
-                context,
-                title: 'Preferred Language',
-                value: teacher.prefLanguage ?? '-',
-                icon: Icons.language_outlined,
-              ),
-
-              SizedBox(height: 14),
-
-              /// Work Experience
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: cs.outline.withOpacity(0.2),
-                  ),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 🔹 Professional Details
+          _glassCard(
+            context: context,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _cardHeader(
+                  context,
+                  'Professional Details',
+                  icon: Icons.work_outline,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                _divider(cs),
+
+                SizedBox(height: 14),
+
+                /// Qualification + Experience
+                Row(
                   children: [
-                    Text(
-                      'Work Experience',
-                      style: Get.textTheme
-                          .titleSmall!
-                          .copyWith(color: cs.onSurface),
+                    Expanded(
+                      child: _infoTile(
+                        context,
+                        title: 'Qualification',
+                        value: teacher.qualification ?? '-',
+                        icon: Icons.school_outlined,
+                      ),
                     ),
-                    SizedBox(height: 10),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if ((teacher.experience ?? []).isEmpty)
-                          Text(
-                            'No work experience added',
-                            style: Get.textTheme
-                                .bodySmall!
-                                .copyWith(color: cs.outline),
-                          )
-                        else
-                          Column(
-                            children: (teacher.experience ?? []).map((exp) {
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      height: 36,
-                                      width: 36,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: cs.primary.withOpacity(0.08),
-                                      ),
-                                      child: Icon(
-                                        Icons.business_center_outlined,
-                                        size: 18,
-                                        color: cs.primary,
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.6,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            exp.companyName ?? '-',
-                                            style: Get.textTheme
-                                                .titleSmall!
-                                                .copyWith(color: cs.onSurface),
-                                          ),
-                                          SizedBox(height: 2),
-                                          Text(
-                                            '${exp.years ?? 0} Years ${exp.months ?? 0} Months',
-                                            style: Get.textTheme
-                                                .labelSmall!
-                                                .copyWith(color: cs.outline),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          )
-                      ],
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: _infoTile(
+                        context,
+                        title: 'Experience',
+                        value: experienceText,
+                        icon: Icons.workspace_premium_outlined,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-        ),
 
-        SizedBox(height: 16),
+                SizedBox(height: 14),
 
-        /// 🔹 Documents & Security
-        _glassCard(
-          context: context,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _cardHeader(
-                context,
-                'Documents & Security',
-                icon: Icons.folder_outlined,
-              ),
+                /// Preferred Language
+                _infoTile(
+                  context,
+                  title: 'Preferred Language',
+                  value: teacher.prefLanguage ?? '-',
+                  icon: Icons.language_outlined,
+                ),
 
-              _divider(cs),
+                SizedBox(height: 14),
 
-              SizedBox(height: 14),
-
-              /// 🔹 Documents
-              Text(
-                'Documents',
-                style: Get.textTheme
-                    .titleSmall!
-                    .copyWith(color: cs.outline),
-              ),
-
-              SizedBox(height: 10),
-
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'ID Card',
-                    icon: Icons.badge_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Resume',
-                    icon: Icons.description_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Educational Certificate',
-                    icon: Icons.school_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Aadhar Front',
-                    icon: Icons.credit_card_outlined,
-                    onTap: () {},
-                  ),
-                  _docButton(
-                    context,
-                    cs,
-                    title: 'Aadhar Back',
-                    icon: Icons.credit_card,
-                    onTap: () {},
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 18),
-
-              /// 🔹 Security
-              Text(
-                'Security',
-                style: Get.textTheme
-                    .titleSmall!
-                    .copyWith(color: cs.outline),
-              ),
-
-              SizedBox(height: 10),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: _docButton(
-                      context,
-                      cs,
-                      title: 'Change Username',
-                      icon: Icons.person_outline,
-                      onTap: () => CustomWidgets().showCustomDialog(
-                        context: context,
-                        title: Text('Change Username'),
-                        formKey: GlobalKey(),
-                        sections: [
-                          CustomWidgets().labelWithAsterisk('New Username',
-                              required: true),
-                          SizedBox(height: 10),
-                          CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Enter new username',
-                              controller: c.usernameController),
-                        ],
-                        submitText: 'Change',
-                        onSubmit: () {},
-                      ),
+                /// Work Experience
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: cs.outline.withOpacity(0.2),
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: _docButton(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Work Experience',
+                        style: Get.textTheme.titleSmall!
+                            .copyWith(color: cs.onSurface),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if ((teacher.experience ?? []).isEmpty)
+                            Text(
+                              'No work experience added',
+                              style: Get.textTheme.bodySmall!
+                                  .copyWith(color: cs.outline),
+                            )
+                          else
+                            Column(
+                              children: (teacher.experience ?? []).map((exp) {
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        height: 36,
+                                        width: 36,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: cs.primary.withOpacity(0.08),
+                                        ),
+                                        child: Icon(
+                                          Icons.business_center_outlined,
+                                          size: 18,
+                                          color: cs.primary,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              exp.companyName ?? '-',
+                                              style: Get.textTheme.titleSmall!
+                                                  .copyWith(
+                                                      color: cs.onSurface),
+                                            ),
+                                            SizedBox(height: 2),
+                                            Text(
+                                              '${exp.years ?? 0} Years ${exp.months ?? 0} Months',
+                                              style: Get.textTheme.labelSmall!
+                                                  .copyWith(color: cs.outline),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 16),
+
+          /// 🔹 Documents & Security
+          _glassCard(
+            context: context,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _cardHeader(
+                  context,
+                  'Documents & Security',
+                  icon: Icons.folder_outlined,
+                ),
+
+                _divider(cs),
+
+                SizedBox(height: 14),
+
+                /// 🔹 Documents
+                Text(
+                  'Documents',
+                  style: Get.textTheme.titleSmall!.copyWith(color: cs.outline),
+                ),
+
+                SizedBox(height: 10),
+
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    _docButton(
                       context,
                       cs,
-                      title: 'Change Password',
-                      icon: Icons.lock_outline,
-                      onTap: () => CustomWidgets().showCustomDialog(
-                        context: context,
-                        title: Text('Change Password'),
-                        formKey: GlobalKey(),
-                        sections: [
-                          CustomWidgets().labelWithAsterisk('Current Password',
-                              required: true),
-                          SizedBox(height: 10),
-                          Obx(
-                            () => CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              isPassword: true,
-                              hint: 'Enter current password',
-                              controller: c.currentPasswordController,
-                              obscureText: c.obscurePassword.value,
-                              onTogglePassword: () {
-                                c.obscurePassword.value =
-                                    !c.obscurePassword.value;
-                              },
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('New Password',
-                              required: true),
-                          SizedBox(height: 10),
-                          Obx(
-                            () => CustomWidgets().dropdownStyledTextField(
-                              context: context,
-                              hint: 'Enter new password',
-                              isPassword: true,
-                              controller: c.newPasswordController,
-                              obscureText: c.obscureNewPassword.value,
-                              onTogglePassword: () {
-                                c.obscureNewPassword.value =
-                                    !c.obscureNewPassword.value;
-                              },
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          CustomWidgets().labelWithAsterisk('Confirm Password',
-                              required: true),
-                          SizedBox(height: 10),
-                          Obx(
-                            () => CustomWidgets().dropdownStyledTextField(
+                      title: 'ID Card',
+                      icon: Icons.badge_outlined,
+                      onTap: () {},
+                    ),
+                    _docButton(
+                      context,
+                      cs,
+                      title: 'Resume',
+                      icon: Icons.description_outlined,
+                      onTap: () {},
+                    ),
+                    _docButton(
+                      context,
+                      cs,
+                      title: 'Educational Certificate',
+                      icon: Icons.school_outlined,
+                      onTap: () {},
+                    ),
+                    _docButton(
+                      context,
+                      cs,
+                      title: 'Aadhar Front',
+                      icon: Icons.credit_card_outlined,
+                      onTap: () {},
+                    ),
+                    _docButton(
+                      context,
+                      cs,
+                      title: 'Aadhar Back',
+                      icon: Icons.credit_card,
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 18),
+
+                /// 🔹 Security
+                Text(
+                  'Security',
+                  style: Get.textTheme.titleSmall!.copyWith(color: cs.outline),
+                ),
+
+                SizedBox(height: 10),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: _docButton(
+                        context,
+                        cs,
+                        title: 'Change Username',
+                        icon: Icons.person_outline,
+                        onTap: () => CustomWidgets().showCustomDialog(
+                          context: context,
+                          title: Text('Change Username'),
+                          formKey: GlobalKey(),
+                          sections: [
+                            CustomWidgets().labelWithAsterisk('New Username',
+                                required: true),
+                            SizedBox(height: 10),
+                            CustomWidgets().dropdownStyledTextField(
+                                context: context,
+                                hint: 'Enter new username',
+                                controller: c.usernameController),
+                          ],
+                          submitText: 'Change',
+                          onSubmit: () {},
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _docButton(
+                        context,
+                        cs,
+                        title: 'Change Password',
+                        icon: Icons.lock_outline,
+                        onTap: () => CustomWidgets().showCustomDialog(
+                          context: context,
+                          title: Text('Change Password'),
+                          formKey: GlobalKey(),
+                          sections: [
+                            CustomWidgets().labelWithAsterisk(
+                                'Current Password',
+                                required: true),
+                            SizedBox(height: 10),
+                            Obx(
+                              () => CustomWidgets().dropdownStyledTextField(
                                 context: context,
                                 isPassword: true,
-                                obscureText: c.obscureConfirmPassword.value,
+                                hint: 'Enter current password',
+                                controller: c.currentPasswordController,
+                                obscureText: c.obscurePassword.value,
                                 onTogglePassword: () {
-                                  c.obscureConfirmPassword.value =
-                                      !c.obscureConfirmPassword.value;
+                                  c.obscurePassword.value =
+                                      !c.obscurePassword.value;
                                 },
-                                hint: 'Confirm new password',
-                                controller: c.confirmNewPasswordController),
-                          ),
-                        ],
-                        submitText: 'Change',
-                        onSubmit: () {},
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            CustomWidgets().labelWithAsterisk('New Password',
+                                required: true),
+                            SizedBox(height: 10),
+                            Obx(
+                              () => CustomWidgets().dropdownStyledTextField(
+                                context: context,
+                                hint: 'Enter new password',
+                                isPassword: true,
+                                controller: c.newPasswordController,
+                                obscureText: c.obscureNewPassword.value,
+                                onTogglePassword: () {
+                                  c.obscureNewPassword.value =
+                                      !c.obscureNewPassword.value;
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            CustomWidgets().labelWithAsterisk(
+                                'Confirm Password',
+                                required: true),
+                            SizedBox(height: 10),
+                            Obx(
+                              () => CustomWidgets().dropdownStyledTextField(
+                                  context: context,
+                                  isPassword: true,
+                                  obscureText: c.obscureConfirmPassword.value,
+                                  onTogglePassword: () {
+                                    c.obscureConfirmPassword.value =
+                                        !c.obscureConfirmPassword.value;
+                                  },
+                                  hint: 'Confirm new password',
+                                  controller: c.confirmNewPasswordController),
+                            ),
+                          ],
+                          submitText: 'Change',
+                          onSubmit: () {},
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )
-      ],
+                  ],
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -625,16 +629,13 @@ class TeacherDetailsPage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: cs.outline),
+                  style: Get.textTheme.titleSmall!.copyWith(color: cs.outline),
                 ),
                 SizedBox(height: 2),
                 Text(
                   value,
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: cs.onSurface),
+                  style:
+                      Get.textTheme.titleSmall!.copyWith(color: cs.onSurface),
                 ),
               ],
             ),
@@ -678,9 +679,7 @@ class TeacherDetailsPage extends StatelessWidget {
             SizedBox(width: 8),
             Text(
               title,
-              style: Get.textTheme
-                  .titleSmall!
-                  .copyWith(color: cs.onSurface),
+              style: Get.textTheme.titleSmall!.copyWith(color: cs.onSurface),
             ),
           ],
         ),
@@ -746,8 +745,7 @@ class TeacherDetailsPage extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text('ID: ${batch.id ?? '-'}',
-                        style: Get.textTheme
-                            .labelSmall!
+                        style: Get.textTheme.labelSmall!
                             .copyWith(color: cs.outline)),
                     SizedBox(height: 14),
                     Divider(height: 1, color: cs.outline.withOpacity(0.15)),
@@ -756,21 +754,20 @@ class TeacherDetailsPage extends StatelessWidget {
                     // Mentor row
                     Row(
                       children: [
-                        CustomWidgets().squareAvatar(batch.mentor?.imageUrl, 44),
+                        CustomWidgets()
+                            .squareAvatar(batch.mentor?.imageUrl, 44),
                         SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Assigned Mentor',
-                                style: Get.textTheme
-                                    .labelSmall!
+                                style: Get.textTheme.labelSmall!
                                     .copyWith(color: cs.outline)),
                             SizedBox(height: 2),
                             Text(batch.mentor?.name ?? '-',
                                 style: Get.textTheme.titleSmall),
                             Text('ID: ${batch.mentor?.id ?? '-'}',
-                                style: Get.textTheme
-                                    .labelSmall!
+                                style: Get.textTheme.labelSmall!
                                     .copyWith(color: cs.outline)),
                           ],
                         )
@@ -793,36 +790,41 @@ class TeacherDetailsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Obx(() => CustomWidgets().customTabs(
-              context,
-              tabs: c.feedbackTabs,
-              selectedIndex: c.feedbackTabIndex.value,
-              onTap: (i) => c.feedbackTabIndex.value = i,
+        Obx(() => Center(
+              child: CustomWidgets().customTabs(
+                context,
+                tabs: c.feedbackTabs,
+                selectedIndex: c.feedbackTabIndex.value,
+                onTap: (i) => c.feedbackTabIndex.value = i,
+              ),
             )),
-        SizedBox(height: 12),
-        Obx(() {
-          final isStudent = c.feedbackTabIndex.value == 0;
-          final feedbacks = isStudent
-              ? (c.studentFeedbacks[teacher.id] ?? [])
-              : (c.mentorFeedbacks[teacher.id] ?? []);
-          final label = isStudent ? 'Student' : 'Mentor';
+        const SizedBox(height: 12),
+        Expanded(
+          child: Obx(() {
+            final isStudent = c.feedbackTabIndex.value == 0;
 
-          if (feedbacks.isEmpty) {
-            return EmptyState(
-              cs: cs,
-              icon: Icons.feedback_outlined,
-              title: 'No feedback from $label yet',
-              subtitle: 'Feedback added by $label will appear here',
+            final feedbacks = isStudent
+                ? (c.studentFeedbacks[teacher.id] ?? [])
+                : (c.mentorFeedbacks[teacher.id] ?? []);
+
+            final label = isStudent ? 'Student' : 'Mentor';
+
+            if (feedbacks.isEmpty) {
+              return EmptyState(
+                cs: cs,
+                icon: Icons.feedback_outlined,
+                title: 'No feedback from $label yet',
+                subtitle: 'Feedback added by $label will appear here',
+              );
+            }
+
+            return ListView.separated(
+              itemCount: feedbacks.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (_, i) => feedbackCard(feedbacks[i], context),
             );
-          }
-          return ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: feedbacks.length,
-            separatorBuilder: (_, __) => SizedBox(height: 10),
-            itemBuilder: (_, i) => feedbackCard(feedbacks[i], context),
-          );
-        }),
+          }),
+        ),
       ],
     );
   }
@@ -874,7 +876,8 @@ class TeacherDetailsPage extends StatelessWidget {
                             color: cs.shadow.withOpacity(0.1), blurRadius: 8)
                       ],
                     ),
-                    child: CustomWidgets().squareAvatar(teacher.imageUrl, 64, radius: 12),
+                    child: CustomWidgets()
+                        .squareAvatar(teacher.imageUrl, 64, radius: 12),
                   ),
                 ),
 
@@ -882,12 +885,10 @@ class TeacherDetailsPage extends StatelessWidget {
                   offset: const Offset(0, -20),
                   child: Column(
                     children: [
-                      Text(teacher.name,
-                          style: Get.textTheme.titleLarge),
+                      Text(teacher.name, style: Get.textTheme.titleLarge),
                       SizedBox(height: 4),
                       Text(teacher.email ?? '-',
-                          style: Get.textTheme
-                              .bodySmall!
+                          style: Get.textTheme.bodySmall!
                               .copyWith(color: cs.outline)),
                       SizedBox(height: 10),
 
@@ -900,8 +901,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           border: Border.all(color: _blue.withOpacity(0.3)),
                         ),
                         child: Text('ID: ${teacher.id}',
-                            style: Get.textTheme
-                                .titleSmall!
+                            style: Get.textTheme.titleSmall!
                                 .copyWith(color: _blue)),
                       ),
 
@@ -922,8 +922,7 @@ class TeacherDetailsPage extends StatelessWidget {
                               size: 15, color: Colors.white),
                           iconAlignment: IconAlignment.end,
                           label: Text('Go to Dashboard',
-                              style: Get.textTheme
-                                  .bodySmall!
+                              style: Get.textTheme.bodySmall!
                                   .copyWith(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: cs.primary,
@@ -990,9 +989,8 @@ class TeacherDetailsPage extends StatelessWidget {
                     SizedBox(height: 2),
                     Text(
                       feedback['date'] ?? '-',
-                      style: Get.textTheme
-                          .labelSmall!
-                          .copyWith(color: cs.outline),
+                      style:
+                          Get.textTheme.labelSmall!.copyWith(color: cs.outline),
                     ),
                   ],
                 ),
@@ -1028,8 +1026,7 @@ class TeacherDetailsPage extends StatelessWidget {
           SizedBox(height: 12),
           Text(
             feedback['message'] ?? '-',
-            style: Get.textTheme
-                .bodySmall!
+            style: Get.textTheme.bodySmall!
                 .copyWith(color: cs.onSurface.withOpacity(.8), height: 1.4),
           ),
         ],
@@ -1100,9 +1097,7 @@ class TeacherDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label,
-                style: Get.textTheme
-                    .labelSmall!
-                    .copyWith(color: cs.outline)),
+                style: Get.textTheme.labelSmall!.copyWith(color: cs.outline)),
             Text(value, style: Get.textTheme.titleSmall),
           ],
         ),
@@ -1118,18 +1113,16 @@ class TeacherDetailsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withOpacity(0.4)),
       ),
-      child: Text(label,
-          style:
-              Get.textTheme.titleSmall!.copyWith(color: color)),
+      child:
+          Text(label, style: Get.textTheme.titleSmall!.copyWith(color: color)),
     );
   }
-
 
   Widget _studentsTab(BuildContext context, ColorScheme cs) {
     final students = teacher.student ?? [];
 
     if (students.isEmpty) {
-        return EmptyState(
+      return EmptyState(
           cs: cs,
           title: 'No students assigned',
           subtitle: '',
@@ -1191,8 +1184,7 @@ class TeacherDetailsPage extends StatelessWidget {
                           /// Title
                           Text(
                             student.name,
-                            style: Get.textTheme
-                                .titleLarge!
+                            style: Get.textTheme.titleLarge!
                                 .copyWith(color: cs.onSurface),
                           ),
 
@@ -1203,8 +1195,7 @@ class TeacherDetailsPage extends StatelessWidget {
                               ? Center(
                                   child: Text(
                                     'No packages available',
-                                    style: Get.textTheme
-                                        .bodyMedium!
+                                    style: Get.textTheme.bodyMedium!
                                         .copyWith(color: cs.outline),
                                   ),
                                 )
@@ -1255,8 +1246,8 @@ class TeacherDetailsPage extends StatelessWidget {
                                                 children: [
                                                   Text(
                                                     package.name ?? '-',
-                                                    style: Get.textTheme
-                                                        .titleMedium!
+                                                    style: Get
+                                                        .textTheme.titleMedium!
                                                         .copyWith(
                                                             color:
                                                                 cs.onSurface),
@@ -1374,15 +1365,13 @@ class TeacherDetailsPage extends StatelessWidget {
                         children: [
                           Text(
                             student.name,
-                            style: Get.textTheme
-                                .titleMedium!
+                            style: Get.textTheme.titleMedium!
                                 .copyWith(color: cs.onSurface),
                           ),
                           SizedBox(height: 4),
                           Text(
                             student.studentId ?? '-',
-                            style: Get.textTheme
-                                .bodySmall!
+                            style: Get.textTheme.bodySmall!
                                 .copyWith(color: cs.outline),
                           ),
                         ],
@@ -1401,8 +1390,7 @@ class TeacherDetailsPage extends StatelessWidget {
                       ),
                       child: Text(
                         '$packageCount Packages',
-                        style: Get.textTheme
-                            .titleSmall!
+                        style: Get.textTheme.titleSmall!
                             .copyWith(color: cs.primary),
                       ),
                     ),
@@ -1429,9 +1417,7 @@ class TeacherDetailsPage extends StatelessWidget {
         icon: const Icon(Icons.add, size: 15, color: Colors.white),
         label: Text(
           'Add Unlock',
-          style: Get.textTheme
-              .bodySmall!
-              .copyWith(color: Colors.white),
+          style: Get.textTheme.bodySmall!.copyWith(color: Colors.white),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: cs.secondary,
@@ -1516,8 +1502,7 @@ class TeacherDetailsPage extends StatelessWidget {
                     ),
                     child: Text(
                       "Grant Access",
-                      style: Get.textTheme
-                          .bodyMedium!
+                      style: Get.textTheme.bodyMedium!
                           .copyWith(color: Colors.white),
                     ),
                   ),
@@ -1624,9 +1609,7 @@ class TeacherDetailsPage extends StatelessWidget {
           SizedBox(height: 6),
           Text(
             "From: ${data['from']}  →  To: ${data['to']}",
-            style: Get.textTheme
-                .bodySmall!
-                .copyWith(color: cs.outline),
+            style: Get.textTheme.bodySmall!.copyWith(color: cs.outline),
           ),
         ],
       ),
@@ -1660,9 +1643,7 @@ Widget summaryCard({
           ),
           child: Center(
             child: Text(value.substring(0, 1),
-                style: Get.textTheme
-                    .titleLarge!
-                    .copyWith(color: color)),
+                style: Get.textTheme.titleLarge!.copyWith(color: color)),
           ),
         ),
         SizedBox(width: 14),
@@ -1670,14 +1651,11 @@ Widget summaryCard({
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: Get.textTheme
-                    .labelSmall!
+                style: Get.textTheme.labelSmall!
                     .copyWith(color: color.withOpacity(0.8))),
             SizedBox(height: 3),
             Text(value,
-                style: Get.textTheme
-                    .titleLarge!
-                    .copyWith(color: color)),
+                style: Get.textTheme.titleLarge!.copyWith(color: color)),
           ],
         ),
       ],
@@ -1733,16 +1711,12 @@ Widget _supportTile(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(role,
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: _blue)),
+                  style: Get.textTheme.titleSmall!.copyWith(color: _blue)),
               SizedBox(height: 2),
               Text(name, style: Get.textTheme.titleSmall),
               SizedBox(height: 3),
               Text('$id  •  $date',
-                  style: Get.textTheme
-                      .labelSmall!
-                      .copyWith(color: cs.outline)),
+                  style: Get.textTheme.labelSmall!.copyWith(color: cs.outline)),
             ],
           ),
         ),

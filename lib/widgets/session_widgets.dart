@@ -139,7 +139,13 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
                       timeController.text = widget.time;
                     });
                   },
-                  child: Text("Cancel"),
+                  child: Text(
+                    "Cancel",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(color: color),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -150,7 +156,21 @@ class _EditableInfoCardState extends State<EditableInfoCard> {
 
                     setState(() => isEditing = false);
                   },
-                  child: Text("Save"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    "Save",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(color: Colors.white),
+                  ),
                 ),
               ],
             ),

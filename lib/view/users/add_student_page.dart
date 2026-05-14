@@ -47,7 +47,8 @@ class AddStudentPage extends StatelessWidget {
                       /// TITLE
                       Text(
                         isEdit ? 'Edit Student' : 'Add Student',
-                        style: Theme.of(context).textTheme.titleLarge,
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.primary),
                       ),
 
                       SizedBox(height: 20),
@@ -143,12 +144,13 @@ class AddStudentPage extends StatelessWidget {
                       SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Gender'),
                       SizedBox(height: 10),
-                      // CustomWidgets().customDropdownField(
-                      //   context: context,
-                      //   hint: 'Select Gender',
-                      //   items: ['Male', 'Female'],
-                      //   onChanged: (p0) {},
-                      // ),
+                      CustomWidgets().customDropdownField(
+                        context: context,
+                        hint: 'Select Gender',
+                        itemLabel: (item) => item,
+                        items: ['Male', 'Female'],
+                        onChanged: (p0) {},
+                      ),
                       SizedBox(height: 10),
                       CustomWidgets().labelWithAsterisk('Place'),
                       CustomWidgets().dropdownStyledTextField(

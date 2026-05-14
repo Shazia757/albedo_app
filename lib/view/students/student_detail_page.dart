@@ -111,10 +111,11 @@ class StudentDetailsPage extends StatelessWidget {
           return FloatingActionButton(
             mini: true,
             onPressed: () {
+              c.step.value = 1;
               CustomWidgets().showCustomDialog(
                 context: context,
                 title: Text('Create Certificate'),
-                formKey: GlobalKey<FormState>(),
+                formKey: c.certificateFormKey,
                 sections: [
                   Obx(() {
                     if (c.step.value == 1) {
@@ -147,12 +148,17 @@ class StudentDetailsPage extends StatelessWidget {
                 ],
                 submitText: 'Continue',
                 onSubmit: () {
-                  final isValid = c.validate(context);
+                  FocusScope.of(context).unfocus();
+
+                  final isValid = c.validateCertificate(context);
+
                   if (!isValid) return;
+
                   if (c.step.value == 1) {
-                    Future.microtask(() => c.step.value = 2);
+                    c.step.value = 2;
                     return;
                   }
+
                   Get.back();
                 },
               );
@@ -167,136 +173,141 @@ class StudentDetailsPage extends StatelessWidget {
         return SizedBox();
       }),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Tabs (untouched) ───────────────────────────────
-            Obx(() => CustomWidgets().customTabs(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Tabs (untouched) ───────────────────────────────
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Obx(() => CustomWidgets().customTabs(
                   context,
                   tabs: c.tabs,
                   selectedIndex: c.selectedIndex.value,
-                  onTap: (index) => c.selectedIndex.value = index,
+                  onTap: (i) => c.selectedIndex.value = i,
                 )),
-            SizedBox(height: 16),
+          ),
 
-            // ── Tab bodies (upgraded) ──────────────────────────
-            Obx(() {
-              final index = c.selectedIndex.value;
-              final packages = student.packages ?? [];
-              final assessments = student.assessment ?? [];
+          // ── Tab bodies (upgraded) ──────────────────────────
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Obx(() {
+                final index = c.selectedIndex.value;
+                final packages = student.packages ?? [];
+                final assessments = student.assessment ?? [];
 
-              // ─── PROFILE ───────────────────────────────────
-              if (c.tabs[index] == 'Profile') return _profileTab(context, cs);
+                // ─── PROFILE ───────────────────────────────────
+                if (c.tabs[index] == 'Profile') return _profileTab(context, cs);
 
-              // ─── PACKAGES ──────────────────────────────────
-              if (c.tabs[index] == 'Packages') {
-                if (packages.isEmpty) {
-                  return EmptyState(
-                    cs: cs,
-                    icon: Icons.inventory_2_outlined,
-                    title: 'No packages yet',
-                    subtitle: '',
-                  );
-                }
-                return _packagesTab(context, cs, packages);
-              }
-
-              // ─── BATCHES ───────────────────────────────────
-              if (c.tabs[index] == 'Batches') {
-                final batches = student.batch ?? [];
-                if (batches.isEmpty) {
-                  return EmptyState(
+                // ─── PACKAGES ──────────────────────────────────
+                if (c.tabs[index] == 'Packages') {
+                  if (packages.isEmpty) {
+                    return EmptyState(
                       cs: cs,
+                      icon: Icons.inventory_2_outlined,
+                      title: 'No packages yet',
                       subtitle: '',
-                      icon: Icons.groups_outlined,
-                      title: 'No batches assigned');
+                    );
+                  }
+                  return _packagesTab(context, cs, packages);
                 }
-                return _batchesTab(context, cs, batches);
-              }
 
-              // ─── WALLET ────────────────────────────────────
-              if (c.tabs[index] == 'Wallet') {
-                return studentWalletTab(context, student, c);
-              }
-
-              // ─── BATCH PAYMENTS ────────────────────────────
-              if (c.tabs[index] == 'Batch Payments') {
-                final batches = student.batch ?? [];
-                final hasPayments = batches.any((b) =>
-                    b.amountPaid != null &&
-                    b.amountPaid.toString().trim().isNotEmpty);
-                if (!hasPayments) {
-                  return EmptyState(
-                    icon: Icons.receipt_long_outlined,
-                    cs: cs,
-                    title: 'No batch payments found',
-                    subtitle: '',
-                  );
+                // ─── BATCHES ───────────────────────────────────
+                if (c.tabs[index] == 'Batches') {
+                  final batches = student.batch ?? [];
+                  if (batches.isEmpty) {
+                    return EmptyState(
+                        cs: cs,
+                        subtitle: '',
+                        icon: Icons.groups_outlined,
+                        title: 'No batches assigned');
+                  }
+                  return _batchesTab(context, cs, batches);
                 }
-                return _batchPaymentsTab(context, cs, batches);
-              }
 
-              // ─── ASSESSMENTS ───────────────────────────────
-              if (c.tabs[index] == 'Assessments') {
-                if (assessments.isEmpty) {
-                  return EmptyState(
-                    cs: cs,
-                    icon: Icons.quiz_outlined,
-                    title: 'No assessments available0',
-                    subtitle: '',
-                  );
+                // ─── WALLET ────────────────────────────────────
+                if (c.tabs[index] == 'Wallet') {
+                  return studentWalletTab(context, student, c);
                 }
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: assessments.length,
-                  itemBuilder: (context, i) =>
-                      studentAssessmentCard(context, assessments[i]),
-                );
-              }
 
-              // ─── SESSIONS ──────────────────────────────────
-              if (c.tabs[index] == 'Sessions') {
-                if (packages.isEmpty) {
-                  return EmptyState(
-                    cs: cs,
-                    icon: Icons.event_note_outlined,
-                    title: 'No packages available',
-                    subtitle: '',
-                  );
-                }
-                return _sessionsTab(context, cs, packages);
-              }
-
-              // ─── FEEDBACKS ─────────────────────────────────
-              if (c.tabs[index] == 'Feedbacks') {
-                return _feedbacksTab(context, cs);
-              }
-
-              // ─── CERTIFICATES ──────────────────────────────
-              if (c.tabs[index] == 'Certificates') {
-                final certs = student.certificate ?? [];
-                if (certs.isEmpty) {
-                  return EmptyState(
+                // ─── BATCH PAYMENTS ────────────────────────────
+                if (c.tabs[index] == 'Batch Payments') {
+                  final batches = student.batch ?? [];
+                  final hasPayments = batches.any((b) =>
+                      b.amountPaid != null &&
+                      b.amountPaid.toString().trim().isNotEmpty);
+                  if (!hasPayments) {
+                    return EmptyState(
+                      icon: Icons.receipt_long_outlined,
                       cs: cs,
-                      icon: Icons.workspace_premium_outlined,
+                      title: 'No batch payments found',
                       subtitle: '',
-                      title: 'No certificates yet');
+                    );
+                  }
+                  return _batchPaymentsTab(context, cs, batches);
                 }
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: certs.length,
-                  itemBuilder: (context, i) => CertificateCard(cert: certs[i]),
-                );
-              }
 
-              return SizedBox();
-            }),
-          ],
-        ),
+                // ─── ASSESSMENTS ───────────────────────────────
+                if (c.tabs[index] == 'Assessments') {
+                  if (assessments.isEmpty) {
+                    return EmptyState(
+                      cs: cs,
+                      icon: Icons.quiz_outlined,
+                      title: 'No assessments available0',
+                      subtitle: '',
+                    );
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: assessments.length,
+                    itemBuilder: (context, i) =>
+                        studentAssessmentCard(context, assessments[i]),
+                  );
+                }
+
+                // ─── SESSIONS ──────────────────────────────────
+                if (c.tabs[index] == 'Sessions') {
+                  if (packages.isEmpty) {
+                    return EmptyState(
+                      cs: cs,
+                      icon: Icons.event_note_outlined,
+                      title: 'No packages available',
+                      subtitle: '',
+                    );
+                  }
+                  return _sessionsTab(context, cs, packages);
+                }
+
+                // ─── FEEDBACKS ─────────────────────────────────
+                if (c.tabs[index] == 'Feedbacks') {
+                  return _feedbacksTab(context, cs);
+                }
+
+                // ─── CERTIFICATES ──────────────────────────────
+                if (c.tabs[index] == 'Certificates') {
+                  final certs = student.certificate ?? [];
+                  if (certs.isEmpty) {
+                    return EmptyState(
+                        cs: cs,
+                        icon: Icons.workspace_premium_outlined,
+                        subtitle: '',
+                        title: 'No certificates yet');
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: certs.length,
+                    itemBuilder: (context, i) =>
+                        CertificateCard(cert: certs[i]),
+                  );
+                }
+
+                return SizedBox();
+              }),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -305,99 +316,106 @@ class StudentDetailsPage extends StatelessWidget {
   //  PROFILE TAB
   // ══════════════════════════════════════════════════════════
   Widget _profileTab(BuildContext context, ColorScheme cs) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _profileCard(context),
-        SizedBox(height: 16),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _profileCard(context),
+          SizedBox(height: 16),
 
-        // Personal Information card
-        _glassCard(
-          context: context,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _cardHeader(context, 'Personal Information',
-                  icon: Icons.person_outline),
-              _divider(cs),
-              _infoGridRow(context,
-                  label1: 'Created By',
-                  value1: student.createdBy ?? '-',
-                  label2: 'Created At',
-                  value2: 'Oct 10, 2024'),
-              SizedBox(height: 14),
-              _contactRow(context, Icons.phone_outlined, 'Mobile',
-                  student.phone ?? '-'),
-              SizedBox(height: 10),
-              _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
-                  student.whatsapp ?? '-'),
-              _divider(cs),
-              _parentSection(context),
-            ],
+          // Personal Information card
+          _glassCard(
+            context: context,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _cardHeader(context, 'Personal Information',
+                    icon: Icons.person_outline),
+                _divider(cs),
+                _infoGridRow(context,
+                    label1: 'Created By',
+                    value1: student.createdBy ?? '-',
+                    label2: 'Created At',
+                    value2: 'Oct 10, 2024'),
+                SizedBox(height: 14),
+                _contactRow(context, Icons.phone_outlined, 'Mobile',
+                    student.phone ?? '-'),
+                SizedBox(height: 10),
+                _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
+                    student.whatsapp ?? '-'),
+                _divider(cs),
+                _parentSection(context),
+              ],
+            ),
           ),
-        ),
 
-        SizedBox(height: 16),
+          SizedBox(height: 16),
 
-        // Academic Details card
-        _glassCard(
-          context: context,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _cardHeader(context, 'Academic Details',
-                      icon: Icons.school_outlined),
-                  TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.badge_outlined, size: 16),
-                    label: Text('View ID Card', style: Get.textTheme.bodySmall),
-                  ),
-                ],
-              ),
-              _divider(cs),
-              _labelValue('Current Address', student.address ?? '-'),
-              SizedBox(height: 14),
-              _divider(cs),
-              Row(
-                children: [
-                  Expanded(
-                      child: _statPill(context, 'Category',
-                          student.category ?? '-', Icons.category_outlined)),
-                  SizedBox(width: 12),
-                  Expanded(
-                      child: _statPill(
-                          context,
-                          'Standard',
-                          student.standard?.toString() ?? '-',
-                          Icons.menu_book_outlined)),
-                ],
-              ),
-            ],
+          // Academic Details card
+          _glassCard(
+            context: context,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _cardHeader(context, 'Academic Details',
+                        icon: Icons.school_outlined),
+                    TextButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.badge_outlined, size: 16),
+                      label:
+                          Text('View ID Card', style: Get.textTheme.bodySmall),
+                    ),
+                  ],
+                ),
+                _divider(cs),
+                _labelValue('Current Address', student.address ?? '-'),
+                SizedBox(height: 14),
+                _divider(cs),
+                Row(
+                  children: [
+                    Expanded(
+                        child: _statPill(context, 'Category',
+                            student.category ?? '-', Icons.category_outlined)),
+                    SizedBox(width: 12),
+                    Expanded(
+                        child: _statPill(
+                            context,
+                            'Standard',
+                            student.standard?.toString() ?? '-',
+                            Icons.menu_book_outlined)),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
 
-        SizedBox(height: 16),
+          SizedBox(height: 16),
 
-        // Support Staff
-        _cardHeader(context, 'Support Staff',
-            icon: Icons.support_agent_outlined),
-        SizedBox(height: 10),
-        ...[
-          _supportTile(context, 'Coordinator', student.coordinator?.name ?? '-',
-              student.coordinator?.id ?? '-', 'Oct 12, 2024',
-              imageUrl: student.coordinator?.imageUrl),
-          _supportTile(context, 'Mentor', student.mentor?.name ?? '-',
-              student.mentor?.id ?? '-', 'Oct 15, 2024 - 02:30 PM'),
-          _supportTile(context, 'Advisor', student.advisorName ?? '-',
-              student.advisorId ?? '-', 'Oct 11, 2024 - 10:00 AM'),
-          _supportTile(context, 'Referral', student.referralName ?? '-', '',
-              'Oct 05, 2024 - 09:00 AM'),
-        ].map((w) =>
-            Padding(padding: const EdgeInsets.only(bottom: 10), child: w)),
-      ],
+          // Support Staff
+          _cardHeader(context, 'Support Staff',
+              icon: Icons.support_agent_outlined),
+          SizedBox(height: 10),
+          ...[
+            _supportTile(
+                context,
+                'Coordinator',
+                student.coordinator?.name ?? '-',
+                student.coordinator?.id ?? '-',
+                'Oct 12, 2024',
+                imageUrl: student.coordinator?.imageUrl),
+            _supportTile(context, 'Mentor', student.mentor?.name ?? '-',
+                student.mentor?.id ?? '-', 'Oct 15, 2024 - 02:30 PM'),
+            _supportTile(context, 'Advisor', student.advisorName ?? '-',
+                student.advisorId ?? '-', 'Oct 11, 2024 - 10:00 AM'),
+            _supportTile(context, 'Referral', student.referralName ?? '-', '',
+                'Oct 05, 2024 - 09:00 AM'),
+          ].map((w) =>
+              Padding(padding: const EdgeInsets.only(bottom: 10), child: w)),
+        ],
+      ),
     );
   }
 
@@ -406,97 +424,107 @@ class StudentDetailsPage extends StatelessWidget {
   // ══════════════════════════════════════════════════════════
   Widget _packagesTab(
       BuildContext context, ColorScheme cs, List<Package> packages) {
-    return Column(
-      children: [
-        CustomWidgets().premiumSearch(context,
-            hint: 'Search by package name', onChanged: (p0) {}),
-        SizedBox(height: 10),
-        // Summary button (untouched logic)
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () {
-              double totalPackageAmount = 0,
-                  totalPaid = 0,
-                  totalHours = 0,
-                  totalTeacherSalary = 0;
-              for (var pkg in packages) {
-                totalPackageAmount += pkg.packageFee ?? 0;
-                totalPaid += pkg.takenFee ?? 0;
-                totalHours += pkg.sessionsCompleted ?? 0;
-                totalTeacherSalary += pkg.totalTeacherSalary;
-              }
-              CustomWidgets().showCustomDialog(
-                context: context,
-                title: Text('Package Summary (${packages.length} packages)'),
-                formKey: GlobalKey(),
-                isViewOnly: true,
-                onSubmit: () {},
-                sections: [
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 4,
-                    separatorBuilder: (_, __) => SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final items = [
-                        {
-                          "title": "Total Package",
-                          "value": "₹${totalPackageAmount.toStringAsFixed(0)}",
-                          "color": Colors.blue
-                        },
-                        {
-                          "title": "Class Taken Amount",
-                          "value": "₹${totalPaid.toStringAsFixed(0)}",
-                          "color": Colors.green
-                        },
-                        {
-                          "title": "Total Hours",
-                          "value": totalHours.toStringAsFixed(0),
-                          "color": Colors.orange
-                        },
-                        {
-                          "title": "Teacher Salary",
-                          "value": "₹${totalTeacherSalary.toStringAsFixed(0)}",
-                          "color": Colors.purple
-                        },
-                        {
-                          "title": "Expense Ratio",
-                          "value": "26.7%",
-                          "color": Colors.red,
-                        },
-                      ];
-                      final item = items[index];
-                      return summaryCard(
-                          title: item["title"] as String,
-                          value: item["value"] as String,
-                          color: item["color"] as Color);
-                    },
-                  ),
-                ],
-              );
-            },
-            iconAlignment: IconAlignment.end,
-            label: Text('Package Summary',
-                style: Get.textTheme.bodySmall!.copyWith(color: Colors.white)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Get.theme.colorScheme.primary,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          CustomWidgets().premiumSearch(context,
+              hint: 'Search by package name', onChanged: (p0) {}),
+          SizedBox(height: 10),
+          // Summary button (untouched logic)
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                double totalPackageAmount = 0,
+                    totalPaid = 0,
+                    totalHours = 0,
+                    totalTeacherSalary = 0;
+                for (var pkg in packages) {
+                  totalPackageAmount += pkg.packageFee ?? 0;
+                  totalPaid += pkg.takenFee ?? 0;
+                  totalHours += pkg.sessionsCompleted ?? 0;
+                  totalTeacherSalary += pkg.totalTeacherSalary;
+                }
+                CustomWidgets().showCustomDialog(
+                  context: context,
+                  title: Text('Package Summary (${packages.length} packages)'),
+                  formKey: GlobalKey(),
+                  isViewOnly: true,
+                  onSubmit: () {},
+                  sections: [
+                    ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: 5,
+                      separatorBuilder: (_, __) => SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        final items = [
+                          {
+                            "title": "Total Package",
+                            "value":
+                                "₹${totalPackageAmount.toStringAsFixed(0)}",
+                            "color": Colors.blue,
+                            "leading": "₹",
+                          },
+                          {
+                            "title": "Class Taken Amount",
+                            "value": "₹${totalPaid.toStringAsFixed(0)}",
+                            "color": Colors.green,
+                            "leading": "₹",
+                          },
+                          {
+                            "title": "Total Hours",
+                            "value": "${totalHours.toStringAsFixed(0)} hrs",
+                            "color": Colors.orange,
+                            "leading": "⏱",
+                          },
+                          {
+                            "title": "Teacher Salary",
+                            "value":
+                                "₹${totalTeacherSalary.toStringAsFixed(0)}",
+                            "color": Colors.purple,
+                            "leading": "₹",
+                          },
+                          {
+                            "title": "Expense Ratio",
+                            "value": "26.7%",
+                            "color": Colors.red,
+                            "leading": "%",
+                          },
+                        ];
+                        final item = items[index];
+                        return summaryCard(
+                            title: item["title"] as String,
+                            value: item["value"] as String,
+                            color: item["color"] as Color,
+                            leading: item["leading"] as String);
+                      },
+                    ),
+                  ],
+                );
+              },
+              iconAlignment: IconAlignment.end,
+              label: Text('Package Summary',
+                  style:
+                      Get.textTheme.bodySmall!.copyWith(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Get.theme.colorScheme.primary,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
             ),
           ),
-        ),
-        SizedBox(height: 10),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: packages.length,
-          itemBuilder: (context, index) =>
-              studentPackageCard(context, packages[index]),
-        ),
-      ],
+          SizedBox(height: 10),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: packages.length,
+            itemBuilder: (context, index) =>
+                studentPackageCard(context, packages[index]),
+          ),
+        ],
+      ),
     );
   }
 
@@ -543,21 +571,31 @@ class StudentDetailsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        CustomWidgets().squareAvatar(batch.imageUrl, 44),
+                        const SizedBox(width: 12),
                         Expanded(
-                          child: Text(
-                            batch.batchName ?? 'No Name',
-                            style: Get.textTheme.titleMedium,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                batch.batchName ?? 'No Name',
+                                style: Get.textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'ID: ${batch.id ?? '-'}',
+                                style: Get.textTheme.labelSmall!
+                                    .copyWith(color: cs.outline),
+                              ),
+                            ],
                           ),
                         ),
                         _statusBadge(batch.status ?? '-', statusColor),
                       ],
                     ),
-                    SizedBox(height: 4),
-                    Text('ID: ${batch.id ?? '-'}',
-                        style: Get.textTheme.labelSmall!
-                            .copyWith(color: cs.outline)),
+
                     SizedBox(height: 14),
                     Divider(height: 1, color: cs.outline.withOpacity(0.15)),
                     SizedBox(height: 14),
@@ -629,21 +667,34 @@ class StudentDetailsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        CustomWidgets().squareAvatar(batch.imageUrl, 40),
+                        const SizedBox(width: 10),
                         Expanded(
-                          child: Text(batch.batchName ?? 'No Name',
-                              style: Get.textTheme.titleMedium),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                batch.batchName ?? 'No Name',
+                                style: Get.textTheme.titleMedium,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Code: ${batch.id ?? '-'}',
+                                style: Get.textTheme.bodySmall!
+                                    .copyWith(color: cs.outline),
+                              ),
+                            ],
+                          ),
                         ),
                         _statusBadge(
-                            batch.status ?? '-', _statusColor(batch.status)),
+                          batch.status ?? '-',
+                          _statusColor(batch.status),
+                        ),
                       ],
                     ),
-                    SizedBox(height: 4),
-                    Text('Code: ${batch.id ?? '-'}',
-                        style: Get.textTheme.bodySmall!
-                            .copyWith(color: cs.outline)),
-                    SizedBox(height: 14),
+                    const SizedBox(height: 14),
 
                     // Amount pills
                     Row(
@@ -761,9 +812,10 @@ class StudentDetailsPage extends StatelessWidget {
                       ];
                       final item = items[index];
                       return summaryCard(
-                          title: item["title"] as String,
-                          value: item["value"] as String,
-                          color: item["color"] as Color);
+                        title: item["title"] as String,
+                        value: item["value"] as String,
+                        color: item["color"] as Color,
+                      );
                     },
                   ),
                 ],
@@ -800,34 +852,44 @@ class StudentDetailsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Obx(() => CustomWidgets().customTabs(
-              context,
-              tabs: c.feedbackTabs,
-              selectedIndex: c.feedbackTabIndex.value,
-              onTap: (i) => c.feedbackTabIndex.value = i,
+        // ── FEEDBACK SUB TABS ─────────────────────────────
+        Obx(() => Center(
+              child: CustomWidgets().customTabs(
+                context,
+                tabs: c.feedbackTabs, //
+                selectedIndex: c.feedbackTabIndex.value,
+                onTap: (i) => c.feedbackTabIndex.value = i,
+              ),
             )),
-        SizedBox(height: 12),
-        Obx(() {
-          final isTeacher = c.feedbackTabIndex.value == 0;
-          final feedbacks = isTeacher ? c.teacherFeedbacks : c.mentorFeedbacks;
-          final label = isTeacher ? 'teacher' : 'mentor';
-
-          if (feedbacks.isEmpty) {
-            return EmptyState(
-              cs: cs,
-              icon: Icons.feedback_outlined,
-              title: 'No feedback from $label yet',
-              subtitle: 'Feedback added by $label will appear here',
+    
+        const SizedBox(height: 12),
+    
+        // ── FEEDBACK LIST ─────────────────────────────────
+        Expanded(
+          child: Obx(() {
+            final isTeacher = c.feedbackTabIndex.value == 0;
+            final feedbacks =
+                isTeacher ? c.teacherFeedbacks : c.mentorFeedbacks;
+            final label = isTeacher ? 'teacher' : 'mentor';
+    
+            if (feedbacks.isEmpty) {
+              return Center(
+                child: EmptyState(
+                  cs: cs,
+                  icon: Icons.feedback_outlined,
+                  title: 'No feedback from $label yet',
+                  subtitle: 'Feedback added by $label will appear here',
+                ),
+              );
+            }
+    
+            return ListView.separated(
+              itemCount: feedbacks.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (_, i) => feedbackCard(feedbacks[i], context),
             );
-          }
-          return ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: feedbacks.length,
-            separatorBuilder: (_, __) => SizedBox(height: 10),
-            itemBuilder: (_, i) => feedbackCard(feedbacks[i], context),
-          );
-        }),
+          }),
+        ),
       ],
     );
   }
@@ -879,7 +941,8 @@ class StudentDetailsPage extends StatelessWidget {
                             color: cs.shadow.withOpacity(0.1), blurRadius: 8)
                       ],
                     ),
-                    child: CustomWidgets(). squareAvatar(student.imageUrl, 64, radius: 12),
+                    child: CustomWidgets()
+                        .squareAvatar(student.imageUrl, 64, radius: 12),
                   ),
                 ),
 
@@ -1000,20 +1063,230 @@ class StudentDetailsPage extends StatelessWidget {
                           Text(package.name ?? '-',
                               style: Get.textTheme.titleMedium),
                           SizedBox(height: 6),
-                          _statusBadge(package.status ?? '', statusColor),
+                          if (package.status != null && package.status != '')
+                            _statusBadge(package.status ?? "", statusColor),
                         ],
                       ),
                     ),
                     PopupMenuButton<String>(
-                      icon: Icon(Icons.more_vert, color: cs.outline),
-                      onSelected: (value) {},
+                      padding: EdgeInsets.zero,
+                      offset: const Offset(0, 45),
+                      color: cs.surface,
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      onSelected: (value) {
+                        switch (value) {
+                          case "edit":
+                            Get.to(() => AddPackagePage(package: package));
+
+                            break;
+
+                          case "delete":
+                            CustomWidgets().showDeleteDialog(
+                              context: context,
+                              title: 'Are you sure?',
+                              text:
+                                  'Are you sure you want to delete this package parmanently',
+                              onConfirm: () {},
+                            );
+
+                            break;
+                          case "refund":
+                            c.init(
+                              packageFee: package.packageFee ?? 0,
+                              takenFee: package.takenFee ?? 0,
+                              totalPaid: package.totalStudentPaid ?? 0,
+                            );
+                            CustomWidgets().showCustomDialog(
+                                context: context,
+                                formKey: GlobalKey(),
+                                title: Text('Request Refund'),
+                                onSubmit: () {
+                                  final refunded =
+                                      double.tryParse(c.refundedC.text) ?? 0;
+                                  final refundable = c.refundable;
+
+                                  if (refunded < 0) {
+                                    Get.snackbar("Error",
+                                        "Refunded amount cannot be negative");
+                                    return;
+                                  }
+
+                                  if (refunded > refundable) {
+                                    Get.snackbar(
+                                      "Error",
+                                      "Refunded amount cannot exceed refundable amount (${refundable.toStringAsFixed(2)})",
+                                    );
+                                    return;
+                                  }
+
+                                  final convenienceFee = refundable - refunded;
+
+                                  final reason = c.reasonC.text.trim();
+
+                                  if (reason.isEmpty) {
+                                    Get.snackbar("Error", "Reason is required");
+                                    return;
+                                  }
+
+                                  final payload = {
+                                    "package_refund_amount":
+                                        c.packageRefundC.text,
+                                    "refundable_amount": refundable,
+                                    "refunded_amount": refunded,
+                                    "convenience_fee": convenienceFee,
+                                    "reason": reason,
+                                  };
+
+                                  c.submitRefund(payload);
+                                },
+                                sections: [
+                                  infoCard(
+                                    context,
+                                    type: "package",
+                                    icon: Icons.info_outline,
+                                    title: "Package Details",
+                                    children: [
+                                      infoRow(
+                                        label: "Subject",
+                                        value: package.subjectName ?? "-",
+                                      ),
+                                      infoRow(
+                                        label: "Standard",
+                                        value: package.standard ?? "-",
+                                      ),
+                                      infoRow(
+                                        label: "Syllabus",
+                                        value: package.syllabus ?? "-",
+                                      ),
+                                      infoRow(
+                                        label: "Total Fee",
+                                        value: package.packageFee?.toString() ??
+                                            "-",
+                                      ),
+                                    ],
+                                  ),
+                                  infoCard(
+                                    context,
+                                    type: "payment",
+                                    icon: Icons.currency_rupee_outlined,
+                                    title: "Payment & Teacher",
+                                    children: [
+                                      infoRow(
+                                        label: "Total Paid",
+                                        value: package.totalStudentPaid
+                                                ?.toString() ??
+                                            "-",
+                                      ),
+                                      infoRow(
+                                        label: "Class Taken",
+                                        value:
+                                            package.takenFee?.toString() ?? "-",
+                                      ),
+                                      infoRow(
+                                        label: "Teacher",
+                                        value: package.teacher?.name ?? "-",
+                                      ),
+                                    ],
+                                  ),
+                                  CustomWidgets().labelWithAsterisk(
+                                      'Package Refund Amount',
+                                      required: true),
+                                  const SizedBox(height: 10),
+                                  CustomWidgets().dropdownStyledTextField(
+                                      context: context,
+                                      controller: c.packageRefundC,
+                                      hint: 'Enter the package refund amount',
+                                      readOnly: true),
+                                  const SizedBox(height: 10),
+                                  CustomWidgets().labelWithAsterisk(
+                                      'Refundable Amount',
+                                      required: true),
+                                  const SizedBox(height: 10),
+                                  CustomWidgets().dropdownStyledTextField(
+                                      context: context,
+                                      hint: 'Enter refund amount',
+                                      controller: c.refundableC,
+                                      readOnly: true),
+                                  const SizedBox(height: 10),
+                                  CustomWidgets().labelWithAsterisk(
+                                      'Refunded Amount',
+                                      required: true),
+                                  const SizedBox(height: 10),
+                                  CustomWidgets().dropdownStyledTextField(
+                                    context: context,
+                                    hint: 'Enter refund amount',
+                                    controller: c.refundedC,
+                                    isNumber: true,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  CustomWidgets().labelWithAsterisk(
+                                      'Conveniencing Fees',
+                                      required: true),
+                                  const SizedBox(height: 10),
+                                  CustomWidgets().dropdownStyledTextField(
+                                      context: context,
+                                      hint: 'Conveniencing fees',
+                                      controller: c.convenienceC,
+                                      readOnly: true),
+                                  const SizedBox(height: 10),
+                                  CustomWidgets().labelWithAsterisk(
+                                      'Reason for refund',
+                                      required: true),
+                                  const SizedBox(height: 10),
+                                  CustomWidgets().dropdownStyledTextField(
+                                    context: context,
+                                    controller: c.reasonC,
+                                    hint: 'Reason for Refund',
+                                    isMultiline: true,
+                                    maxLength: 500,
+                                  ),
+                                  const SizedBox(height: 10),
+                                ]);
+
+                            break;
+                          case "deactivate":
+                            CustomWidgets().showDeactivateDialog(
+                              context: context,
+                              text:
+                                  'Are you sure you want to deactivate this package parmanently',
+                              onConfirm: () {},
+                            );
+
+                            break;
+                        }
+                      },
                       itemBuilder: (context) => const [
-                        PopupMenuItem(value: "edit", child: Text("Edit")),
-                        PopupMenuItem(value: "delete", child: Text("Delete")),
                         PopupMenuItem(
-                            value: "refund", child: Text("Request Refund")),
+                          value: "edit",
+                          child: MenuItem(
+                            icon: Icons.edit_outlined,
+                            title: "Edit",
+                          ),
+                        ),
                         PopupMenuItem(
-                            value: "deactivate", child: Text("Deactivate")),
+                          value: "delete",
+                          child: MenuItem(
+                            icon: Icons.delete_outline,
+                            title: "Delete",
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: "refund",
+                          child: MenuItem(
+                            icon: Icons.request_page_outlined,
+                            title: "Request Refund",
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: "deactivate",
+                          child: MenuItem(
+                            icon: Icons.pause_circle_outline,
+                            title: "Deactivate",
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -1056,11 +1329,12 @@ class StudentDetailsPage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        CircleAvatar(
-                          radius: 22,
-                          backgroundImage: const NetworkImage(
-                              "https://i.pravatar.cc/150?img=3"),
-                        ),
+                        if (package.teacher != null && package.teacher != "")
+                          CircleAvatar(
+                            radius: 22,
+                            backgroundImage: const NetworkImage(
+                                "https://i.pravatar.cc/150?img=3"),
+                          ),
                         SizedBox(height: 6),
                         Text(package.teacher?.name ?? '',
                             style: Get.textTheme.titleSmall),
@@ -1112,40 +1386,48 @@ class StudentDetailsPage extends StatelessWidget {
                 _sectionDivider(cs),
 
                 // STATUS TOGGLE
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Obx(() => Row(
-                          children: [
-                            Icon(
-                              c.isActive.value
-                                  ? Icons.check_circle_outline
-                                  : Icons.cancel_outlined,
-                              size: 16,
-                              color: c.isActive.value
-                                  ? const Color(0xFF22C55E)
-                                  : cs.error,
-                            ),
-                            SizedBox(width: 6),
-                            Text(c.status.value,
-                                style: Get.textTheme.titleSmall!.copyWith(
-                                    color: c.isActive.value
-                                        ? const Color(0xFF22C55E)
-                                        : cs.error)),
-                          ],
-                        )),
-                    Obx(() => Switch(
-                          value: c.isActive.value,
-                          activeColor: const Color(0xFF22C55E),
-                          onChanged: (v) {
-                            c.isActive.value = v;
-                            c.status.value =
-                                v ? 'Demo Completed' : 'Demo Pending';
-                          },
-                        )),
-                  ],
-                ),
+                Obx(() => Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: StudentStatus.values.map((status) {
+                        final isSelected = c.status.value == status;
 
+                        return ChoiceChip(
+                          selectedColor: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.12),
+
+                          // 👇 default background
+                          backgroundColor: Colors.transparent,
+
+                          // 👇 border styling
+                          shape: StadiumBorder(
+                            side: BorderSide(
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .outline
+                                      .withOpacity(0.5),
+                              width: 0.6, // 👈 reduced border width
+                            ),
+                          ),
+
+                          // 👇 text color
+                          labelStyle: Theme.of(context)
+                              .textTheme
+                              .labelMedium!
+                              .copyWith(
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.black87),
+                          label: Text(status.label),
+                          selected: isSelected,
+                          onSelected: (_) => c.status.value = status,
+                        );
+                      }).toList(),
+                    )),
                 _sectionDivider(cs),
 
                 // TEACHER FEES
@@ -1318,11 +1600,19 @@ class StudentDetailsPage extends StatelessWidget {
                   ),
                   IconButton(
                       icon: const Icon(Icons.edit_outlined, size: 18),
-                      onPressed: () {}),
+                      onPressed: () => Get.to(AddAssessmentPage(
+                            assessment: assessment,
+                          ))),
                   IconButton(
                       icon:
                           Icon(Icons.delete_outline, size: 18, color: cs.error),
-                      onPressed: () {}),
+                      onPressed: () => CustomWidgets().showDeleteDialog(
+                            context: context,
+                            title: 'Are you sure?',
+                            text:
+                                'Are you sure you want to delete this assessment permanently?',
+                            onConfirm: () {},
+                          )),
                 ],
               ),
             ),
@@ -1580,7 +1870,7 @@ class StudentDetailsPage extends StatelessWidget {
         border: Border.all(color: color.withOpacity(0.4)),
       ),
       child:
-          Text(label, style: Get.textTheme.titleSmall!.copyWith(color: color)),
+          Text(label, style: Get.textTheme.labelSmall!.copyWith(color: color)),
     );
   }
 
@@ -1746,6 +2036,7 @@ Widget summaryCard({
   required String title,
   required String value,
   required Color color,
+  String? leading,
 }) {
   return Container(
     padding: const EdgeInsets.all(16),
@@ -1755,28 +2046,34 @@ Widget summaryCard({
     ),
     child: Row(
       children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(10),
+        if (leading != null && leading.isNotEmpty)
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+                child: Text(
+              leading,
+              style: Get.textTheme.titleLarge!.copyWith(color: color),
+            )),
           ),
-          child: Center(
-            child: Text(value.substring(0, 1),
-                style: Get.textTheme.titleLarge!.copyWith(color: color)),
-          ),
-        ),
-        SizedBox(width: 14),
+        if (leading != null && leading.isNotEmpty) const SizedBox(width: 14),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: Get.textTheme.labelSmall!
-                    .copyWith(color: color.withOpacity(0.8))),
-            SizedBox(height: 3),
-            Text(value,
-                style: Get.textTheme.titleLarge!.copyWith(color: color)),
+            Text(
+              title,
+              style: Get.textTheme.labelSmall!
+                  .copyWith(color: color.withOpacity(0.8)),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              value,
+              style: Get.textTheme.titleLarge!.copyWith(color: color),
+            ),
           ],
         ),
       ],

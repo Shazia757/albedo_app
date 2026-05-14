@@ -414,13 +414,11 @@ class BatchDetailsPage extends StatelessWidget {
                         iconAlignment: IconAlignment.end,
                         label: Text(
                           'Package Summary',
-                          style: Get.textTheme
-                              .bodySmall!
+                          style: Get.textTheme.bodySmall!
                               .copyWith(color: Colors.white),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Get.theme.colorScheme.primary,
+                          backgroundColor: Get.theme.colorScheme.primary,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -570,13 +568,11 @@ class BatchDetailsPage extends StatelessWidget {
                         iconAlignment: IconAlignment.end,
                         label: Text(
                           'Session Summary',
-                          style: Get.textTheme
-                              .bodySmall!
+                          style: Get.textTheme.bodySmall!
                               .copyWith(color: Colors.white),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Get.theme.colorScheme.primary,
+                          backgroundColor: Get.theme.colorScheme.primary,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -658,8 +654,7 @@ class BatchDetailsPage extends StatelessWidget {
                     child: Text(
                       'No certificates are available for this student',
                       textAlign: TextAlign.center,
-                      style: Get.textTheme
-                          .bodyMedium!
+                      style: Get.textTheme.bodyMedium!
                           .copyWith(color: Colors.grey),
                     ),
                   );
@@ -869,9 +864,7 @@ class BatchDetailsPage extends StatelessWidget {
 
           Text(
             "Enrolled: 12 Oct 2024 • 10:30 AM",
-            style: Get.textTheme
-                .bodySmall!
-                .copyWith(color: Colors.grey),
+            style: Get.textTheme.bodySmall!.copyWith(color: Colors.grey),
           ),
 
           SizedBox(height: 12),
@@ -918,8 +911,7 @@ class BatchDetailsPage extends StatelessWidget {
                       ),
                       Text(
                         package.teacher?.id ?? '',
-                        style: Get.textTheme
-                            .bodySmall!
+                        style: Get.textTheme.bodySmall!
                             .copyWith(color: Colors.grey),
                       ),
                     ],
@@ -943,15 +935,13 @@ class BatchDetailsPage extends StatelessWidget {
               Column(
                 children: [
                   Text("Mode"),
-                  Text(package.mode ?? '-',
-                      style: Get.textTheme.titleSmall),
+                  Text(package.mode ?? '-', style: Get.textTheme.titleSmall),
                 ],
               ),
               Column(
                 children: [
                   Text("Time"),
-                  Text(package.time ?? '-',
-                      style: Get.textTheme.titleSmall),
+                  Text(package.time ?? '-', style: Get.textTheme.titleSmall),
                 ],
               ),
               Column(
@@ -1008,15 +998,15 @@ class BatchDetailsPage extends StatelessWidget {
                   )),
 
               /// 👇 Switch must be inside Obx
-              Obx(() => Switch(
-                    value: c.isActive.value,
-                    onChanged: (v) {
-                      c.isActive.value = v;
+              // Obx(() => Switch(
+              //       value: c.isActive.value,
+              //       onChanged: (v) {
+              //         c.isActive.value = v;
 
-                      // optional: update status text
-                      c.status.value = v ? "Demo Completed" : "Demo Pending";
-                    },
-                  )),
+              //         // optional: update status text
+              //         c.status.value = v ? "Demo Completed" : "Demo Pending";
+              //       },
+              //     )),
             ],
           ),
 
@@ -1096,9 +1086,7 @@ class BatchDetailsPage extends StatelessWidget {
             Expanded(
               child: Text(
                 package.name ?? '-',
-                style: Get.textTheme
-                    .titleMedium!
-                    .copyWith(color: cs.onSurface),
+                style: Get.textTheme.titleMedium!.copyWith(color: cs.onSurface),
               ),
             ),
 
@@ -1114,9 +1102,7 @@ class BatchDetailsPage extends StatelessWidget {
               ),
               child: Text(
                 '$totalSessions Sessions',
-                style: Get.textTheme
-                    .titleSmall!
-                    .copyWith(color: cs.primary),
+                style: Get.textTheme.titleSmall!.copyWith(color: cs.primary),
               ),
             ),
           ],
@@ -1246,9 +1232,7 @@ class BatchDetailsPage extends StatelessWidget {
           SizedBox(height: 10),
           Text(student.name, style: Get.textTheme.titleLarge),
           Text(student.email ?? '-',
-              style: Get.textTheme
-                  .bodyMedium!
-                  .copyWith(color: Colors.grey)),
+              style: Get.textTheme.bodyMedium!.copyWith(color: Colors.grey)),
           SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -1267,8 +1251,7 @@ class BatchDetailsPage extends StatelessWidget {
             ),
             label: Text(
               student.isFeePaid ? 'Admission Fee Paid' : 'Admission Fee Unpaid',
-              style: Get.textTheme
-                  .labelSmall!
+              style: Get.textTheme.labelSmall!
                   .copyWith(color: student.isFeePaid ? Colors.green : cs.error),
             ),
             backgroundColor: student.isFeePaid
@@ -1293,9 +1276,7 @@ class BatchDetailsPage extends StatelessWidget {
               iconAlignment: IconAlignment.end,
               label: Text(
                 'Go to Dashboard',
-                style: Get.textTheme
-                    .bodySmall!
-                    .copyWith(color: Colors.white),
+                style: Get.textTheme.bodySmall!.copyWith(color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Get.theme.colorScheme.primary,
@@ -1345,14 +1326,12 @@ class BatchDetailsPage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(l1),
-          Text(v1, style: Get.textTheme.titleSmall)
-        ]),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(l2),
-          Text(v2, style: Get.textTheme.titleSmall)
-        ]),
+        Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text(l1), Text(v1, style: Get.textTheme.titleSmall)]),
+        Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text(l2), Text(v2, style: Get.textTheme.titleSmall)]),
       ],
     );
   }
@@ -1367,9 +1346,7 @@ Widget _labelValue(String label, String value) {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(label,
-          style: Get.textTheme
-              .bodyMedium!
-              .copyWith(color: Colors.grey)),
+          style: Get.textTheme.bodyMedium!.copyWith(color: Colors.grey)),
       Text(value, style: Get.textTheme.titleSmall),
     ],
   );
@@ -1400,8 +1377,7 @@ Widget summaryCard({
         SizedBox(height: 6),
         Text(
           value,
-          style:
-              Get.textTheme.titleMedium!.copyWith(color: color),
+          style: Get.textTheme.titleMedium!.copyWith(color: color),
         ),
       ],
     ),
@@ -1455,9 +1431,7 @@ Widget _supportTile(
               // Line 1: Role
               Text(
                 role,
-                style: Get.textTheme
-                    .titleSmall!
-                    .copyWith(color: Colors.grey),
+                style: Get.textTheme.titleSmall!.copyWith(color: Colors.grey),
               ),
 
               SizedBox(height: 4),
@@ -1473,8 +1447,7 @@ Widget _supportTile(
               // Line 3: ID + Date
               Text(
                 "$id • $date",
-                style: Get.textTheme
-                    .bodySmall!
+                style: Get.textTheme.bodySmall!
                     .copyWith(color: Colors.grey.shade600),
               ),
             ],

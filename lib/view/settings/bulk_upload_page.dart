@@ -31,7 +31,7 @@ class BulkUploadPage extends StatelessWidget {
                     /// TITLE (outside card)
                     Text(
                       "Bulk Upload",
-                      style: Get.textTheme.titleLarge,
+                      style: Get.textTheme.titleLarge!.copyWith(color: cs.primary),
                     ),
                     SizedBox(height: 12),
 
