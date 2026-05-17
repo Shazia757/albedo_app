@@ -656,19 +656,19 @@ class SessionController extends GetxController {
         status: "finished",
         members: [
           Users(
-            id: "STU001",
+            empId: "STU001",
             name: "Aisha",
             email: "aisha@mail.com",
             role: "Student",
           ),
           Users(
-            id: "T001",
+            empId: "T001",
             name: "Ameen Rahman",
             email: "ameen@mail.com",
             role: "Teacher",
           ),
           Users(
-            id: "MTR001",
+            empId: "MTR001",
             name: "Saeeda",
             email: "saeeda@mail.com",
             role: "Mentor",
@@ -684,13 +684,13 @@ class SessionController extends GetxController {
         status: "ongoing",
         members: [
           Users(
-            id: "STU002",
+            empId: "STU002",
             name: "Rahul",
             email: "rahul@mail.com",
             role: "Student",
           ),
           Users(
-            id: "T002",
+            empId: "T002",
             name: "David",
             email: "david@mail.com",
             role: "Teacher",
@@ -706,19 +706,19 @@ class SessionController extends GetxController {
         status: "upcoming",
         members: [
           Users(
-            id: "STU003",
+            empId: "STU003",
             name: "Fatima",
             email: "fatima@mail.com",
             role: "Student",
           ),
           Users(
-            id: "T003",
+            empId: "T003",
             name: "John",
             email: "john@mail.com",
             role: "Teacher",
           ),
           Users(
-            id: "ADV001",
+            empId: "ADV001",
             name: "Fathima",
             email: "advisor@mail.com",
             role: "Advisor",
@@ -734,19 +734,19 @@ class SessionController extends GetxController {
         status: "finished",
         members: [
           Users(
-            id: "ST04",
+            empId: "ST04",
             name: "Arjun",
             email: "arjun@mail.com",
             role: "Student",
           ),
           Users(
-            id: "T003",
+            empId: "T003",
             name: "Meera",
             email: "meera@mail.com",
             role: "Teacher",
           ),
           Users(
-            id: "COO1001",
+            empId: "COO1001",
             name: "Maria",
             email: "maria@mail.com",
             role: "Coordinator",
@@ -762,13 +762,13 @@ class SessionController extends GetxController {
         status: "upcoming",
         members: [
           Users(
-            id: "ST05",
+            empId: "ST05",
             name: "Nisha",
             email: "nisha@mail.com",
             role: "Student",
           ),
           Users(
-            id: "T002",
+            empId: "T002",
             name: "David",
             email: "david@mail.com",
             role: "Teacher",
@@ -784,19 +784,19 @@ class SessionController extends GetxController {
         status: "finished",
         members: [
           Users(
-            id: "ST06",
+            empId: "ST06",
             name: "Ali",
             email: "ali@mail.com",
             role: "Student",
           ),
           Users(
-            id: "T003",
+            empId: "T003",
             name: "Meera",
             email: "meera@mail.com",
             role: "Teacher",
           ),
           Users(
-            id: "MTR002",
+            empId: "MTR002",
             name: "David",
             email: "mentor@mail.com",
             role: "Mentor",
@@ -1015,7 +1015,7 @@ class SessionController extends GetxController {
 
   Users mentorToUser(Mentor m) {
     return Users(
-      id: m.id,
+      empId: m.id,
       name: m.name,
       role: "mentor",
     );
@@ -1197,7 +1197,11 @@ class SessionController extends GetxController {
       icon: Icons.description,
       formKey: GlobalKey<FormState>(),
       isViewOnly: false,
-      submitText: "Save Report",
+     submitWidget: Text(
+      "Save Report",
+      style:
+          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
       onSubmit: controller.saveReport,
       sections: [
         SessionReportDialogBody(controller: controller),

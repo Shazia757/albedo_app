@@ -1,62 +1,119 @@
 class Users {
-  String? name;
   String? id;
+
+  String? name;
+  String? empId;
+
   String? role;
-  DateTime? joinedAt;
+  String? position;
+  String? customPosition;
+
   String? email;
+
   String? contact;
+  String? whatsappNumber;
+
   String? profileImage;
 
+  String? dateOfBirth;
+  String? qualification;
+
+  String? place;
+  String? pincode;
+  String? address;
+
+  String? timezone;
+  String? preferredLanguage;
+
+  String? resumeFile;
+  String? resumeUrl;
+
+  dynamic paymentDetails;
+
+  List<dynamic>? workExperiences;
+
+  bool? isResigned;
+
   Users({
-    this.name,
     this.id,
+    this.name,
+    this.empId,
     this.role,
+    this.position,
+    this.customPosition,
     this.email,
-    this.joinedAt,
     this.contact,
+    this.whatsappNumber,
     this.profileImage,
+    this.dateOfBirth,
+    this.qualification,
+    this.place,
+    this.pincode,
+    this.address,
+    this.timezone,
+    this.preferredLanguage,
+    this.resumeFile,
+    this.resumeUrl,
+    this.paymentDetails,
+    this.workExperiences,
+    this.isResigned,
   });
 
-  // Convert object to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'id': id,
-      'role': role,
-      'email': email,
-      'contact': contact,
-      'profileImage': profileImage,
-    };
-  }
-
-  // Create object from JSON
   factory Users.fromJson(Map<String, dynamic> json) {
     return Users(
-      name: json['name'] ?? '',
-      id: json['id'] ?? '',
-      role: json['role'] ?? '',
+      id: json['id']?.toString(),
+      name: json['name'] ?? json['username'] ?? '',
+      empId: json['emp_id'],
+      role: json['role'],
+      position: json['position'],
+      customPosition: json['custom_position'],
       email: json['email'],
-      contact: json['contact'],
-      profileImage: json['profileImage'],
+      contact: json['phone_number'] ?? json['contact'],
+      whatsappNumber: json['whatsapp_number'],
+      profileImage: json['photo'] ?? json['profileImage'],
+      dateOfBirth: json['date_of_birth'],
+      qualification: json['qualification'],
+      place: json['place'],
+      pincode: json['pincode'],
+      address: json['address'],
+      timezone: json['timezone'],
+      preferredLanguage: json['preferred_language'],
+      resumeFile: json['resume_file'],
+      resumeUrl: json['resume_url'],
+      paymentDetails: json['payment_details'],
+      workExperiences: json['work_experiences'] ?? [],
+      isResigned: json['is_resigned'],
     );
   }
 
-  Users copyWith({
-    String? name,
-    String? id,
-    String? role,
-    String? email,
-    String? contact,
-    String? profileImage,
-  }) {
-    return Users(
-      name: name ?? this.name,
-      id: id ?? this.id,
-      role: role ?? this.role,
-      email: email ?? this.email,
-      contact: contact ?? this.contact,
-      profileImage: profileImage ?? this.profileImage,
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'username': name,
+      'emp_id': empId,
+      'role': role,
+      'position': position,
+      'custom_position': customPosition,
+      'email': email,
+      'phone_number': contact,
+      'contact': contact,
+      'whatsapp_number': whatsappNumber,
+      'photo': profileImage,
+      'profileImage': profileImage,
+      'date_of_birth': dateOfBirth,
+      'qualification': qualification,
+      'place': place,
+      'pincode': pincode,
+      'address': address,
+      'timezone': timezone,
+      'preferred_language': preferredLanguage,
+      'resume_file': resumeFile,
+      'resume_url': resumeUrl,
+      'payment_details': paymentDetails,
+      'work_experiences': workExperiences,
+      'is_resigned': isResigned,
+    };
   }
 }
 
@@ -72,4 +129,26 @@ class DeadlineConfig {
     required this.value,
     this.enabled = true,
   });
+}
+
+class LoginResponse {
+  String? accessToken;
+  String? refreshToken;
+  Users? data;
+
+  LoginResponse({required this.data, this.accessToken, this.refreshToken});
+
+  factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    return LoginResponse(
+      data: json['user'] != null
+          ? Users.fromJson(json['user'] as Map<String, dynamic>)
+          : Users(),
+      accessToken: json['access'] as String?,
+      refreshToken: json['refresh'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'access': accessToken};
+  }
 }

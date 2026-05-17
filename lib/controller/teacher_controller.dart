@@ -385,7 +385,7 @@ class TeacherController extends GetxController {
 
   Users teacherToUser(Teacher t) {
     return Users(
-      id: t.id,
+      empId: t.id,
       name: t.name,
       role: "teacher",
     );

@@ -103,12 +103,12 @@ class BatchListController extends GetxController {
 
       List<Session> result = [];
 
-      if (user?.role == "admin") {
+      if (user?.role == "Admin") {
         result = allSessions;
-      } else if (user?.role == "coordinator") {
+      } else if (user?.role == "Coordinator") {
         result =
             allSessions.where((s) => s.coordinator?.id == user!.id).toList();
-      } else if (user?.role == "teacher") {
+      } else if (user?.role == "Teacher") {
         result = allSessions.where((b) => b.teacher?.id == user!.id).toList();
       }
 
@@ -325,7 +325,13 @@ class BatchListController extends GetxController {
       icon: Icons.description,
       formKey: GlobalKey<FormState>(),
       isViewOnly: false,
-      submitText: "Save Report",
+      submitWidget: Text(
+        "Save Report",
+        style: Theme.of(Get.context!)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
+      ),
       onSubmit: controller.saveReport,
       sections: [
         SessionReportDialogBody(controller: controller),

@@ -36,7 +36,11 @@ class GeneralPage extends StatelessWidget {
             context: ctx,
             title: Text('Update Registration Fee'),
             formKey: formKey,
-            submitText: 'Update',
+          submitWidget: Text(
+      "Update",
+      style:
+          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
             sections: [
               Column(
                 children: [
@@ -65,7 +69,11 @@ class GeneralPage extends StatelessWidget {
             context: ctx,
             title: Text('Update Factor Value'),
             formKey: formKey,
-            submitText: 'Update',
+           submitWidget: Text(
+      "Update",
+      style:
+          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
             sections: [
               Column(
                 children: [
@@ -93,7 +101,11 @@ class GeneralPage extends StatelessWidget {
             context: ctx,
             title: Text('Update Salary Invoice Tax'),
             formKey: formKey,
-            submitText: 'Update',
+         submitWidget: Text(
+      "Update",
+      style:
+          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
             sections: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

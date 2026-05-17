@@ -1321,7 +1321,7 @@ class CustomWidgets {
     required List<Widget> sections,
     required VoidCallback onSubmit,
     bool isViewOnly = false,
-    String submitText = "Save",
+     Widget? submitWidget,
   }) {
     final cs = Theme.of(context).colorScheme;
     Get.dialog(
@@ -1431,15 +1431,8 @@ class CustomWidgets {
                             onPressed: () {
                               if (!formKey.currentState!.validate()) return;
                               onSubmit();
-                              Get.back();
                             },
-                            child: Text(
-                              submitText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(color: Colors.white),
-                            ),
+                            child: submitWidget,
                           ),
                         ),
                       ],

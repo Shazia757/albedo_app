@@ -1,7 +1,6 @@
 import 'package:albedo_app/controller/batch_controller.dart';
 import 'package:albedo_app/controller/batch_list_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
-import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/batch/batch_detailed_page.dart';
@@ -145,7 +144,11 @@ class BatchesListPage extends StatelessWidget {
       ),
       icon: Icons.schedule,
       formKey: GlobalKey<FormState>(),
-      submitText: "Close",
+       submitWidget: Text(
+      "Close",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
       onSubmit: () {},
       isViewOnly: true,
       sections: [
@@ -627,7 +630,11 @@ class BatchesListPage extends StatelessWidget {
       context: context,
       title: Text('Edit Batch Session'),
       icon: Icons.edit_outlined,
-      submitText: 'Update',
+      submitWidget: Text(
+      "Update",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
       formKey: GlobalKey<FormState>(),
       sections: [
         DialogSectionCard(
@@ -691,7 +698,7 @@ class BatchesListPage extends StatelessWidget {
                 value: "${data.duration} minutes",
                 onChanged: (p0) {
                   selectedDuration.value = int.tryParse(
-                        p0?.split(" ").first ?? "0",
+                        p0.split(" ").first ?? "0",
                       ) ??
                       0;
                 },

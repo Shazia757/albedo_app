@@ -132,6 +132,7 @@ class NotificationCard extends StatelessWidget {
         highlightColor: Colors.transparent,
         onTap: () {
           CustomWidgets().showCustomDialog(
+            
             context: context,
             title: Text(data.title ?? "Notification"),
             formKey: GlobalKey(),

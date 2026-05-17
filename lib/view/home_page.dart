@@ -13,35 +13,37 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: MediaQuery.of(context).size.width > 800 ? null : DrawerMenu(),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: CustomAppBar(),
-      body: Row(
-        children: [
-          if (MediaQuery.of(context).size.width > 800) DrawerMenu(),
-          Expanded(
-            child: Obx(() {
-              if (c.isLoading.value) {
-                return Center(child: CircularProgressIndicator());
-              }
-              final auth = Get.find<AuthController>();
-              final role = auth.activeUser?.role;
+    return SafeArea(
+      child: Scaffold(
+        drawer: MediaQuery.of(context).size.width > 800 ? null : DrawerMenu(),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        appBar: CustomAppBar(),
+        body: Row(
+          children: [
+            if (MediaQuery.of(context).size.width > 800) DrawerMenu(),
+            Expanded(
+              child: Obx(() {
+                if (c.isLoading.value) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                final auth = Get.find<AuthController>();
+                final role = auth.activeUser?.position;
 
-              return RefreshIndicator(
-                onRefresh: () async {
-                  await c.refreshDashboard(); // we'll define this
-                },
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  child: _buildDashboard(context, role),
-                ),
-              );
-            }),
-          ),
-        ],
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await c.refreshDashboard(); 
+                  },
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    child: _buildDashboard(context, role),
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }

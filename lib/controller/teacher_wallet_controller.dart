@@ -11,6 +11,7 @@ class TeacherWalletController extends GetxController {
   var expanded = false.obs;
   var wallets = <Wallet>[].obs;
   var transactions = <TransactionItem>[].obs;
+  var isLoading=false.obs;
 
   final componentType = ['Bonus', 'Commission', 'Allowance', 'Deduction'];
 

@@ -778,7 +778,11 @@ class SessionPage extends StatelessWidget {
     CustomWidgets().showCustomDialog(
       context: context,
       title: Text('Add New Ticket'),
-      submitText: 'Add',
+     submitWidget: Text(
+      "Add",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
       icon: Icons.support_agent_outlined,
       formKey: GlobalKey<FormState>(),
       sections: [
@@ -911,7 +915,11 @@ class SessionPage extends StatelessWidget {
       context: context,
       title: Text('Edit Session'),
       icon: Icons.edit_outlined,
-      submitText: 'Update',
+      submitWidget: Text(
+      "Update",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
       formKey: GlobalKey<FormState>(),
       sections: [
         DialogSectionCard(
@@ -975,7 +983,7 @@ class SessionPage extends StatelessWidget {
                 value: "${data.duration} minutes",
                 onChanged: (p0) {
                   selectedDuration.value = int.tryParse(
-                        p0?.split(" ").first ?? "0",
+                        p0.split(" ").first ?? "0",
                       ) ??
                       0;
                 },
@@ -1097,7 +1105,11 @@ class SessionPage extends StatelessWidget {
       icon: Icons.video_call_outlined,
       formKey: formKey,
       isViewOnly: true, // 👈 no save button
-      submitText: "Close",
+      submitWidget: Text(
+      "Close",
+      style:
+          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
 
       onSubmit: () {},
 
@@ -1459,7 +1471,11 @@ class _SessionCard extends StatelessWidget {
       context: context,
       formKey: GlobalKey<FormState>(),
       title: Text("Reschedule Session"),
-      submitText: 'Reschedule',
+     submitWidget: Text(
+      "Reschedule",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
       isViewOnly: false,
       onSubmit: () {
         // TODO: submit logic

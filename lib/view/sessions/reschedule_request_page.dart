@@ -1,6 +1,5 @@
 import 'package:albedo_app/controller/request_controller.dart';
 import 'package:albedo_app/model/request_model.dart';
-import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/view/sessions/reshedule_detailed_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';

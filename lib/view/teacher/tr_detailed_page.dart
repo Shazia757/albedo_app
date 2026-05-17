@@ -3,7 +3,6 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/controller/teacher_wallet_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
-import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/teacher/add_wallet_page.dart';
 import 'package:albedo_app/view/teacher/tr_package_session_page.dart';
@@ -507,7 +506,11 @@ class TeacherDetailsPage extends StatelessWidget {
                                 hint: 'Enter new username',
                                 controller: c.usernameController),
                           ],
-                          submitText: 'Change',
+                        submitWidget: Text(
+      "Change",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
                           onSubmit: () {},
                         ),
                       ),
@@ -576,7 +579,11 @@ class TeacherDetailsPage extends StatelessWidget {
                                   controller: c.confirmNewPasswordController),
                             ),
                           ],
-                          submitText: 'Change',
+                        submitWidget: Text(
+      "Change",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
                           onSubmit: () {},
                         ),
                       ),

@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:albedo_app/controller/account_controller.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/database/local_storage.dart';
+import 'package:albedo_app/model/users/user_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -43,7 +47,7 @@ class ProfilePage extends StatelessWidget {
                     children: [
                       _InfoRow(
                         label: "Employee ID",
-                        value: user?.id ?? "—",
+                        value: user?.empId ?? "—",
                         icon: Icons.fingerprint,
                       ),
                       _Divider(cs: cs),
@@ -100,62 +104,13 @@ class ProfilePage extends StatelessWidget {
       }),
     );
   }
-
-  void _openResetDialog(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
-
-    CustomWidgets().showCustomDialog(
-      context: context,
-      icon: Icons.lock_reset,
-      title: Text("Reset Password"),
-      formKey: formKey,
-      submitText: "Reset",
-      sections: [
-        CustomWidgets().labelWithAsterisk('Email', required: true),
-        SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Enter email',
-            controller: c.emailController),
-        SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Old Password', required: true),
-        SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Enter old password',
-            controller: c.oldPasswordController),
-        SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('New Password', required: true),
-        SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Enter new password',
-            controller: c.newPasswordController),
-        SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Confirm Password', required: true),
-        SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Confirm new password',
-            controller: c.confirmPassController),
-        SizedBox(height: 10),
-      ],
-      onSubmit: () {
-        c.resetPassword(
-          email: c.emailController.text,
-          oldPassword: c.oldPasswordController.text,
-          newPassword: c.newPasswordController.text,
-        );
-      },
-    );
-  }
 }
 
 // ─────────────────────────────────────────────────────────────
 // PROFILE HERO CARD
 // ─────────────────────────────────────────────────────────────
 class _ProfileHeroCard extends StatelessWidget {
-  final dynamic user;
+  final Users? user;
   final ColorScheme cs;
   final AccountController c;
 
@@ -167,6 +122,8 @@ class _ProfileHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final profile = user?.profileImage ?? '';
+    final name = user?.name ?? "";
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -231,14 +188,11 @@ class _ProfileHeroCard extends StatelessWidget {
                     radius: 44,
                     backgroundColor: cs.primaryContainer,
                     child: ClipOval(
-                      child: user.profileImage != null &&
-                              user.profileImage!.isNotEmpty
+                      child: profile.isNotEmpty
                           ? Image.asset('assets/images/logo.png',
                               fit: BoxFit.contain, width: 88, height: 88)
                           : Text(
-                              user.name != null && user.name.isNotEmpty
-                                  ? user.name[0].toUpperCase()
-                                  : "?",
+                              name.isNotEmpty ? name[0].toUpperCase() : "?",
                               style: Theme.of(context)
                                   .textTheme
                                   .headlineLarge!
@@ -252,7 +206,7 @@ class _ProfileHeroCard extends StatelessWidget {
 
                 // Name
                 Text(
-                  user.name ?? "N/A",
+                  name ?? "N/A",
                   style: Theme.of(context)
                       .textTheme
                       .headlineSmall!
@@ -270,7 +224,7 @@ class _ProfileHeroCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    user.role ?? "Member",
+                    user?.position ?? "Member",
                     style: Theme.of(context).textTheme.titleSmall!.copyWith(
                         color: Colors.white.withOpacity(0.9),
                         letterSpacing: 0.3),
@@ -292,12 +246,18 @@ class _ProfileHeroCard extends StatelessWidget {
                     ),
                     SizedBox(width: 12),
                     Expanded(
-                      child: _HeroButton(
-                        label: "Logout",
-                        icon: Icons.logout_rounded,
-                        outlined: false,
-                        onTap: () => c.logout(),
-                      ),
+                      child: Obx(() {
+                        return _HeroButton(
+                          label: c.isEditLoading.value ? "Loading..." : "Edit",
+                          icon: Icons.edit_outlined,
+                          outlined: false,
+                          onTap: () {
+                            if (!c.isEditLoading.value) {
+                              editUser(context);
+                            }
+                          },
+                        );
+                      }),
                     ),
                   ],
                 ),
@@ -309,51 +269,291 @@ class _ProfileHeroCard extends StatelessWidget {
     );
   }
 
+  ///---------------- SEND RESET LINK DIALOG ----------------///
+
   void _openResetDialog(BuildContext context) {
     final formKey = GlobalKey<FormState>();
+
+    CustomWidgets().showCustomDialog(
+      context: context,
+      icon: Icons.email_outlined,
+      title: Text("Request Password Reset"),
+      formKey: formKey,
+      submitWidget: Obx(
+        () => (c.isLoading.value)
+            ? CircularProgressIndicator(
+                color: cs.primary,
+              )
+            : Text(
+                "Send Link",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Colors.white),
+              ),
+      ),
+      sections: [
+        /// EMAIL
+        CustomWidgets().labelWithAsterisk(
+          'Email',
+          required: true,
+        ),
+
+        SizedBox(height: 10),
+
+        CustomWidgets().dropdownStyledTextField(
+          context: context,
+          hint: 'Enter email',
+          controller: c.emailController,
+        ),
+      ],
+      onSubmit: () async {
+        final success = await c.passwordResetRequest();
+
+        /// OPEN NEXT DIALOG AFTER SUCCESS
+        if (success) {
+          /// CLEAR OLD VALUES
+          c.otpController.clear();
+          c.newPasswordController.clear();
+          c.confirmPassController.clear();
+
+          Future.delayed(
+            const Duration(milliseconds: 300),
+            () => _openResetConfirmDialog(context),
+          );
+        }
+      },
+    );
+  }
+
+  ///---------------- CONFIRM RESET DIALOG ----------------///
+
+  void _openResetConfirmDialog(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
+
     CustomWidgets().showCustomDialog(
       context: context,
       icon: Icons.lock_reset,
       title: Text("Reset Password"),
       formKey: formKey,
-      submitText: "Reset",
+      submitWidget: Obx(
+        () => (c.isLoading.value)
+            ? CircularProgressIndicator(
+                color: cs.primary,
+              )
+            : Text(
+                "Reset Password",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Colors.white),
+              ),
+      ),
       sections: [
-        CustomWidgets().labelWithAsterisk('Email', required: true),
+        /// OTP
+        CustomWidgets().labelWithAsterisk(
+          'OTP / Token',
+          required: true,
+        ),
+
         SizedBox(height: 10),
+
         CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Enter email',
-            controller: c.emailController),
+          context: context,
+          hint: 'Enter OTP',
+          controller: c.otpController,
+        ),
+
+        SizedBox(height: 20),
+
+        /// NEW PASSWORD
+        CustomWidgets().labelWithAsterisk(
+          'New Password',
+          required: true,
+        ),
+
         SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Old Password', required: true),
-        SizedBox(height: 10),
+
         CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Enter old password',
-            controller: c.oldPasswordController),
+          context: context,
+          hint: 'Enter new password',
+          controller: c.newPasswordController,
+        ),
+
+        SizedBox(height: 20),
+
+        /// CONFIRM PASSWORD
+        CustomWidgets().labelWithAsterisk(
+          'Confirm Password',
+          required: true,
+        ),
+
         SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('New Password', required: true),
-        SizedBox(height: 10),
+
         CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Enter new password',
-            controller: c.newPasswordController),
-        SizedBox(height: 10),
-        CustomWidgets().labelWithAsterisk('Confirm Password', required: true),
-        SizedBox(height: 10),
-        CustomWidgets().dropdownStyledTextField(
-            context: context,
-            hint: 'Confirm new password',
-            controller: c.confirmPassController),
+          context: context,
+          hint: 'Confirm new password',
+          controller: c.confirmPassController,
+        ),
       ],
-      onSubmit: () {
-        c.resetPassword(
-          email: c.emailController.text,
-          oldPassword: c.oldPasswordController.text,
-          newPassword: c.newPasswordController.text,
-        );
+      onSubmit: () async {
+        await c.resetPasswordConfirmRequest();
       },
     );
+  }
+
+  Future<void> editUser(BuildContext context) async {
+    c.isEditLoading.value = true;
+
+    try {
+      final user = LocalStorage().readUser();
+
+      c.nameController.text = user?.name ?? '';
+      c.empIdController.text = user?.empId ?? '';
+      c.emailController.text = user?.email ?? '';
+      c.phoneController.text = user?.contact ?? '';
+      c.positionController.text = user?.position ?? '';
+
+      c.profileImagePath.value = ''; // reset picked image
+      c.remoteProfileImage.value = user?.profileImage ?? '';
+
+      final rawPath = c.remoteProfileImage.value;
+      final imageUrl = buildImageUrl(rawPath);
+
+      if (imageUrl.isNotEmpty) {
+        await precacheImage(
+          NetworkImage(imageUrl),
+          context,
+        );
+      }
+
+      if (!context.mounted) return;
+
+      CustomWidgets().showCustomDialog(
+        context: context,
+        title: Text('Edit User'),
+        icon: Icons.edit,
+        submitWidget: Obx(
+          () => (c.isLoading.value)
+              ? CircularProgressIndicator(
+                  color: cs.primary,
+                )
+              : Text(
+                  "Update",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Colors.white),
+                ),
+        ),
+        formKey: GlobalKey<FormState>(),
+        sections: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text('Profile Photo (Max: 50 MB)'),
+                  SizedBox(height: 10),
+                  InkWell(
+                    onTap: () => c.pickProfileImage(),
+                    child: CircleAvatar(
+                      radius: 35,
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 70,
+                          height: 70,
+                          child: Obx(() {
+                            final local = c.profileImagePath.value;
+                            final remote = c.remoteProfileImage.value;
+
+                            if (local.isNotEmpty) {
+                              return Image.file(File(local), fit: BoxFit.cover);
+                            }
+
+                            if (remote.isNotEmpty) {
+                              return Image.network(
+                                remote.trim(),
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    Image.asset('assets/images/logo.png'),
+                              );
+                            }
+
+                            return Image.asset('assets/images/logo.png');
+                          }),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  CustomWidgets().labelWithAsterisk('Name', required: true),
+                  CustomWidgets().dropdownStyledTextField(
+                    context: context,
+                    hint: 'Enter name',
+                    controller: c.nameController,
+                  ),
+                  SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Employee ID', required: true),
+                  CustomWidgets().dropdownStyledTextField(
+                      hint: '',
+                      context: context,
+                      controller: c.empIdController,
+                      readOnly: true),
+                  SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Email', required: true),
+                  CustomWidgets().dropdownStyledTextField(
+                    hint: '',
+                    context: context,
+                    controller: c.emailController,
+                  ),
+                  SizedBox(height: 10),
+                  CustomWidgets()
+                      .labelWithAsterisk('Phone Number', required: true),
+                  CustomWidgets().dropdownStyledTextField(
+                    hint: '',
+                    context: context,
+                    controller: c.phoneController,
+                  ),
+                  SizedBox(height: 10),
+                  CustomWidgets().labelWithAsterisk('Position'),
+                  CustomWidgets().dropdownStyledTextField(
+                    hint: '',
+                    context: context,
+                    controller: c.positionController,
+                    readOnly: true,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        onSubmit: () {
+          c.updateUser(
+            id: user?.id ?? '',
+            empId: c.empIdController.text,
+            name: c.nameController.text,
+            email: c.emailController.text,
+            contact: c.phoneController.text,
+          );
+        },
+      );
+    } finally {
+      c.isEditLoading.value = false;
+    }
+  }
+
+  String buildImageUrl(String? path) {
+    if (path == null) return '';
+
+    final clean = path.trim().replaceAll('\n', '').replaceAll('\r', '');
+
+    if (clean.isEmpty) return '';
+
+    if (clean.startsWith('http')) return clean;
+
+    return "https://api.albedoedu.com$clean";
   }
 }
 
@@ -652,9 +852,20 @@ class _DangerZoneCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: Text(
-              "Logout",
-              style: Theme.of(context).textTheme.titleSmall,
+            child: Obx(
+              () => (c.isLoading.value)
+                  ? SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: cs.onSurface,
+                      ),
+                    )
+                  : Text(
+                      "Logout",
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
             ),
           )
         ],

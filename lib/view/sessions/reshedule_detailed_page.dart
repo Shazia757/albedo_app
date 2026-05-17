@@ -1,12 +1,10 @@
 import 'package:albedo_app/model/request_model.dart';
-import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/view/students/student_detail_page.dart';
 import 'package:albedo_app/view/teacher/tr_detailed_page.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/request/request.dart';
 
 class RescheduleRequestsDetailedPage extends StatelessWidget {
   final StudentRequest? student;

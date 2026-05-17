@@ -36,7 +36,7 @@ class DrawerMenu extends StatelessWidget {
     final isDesktop = MediaQuery.of(context).size.width > 800;
 
     final sidebar = Container(
-      width: isDesktop ? 260 : MediaQuery.of(context).size.width * 0.5,
+      width: isDesktop ? 260 : MediaQuery.of(context).size.width * 0.7,
       decoration: BoxDecoration(
         color: cs.onPrimary,
         border: Border(
@@ -58,16 +58,18 @@ class DrawerMenu extends StatelessWidget {
               if (user == null) {
                 return Center(child: CircularProgressIndicator());
               }
-              final role = auth.activeUser?.role;
-              final isAdmin = role == "admin";
-              final isMentor = role == "mentor";
-              final isAdvisor = role == "advisor";
-              final isTeacher = role == 'teacher';
-              final isStudent = role == 'student';
-              final isCoordinator = role == 'coordinator';
-              final isFinance = role == 'finance';
-              final isSales = role == 'sales';
-              final isHr = role == 'hr';
+              final role = auth.activeUser?.position;
+              final normalizedRole = role?.trim().toLowerCase();
+
+              final isAdmin = normalizedRole == "admin";
+              final isMentor = normalizedRole == "mentor";
+              final isAdvisor = normalizedRole == "advisor";
+              final isTeacher = normalizedRole == "teacher";
+              final isStudent = normalizedRole == "student";
+              final isCoordinator = normalizedRole == "coordinator";
+              final isFinance = normalizedRole == "finance";
+              final isSales = normalizedRole == "sales";
+              final isHr = normalizedRole == "hr";
               final isCustom = ![
                 "admin",
                 "mentor",
@@ -78,8 +80,7 @@ class DrawerMenu extends StatelessWidget {
                 "finance",
                 "sales",
                 "hr"
-              ].contains(role);
-
+              ].contains(normalizedRole);
               final List<Widget> menuItems = _buildMenuByRole(
                 context,
                 c,
@@ -536,22 +537,24 @@ class DrawerMenu extends StatelessWidget {
         children: [
           _buildAvatar(context, size: 36),
           SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                auth.activeUser?.name ?? '',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              SizedBox(height: 2),
-              Text(
-                auth.activeUser?.email ?? '',
-                style: Theme.of(context)
-                    .textTheme
-                    .labelSmall!
-                    .copyWith(color: cs.onSurface.withOpacity(0.6)),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  auth.activeUser?.name ?? '',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                SizedBox(height: 2),
+                Text(
+                  auth.activeUser?.email ?? '',
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelSmall!
+                      .copyWith(color: cs.onSurface.withOpacity(0.6)),
+                ),
+              ],
+            ),
           )
         ],
       ),

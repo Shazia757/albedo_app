@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:albedo_app/model/users/user_model.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -16,22 +15,42 @@ class LocalStorage {
     }
   }
 
-  writeToken(String toc) {
+  Future<void> writeToken(
+    String access,
+    String refresh,
+  ) async {
     try {
-      _box.write('token', toc);
+      await _box.write('access', access);
+
+      await _box.write('refresh', refresh);
     } catch (e) {
       log(e.toString());
     }
   }
 
-  Future<String?> readToken() async {
+  String? readAccessToken() {
     try {
-      final token = await _box.read('token');
-      return token;
+      return _box.read('access');
     } catch (e) {
       log(e.toString());
       return null;
     }
+  }
+
+  String? readRefreshToken() {
+    try {
+      return _box.read('refresh');
+    } catch (e) {
+      log(e.toString());
+      return null;
+    }
+  }
+
+
+
+  Future<void> clearToken() async {
+    await _box.remove('access');
+    await _box.remove('refresh');
   }
 
   void writePermissions(String userId, Map<String, bool> permissions) {

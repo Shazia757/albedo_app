@@ -210,7 +210,11 @@ class _FilterRow extends StatelessWidget {
                   c.applyCoupon();
                 }
               },
-              submitText: 'Validate & Apply',
+              submitWidget: Text(
+      "Validate & Apply",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -326,7 +330,11 @@ class _FilterRow extends StatelessWidget {
         ),
         SizedBox(height: 10),
       ],
-      submitText: 'Request',
+       submitWidget: Text(
+      "Request",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
       onSubmit: () {if (c.validateRequest(context)) {
         c.requestRefund();
       }},
@@ -843,6 +851,7 @@ void _showWalletSummary(
       0;
 
   CustomWidgets().showCustomDialog(
+   
     context: context,
     title: Text('Wallet Summary ($totalTransactions transactions)'),
     formKey: GlobalKey(),

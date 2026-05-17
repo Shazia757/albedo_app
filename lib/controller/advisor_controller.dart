@@ -197,7 +197,7 @@ class AdvisorController extends GetxController {
 
   Users advisorToUser(Advisor a) {
     return Users(
-      id: a.id,
+      empId: a.id,
       name: a.name,
       role: "advisor",
     );

@@ -1,16 +1,12 @@
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
-import 'package:albedo_app/controller/batch_list_controller.dart';
-import 'package:albedo_app/controller/session_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
-import 'package:albedo_app/model/users/other_users_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
-import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -682,7 +678,7 @@ void openStudentProfile(BuildContext context, Student data) {
 
 Users studentToUser(Student s) {
   return Users(
-    id: s.studentId!,
+    empId: s.studentId!,
     name: s.name,
     role: "student",
   );
@@ -823,7 +819,7 @@ void openTeacherProfile(
 
 Users teacherToUser(Teacher t) {
   return Users(
-    id: t.id,
+    empId: t.id,
     name: t.name,
     role: "teacher",
   );
@@ -1018,7 +1014,7 @@ List<Widget> staffSections(BuildContext context, dynamic data, Color color) {
 
 Users mentorToUser(Mentor m) {
   return Users(
-    id: m.id,
+    empId: m.id,
     name: m.name,
     role: "mentor",
   );
@@ -1048,7 +1044,7 @@ void openCoordinatorProfile(
 
 Users coordinatorToUser(Coordinator c) {
   return Users(
-    id: c.id,
+    empId: c.id,
     name: c.name,
     role: "coordinator",
   );
@@ -1104,7 +1100,7 @@ void openAdvisorProfile(
 
 Users advisorToUser(Advisor a) {
   return Users(
-    id: a.id,
+    empId: a.id,
     name: a.name,
     role: "advisor",
   );
@@ -1166,7 +1162,11 @@ void openProfileDialog({
         style: Get.textTheme.titleMedium?.copyWith(color: Colors.white)),
     icon: icon,
     formKey: GlobalKey<FormState>(),
-    submitText: "Close",
+    submitWidget: Text(
+      "Close",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
     onSubmit: () {},
     sections: [
       SizedBox(

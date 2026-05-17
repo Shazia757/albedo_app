@@ -97,6 +97,7 @@ class BatchDetailsPage extends StatelessWidget {
             mini: true,
             onPressed: () {
               CustomWidgets().showCustomDialog(
+             
                 context: context,
                 title: Text('Create Certificate'),
                 formKey: GlobalKey<FormState>(),
@@ -139,7 +140,11 @@ class BatchDetailsPage extends StatelessWidget {
                     );
                   }),
                 ],
-                submitText: 'Continue',
+                 submitWidget: Text(
+      "Continue",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
                 onSubmit: () {
                   final isValid = c.validate(context);
                   if (!isValid) return;
@@ -359,6 +364,8 @@ class BatchDetailsPage extends StatelessWidget {
                             totalTeacherSalary += pkg.totalTeacherSalary;
                           }
                           CustomWidgets().showCustomDialog(
+
+
                             context: context,
                             title: Text(
                                 'Package Summary (${packages.length} packages)'),

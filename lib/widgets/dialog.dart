@@ -1,4 +1,3 @@
-import 'package:albedo_app/controller/assessment_controller.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/settings/assessment_model.dart';
 import 'package:albedo_app/model/wallet_model.dart';
@@ -21,7 +20,13 @@ class DialogUtils {
       context: context,
       formKey: formKey,
       icon: Icons.account_balance_wallet,
-      submitText: 'Deposit',
+      submitWidget: Text(
+        "Deposit",
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
+      ),
       title: Text("Deposit Funds"),
       sections: [
         CustomWidgets().labelWithAsterisk('Amount(₹)', required: true),

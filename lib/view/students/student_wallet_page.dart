@@ -1,12 +1,10 @@
 import 'package:albedo_app/controller/student_wallet_controller.dart';
 import 'package:albedo_app/model/package_model.dart';
-import 'package:albedo_app/model/wallet_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/dialog.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 
 class StudentWalletPage extends StatelessWidget {
   StudentWalletPage({super.key});

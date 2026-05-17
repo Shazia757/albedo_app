@@ -3,7 +3,6 @@ import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/support_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/support_model.dart';
-import 'package:albedo_app/widgets/custom_tab.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -288,6 +287,7 @@ class SupportsPage extends StatelessWidget {
 
   void editTicket(BuildContext context) {
     CustomWidgets().showCustomDialog(
+     
       context: context,
       title: Text('Edit Ticket'),
       icon: Icons.edit,
@@ -386,6 +386,7 @@ class SupportsPage extends StatelessWidget {
     });
 
     CustomWidgets().showCustomDialog(
+   
       context: context,
       icon: Icons.confirmation_number,
       title: Text("Ticket #${s.id}"),
@@ -602,7 +603,13 @@ class SupportsPage extends StatelessWidget {
         );
       },
 
-      submitText: "Post Reply",
+      submitWidget: Text(
+        "Post Reply",
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
+      ),
     );
   }
 
@@ -632,8 +639,7 @@ class SupportsPage extends StatelessWidget {
         children: [
           /// 🔹 TITLE
           DefaultTextStyle(
-              style: Theme.of(context).textTheme.titleSmall!,
-              child: title),
+              style: Theme.of(context).textTheme.titleSmall!, child: title),
 
           SizedBox(height: 8),
 

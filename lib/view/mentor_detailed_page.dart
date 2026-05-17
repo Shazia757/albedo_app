@@ -1,12 +1,9 @@
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/mentor_controller.dart';
-import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/controller/teacher_wallet_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
-import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
-import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/teacher/add_wallet_page.dart';
 import 'package:albedo_app/view/teacher/tr_package_session_page.dart';
 import 'package:albedo_app/view/teacher/tr_wallet_tab.dart';
@@ -125,10 +122,8 @@ class MentorDetailsPage extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 'Last Updated: 08 May 2026 • 11:45 AM',
-                                style: Get.textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                        color: cs.onSurface.withOpacity(.7)),
+                                style: Get.textTheme.bodySmall!.copyWith(
+                                    color: cs.onSurface.withOpacity(.7)),
                               ),
                             ),
                           ],
@@ -207,8 +202,7 @@ class MentorDetailsPage extends StatelessWidget {
                               ),
                               label: Text(
                                 'Default Value',
-                                style: Get.textTheme
-                                    .bodySmall!
+                                style: Get.textTheme.bodySmall!
                                     .copyWith(color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
@@ -235,8 +229,7 @@ class MentorDetailsPage extends StatelessWidget {
                               ),
                               label: Text(
                                 'Update',
-                                style: Get.textTheme
-                                    .bodySmall!
+                                style: Get.textTheme.bodySmall!
                                     .copyWith(color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
@@ -355,28 +348,23 @@ class MentorDetailsPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('UPI ID',
-                      style: Get.textTheme
-                          .titleSmall!
+                      style: Get.textTheme.titleSmall!
                           .copyWith(color: cs.outline)),
                   SizedBox(height: 4),
-                  Text(mentor.upiId ?? '-',
-                      style: Get.textTheme.titleSmall),
+                  Text(mentor.upiId ?? '-', style: Get.textTheme.titleSmall),
                   SizedBox(height: 8),
                   Text('Account No.',
-                      style: Get.textTheme
-                          .titleSmall!
+                      style: Get.textTheme.titleSmall!
                           .copyWith(color: cs.outline)),
                   SizedBox(height: 4),
                   Text(mentor.accountNumber ?? '-',
                       style: Get.textTheme.titleSmall),
                   SizedBox(height: 8),
                   Text('IFSC Code',
-                      style: Get.textTheme
-                          .titleSmall!
+                      style: Get.textTheme.titleSmall!
                           .copyWith(color: cs.outline)),
                   SizedBox(height: 4),
-                  Text(mentor.ifscCode ?? '-',
-                      style: Get.textTheme.titleSmall),
+                  Text(mentor.ifscCode ?? '-', style: Get.textTheme.titleSmall),
                 ],
               )
             ],
@@ -477,8 +465,7 @@ class MentorDetailsPage extends StatelessWidget {
                   children: [
                     Text(
                       'Work Experience',
-                      style: Get.textTheme
-                          .titleSmall!
+                      style: Get.textTheme.titleSmall!
                           .copyWith(color: cs.onSurface),
                     ),
                     SizedBox(height: 10),
@@ -488,8 +475,7 @@ class MentorDetailsPage extends StatelessWidget {
                         if ((mentor.experience ?? []).isEmpty)
                           Text(
                             'No work experience added',
-                            style: Get.textTheme
-                                .bodySmall!
+                            style: Get.textTheme.bodySmall!
                                 .copyWith(color: cs.outline),
                           )
                         else
@@ -523,15 +509,13 @@ class MentorDetailsPage extends StatelessWidget {
                                         children: [
                                           Text(
                                             exp.companyName ?? '-',
-                                            style: Get.textTheme
-                                                .titleSmall!
+                                            style: Get.textTheme.titleSmall!
                                                 .copyWith(color: cs.onSurface),
                                           ),
                                           SizedBox(height: 2),
                                           Text(
                                             '${exp.years ?? 0} Years ${exp.months ?? 0} Months',
-                                            style: Get.textTheme
-                                                .labelSmall!
+                                            style: Get.textTheme.labelSmall!
                                                 .copyWith(color: cs.outline),
                                           ),
                                         ],
@@ -573,8 +557,7 @@ class MentorDetailsPage extends StatelessWidget {
                   icon: const Icon(Icons.perm_identity_rounded,
                       size: 15, color: Colors.white),
                   label: Text('ID Card',
-                      style: Get.textTheme
-                          .bodySmall!
+                      style: Get.textTheme.bodySmall!
                           .copyWith(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: cs.primary,
@@ -595,6 +578,7 @@ class MentorDetailsPage extends StatelessWidget {
                       title: 'Change Username',
                       icon: Icons.person_outline,
                       onTap: () => CustomWidgets().showCustomDialog(
+                     
                         context: context,
                         title: Text('Change Username'),
                         formKey: GlobalKey(),
@@ -607,7 +591,13 @@ class MentorDetailsPage extends StatelessWidget {
                               hint: 'Enter new username',
                               controller: c.usernameController),
                         ],
-                        submitText: 'Change',
+                        submitWidget: Text(
+                          "Change",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(color: Colors.white),
+                        ),
                         onSubmit: () {},
                       ),
                     ),
@@ -674,7 +664,13 @@ class MentorDetailsPage extends StatelessWidget {
                                 controller: c.confirmNewPasswordController),
                           ),
                         ],
-                        submitText: 'Change',
+                        submitWidget: Text(
+                          "Change",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(color: Colors.white),
+                        ),
                         onSubmit: () {},
                       ),
                     ),
@@ -726,16 +722,13 @@ class MentorDetailsPage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: cs.outline),
+                  style: Get.textTheme.titleSmall!.copyWith(color: cs.outline),
                 ),
                 SizedBox(height: 2),
                 Text(
                   value,
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: cs.onSurface),
+                  style:
+                      Get.textTheme.titleSmall!.copyWith(color: cs.onSurface),
                 ),
               ],
             ),
@@ -779,9 +772,7 @@ class MentorDetailsPage extends StatelessWidget {
             SizedBox(width: 8),
             Text(
               title,
-              style: Get.textTheme
-                  .titleSmall!
-                  .copyWith(color: cs.onSurface),
+              style: Get.textTheme.titleSmall!.copyWith(color: cs.onSurface),
             ),
           ],
         ),
@@ -847,8 +838,7 @@ class MentorDetailsPage extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text('ID: ${batch.id ?? '-'}',
-                        style: Get.textTheme
-                            .labelSmall!
+                        style: Get.textTheme.labelSmall!
                             .copyWith(color: cs.outline)),
                     SizedBox(height: 14),
                     Divider(height: 1, color: cs.outline.withOpacity(0.15)),
@@ -857,21 +847,20 @@ class MentorDetailsPage extends StatelessWidget {
                     // Mentor row
                     Row(
                       children: [
-                        CustomWidgets().squareAvatar(batch.mentor?.imageUrl, 44),
+                        CustomWidgets()
+                            .squareAvatar(batch.mentor?.imageUrl, 44),
                         SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Assigned Mentor',
-                                style: Get.textTheme
-                                    .labelSmall!
+                                style: Get.textTheme.labelSmall!
                                     .copyWith(color: cs.outline)),
                             SizedBox(height: 2),
                             Text(batch.mentor?.name ?? '-',
                                 style: Get.textTheme.titleSmall),
                             Text('ID: ${batch.mentor?.id ?? '-'}',
-                                style: Get.textTheme
-                                    .labelSmall!
+                                style: Get.textTheme.labelSmall!
                                     .copyWith(color: cs.outline)),
                           ],
                         )
@@ -973,7 +962,8 @@ class MentorDetailsPage extends StatelessWidget {
                             color: cs.shadow.withOpacity(0.1), blurRadius: 8)
                       ],
                     ),
-                    child: CustomWidgets().squareAvatar(mentor.imageUrl, 64, radius: 12),
+                    child: CustomWidgets()
+                        .squareAvatar(mentor.imageUrl, 64, radius: 12),
                   ),
                 ),
 
@@ -981,12 +971,10 @@ class MentorDetailsPage extends StatelessWidget {
                   offset: const Offset(0, -20),
                   child: Column(
                     children: [
-                      Text(mentor.name,
-                          style: Get.textTheme.titleLarge),
+                      Text(mentor.name, style: Get.textTheme.titleLarge),
                       SizedBox(height: 4),
                       Text(mentor.email ?? '-',
-                          style: Get.textTheme
-                              .bodySmall!
+                          style: Get.textTheme.bodySmall!
                               .copyWith(color: cs.outline)),
                       SizedBox(height: 10),
 
@@ -999,8 +987,7 @@ class MentorDetailsPage extends StatelessWidget {
                           border: Border.all(color: _blue.withOpacity(0.3)),
                         ),
                         child: Text('ID: ${mentor.id}',
-                            style: Get.textTheme
-                                .titleSmall!
+                            style: Get.textTheme.titleSmall!
                                 .copyWith(color: _blue)),
                       ),
 
@@ -1021,8 +1008,7 @@ class MentorDetailsPage extends StatelessWidget {
                               size: 15, color: Colors.white),
                           iconAlignment: IconAlignment.end,
                           label: Text('Go to Dashboard',
-                              style: Get.textTheme
-                                  .bodySmall!
+                              style: Get.textTheme.bodySmall!
                                   .copyWith(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: cs.primary,
@@ -1089,9 +1075,8 @@ class MentorDetailsPage extends StatelessWidget {
                     SizedBox(height: 2),
                     Text(
                       feedback['date'] ?? '-',
-                      style: Get.textTheme
-                          .labelSmall!
-                          .copyWith(color: cs.outline),
+                      style:
+                          Get.textTheme.labelSmall!.copyWith(color: cs.outline),
                     ),
                   ],
                 ),
@@ -1127,8 +1112,7 @@ class MentorDetailsPage extends StatelessWidget {
           SizedBox(height: 12),
           Text(
             feedback['message'] ?? '-',
-            style: Get.textTheme
-                .bodySmall!
+            style: Get.textTheme.bodySmall!
                 .copyWith(color: cs.onSurface.withOpacity(.8), height: 1.4),
           ),
         ],
@@ -1199,9 +1183,7 @@ class MentorDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label,
-                style: Get.textTheme
-                    .labelSmall!
-                    .copyWith(color: cs.outline)),
+                style: Get.textTheme.labelSmall!.copyWith(color: cs.outline)),
             Text(value, style: Get.textTheme.titleSmall),
           ],
         ),
@@ -1217,9 +1199,8 @@ class MentorDetailsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withOpacity(0.4)),
       ),
-      child: Text(label,
-          style:
-              Get.textTheme.titleSmall!.copyWith(color: color)),
+      child:
+          Text(label, style: Get.textTheme.titleSmall!.copyWith(color: color)),
     );
   }
 
@@ -1289,8 +1270,7 @@ class MentorDetailsPage extends StatelessWidget {
                           /// Title
                           Text(
                             student.name,
-                            style: Get.textTheme
-                                .titleLarge!
+                            style: Get.textTheme.titleLarge!
                                 .copyWith(color: cs.onSurface),
                           ),
 
@@ -1301,8 +1281,7 @@ class MentorDetailsPage extends StatelessWidget {
                               ? Center(
                                   child: Text(
                                     'No packages available',
-                                    style: Get.textTheme
-                                        .bodyMedium!
+                                    style: Get.textTheme.bodyMedium!
                                         .copyWith(color: cs.outline),
                                   ),
                                 )
@@ -1353,8 +1332,8 @@ class MentorDetailsPage extends StatelessWidget {
                                                 children: [
                                                   Text(
                                                     package.name ?? '-',
-                                                    style: Get.textTheme
-                                                        .titleMedium!
+                                                    style: Get
+                                                        .textTheme.titleMedium!
                                                         .copyWith(
                                                             color:
                                                                 cs.onSurface),
@@ -1472,15 +1451,13 @@ class MentorDetailsPage extends StatelessWidget {
                         children: [
                           Text(
                             student.name,
-                            style: Get.textTheme
-                                .titleMedium!
+                            style: Get.textTheme.titleMedium!
                                 .copyWith(color: cs.onSurface),
                           ),
                           SizedBox(height: 4),
                           Text(
                             student.studentId ?? '-',
-                            style: Get.textTheme
-                                .bodySmall!
+                            style: Get.textTheme.bodySmall!
                                 .copyWith(color: cs.outline),
                           ),
                         ],
@@ -1499,8 +1476,7 @@ class MentorDetailsPage extends StatelessWidget {
                       ),
                       child: Text(
                         '$packageCount Packages',
-                        style: Get.textTheme
-                            .titleSmall!
+                        style: Get.textTheme.titleSmall!
                             .copyWith(color: cs.primary),
                       ),
                     ),
@@ -1527,9 +1503,7 @@ class MentorDetailsPage extends StatelessWidget {
         icon: const Icon(Icons.add, size: 15, color: Colors.white),
         label: Text(
           'Add Unlock',
-          style: Get.textTheme
-              .bodySmall!
-              .copyWith(color: Colors.white),
+          style: Get.textTheme.bodySmall!.copyWith(color: Colors.white),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: cs.secondary,
@@ -1610,8 +1584,7 @@ class MentorDetailsPage extends StatelessWidget {
                     ),
                     child: Text(
                       "Grant Access",
-                      style: Get.textTheme
-                          .bodyMedium!
+                      style: Get.textTheme.bodyMedium!
                           .copyWith(color: Colors.white),
                     ),
                   ),
@@ -1718,9 +1691,7 @@ class MentorDetailsPage extends StatelessWidget {
           SizedBox(height: 6),
           Text(
             "From: ${data['from']}  →  To: ${data['to']}",
-            style: Get.textTheme
-                .bodySmall!
-                .copyWith(color: cs.outline),
+            style: Get.textTheme.bodySmall!.copyWith(color: cs.outline),
           ),
         ],
       ),
@@ -1754,9 +1725,7 @@ Widget summaryCard({
           ),
           child: Center(
             child: Text(value.substring(0, 1),
-                style: Get.textTheme
-                    .titleLarge!
-                    .copyWith(color: color)),
+                style: Get.textTheme.titleLarge!.copyWith(color: color)),
           ),
         ),
         SizedBox(width: 14),
@@ -1764,14 +1733,11 @@ Widget summaryCard({
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: Get.textTheme
-                    .labelSmall!
+                style: Get.textTheme.labelSmall!
                     .copyWith(color: color.withOpacity(0.8))),
             SizedBox(height: 3),
             Text(value,
-                style: Get.textTheme
-                    .titleLarge!
-                    .copyWith(color: color)),
+                style: Get.textTheme.titleLarge!.copyWith(color: color)),
           ],
         ),
       ],
@@ -1827,16 +1793,12 @@ Widget _supportTile(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(role,
-                  style: Get.textTheme
-                      .titleSmall!
-                      .copyWith(color: _blue)),
+                  style: Get.textTheme.titleSmall!.copyWith(color: _blue)),
               SizedBox(height: 2),
               Text(name, style: Get.textTheme.titleSmall),
               SizedBox(height: 3),
               Text('$id  •  $date',
-                  style: Get.textTheme
-                      .labelSmall!
-                      .copyWith(color: cs.outline)),
+                  style: Get.textTheme.labelSmall!.copyWith(color: cs.outline)),
             ],
           ),
         ),

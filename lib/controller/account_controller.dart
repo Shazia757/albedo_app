@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/view/login_page.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/database/local_storage.dart';
@@ -6,148 +9,184 @@ import 'package:albedo_app/view/home_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AccountController extends GetxController {
   final nameController = TextEditingController();
+  final empIdController = TextEditingController();
+  final phoneController = TextEditingController();
+  final positionController = TextEditingController();
   final emailController = TextEditingController();
+  final otpController = TextEditingController();
   final contactController = TextEditingController();
   final passwordController = TextEditingController();
   final oldPasswordController = TextEditingController();
   final newPasswordController = TextEditingController();
   final confirmPassController = TextEditingController();
+  final AuthController auth = Get.find();
 
-  final bool useMock = true;
+  final bool useMock = false;
   var obscurePassword = true.obs;
   var isLoading = false.obs;
   var isEditing = false.obs;
+  var isEditLoading = false.obs;
+  var errorMessage = ''.obs;
+  RxInt forgotStep = 1.obs;
+  var profileImagePath = ''.obs;
+  var remoteProfileImage = ''.obs;
 
   @override
   onInit() {
     super.onInit();
     if (kDebugMode) {
-      emailController.text = 'admin@gmail.com';
-      passwordController.text = '0000';
+      emailController.text = 'albedoeducator@gmail.com';
+      passwordController.text = 'adm@7012';
     }
   }
 
+  //------------------Login---------------------------//
+
   Future<void> login() async {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    errorMessage.value = '';
+
+    await LocalStorage().clearToken();
+
+    final email = emailController.text;
+    final password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
       Get.snackbar("Error", "Please fill all fields");
       return;
     }
 
     isLoading.value = true;
 
-    try {
-      Users user = useMock ? await _mockLogin() : await _apiLogin();
+    final result = await Api().login({
+      'email': email,
+      'password': password,
+    });
 
-      final AuthController auth = Get.find<AuthController>();
+    if (result is LoginResponse) {
+      await LocalStorage().writeUser(result.data ?? Users());
 
-      auth.currentUser.value = user;
-      auth.impersonatedUser.value = null;
+      await LocalStorage().writeToken(
+        result.accessToken ?? '',
+        result.refreshToken ?? '',
+      );
 
-      LocalStorage().writeUser(user);
+      await getUserDetails();
 
-      Get.snackbar("Success", "Login Successful");
+      Get.snackbar('Welcome', auth.activeUser?.name ?? '',
+          icon: Icon(
+            Icons.login,
+            color: Theme.of(Get.context!).colorScheme.onSurface,
+          ),
+          colorText: Theme.of(Get.context!).colorScheme.onSurface);
+
       Get.offAll(() => HomeView());
+    } else {
+      Get.snackbar('Error', result.toString(),
+          colorText: Theme.of(Get.context!).colorScheme.onPrimary);
+    }
+
+    isLoading.value = false;
+  }
+
+//------------------Google Login---------------------------//
+
+  Future<void> googleLogin() async {
+    errorMessage.value = '';
+
+    try {
+      isLoading.value = true;
+
+      final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+
+      await googleSignIn.initialize();
+
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null || idToken.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'Failed to get Google token',
+        );
+
+        isLoading.value = false;
+        return;
+      }
+
+      final result = await Api().googleLogin({
+        'id_token': idToken,
+      });
+
+      if (result is LoginResponse) {
+        await LocalStorage().writeUser(
+          result.data ?? Users(),
+        );
+
+        await LocalStorage().writeToken(
+          result.accessToken ?? '',
+          result.refreshToken ?? '',
+        );
+
+        Get.snackbar(
+          'Welcome',
+          '',
+          icon: Icon(
+            Icons.login,
+            color: Theme.of(Get.context!).colorScheme.onSurface,
+          ),
+        );
+
+        Get.offAll(() => HomeView());
+      } else {
+        Get.snackbar(
+          'Error',
+          result.toString(),
+        );
+      }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      log("Google Login Error: $e");
+
+      Get.snackbar(
+        'Error',
+        'Google login failed',
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<Users> _mockLogin() async {
-    await Future.delayed(const Duration(seconds: 2));
+//------------------User Details---------------------------//
 
-    final email = emailController.text;
+  Future<void> getUserDetails() async {
+    errorMessage.value = '';
 
-    if (email.contains("admin")) {
-      return Users(
-          name: 'Admin',
-          id: 'EMP001',
-          role: 'admin',
-          email: email,
-          contact: '9999999999');
-    } else if (email.contains("student")) {
-      return Users(
-          name: 'Student User',
-          id: 'STU001',
-          role: 'student',
-          email: email,
-          contact: '8888888888');
-    } else if (email.contains("teacher")) {
-      return Users(
-          name: 'Teacher User',
-          id: 'TCH001',
-          role: 'teacher',
-          email: email,
-          contact: '7777777777');
-    } else if (email.contains("mentor")) {
-      return Users(
-          name: 'Mentor User',
-          id: 'MTR001',
-          role: 'mentor',
-          email: email,
-          contact: '6666666666');
-    } else if (email.contains("coordinator")) {
-      return Users(
-          name: 'Coordinator User',
-          id: 'COR001',
-          role: 'coordinator',
-          email: email,
-          contact: '5555555555');
-    } else if (email.contains("advisor")) {
-      return Users(
-          name: 'Advisor User',
-          id: 'ADV001',
-          role: 'advisor',
-          email: email,
-          contact: '4444444444');
-    } else if (email.contains("finance")) {
-      return Users(
-          name: 'Finance User',
-          id: 'FIN001',
-          role: 'finance',
-          email: email,
-          contact: '0000000000');
-    } else if (email.contains("hr")) {
-      return Users(
-          name: 'HR User',
-          id: 'HR001',
-          role: 'hr',
-          email: email,
-          contact: '4444444444');
-    } else if (email.contains("sales")) {
-      return Users(
-          name: 'Sales User',
-          id: 'SAL001',
-          role: 'sales',
-          email: email,
-          contact: '4444444444');
+    isLoading.value = true;
+
+    final result = await Api().userDetails();
+
+    if (result is Users) {
+      /// Save updated user
+      await LocalStorage().writeUser(result);
+
+      /// Update current user
+      auth.currentUser.value = result;
+    } else {
+      Get.snackbar(
+        'Error',
+        result.toString(),
+        colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+      );
     }
 
-    return Users(
-      name: 'Guest User',
-      id: 'GST001',
-      role: 'guest',
-      email: email,
-      contact: '0000000000',
-    );
-  }
-
-  Future<Users> _apiLogin() async {
-    // Example structure
-    // final response = await ApiService.login(
-    //   emailController.text,
-    //   passwordController.text,
-    // );
-
-    // if (!response.success) throw Exception(response.message);
-
-    // return Users.fromJson(response.data);
-
-    throw UnimplementedError("API not implemented yet");
+    isLoading.value = false;
   }
 
   void toggleEdit() {
@@ -160,96 +199,363 @@ class AccountController extends GetxController {
     }
   }
 
-  void updateUser(
-      {required String name, required String email, required String contact}) {
-    final AuthController auth = Get.find<AuthController>();
-    final user = auth.activeUser;
-    if (user == null) return;
-    user.copyWith(
-      name: name,
-      email: email,
-      contact: contact,
-    );
+  //------------------Edit User---------------------------//
+  Future<void> updateUser({
+    required String empId,
+    required String id,
+    required String name,
+    required String email,
+    required String contact,
+  }) async {
+    isLoading.value = true;
 
-    isEditing.value = false;
+    try {
+      final oldUser = auth.currentUser.value;
+      final userId = oldUser?.id;
+
+      final result = await Api().updateUser(id, {
+        "emp_id": empId,
+        "name": name,
+        "email": email,
+        "phone_number": contact,
+      });
+
+      if (result is Users) {
+        final updatedUser = result;
+
+        updatedUser.id ??= userId;
+
+        await LocalStorage().writeUser(updatedUser);
+
+        auth.currentUser.value = updatedUser;
+
+        await getUserDetails();
+
+        Get.back();
+
+        Get.snackbar(
+          "Success",
+          "Profile updated successfully",
+          icon: Icon(
+            Icons.check_circle,
+            color: Theme.of(Get.context!).colorScheme.primary,
+          ),
+        );
+      } else {
+        Get.snackbar("Error", result.toString());
+      }
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void cancelEdit() {
     isEditing.value = false;
   }
 
-  Future<void> resetPassword({
-    required String email,
-    required String oldPassword,
-    required String newPassword,
-  }) async {
-    if (email.isEmpty || oldPassword.isEmpty || newPassword.isEmpty) {
-      Get.snackbar("Error", "All fields are required");
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      Get.snackbar("Error", "Password must be at least 6 characters");
-      return;
-    }
-
-    Get.dialog(
-      Center(child: CircularProgressIndicator()),
-      barrierDismissible: false,
-    );
-
-    try {
-      if (useMock) {
-        await Future.delayed(const Duration(seconds: 2));
-      } else {
-        await _apiResetPassword(email, oldPassword, newPassword);
-      }
-
-      Get.back();
-      Get.snackbar("Success", "Password updated successfully");
-    } catch (e) {
-      Get.back();
-      Get.snackbar("Error", e.toString());
-    }
-  }
-
-  Future<void> _apiResetPassword(
-    String email,
-    String oldPassword,
-    String newPassword,
-  ) async {
-    // await ApiService.resetPassword(email, oldPassword, newPassword);
-  }
+//------------------Logout---------------------------//
 
   void logout() {
-    LocalStorage().clearAll();
-    Get.offAll(LoginView());
+    log('Logging out');
+    isLoading.value = true;
+    Api().logout().then(
+      (value) {
+        isLoading.value = false;
+        if (value) {
+          LocalStorage().clearAll();
+          Get.offAll(() => LoginView());
+          Get.snackbar("Success", "Logged out successfully",
+              colorText: Theme.of(Get.context!).colorScheme.onPrimary);
+        }
+      },
+    );
   }
 
-  Future<void> forgotPassword() async {
-    if (emailController.text.isEmpty) {
-      Get.snackbar("Error", "Please enter your email address");
+//------------------Forgot Password---------------------------//
+
+  Future<bool> forgotPasswordRequest() async {
+    errorMessage.value = '';
+
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      Get.snackbar("Error", "Please enter your email");
+      return false;
+    }
+
+    isLoading.value = true;
+
+    final result = await Api().forgotPasswordRequest({
+      'email': email,
+    });
+
+    isLoading.value = false;
+
+    if (result == true) {
+      Get.snackbar(
+        'Success',
+        'Password reset link sent to your email',
+        icon: Icon(
+          Icons.email,
+          color: Theme.of(Get.context!).colorScheme.onPrimary,
+        ),
+        colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+      );
+
+      return true;
+    }
+
+    Get.snackbar(
+      'Error',
+      result.toString(),
+      colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+    );
+
+    return false;
+  }
+
+  Future<bool> validateForgotPasswordTokenRequest() async {
+    errorMessage.value = '';
+
+    final email = emailController.text.trim();
+    final otp = otpController.text.trim();
+
+    if (email.isEmpty || otp.isEmpty) {
+      Get.snackbar("Error", "Please enter OTP");
+      return false;
+    }
+
+    isLoading.value = true;
+
+    final result = await Api().validateForgotPasswordToken({
+      'email': email,
+      'token': otp,
+    });
+
+    isLoading.value = false;
+
+    if (result == true) {
+      Get.snackbar(
+        'Success',
+        'OTP validated successfully',
+        icon: Icon(
+          Icons.verified,
+          color: Theme.of(Get.context!).colorScheme.onPrimary,
+        ),
+        colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+      );
+
+      return true;
+    }
+
+    Get.snackbar(
+      'Error',
+      result.toString(),
+      colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+    );
+
+    return false;
+  }
+
+  Future<void> forgotPasswordConfirmRequest() async {
+    errorMessage.value = '';
+
+    final email = emailController.text.trim();
+    final token = LocalStorage().readAccessToken();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPassController.text.trim();
+
+    if (email.isEmpty ||
+        (token?.isEmpty ?? true) ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      Get.snackbar("Error", "Please fill all fields");
+      return;
+    }
+
+    if (password != confirmPassword) {
+      Get.snackbar("Error", "Passwords do not match");
       return;
     }
 
     isLoading.value = true;
 
-    try {
-      if (useMock) {
-        await Future.delayed(const Duration(seconds: 2));
-      } else {
-        await _apiForgotPassword();
-      }
+    final result = await Api().forgotPasswordConfirm({
+      'email': email,
+      'token': token,
+      'password': password,
+      'password_confirmation': confirmPassword,
+    });
 
-      Get.snackbar("Success", "Password reset link sent");
-    } catch (e) {
-      Get.snackbar("Error", e.toString());
-    } finally {
-      isLoading.value = false;
+    if (result == true) {
+      Get.snackbar(
+        'Success',
+        'Password reset successful',
+        icon: Icon(
+          Icons.check_circle,
+          color: Theme.of(Get.context!).colorScheme.onPrimary,
+        ),
+        colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+      );
+
+      /// Optional navigation
+      /// Get.offAll(() => LoginView());
+    } else {
+      Get.snackbar(
+        'Error',
+        result.toString(),
+        colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+      );
+    }
+
+    isLoading.value = false;
+  }
+
+  //   Future<void> changePassword(String id) async {
+  //   isLoading.value = true;
+  //   Api().changePassword({
+  //     'old_password': oldpasswordController.text,
+  //     'new_password': confirmPassController.text
+  //   }).then((value) {
+  //     isLoading.value = false;
+  //     if (value?.status ?? false) {
+  //       Get.to(() => LoginScreen());
+  //       CustomWidgets.showSnackBar(
+  //           'Success', value?.message ?? 'Password Changed.');
+  //     } else {
+  //       Get.back();
+  //       CustomWidgets.showSnackBar(
+  //           'Error', value?.message ?? 'Password not changed.');
+  //     }
+  //   });
+  // }
+
+//------------------Reset Password---------------------------//
+
+  Future<bool> passwordResetRequest() async {
+    errorMessage.value = '';
+
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      Get.snackbar("Error", "Please enter your email");
+      return false;
+    }
+
+    isLoading.value = true;
+
+    final result = await Api().passwordResetRequest({
+      'email': email,
+    });
+
+    isLoading.value = false;
+
+    if (result is String) {
+      Get.snackbar(
+        'Success',
+        result,
+        icon: Icon(
+          Icons.email,
+          color: Theme.of(Get.context!).colorScheme.onPrimary,
+        ),
+        colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+      );
+
+      return true;
+    }
+
+    Get.snackbar(
+      'Error',
+      result.toString(),
+      colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+    );
+
+    return false;
+  }
+
+  Future<bool> resetPasswordConfirmRequest() async {
+    errorMessage.value = '';
+
+    final email = emailController.text.trim();
+    final token = otpController.text.trim();
+    final password = newPasswordController.text.trim();
+    final confirmPassword = confirmPassController.text.trim();
+
+    if (email.isEmpty ||
+        token.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      Get.snackbar("Error", "Please fill all fields");
+      return false;
+    }
+
+    if (password != confirmPassword) {
+      Get.snackbar("Error", "Passwords do not match");
+      return false;
+    }
+
+    isLoading.value = true;
+
+    final result = await Api().resetPasswordConfirm({
+      'email': email,
+      'token': token,
+      'new_password': password,
+      'confirm_password': confirmPassword,
+    });
+
+    isLoading.value = false;
+
+    if (result == true) {
+      Get.snackbar(
+        'Success',
+        'Password reset successful',
+        icon: Icon(
+          Icons.check_circle,
+          color: Theme.of(Get.context!).colorScheme.onPrimary,
+        ),
+        colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+      );
+
+      return true;
+    }
+
+    Get.snackbar(
+      'Error',
+      result.toString(),
+      colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+    );
+
+    return false;
+  }
+
+  Future<void> pickProfileImage() async {
+    final picker = ImagePicker();
+
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      profileImagePath.value = pickedFile.path;
     }
   }
 
-  Future<void> _apiForgotPassword() async {
-    // await ApiService.forgotPassword(emailController.text);
-  }
+  // Future<void> resetPassword(String id) async {
+  //   isLoading.value = true;
+  //   Api().resetPassword({
+  //     'admission_number': id,
+  //     'new_password': confirmPassController.text
+  //   }).then((value) {
+  //     isLoading.value = false;
+  //     if (value?.status ?? false) {
+  //       Get.back();
+  //       CustomWidgets.showSnackBar(
+  //           'Success', value?.message ?? 'Password Changed.');
+  //     } else {
+  //       Get.back();
+  //       CustomWidgets.showSnackBar(
+  //           'Error', value?.message ?? 'Password not changed.');
+  //     }
+  //   });
+  // }
 }

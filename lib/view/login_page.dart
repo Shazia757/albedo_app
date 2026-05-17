@@ -201,7 +201,7 @@ class LoginView extends StatelessWidget {
 
                           SizedBox(height: 24),
 
-                          /// 🔵 Google Button (Improved)
+                          /// 🔵 Google Button
                           SizedBox(
                             width: double.infinity,
                             height: 52,
@@ -216,7 +216,9 @@ class LoginView extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
-                              onPressed: () {},
+                              onPressed: () async {
+                                await c.googleLogin();
+                              },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [

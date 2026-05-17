@@ -26,9 +26,8 @@ class Urls {
       '$base/accounts/forgot-password/validate/';
 
   static String googleLogin = '$base/accounts/google-login/';
-  static String login = '$base/accounts/login/';
-  static String mobileLogin = '$base/accounts/mobile-login/';
-  static String mobileLogout = '$base/accounts/mobile-logout/';
+  static String login = '$base/accounts/mobile-login/';
+  static String logout = '$base/accounts/mobile-logout/';
 
   static String passwordReset = '$base/accounts/password-reset/';
   static String register = '$base/accounts/register/';
@@ -539,7 +538,7 @@ class Urls {
 
   static String otherUsers = '$base/other_users/other-users/';
 
-  static String otherUserById(String id) =>
+  static String editUserById(String id) =>
       '$base/other_users/other-users/$id/';
 
   static String positionChoices = '$base/other_users/position-choices/';

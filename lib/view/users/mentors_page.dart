@@ -127,14 +127,14 @@ class MentorsPage extends StatelessWidget {
                                       horizontal: 12),
                                   child: PremiumInfoCard(
                                     id: mentor.id ?? "-",
-                                    title: mentor?.name ?? "-",
-                                    subtitle: mentor?.email ?? "-",
-                                    status: mentor?.status,
-                                    statusColor: getStatusColor(mentor?.status),
+                                    title: mentor.name ?? "-",
+                                    subtitle: mentor.email ?? "-",
+                                    status: mentor.status,
+                                    statusColor: getStatusColor(mentor.status),
                                     footerText:
-                                        "Joined • ${mentor?.joinedAt.toString().substring(0, 16)}",
-                                    extraInfo: mentor?.phone != null
-                                        ? "Contact • ${mentor!.phone}"
+                                        "Joined • ${mentor.joinedAt.toString().substring(0, 16)}",
+                                    extraInfo: mentor.phone != null
+                                        ? "Contact • ${mentor.phone}"
                                         : null,
                                     onTap: (!isCustom ||
                                             PermissionService.can(

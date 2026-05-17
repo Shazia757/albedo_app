@@ -116,6 +116,7 @@ void _showWalletSummary(
   final isTeacher = teacher != null;
 
   CustomWidgets().showCustomDialog(
+
     context: context,
     title: Text(
       'Wallet Summary (0 transactions)',
@@ -410,6 +411,7 @@ void _openDialog(BuildContext context, Wallet data) {
   c.selectedStudent.value = null;
 
   CustomWidgets().showCustomDialog(
+  
       context: context,
       title: Column(
         mainAxisSize: MainAxisSize.min,

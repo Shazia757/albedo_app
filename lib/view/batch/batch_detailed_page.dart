@@ -1,16 +1,7 @@
-import 'package:albedo_app/config/root.dart';
-import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/batch_controller.dart';
-import 'package:albedo_app/controller/teacher_controller.dart';
-import 'package:albedo_app/controller/teacher_wallet_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
-import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
-import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/add_batch_package_page.dart';
-import 'package:albedo_app/view/teacher/add_wallet_page.dart';
-import 'package:albedo_app/view/teacher/tr_package_session_page.dart';
-import 'package:albedo_app/view/teacher/tr_wallet_tab.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -96,7 +87,11 @@ class BatchDetailedPage extends StatelessWidget {
                   hint: 'Upload Payment Receipt',
                 ),
               ],
-              submitText: 'Assign',
+               submitWidget: Text(
+      "Assign",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
               onSubmit: () {},
             ),
             backgroundColor: context.theme.colorScheme.primary,
@@ -125,7 +120,11 @@ class BatchDetailedPage extends StatelessWidget {
                 context: context,
                 title: Text("Add Material"),
                 formKey: GlobalKey<FormState>(),
-                submitText: 'Add',
+                submitWidget: Text(
+      "Add",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
                 onSubmit: () {},
                 sections: [
                   CustomWidgets().labelWithAsterisk('Title'),

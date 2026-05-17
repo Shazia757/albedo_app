@@ -146,7 +146,11 @@ class StudentDetailsPage extends StatelessWidget {
                     ]);
                   }),
                 ],
-                submitText: 'Continue',
+                submitWidget: Text(
+      "Continue",
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
                 onSubmit: () {
                   FocusScope.of(context).unfocus();
 
@@ -1177,7 +1181,7 @@ class StudentDetailsPage extends StatelessWidget {
                                       infoRow(
                                         label: "Total Paid",
                                         value: package.totalStudentPaid
-                                                ?.toString() ??
+                                                .toString() ??
                                             "-",
                                       ),
                                       infoRow(

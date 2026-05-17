@@ -78,43 +78,144 @@ class ForgotPasswordPage extends StatelessWidget {
                               .copyWith(color: Colors.white.withOpacity(0.7)),
                         ),
                         SizedBox(height: 30),
+                        Obx(() {
+                          c.forgotStep.value = 1;
 
-                        // Email Input
-                        CustomTextField(
-                          prefixIcon: Icons.email_outlined,
-                          hint: "Enter your email",
-                          controller: c.emailController,
-                        ),
+                          /// STEP 1 — EMAIL
+                          if (c.forgotStep.value == 1) {
+                            return Column(
+                              children: [
+                                CustomTextField(
+                                  prefixIcon: Icons.email_outlined,
+                                  hint: "Enter your email",
+                                  controller: c.emailController,
+                                ),
+                                SizedBox(height: 25),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 55,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      final requested =
+                                          await c.forgotPasswordRequest();
 
-                        SizedBox(height: 25),
-
-                        // Send Request Button (Vibrant Purple)
-                        Obx(() => SizedBox(
-                              width: double.infinity,
-                              height: 55,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.secondary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
+                                      if (requested) {
+                                        c.forgotStep.value = 2;
+                                      }
+                                    },
+                                    child: c.isLoading.value
+                                        ? const CircularProgressIndicator(
+                                            color: Colors.white,
+                                          )
+                                        : Text(
+                                            "Send Request",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .copyWith(color: Colors.white),
+                                          ),
                                   ),
                                 ),
-                                onPressed: () => c.forgotPassword(),
-                                child: c.isLoading.value
-                                    ? const CircularProgressIndicator(
-                                        color: Colors.white)
-                                    : Text("Send Request",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium!
-                                            .copyWith(color: Colors.white)),
+                              ],
+                            );
+                          }
+
+                          /// STEP 2 — OTP/TOKEN
+                          if (c.forgotStep.value == 2) {
+                            return Column(
+                              children: [
+                                CustomTextField(
+                                  prefixIcon: Icons.lock_outline,
+                                  hint: "Enter OTP",
+                                  controller: c.otpController,
+                                  keyboardType: TextInputType.number,
+                                ),
+                                SizedBox(height: 25),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 55,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      final validated = await c
+                                          .validateForgotPasswordTokenRequest();
+
+                                      if (validated) {
+                                        c.forgotStep.value = 3;
+                                      }
+                                    },
+                                    child: Text(
+                                      "Validate OTP",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .copyWith(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+
+                          /// STEP 3 — RESET PASSWORD
+                          return Column(
+                            children: [
+                              CustomTextField(
+                                hint: "New Password",
+                                controller: c.passwordController,
+                                isPassword: true,
+                                prefixIcon: Icons.lock_outline,
                               ),
-                            )),
-
+                              SizedBox(height: 20),
+                              CustomTextField(
+                                hint: "Confirm Password",
+                                controller: c.confirmPassController,
+                                isPassword: true,
+                                prefixIcon: Icons.lock_outline,
+                              ),
+                              SizedBox(height: 25),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 55,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.secondary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    await c.forgotPasswordConfirmRequest();
+                                  },
+                                  child: Text(
+                                    "Reset Password",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
                         SizedBox(height: 15),
-
-                        // Back to Login Button (Blueish tint to match screenshot)
                         SizedBox(
                           width: double.infinity,
                           height: 55,
@@ -135,7 +236,7 @@ class ForgotPasswordPage extends StatelessWidget {
                                     .bodyLarge!
                                     .copyWith(color: Colors.white)),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),

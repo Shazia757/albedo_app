@@ -617,7 +617,7 @@ class OthersPage extends StatelessWidget {
 
   Users otherUserToUser(OtherUsers a) {
     return Users(
-      id: a.id,
+      empId: a.id,
       name: a.name,
       role: a.role,
     );

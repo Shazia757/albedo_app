@@ -96,26 +96,25 @@ class SessionReportController extends GetxController {
     isCompleted.value = value;
   }
 
-  void saveReport() {
-    final current = report;
-    if (current == null) return;
+ saveReport() {
+  final current = report;
+  if (current == null) return null;
 
-    current.isCompleted = isCompleted.value;
+  current.isCompleted = isCompleted.value;
 
-    if (isCompleted.value) {
-      current.topicsCovered = topicCtrl.text;
-      current.teacherNotes = notesCtrl.text;
-      current.startTime = startTimeCtrl.text;
-      current.duration = durationCtrl.text;
-    } else {
-      current.reason = reasonCtrl.text;
-    }
-
-    onSave?.call(current);
-
-    Get.back();
+  if (isCompleted.value) {
+    current.topicsCovered = topicCtrl.text;
+    current.teacherNotes = notesCtrl.text;
+    current.startTime = startTimeCtrl.text;
+    current.duration = durationCtrl.text;
+  } else {
+    current.reason = reasonCtrl.text;
   }
 
+  onSave?.call(current);
+
+  return current;
+}
   void _clearFields() {
     reasonCtrl.clear();
     topicCtrl.clear();
