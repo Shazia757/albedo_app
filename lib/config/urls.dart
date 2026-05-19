@@ -3,6 +3,20 @@ class Urls {
 
   //------------------ Accounts ---------------------------//
 
+  static String forgotPasswordConfirm =
+      '$base/accounts/forgot-password/confirm/';
+  static String forgotPasswordRequest =
+      '$base/accounts/forgot-password/request/';
+  static String forgotPasswordValidate =
+      '$base/accounts/forgot-password/validate/';
+
+  static String googleLogin = '$base/accounts/google-login/';
+  static String login = '$base/accounts/mobile-login/';
+  static String logout = '$base/accounts/mobile-logout/';
+  static String passwordReset = '$base/accounts/password-reset/';
+  static String resetPasswordConfirm = '$base/accounts/reset-password-confirm/';
+  static String refreshToken = '$base/accounts/token/refresh/';
+
   static String impersonate = '$base/accounts/admin-impersonate/';
   static String appAuthenticate(String userId) =>
       '$base/accounts/app-authenticate/$userId/';
@@ -18,26 +32,12 @@ class Urls {
   static String dbBackup = '$base/accounts/db-backup/';
   static String dbLoadData = '$base/accounts/db-load-data/';
 
-  static String forgotPasswordConfirm =
-      '$base/accounts/forgot-password/confirm/';
-  static String forgotPasswordRequest =
-      '$base/accounts/forgot-password/request/';
-  static String forgotPasswordValidate =
-      '$base/accounts/forgot-password/validate/';
-
-  static String googleLogin = '$base/accounts/google-login/';
-  static String login = '$base/accounts/mobile-login/';
-  static String logout = '$base/accounts/mobile-logout/';
-
-  static String passwordReset = '$base/accounts/password-reset/';
   static String register = '$base/accounts/register/';
-  static String resetPasswordConfirm = '$base/accounts/reset-password-confirm/';
 
   static String ssoValidate = '$base/accounts/sso-validate/';
-  static String refreshToken = '$base/accounts/token/refresh/';
 
   static String userDetails = '$base/accounts/user/details/';
-  static String userUpdate = '$base/accounts/user/update/';
+  // static String userUpdate = '$base/accounts/user/update/';
 
   static String users = '$base/accounts/users/';
   static String userById(String id) => '$base/accounts/users/$id/';
@@ -108,9 +108,41 @@ class Urls {
 
   static String readGroup(String chatId) => '$base/chat/groups/$chatId/read/';
 
-  //------------------ Custom Admin ---------------------------//
+  //------------------ Settings ---------------------------//
 
-  static String advisorReports = '$base/custom_admin/advisor-reports/';
+  static String supportTickets = '$base/custom_admin/support-tickets/';
+
+  static String supportTicketById(String id) =>
+      '$base/custom_admin/support-tickets/$id/';
+
+  static String registrationFee = '$base/custom_admin/registration-fee/';
+
+  static String starFactor = '$base/custom_admin/star-factor/';
+
+  static String supportCategories = '$base/custom_admin/support-categories/';
+
+  static String supportCategoryById(String id) =>
+      '$base/custom_admin/support-categories/$id/';
+
+  static String syllabuses = '$base/custom_admin/syllabuses/';
+
+  static String syllabusById(String id) => '$base/custom_admin/syllabuses/$id/';
+
+  static String packageNames = '$base/custom_admin/package-names/';
+
+  static String packageNameById(String id) =>
+      '$base/custom_admin/package-names/$id/';
+
+  static String packageRecommendations =
+      '$base/custom_admin/package-recommendations/';
+
+  static String packageRecommendationById(String id) =>
+      '$base/custom_admin/package-recommendations/$id/';
+
+  static String batchRecommendations = '$base/student/batch-recommendations/';
+
+  static String batchRecommendationById(String id) =>
+      '$base/student/batch-recommendations/$id/';
 
   static String assessmentQuestions =
       '$base/custom_admin/assessment-questions/';
@@ -118,11 +150,81 @@ class Urls {
   static String assessmentQuestionById(String id) =>
       '$base/custom_admin/assessment-questions/$id/';
 
-  static String assessmentReportTypes =
+  static String assessmentReportType =
       '$base/custom_admin/assessment-report-type/';
 
   static String assessmentReportTypeById(String id) =>
       '$base/custom_admin/assessment-report-type/$id/';
+
+  static String banners = '$base/custom_admin/banners/';
+  static String bannerById(String id) => '$base/custom_admin/banners/$id/';
+
+  static String categories = '$base/custom_admin/categories/';
+  static String categoryById(String id) => '$base/custom_admin/categories/$id/';
+
+  static String completionDeadlineSettings =
+      '$base/custom_admin/completion-deadline-settings/';
+
+  static String completionDeadlineSettingById(String id) =>
+      '$base/custom_admin/completion-deadline-settings/$id/';
+
+  static String coupons = '$base/custom_admin/coupons/';
+  static String couponById(String id) => '$base/custom_admin/coupons/$id/';
+
+  static String courses = '$base/custom_admin/courses/';
+  static String courseById(String id) => '$base/custom_admin/courses/$id/';
+
+  static String hiringAds = '$base/custom_admin/hiring-ads/';
+
+  static String hiringAdById(String id) => '$base/custom_admin/hiring-ads/$id/';
+
+  static String privacyPolicies = '$base/custom_admin/privacy-policies/';
+
+  static String privacyPolicyById(String id) =>
+      '$base/custom_admin/privacy-policies/$id/';
+
+  static String privacyPolicyByUserType(String userType) =>
+      '$base/custom_admin/privacy-policy/users/$userType/';
+
+  static String materials = '$base/custom_admin/materials/';
+
+  static String materialById(String id) => '$base/custom_admin/materials/$id/';
+
+  static String salaryInvoiceTaxSettings =
+      '$base/custom_admin/salary-invoice-tax-settings/';
+
+  static String referralSources = '$base/custom_admin/referral-sources/';
+
+  static String referralSourceById(String id) =>
+      '$base/custom_admin/referral-sources/$id/';
+
+  static String refundPolicies = '$base/custom_admin/refund-policies/';
+
+  static String refundPolicyById(String id) =>
+      '$base/custom_admin/refund-policies/$id/';
+
+  static String refundPolicyByUserType(String userType) =>
+      '$base/custom_admin/refund-policy/users/$userType/';
+
+  static String standards = '$base/custom_admin/standards/';
+
+  static String standardById(String id) => '$base/custom_admin/standards/$id/';
+
+  static String supportMacros = '$base/custom_admin/support-macros/';
+
+  static String supportMacroById(String id) =>
+      '$base/custom_admin/support-macros/$id/';
+
+  static String terms = '$base/custom_admin/terms/';
+
+  static String termsByUserType(String userType) =>
+      '$base/custom_admin/terms/users/$userType/';
+
+  static String termById(String id) => '$base/custom_admin/terms/$id/';
+
+  //------------------ Custom Admin ---------------------------//
+
+  static String advisorReports = '$base/custom_admin/advisor-reports/';
 
   static String groupedPermissions =
       '$base/custom_admin/assign-permissions/grouped/';
@@ -147,25 +249,7 @@ class Urls {
   static String assistantMentors(String assistantId) =>
       '$base/custom_admin/assistant/$assistantId/mentors/';
 
-  static String banners = '$base/custom_admin/banners/';
-  static String bannerById(String id) => '$base/custom_admin/banners/$id/';
-
-  static String categories = '$base/custom_admin/categories/';
-  static String categoryById(String id) => '$base/custom_admin/categories/$id/';
-
-  static String combinedReport = '$base/custom_admin/combined-report/';
-
-  static String completionDeadlineSettings =
-      '$base/custom_admin/completion-deadline-settings/';
-
-  static String completionDeadlineSettingById(String id) =>
-      '$base/custom_admin/completion-deadline-settings/$id/';
-
-  static String coupons = '$base/custom_admin/coupons/';
-  static String couponById(String id) => '$base/custom_admin/coupons/$id/';
-
-  static String courses = '$base/custom_admin/courses/';
-  static String courseById(String id) => '$base/custom_admin/courses/$id/';
+       static String combinedReport = '$base/custom_admin/combined-report/';
 
   static String deadlineOverrides = '$base/custom_admin/deadline-overrides/';
 
@@ -191,18 +275,10 @@ class Urls {
 
   static String globalSearch = '$base/custom_admin/global-search/';
 
-  static String hiringAds = '$base/custom_admin/hiring-ads/';
-
-  static String hiringAdById(String id) => '$base/custom_admin/hiring-ads/$id/';
-
   static String hiringReport = '$base/custom_admin/hiring-report/';
 
   static String latestMentorMetrics(String mentorId) =>
       '$base/custom_admin/latest-mentor-metrics/$mentorId/';
-
-  static String materials = '$base/custom_admin/materials/';
-
-  static String materialById(String id) => '$base/custom_admin/materials/$id/';
 
   static String meetSessions = '$base/custom_admin/meet-sessions/';
 
@@ -244,17 +320,6 @@ class Urls {
   static String notificationById(String id) =>
       '$base/custom_admin/notifications/$id/';
 
-  static String packageNames = '$base/custom_admin/package-names/';
-
-  static String packageNameById(String id) =>
-      '$base/custom_admin/package-names/$id/';
-
-  static String packageRecommendations =
-      '$base/custom_admin/package-recommendations/';
-
-  static String packageRecommendationById(String id) =>
-      '$base/custom_admin/package-recommendations/$id/';
-
   static String packageReports = '$base/custom_admin/package-reports/';
 
   static String packagesWithStudentSessionRequests =
@@ -263,37 +328,16 @@ class Urls {
   static String packagesWithTeacherSessionRequests =
       '$base/custom_admin/packages-with-teacher-session-requests/';
 
-  static String privacyPolicies = '$base/custom_admin/privacy-policies/';
-
-  static String privacyPolicyById(String id) =>
-      '$base/custom_admin/privacy-policies/$id/';
-
-  static String privacyPolicyByUserType(String userType) =>
-      '$base/custom_admin/privacy-policy/users/$userType/';
-
   static String pushStatus = '$base/custom_admin/push-status/';
 
   static String recommendationReport =
       '$base/custom_admin/recommendation-report/';
-
-  static String referralSources = '$base/custom_admin/referral-sources/';
-
-  static String referralSourceById(String id) =>
-      '$base/custom_admin/referral-sources/$id/';
 
   static String refundDisbursements =
       '$base/custom_admin/refund-disbursements/';
 
   static String refundDisbursementById(String id) =>
       '$base/custom_admin/refund-disbursements/$id/';
-
-  static String refundPolicies = '$base/custom_admin/refund-policies/';
-
-  static String refundPolicyById(String id) =>
-      '$base/custom_admin/refund-policies/$id/';
-
-  static String refundPolicyByUserType(String userType) =>
-      '$base/custom_admin/refund-policy/users/$userType/';
 
   static String refundRequests = '$base/custom_admin/refund-requests/';
 
@@ -303,8 +347,6 @@ class Urls {
   static String refundRequestDisbursements(String refundRequestId) =>
       '$base/custom_admin/refund-requests/$refundRequestId/disbursements/';
 
-  static String registrationFee = '$base/custom_admin/registration-fee/';
-
   static String rescheduleRequests = '$base/custom_admin/reschedule-requests/';
 
   static String rescheduleRequestsDetails =
@@ -313,16 +355,7 @@ class Urls {
   static String rescheduleRequestById(String id) =>
       '$base/custom_admin/reschedule-requests/$id/';
 
-  static String salaryInvoiceTaxSettings =
-      '$base/custom_admin/salary-invoice-tax-settings/';
-
   static String saleSummary = '$base/custom_admin/sale-summary/';
-
-  static String standards = '$base/custom_admin/standards/';
-
-  static String standardById(String id) => '$base/custom_admin/standards/$id/';
-
-  static String starFactor = '$base/custom_admin/star-factor/';
 
   static String starOfMonthReport = '$base/custom_admin/star-of-month-report/';
 
@@ -354,18 +387,6 @@ class Urls {
 
   static String summary = '$base/custom_admin/summary/';
 
-  static String supportCategories = '$base/custom_admin/support-categories/';
-
-  static String supportCategoryById(String id) =>
-      '$base/custom_admin/support-categories/$id/';
-
-  //------------------ Support Macros ---------------------------//
-
-  static String supportMacros = '$base/custom_admin/support-macros/';
-
-  static String supportMacroById(String id) =>
-      '$base/custom_admin/support-macros/$id/';
-
   //------------------ Support Ticket Replies ---------------------------//
 
   static String supportTicketReplies(String ticketId) =>
@@ -374,34 +395,12 @@ class Urls {
   static String supportTicketReplyById(String ticketId, String id) =>
       '$base/custom_admin/support-ticket-replies/$ticketId/$id/';
 
-  //------------------ Support Tickets ---------------------------//
-
-  static String supportTickets = '$base/custom_admin/support-tickets/';
-
-  static String supportTicketById(String id) =>
-      '$base/custom_admin/support-tickets/$id/';
-
-  //------------------ Syllabuses ---------------------------//
-
-  static String syllabuses = '$base/custom_admin/syllabuses/';
-
-  static String syllabusById(String id) => '$base/custom_admin/syllabuses/$id/';
-
   //------------------ Teacher Reports ---------------------------//
 
   static String teacherReports = '$base/custom_admin/teacher-reports/';
 
   static String teacherRescheduleRequests =
       '$base/custom_admin/teacher-reschedule-requests/';
-
-  //------------------ Terms ---------------------------//
-
-  static String terms = '$base/custom_admin/terms/';
-
-  static String termsByUserType(String userType) =>
-      '$base/custom_admin/terms/users/$userType/';
-
-  static String termById(String id) => '$base/custom_admin/terms/$id/';
 
   //------------------ Test Push ---------------------------//
 
@@ -538,8 +537,7 @@ class Urls {
 
   static String otherUsers = '$base/other_users/other-users/';
 
-  static String editUserById(String id) =>
-      '$base/other_users/other-users/$id/';
+  static String editUserById(String id) => '$base/other_users/other-users/$id/';
 
   static String positionChoices = '$base/other_users/position-choices/';
 
@@ -575,12 +573,7 @@ class Urls {
   static String regenerateBatchPackageMeetLink(String id) =>
       '$base/student/batch-packages/$id/regenerate-meet-link/';
 
-  //------------------ Batch Recommendations ---------------------------//
 
-  static String batchRecommendations = '$base/student/batch-recommendations/';
-
-  static String batchRecommendationById(String id) =>
-      '$base/student/batch-recommendations/$id/';
 
   //------------------ Batch Schedules ---------------------------//
 

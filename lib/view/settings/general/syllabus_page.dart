@@ -7,7 +7,7 @@ import 'package:albedo_app/controller/settings_controller.dart';
 class SyllabusPage extends StatelessWidget {
   SyllabusPage({super.key});
 
-  final SettingsController c = Get.put(SettingsController());
+  final SettingsController c = Get.find<SettingsController>();
 
   @override
   Widget build(BuildContext context) {
@@ -17,182 +17,64 @@ class SyllabusPage extends StatelessWidget {
       itemBuilder: (item, i) {
         return EditableTile(
           icon: Icons.menu_book,
-          key: ValueKey(i),
-          value: item,
-          onSave: (val) {
-            c.syllabus[i] = val;
-            c.syllabus.refresh();
+          key: ValueKey(item.id),
+          value: item.name,
+          onSave: (val) async {
+            final success = await c.updateSyllabus(
+              id: item.id,
+              syllabus: val,
+            );
+
+            if (success) {
+              c.syllabus[i] = c.syllabus[i].copyWith(name: val);
+              c.syllabus.refresh();
+            }
+
           },
           onDelete: () {
             CustomWidgets().showDeleteDialog(
               title: 'Are you sure?',
+              dltText: Obx(
+                () => c.isLoading.value
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        "Yes",
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(color: Colors.white),
+                      ),
+              ),
               context: context,
               text: 'Delete this syllabus permanently?',
-              onConfirm: () {
-                c.syllabus.removeAt(i);
-                c.syllabus.refresh();
+              onConfirm: () async {
+                final success = await c.deleteSyllabus(id: item.id);
+
+                if (success) {
+                  c.syllabus.removeWhere((e) => e.id == item.id);
+                  Get.back();
+                }
               },
             );
           },
         );
       },
       onAdd: (val) async {
-        c.syllabus.add(val);
-        c.syllabus.refresh();
+        final newItem = await c.addSyllabus(val);
+
+        if (newItem != null) {
+          c.syllabus.add(newItem);
+        }
       },
       onUpdate: (i, val) async {},
       onDelete: (i) async {},
-    );
-  }
-}
-
-class AddItemTile extends StatelessWidget {
-  final String title;
-  // final IconData icon;
-  final VoidCallback onTap;
-  final Color? color;
-
-  const AddItemTile({
-    super.key,
-    required this.title,
-    // required this.icon,
-    required this.onTap,
-    this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = color ?? Theme.of(context).colorScheme.primary;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: onTap,
-      child: Ink(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: accent.withOpacity(0.4),
-          ),
-          color: accent.withOpacity(0.05),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-          child: Row(
-            children: [
-              Icon(Icons.add, color: accent),
-              SizedBox(width: 10),
-              Text(
-                title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall!
-                    .copyWith(color: accent),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class CrudItemTile extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
-  final VoidCallback? onTap; // optional (if clickable)
-  final Color? color;
-
-  const CrudItemTile({
-    super.key,
-    required this.title,
-    required this.icon,
-    this.onEdit,
-    this.onDelete,
-    this.onTap,
-    this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = color ?? Theme.of(context).colorScheme.primary;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: onTap,
-      child: Ink(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          gradient: LinearGradient(
-            colors: [
-              Colors.white,
-              accent.withOpacity(0.05),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          border: Border.all(color: accent.withOpacity(0.15)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-          child: Row(
-            children: [
-              // Leading icon
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: accent.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, size: 18, color: accent),
-              ),
-
-              SizedBox(width: 10),
-
-              // Title
-              Expanded(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-              ),
-
-              // Actions
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (onEdit != null)
-                    InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: onEdit,
-                      child: Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: Icon(Icons.edit, size: 18, color: accent),
-                      ),
-                    ),
-                  if (onDelete != null)
-                    InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: onDelete,
-                      child: Padding(
-                        padding: EdgeInsets.all(6),
-                        child: Icon(Icons.delete, size: 18, color: Colors.red),
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

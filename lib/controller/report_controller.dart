@@ -346,8 +346,9 @@ class ReportsController extends GetxController {
     final q = searchQuery.value.toLowerCase();
 
     return hiringViews.where((h) {
+      final package= h.ad.package??'';
       return h.teacher.name.toLowerCase().contains(q) ||
-          h.ad.package.toLowerCase().contains(q) ||
+          package.toLowerCase().contains(q) ||
           h.response.status.toLowerCase().contains(q);
     }).toList();
   }

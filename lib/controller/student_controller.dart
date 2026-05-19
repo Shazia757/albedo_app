@@ -304,21 +304,21 @@ class StudentController extends GetxController {
 
         /// 🔷 Assessments
         assessment: [
-          Assessment(
-            id: "ASM001",
-            type: "Mid Term Assessment",
-            date: "2025-02-10",
-            testType: ["Online"],
-            attentionQuestions: ["Focus", "Listening"],
-          ),
-          Assessment(
-            id: "ASM002",
-            type: "Final Evaluation",
-            date: "2025-03-20",
-            testType: ["Offline"],
-            attentionQuestions: ["Participation"],
-          ),
-        ],
+        //   Assessment(
+        //     id: "ASM001",
+        //     type: "Mid Term Assessment",
+        //     date: "2025-02-10",
+        //     testType: ["Online"],
+        //     attentionQuestions: ["Focus", "Listening"],
+        //   ),
+        //   Assessment(
+        //     id: "ASM002",
+        //     type: "Final Evaluation",
+        //     date: "2025-03-20",
+        //     testType: ["Offline"],
+        //     attentionQuestions: ["Participation"],
+        //   ),
+         ],
       ),
       Student(
         studentId: "STU1002",
@@ -460,6 +460,24 @@ class StudentController extends GetxController {
 
     if (user?.role == "coordinator") {
       CustomWidgets().showDeleteDialog(
+        dltText: Obx(
+  () => isLoading.value
+      ? const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+      : Text(
+          "Yes",
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: Colors.white),
+        ),
+),
         title: 'Are you sure?',
         context: context,
         text: "Do you want to request deletion of this student?",
@@ -467,6 +485,24 @@ class StudentController extends GetxController {
       );
     } else {
       CustomWidgets().showDeleteDialog(
+        dltText: Obx(
+  () => isLoading.value
+      ? const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+      : Text(
+          "Yes",
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: Colors.white),
+        ),
+),
         title: 'Are you sure?',
         context: context,
         text: "Are you sure you want to delete this student permanently?",

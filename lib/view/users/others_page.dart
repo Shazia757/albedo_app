@@ -231,6 +231,24 @@ class OthersPage extends StatelessWidget {
                                                           onTap: () =>
                                                               CustomWidgets()
                                                                   .showDeleteDialog(
+                                                                    dltText: Obx(
+  () => c.isLoading.value
+      ? const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+      : Text(
+          "Yes",
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: Colors.white),
+        ),
+),
                                                             title:
                                                                 'Are you sure?',
                                                             text:

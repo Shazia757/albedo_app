@@ -92,45 +92,45 @@ class DialogUtils {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// ✅ Always show header
-              _reportCard(child: _header(a)),
+              // _reportCard(child: _header(a)),
               SizedBox(height: 12),
 
-              /// ✅ Attention (only if data exists)
-              if ((a.attentionData ?? []).isNotEmpty) ...[
-                attentionReportCard(context, a),
-                SizedBox(height: 12),
-              ],
+              // /// ✅ Attention (only if data exists)
+              // if ((a.attentionData ?? []).isNotEmpty) ...[
+              //   attentionReportCard(context, a),
+              //   SizedBox(height: 12),
+              // ],
 
-              /// ✅ Academics
-              if ((a.academicData ?? []).isNotEmpty) ...[
-                academicReportCard(context, a.academicData!),
-                SizedBox(height: 12),
-              ],
+              // /// ✅ Academics
+              // if ((a.academicData ?? []).isNotEmpty) ...[
+              //   academicReportCard(context, a.academicData!),
+              //   SizedBox(height: 12),
+              // ],
 
-              /// ✅ Maths
-              if ((a.mathsData ?? []).isNotEmpty) ...[
-                mathReportCard(context, a.mathsData!),
-                SizedBox(height: 12),
-              ],
+              // /// ✅ Maths
+              // if ((a.mathsData ?? []).isNotEmpty) ...[
+              //   mathReportCard(context, a.mathsData!),
+              //   SizedBox(height: 12),
+              // ],
 
-              /// ✅ Subjects
-              if ((a.subjectsData ?? []).isNotEmpty) ...[
-                subjectsReportCard(context, a.subjectsData!),
-                SizedBox(height: 12),
-              ],
+              // /// ✅ Subjects
+              // if ((a.subjectsData ?? []).isNotEmpty) ...[
+              //   subjectsReportCard(context, a.subjectsData!),
+              //   SizedBox(height: 12),
+              // ],
 
-              /// ✅ Key Points
-              if ((a.keypoints ?? []).isNotEmpty) ...[
-                keyPointsReportCard(context, a.keypoints!),
-                SizedBox(height: 12),
-              ],
+              // /// ✅ Key Points
+              // if ((a.keypoints ?? []).isNotEmpty) ...[
+              //   keyPointsReportCard(context, a.keypoints!),
+              //   SizedBox(height: 12),
+              // ],
 
-              /// ✅ ALWAYS SHOW
-              parentOpinionReportCard(context, a.parentOpinion),
-              SizedBox(height: 12),
+              // /// ✅ ALWAYS SHOW
+              // parentOpinionReportCard(context, a.parentOpinion),
+              // SizedBox(height: 12),
 
-              assessmentSummaryReportCard(context, a.summary),
-              SizedBox(height: 12),
+              // assessmentSummaryReportCard(context, a.summary),
+              // SizedBox(height: 12),
 
               _reportCard(
                 child: isAdmin
@@ -156,6 +156,13 @@ class DialogUtils {
                             icon: Icon(Icons.delete_outline,
                                 color: Get.theme.colorScheme.error),
                             onPressed: () => CustomWidgets().showDeleteDialog(
+                              dltText: Text(
+                                "Yes",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall!
+                                    .copyWith(color: Colors.white),
+                              ),
                               title: 'Are you sure?',
                               context: context,
                               text:
@@ -236,35 +243,35 @@ class DialogUtils {
     // TODO: implement PDF generation or API download
   }
 
-  Widget _header(Assessment a) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          a.type ?? "Assessment",
-          style: Get.textTheme.titleLarge,
-        ),
-        SizedBox(height: 8),
-        Row(
-          children: [
-            Row(
-              children: [
-                Icon(Icons.calendar_month_outlined),
-                Text(a.date ?? ''),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(Icons.timer_outlined),
-                Text(a.time ?? ''),
-              ],
-            )
-          ],
-        ),
-      ],
-    );
-  }
+  // Widget _header(Assessment a) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(
+  //         a.type ?? "Assessment",
+  //         style: Get.textTheme.titleLarge,
+  //       ),
+  //       SizedBox(height: 8),
+  //       Row(
+  //         children: [
+  //           Row(
+  //             children: [
+  //               Icon(Icons.calendar_month_outlined),
+  //               Text(a.date ?? ''),
+  //             ],
+  //           ),
+  //           Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //             children: [
+  //               Icon(Icons.timer_outlined),
+  //               Text(a.time ?? ''),
+  //             ],
+  //           )
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget languageReportCard(BuildContext context, List languages) {
     return _card(
@@ -541,70 +548,70 @@ class DialogUtils {
     );
   }
 
-  Widget attentionReportCard(
-    BuildContext context,
-    Assessment assessment,
-  ) {
-    final cs = Get.theme.colorScheme;
+  // Widget attentionReportCard(
+  //   BuildContext context,
+  //   Assessment assessment,
+  // ) {
+  //   final cs = Get.theme.colorScheme;
 
-    final items = assessment.attentionData ?? [];
+  //   final items = assessment.attentionData ?? [];
 
-    return _card(
-      title: "Attention in Online Classes",
-      child: Column(
-        children: items.map((q) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: cs.outline.withOpacity(0.2),
-              ),
-            ),
-            child: Row(
-              children: [
-                /// 🔷 Question
-                Expanded(
-                  child: Text(
-                    q.question,
-                    style: Get.textTheme.titleSmall,
-                  ),
-                ),
+  //   return _card(
+  //     title: "Attention in Online Classes",
+  //     child: Column(
+  //       children: items.map((q) {
+  //         return Container(
+  //           margin: const EdgeInsets.only(bottom: 10),
+  //           padding: const EdgeInsets.all(12),
+  //           decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.circular(10),
+  //             border: Border.all(
+  //               color: cs.outline.withOpacity(0.2),
+  //             ),
+  //           ),
+  //           child: Row(
+  //             children: [
+  //               /// 🔷 Question
+  //               Expanded(
+  //                 child: Text(
+  //                   q.question,
+  //                   style: Get.textTheme.titleSmall,
+  //                 ),
+  //               ),
 
-                /// ⭐ Rating (read-only stars)
-                Row(
-                  children: List.generate(5, (i) {
-                    return Icon(
-                      i < q.rating ? Icons.star : Icons.star_border,
-                      size: 16,
-                      color: Colors.amber,
-                    );
-                  }),
-                ),
+  //               /// ⭐ Rating (read-only stars)
+  //               Row(
+  //                 children: List.generate(5, (i) {
+  //                   return Icon(
+  //                     i < q.rating ? Icons.star : Icons.star_border,
+  //                     size: 16,
+  //                     color: Colors.amber,
+  //                   );
+  //                 }),
+  //               ),
 
-                SizedBox(width: 12),
+  //               SizedBox(width: 12),
 
-                /// 📝 Mark
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: cs.surfaceContainerHighest,
-                  ),
-                  child: Text(
-                    q.mark.isEmpty ? '-' : q.mark,
-                    style: Get.textTheme.titleSmall,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+  //               /// 📝 Mark
+  //               Container(
+  //                 padding:
+  //                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+  //                 decoration: BoxDecoration(
+  //                   borderRadius: BorderRadius.circular(8),
+  //                   color: cs.surfaceContainerHighest,
+  //                 ),
+  //                 child: Text(
+  //                   q.mark.isEmpty ? '-' : q.mark,
+  //                   style: Get.textTheme.titleSmall,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         );
+  //       }).toList(),
+  //     ),
+  //   );
+  // }
 
   Widget _card(
       {required String title, String? subtitle, required Widget child}) {

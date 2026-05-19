@@ -1,6 +1,7 @@
 import 'package:albedo_app/controller/report_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 Widget hiringsTab(BuildContext context) {
   final ReportsController c = Get.put(ReportsController());
@@ -55,7 +56,13 @@ Widget hiringsTab(BuildContext context) {
                 DataCell(Text(s.ad.package ?? '-')),
 
                 // Date Created (use startDate for now)
-                DataCell(Text(s.ad.startDate ?? '-')),
+                DataCell(
+  Text(
+    s.ad.fromDate != null
+        ? DateFormat('dd MMM yyyy').format(s.ad.fromDate!)
+        : '-',
+  ),
+),
 
                 // Status (you can customize)
                 DataCell(Container(

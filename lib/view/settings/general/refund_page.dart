@@ -5,79 +5,87 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class RefundPage extends StatelessWidget {
-  final c = Get.put(SettingsController());
-
   RefundPage({super.key});
+
+  final SettingsController c = Get.find<SettingsController>();
 
   @override
   Widget build(BuildContext context) {
-    final refundList = [
-      RefundItem("Student", c.studentRefundController),
-      RefundItem("Teacher", c.teacherRefundController),
-      RefundItem("Mentor", c.mentorRefundController),
-      RefundItem("Coordinator", c.coordinatorRefundController),
-      RefundItem("Other", c.otherRefundController),
-    ];
+    final refundList = <RefundItem>[
+      RefundItem('Student', 'STUDENT', c.studentRefundController),
+      RefundItem('Teacher', 'TEACHER', c.teacherRefundController),
+      RefundItem('Mentor', 'MENTOR', c.mentorRefundController),
+      RefundItem('Coordinator', 'COORDINATOR', c.coordinatorRefundController),
+      RefundItem('Other', 'OTHER', c.otherRefundController),
+    ].obs;
 
     return CrudPage(
-      title: "Refund Policy",
+      title: 'Refund Policy',
       items: refundList,
-      enableAdd: false, // 🚫 no add button
-
+      enableAdd: false,
       itemBuilder: (item, i) {
         return ViewEditTile(
           value: item.title,
           icon: Icons.assignment_return,
-
-          /// ✏️ Edit dialog
-          onEdit: () {
-            CustomWidgets().showCustomDialog(
-              context: context,
-              title: Text('Edit ${item.title}'),
-              formKey: GlobalKey<FormState>(),
-              sections: [
-                CustomWidgets().dropdownStyledTextField(
-                  context: context,
-                  hint: 'Edit Refund',
-                  isMultiline: true,
-                  controller: item.controller,
-                )
-              ],
-              onSubmit: () {
-                Get.back();
-              },
-            );
-          },
-
-          /// 👁️ View dialog
-          onTap: () {
-            CustomWidgets().showCustomDialog(
-              context: context,
-              title: Text(item.title),
-              formKey: GlobalKey<FormState>(),
-              sections: [
-                Text(
-                  item.controller.text.isEmpty
-                      ? "No content"
-                      : item.controller.text,
-                )
-              ],
-              onSubmit: () {},
-            );
-          },
+      
+          onEdit: () => _openEditDialog(context, item),
         );
       },
-
       onAdd: (_) async {},
       onUpdate: (_, __) async {},
       onDelete: (_) async {},
     );
   }
+
+  Future<void> _openEditDialog(BuildContext context, RefundItem item) async {
+    await c.getRefundPolicies(item.userType, item.id, item.controller);
+
+  
+
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text('Edit ${item.title}'),
+      icon: Icons.edit_rounded,
+      formKey: GlobalKey<FormState>(),
+      submitWidget: Obx(
+        () => c.isLoading.value
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : const Text(
+                'Update',
+                style: TextStyle(color: Colors.white),
+              ),
+      ),
+      sections: [
+        CustomWidgets().dropdownStyledTextField(
+          context: context,
+          hint: 'Edit Refund Policy',
+          isMultiline: true,
+          controller: item.controller,
+        ),
+      ],
+      onSubmit: () {
+        c.updateRefundPolicies(
+          id: item.id.value,
+          content: item.controller.text,
+          userType: item.userType,
+        );
+      },
+    );
+  }
 }
 
 class RefundItem {
+  final RxString id = ''.obs;
   final String title;
+  final String userType;
   final TextEditingController controller;
 
-  RefundItem(this.title, this.controller);
+  RefundItem(this.title, this.userType, this.controller);
 }

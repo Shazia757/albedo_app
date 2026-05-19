@@ -562,15 +562,15 @@ class SessionController extends GetxController {
             studentId: "ST07",
             name: "Sneha",
             assessment: [
-              Assessment(
-                  id: "A001",
-                  type: "Monthly Academic Assessment",
-                  testType: ["academic", "maths", "basics"],
-                  date: "06 May 2026",
-                  attentionQuestions: ["Focus", "Listening", "Participation"],
-                  attentionData: [
-                    AttentionItem(mark: '10', question: 'Focus', rating: 2)
-                  ]),
+              // Assessment(
+              //     id: "A001",
+              //     type: "Monthly Academic Assessment",
+              //     testType: ["academic", "maths", "basics"],
+              //     date: "06 May 2026",
+              //     attentionQuestions: ["Focus", "Listening", "Participation"],
+              //     attentionData: [
+              //       AttentionItem(mark: '10', question: 'Focus', rating: 2)
+              //     ]),
             ],
             joinedAt: DateTime.now(),
             packages: [

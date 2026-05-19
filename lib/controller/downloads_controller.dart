@@ -1,37 +1,39 @@
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/model/settings/assessment_model.dart';
 import 'package:get/get.dart';
 
 class DownloadsController extends GetxController {
   var assessments = <Assessment>[].obs;
   var selectedIndex = 0.obs;
+  var isLoading = false.obs;
 
-  List<String> tabs = ['Certificates', 'Assessments'];
+  List<String> tabs = [
+    'Certificates',
+    'Assessments',
+  ];
 
   @override
   void onInit() {
     super.onInit();
+    fetchAssessments();
+  }
 
-    // Dummy data
-    assessments.addAll([
-      Assessment(
-        id: "A-101",
-        type: "Mid Term Exam",
-        testType: ["Written", "Objective"],
-        date: "2026-04-10",
-        attentionQuestions: [
-          "Why was question 3 left unanswered?",
-          "Explain low score in section B",
-        ],
-      ),
-      Assessment(
-        id: "A-102",
-        type: "Unit Test",
-        testType: ["MCQ"],
-        date: "2026-04-15",
-        attentionQuestions: [
-          "Time management issue noted",
-        ],
-      ),
-    ]);
+  Future<void> fetchAssessments() async {
+    try {
+      isLoading.value = true;
+
+      final data =
+          await Api().getAssessmentReportTypes();
+
+      assessments.assignAll(data);
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

@@ -113,7 +113,7 @@ class StudentsPage extends StatelessWidget {
                               break;
 
                             case "bulk_upload":
-                              Get.to(() => const BulkUploadPage());
+                              // Get.to(() => const BulkUploadPage());
                               break;
                           }
                         },

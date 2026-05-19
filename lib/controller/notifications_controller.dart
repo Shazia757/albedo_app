@@ -1,39 +1,66 @@
+import 'package:albedo_app/api.dart';
+import 'package:albedo_app/controller/settings_controller.dart';
 import 'package:albedo_app/model/settings/notification_model.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class NotificationsController extends GetxController {
   var selectedTab = 0.obs;
   var msgs = <Notifications>[].obs;
   var isLoading = true.obs;
+  var errorMessage = ''.obs;
+  RxBool isDeleteButtonLoading = false.obs;
+  RxList<VisibleTo> selected = <VisibleTo>[].obs;
+
+
   var filteredMessages = <Notifications>[].obs;
   final tabs = ["All", "Important", "Updates"];
+
+  TextEditingController titleController = TextEditingController();
+  TextEditingController messageController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
 
-    // mock data
-    msgs.value = [
-      Notifications(
-        id: "1",
-        title: "Session Reminder",
-        message: "Your session starts in 1 hour",
-        visibleTo: [],
-        isImportant: true,
-        date: DateTime.now(),
-      ),
-      Notifications(
-        id: "2",
-        title: "Payment Update",
-        message: "Your payment has been received",
-        visibleTo: [],
-        isImportant: false,
-        date: DateTime.now(),
-      ),
-    ];
-
     applyFilters();
     isLoading.value = false;
+  }
+
+  Future<void> getNotifications() async {
+    errorMessage.value = '';
+
+    try {
+      isLoading.value = true;
+
+      final result = await Api().getNotifications();
+
+      if (result is String) {
+        Get.snackbar(
+          'Error',
+          result,
+          colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+        );
+
+        return;
+      }
+
+      msgs.assignAll(
+        result
+            .map<Notifications>(
+              (e) => Notifications.fromJson(e),
+            )
+            .toList(),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   int getCount(int index) {
@@ -50,6 +77,24 @@ class NotificationsController extends GetxController {
       default:
         return 0;
     }
+  }
+
+  delete(id) {
+    isDeleteButtonLoading.value = true;
+    // Api().deleteProgram(id).then(
+    //   (value) {
+    //     if (value?.status == true) {
+    //       isDeleteButtonLoading.value = false;
+    //       Get.back();
+    //       Get.back();
+    //       Get.snackbar(
+    //           "Success", value?.message ?? "Program deleted successfully.");
+    //     } else {
+    //       // CustomWidgets.showSnackBar(
+    //       //     "Error", value?.message ?? 'Failed to delete program.');
+    //     }
+    //   },
+    // );
   }
 
   void applyFilters() {
@@ -70,4 +115,27 @@ class NotificationsController extends GetxController {
 
     filteredMessages.value = temp;
   }
+
+  VisibleTo visibleToFromString(String value) {
+    switch (value.toUpperCase()) {
+      case 'ADMIN':
+        return VisibleTo.admin;
+
+      case 'TEACHER':
+        return VisibleTo.teacher;
+
+      case 'STUDENT':
+        return VisibleTo.student;
+
+      case 'MENTOR':
+        return VisibleTo.mentor;
+
+      case 'COORDINATOR':
+        return VisibleTo.coordinator;
+
+      default:
+        return VisibleTo.other;
+    }
+  }
+
 }

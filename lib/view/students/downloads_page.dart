@@ -7,6 +7,7 @@ import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class DownloadsPage extends StatelessWidget {
   DownloadsPage({super.key});
@@ -162,7 +163,11 @@ class AssessmentsTab extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          assessment.type ?? 'Assessment',
+                          assessment.testTypes
+                                  ?.map((e) => e.name)
+                                  .where((e) => e != null && e.isNotEmpty)
+                                  .join(', ') ??
+                              '-',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         SizedBox(height: 4),
@@ -172,7 +177,8 @@ class AssessmentsTab extends StatelessWidget {
                                 size: 12, color: cs.outline),
                             SizedBox(width: 4),
                             Text(
-                              assessment.date ?? '-',
+                              DateFormat('dd MMM yyyy • hh:mm a')
+                                  .format(assessment.dateAdded!),
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall!

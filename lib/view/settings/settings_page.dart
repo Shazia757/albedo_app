@@ -1,7 +1,6 @@
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/settings_controller.dart';
-import 'package:albedo_app/view/notifications_page.dart';
 import 'package:albedo_app/view/settings/assessments_page.dart';
 import 'package:albedo_app/view/settings/backup_page.dart';
 import 'package:albedo_app/view/settings/banner_ads_page.dart';
@@ -11,6 +10,7 @@ import 'package:albedo_app/view/settings/general/general_page.dart';
 import 'package:albedo_app/view/settings/hiring_page.dart';
 import 'package:albedo_app/view/settings/macro_page.dart';
 import 'package:albedo_app/view/settings/materials_page.dart';
+import 'package:albedo_app/view/settings/notifications_page.dart';
 import 'package:albedo_app/view/settings/recommendation_page.dart';
 import 'package:albedo_app/view/settings/star_page.dart';
 
@@ -41,7 +41,8 @@ class SettingsPage extends StatelessWidget {
             child: Obx(
               () {
                 final auth = Get.find<AuthController>();
-                final role = auth.activeUser?.role;
+                final role = auth.activeUser?.position;
+                final normalizedRole = role?.trim().toLowerCase();
 
                 final isCustom = ![
                   "admin",
@@ -53,7 +54,7 @@ class SettingsPage extends StatelessWidget {
                   "finance",
                   "sales",
                   "hr"
-                ].contains(role);
+                ].contains(normalizedRole);
 
                 bool canShow(String title) {
                   if (!isCustom) return true;
@@ -95,13 +96,13 @@ class SettingsPage extends StatelessWidget {
                               icon: Icons.settings,
                               page: GeneralPage(),
                             ),
-                          if (canShow("Notifications"))
-                            _TileData(
-                              title: "Notifications",
-                              subtitle: "Configure alerts & notifications",
-                              icon: Icons.notifications,
-                              page: NotificationsPage(),
-                            ),
+                          // if (canShow("Notifications"))
+                          //   _TileData(
+                          //     title: "Notifications",
+                          //     subtitle: "Configure alerts & notifications",
+                          //     icon: Icons.notifications,
+                          //     page: NotificationsPage(),
+                          //   ),
                           if (canShow("Backup"))
                             _TileData(
                               title: "Backup",
@@ -126,19 +127,19 @@ class SettingsPage extends StatelessWidget {
                         context,
                         items: [
                           if (canShow("Banner Ads"))
-                            _TileData(
-                              title: "Banner Ads",
-                              subtitle: "Manage promotional banners",
-                              icon: Icons.campaign,
-                              page: BannerAdsPage(),
-                            ),
-                          if (canShow("Coupons"))
-                            _TileData(
-                              title: "Coupons",
-                              subtitle: "Create and manage coupons",
-                              icon: Icons.confirmation_number,
-                              page: CouponsPage(),
-                            ),
+                            // _TileData(
+                            //   title: "Banner Ads",
+                            //   subtitle: "Manage promotional banners",
+                            //   icon: Icons.campaign,
+                            //   page: BannerAdsPage(),
+                            // ),
+                          // if (canShow("Coupons"))
+                          //   _TileData(
+                          //     title: "Coupons",
+                          //     subtitle: "Create and manage coupons",
+                          //     icon: Icons.confirmation_number,
+                          //     page: CouponsPage(),
+                          //   ),
                           if (canShow("Star of Month"))
                             _TileData(
                               title: "Star of Month",
@@ -163,27 +164,27 @@ class SettingsPage extends StatelessWidget {
                         cs: cs,
                         context,
                         items: [
-                          if (canShow("Assessments"))
-                            _TileData(
-                              title: "Assessments",
-                              subtitle: "Manage tests and evaluations",
-                              icon: Icons.assignment,
-                              page: AssessmentsPage(),
-                            ),
-                          if (canShow("Materials"))
-                            _TileData(
-                              title: "Materials",
-                              subtitle: "Learning resources & materials",
-                              icon: Icons.menu_book,
-                              page: MaterialsPage(),
-                            ),
-                          if (canShow("Recommendation"))
-                            _TileData(
-                              title: "Recommendation",
-                              subtitle: "Recommendation settings",
-                              icon: Icons.thumb_up,
-                              page: RecommendationPage(),
-                            ),
+                          // if (canShow("Assessments"))
+                          //   _TileData(
+                          //     title: "Assessments",
+                          //     subtitle: "Manage tests and evaluations",
+                          //     icon: Icons.assignment,
+                          //     page: AssessmentsPage(),
+                          //   ),
+                          // if (canShow("Materials"))
+                          //   _TileData(
+                          //     title: "Materials",
+                          //     subtitle: "Learning resources & materials",
+                          //     icon: Icons.menu_book,
+                          //     page: MaterialsPage(),
+                          //   ),
+                          // if (canShow("Recommendation"))
+                          //   _TileData(
+                          //     title: "Recommendation",
+                          //     subtitle: "Recommendation settings",
+                          //     icon: Icons.thumb_up,
+                          //     page: RecommendationPage(),
+                          //   ),
                         ],
                       ),
 
@@ -201,27 +202,27 @@ class SettingsPage extends StatelessWidget {
                         cs: cs,
                         context,
                         items: [
-                          if (canShow("Hiring"))
-                            _TileData(
-                              title: "Hiring",
-                              subtitle: "Manage recruitment settings",
-                              icon: Icons.work,
-                              page: HiringPage(),
-                            ),
-                          if (canShow("Automation"))
-                            _TileData(
-                              title: "Automation",
-                              subtitle: "Macros and automation tools",
-                              icon: Icons.auto_mode,
-                              page: MacroPage(),
-                            ),
-                          if (canShow("Bulk Upload"))
-                            _TileData(
-                              title: "Bulk Upload",
-                              subtitle: "Upload large datasets easily",
-                              icon: Icons.upload_file,
-                              page: BulkUploadPage(),
-                            ),
+                          // if (canShow("Hiring"))
+                          //   _TileData(
+                          //     title: "Hiring",
+                          //     subtitle: "Manage recruitment settings",
+                          //     icon: Icons.work,
+                          //     page: HiringPage(),
+                          //   ),
+                          // if (canShow("Automation"))
+                          //   _TileData(
+                          //     title: "Automation",
+                          //     subtitle: "Macros and automation tools",
+                          //     icon: Icons.auto_mode,
+                          //     page: MacroPage(),
+                          //   ),
+                          // if (canShow("Bulk Upload"))
+                          //   _TileData(
+                          //     title: "Bulk Upload",
+                          //     subtitle: "Upload large datasets easily",
+                          //     icon: Icons.upload_file,
+                          //     page: BulkUploadPage(),
+                          //   ),
                         ],
                       ),
                     ],

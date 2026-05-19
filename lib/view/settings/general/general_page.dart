@@ -17,6 +17,7 @@ import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class GeneralPage extends StatelessWidget {
   final c = Get.put(SettingsController());
@@ -28,163 +29,314 @@ class GeneralPage extends StatelessWidget {
       title: "Financial & Pricing",
       icon: Icons.attach_money,
       items: [
-        _Item("Registration Fee", Icons.payments, (ctx) {
+        _Item("Registration Fee", Icons.payments, (ctx) async {
           final formKey = GlobalKey<FormState>();
           final c = Get.put(SettingsController());
+          await c.getRegistrationFee();
+          final updatedAt = c.registrationFee.value?['date_updated'];
 
           CustomWidgets().showCustomDialog(
             context: ctx,
             title: Text('Update Registration Fee'),
             formKey: formKey,
-          submitWidget: Text(
-      "Update",
-      style:
-          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
+            submitWidget: Obx(
+              () => SizedBox(
+                width: 80,
+                child: Center(
+                  child: c.isLoading.value
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          "Update",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                ),
+              ),
+            ),
             sections: [
               Column(
                 children: [
                   Text('Please click update button after changing the amount'),
                   SizedBox(height: 10),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 150),
-                    child: CustomWidgets().dropdownStyledTextField(
-                        context: ctx,
-                        hint: '0.0',
-                        controller: c.regFeeController),
-                  ),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: ctx,
+                      icon: Icons.currency_rupee,
+                      hint: '0.0',
+                      controller: c.regFeeController),
                   SizedBox(height: 10),
-                  Text('Last updated: ')
+                  Text(
+                    updatedAt != null
+                        ? 'Last updated: '
+                            '${DateTime.parse(updatedAt).day}/'
+                            '${DateTime.parse(updatedAt).month}/'
+                            '${DateTime.parse(updatedAt).year} '
+                            '${TimeOfDay.fromDateTime(
+                            DateTime.parse(updatedAt),
+                          ).format(ctx)}'
+                        : 'Last updated: --',
+                  ),
                 ],
               )
             ],
-            onSubmit: () {},
+            onSubmit: () => c.updateRegistrationFee(
+                value: double.parse(c.regFeeController.text).toInt()),
           );
         }),
-        _Item("Factor Value", Icons.tune, (ctx) {
+        _Item("Factor Value", Icons.tune, (ctx) async {
           final formKey = GlobalKey<FormState>();
           final c = Get.put(SettingsController());
+          await c.getStarFactor();
 
           CustomWidgets().showCustomDialog(
             context: ctx,
             title: Text('Update Factor Value'),
             formKey: formKey,
-           submitWidget: Text(
-      "Update",
-      style:
-          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
+            submitWidget: Obx(
+              () => SizedBox(
+                width: 80,
+                child: Center(
+                  child: c.isLoading.value
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          "Update",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                ),
+              ),
+            ),
             sections: [
               Column(
                 children: [
                   Text('Please click update button after changing the value'),
                   SizedBox(height: 10),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 150),
-                    child: CustomWidgets().dropdownStyledTextField(
-                        context: ctx,
-                        hint: '0.0',
-                        controller: c.factorValueController),
-                  ),
+                  CustomWidgets().dropdownStyledTextField(
+                      context: ctx,
+                      hint: '0.0',
+                      controller: c.factorValueController),
                   SizedBox(height: 10),
                 ],
               )
             ],
-            onSubmit: () {},
+            onSubmit: () => c.updateFactorValue(
+                value: double.parse(c.factorValueController.text).toInt()),
           );
         }),
-        _Item("Tax", Icons.receipt_long, (ctx) {
+        _Item("Tax", Icons.receipt_long, (ctx) async {
           final formKey = GlobalKey<FormState>();
           final c = Get.put(SettingsController());
+
+          /// FETCH SETTINGS
+          await c.getSalaryInvoiceTaxSettings();
+
+          /// SET UI VALUES
+          final data = c.salaryInvoiceTaxSettings.value;
+
+          c.feeType.value =
+              (data?['tax_type'] ?? 'AMOUNT').toString().toLowerCase() ==
+                      'percentage'
+                  ? 'percentage'
+                  : 'amount';
+
+          c.status.value =
+              (data?['is_enabled'] ?? false) ? 'active' : 'inactive';
+
+          c.taxController.text = data?['tax_value'] ?? '';
+          final updatedAt = data?['date_updated'];
 
           CustomWidgets().showCustomDialog(
             context: ctx,
             title: Text('Update Salary Invoice Tax'),
             formKey: formKey,
-         submitWidget: Text(
-      "Update",
-      style:
-          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
+            submitWidget: Obx(
+              () => SizedBox(
+                width: 80,
+                child: Center(
+                  child: c.isLoading.value
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          "Update",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                ),
+              ),
+            ),
             sections: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Please click update button after changing'),
+                  Text(
+                    'Please click update button after changing',
+                  ),
 
                   SizedBox(height: 12),
 
                   /// 🔘 TYPE SELECTION
-                  Obx(() => Row(
-                        children: [
-                          Expanded(
-                            child: RadioListTile<String>(
-                              title: Text("Percentage"),
-                              value: "percentage",
-                              groupValue: c.feeType.value,
-                              onChanged: (val) => c.feeType.value = val!,
-                              contentPadding: EdgeInsets.zero,
-                              dense: true,
-                            ),
+                  Obx(
+                    () => Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Text("Percentage"),
+                            value: "percentage",
+                            groupValue: c.feeType.value,
+                            onChanged: (val) => c.feeType.value = val!,
+                            contentPadding: EdgeInsets.zero,
+                            dense: true,
                           ),
-                          Expanded(
-                            child: RadioListTile<String>(
-                              title: Text("Amount"),
-                              value: "amount",
-                              groupValue: c.feeType.value,
-                              onChanged: (val) => c.feeType.value = val!,
-                              contentPadding: EdgeInsets.zero,
-                              dense: true,
-                            ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Text("Amount"),
+                            value: "amount",
+                            groupValue: c.feeType.value,
+                            onChanged: (val) => c.feeType.value = val!,
+                            contentPadding: EdgeInsets.zero,
+                            dense: true,
                           ),
-                        ],
-                      )),
+                        ),
+                      ],
+                    ),
+                  ),
 
                   SizedBox(height: 8),
 
                   /// 💰 INPUT FIELD
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 150),
-                    child: Obx(
-                      () => CustomWidgets().dropdownStyledTextField(
-                        context: ctx,
-                        hint: c.feeType.value == "percentage" ? '0%' : '₹0.0',
-                        controller: c.regFeeController,
-                      ),
+                  Obx(
+                    () => CustomWidgets().dropdownStyledTextField(
+                      context: ctx,
+                      icon: c.feeType.value == "percentage"
+                          ? Icons.percent
+                          : Icons.currency_rupee,
+                      hint: c.feeType.value == "percentage" ? '0%' : '₹0.0',
+                      controller: c.taxController,
                     ),
                   ),
 
                   SizedBox(height: 14),
 
                   /// 🔁 STATUS TOGGLE
-                  Obx(() => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Status",
-                            style: Get.textTheme.titleSmall,
-                          ),
-                          Row(
-                            children: [
-                              ChoiceChip(
-                                label: Text("Active"),
-                                selected: c.status.value == "active",
-                                onSelected: (_) => c.status.value = "active",
+                  Obx(
+                    () => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Status",
+                          style: Get.textTheme.titleSmall,
+                        ),
+                        Row(
+                          children: [
+                            ChoiceChip(
+                              selectedColor: Theme.of(ctx)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.12),
+
+                              // 👇 default background
+                              backgroundColor: Colors.transparent,
+
+                              // 👇 border styling
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                  color: (c.status.value == "active")
+                                      ? Theme.of(ctx).colorScheme.primary
+                                      : Theme.of(ctx)
+                                          .colorScheme
+                                          .outline
+                                          .withOpacity(0.5),
+                                  width: 0.6, // 👈 reduced border width
+                                ),
                               ),
-                              SizedBox(width: 8),
-                              ChoiceChip(
-                                label: Text("Inactive"),
-                                selected: c.status.value == "inactive",
-                                onSelected: (_) => c.status.value = "inactive",
+                              labelStyle: Theme.of(ctx)
+                                  .textTheme
+                                  .labelMedium!
+                                  .copyWith(
+                                      color: (c.status.value == "active")
+                                          ? Theme.of(ctx).colorScheme.primary
+                                          : Colors.black87),
+                              label: Text("Active"),
+                              selected: c.status.value == "active",
+                              onSelected: (_) => c.status.value = "active",
+                            ),
+                            SizedBox(width: 8),
+                            ChoiceChip(
+                              selectedColor: Theme.of(ctx)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.12),
+
+                              // 👇 default background
+                              backgroundColor: Colors.transparent,
+
+                              // 👇 border styling
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                  color: (c.status.value == "active")
+                                      ? Theme.of(ctx).colorScheme.primary
+                                      : Theme.of(ctx)
+                                          .colorScheme
+                                          .outline
+                                          .withOpacity(0.5),
+                                  width: 0.6, // 👈 reduced border width
+                                ),
                               ),
-                            ],
-                          ),
-                        ],
-                      )),
+                              labelStyle: Theme.of(ctx)
+                                  .textTheme
+                                  .labelMedium!
+                                  .copyWith(
+                                      color: (c.status.value == "active")
+                                          ? Theme.of(ctx).colorScheme.primary
+                                          : Colors.black87),
+
+                              label: Text("Inactive"),
+                              selected: c.status.value == "inactive",
+                              onSelected: (_) => c.status.value = "inactive",
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 12),
+
+                  /// LAST UPDATED
+                  Text(
+                    updatedAt != null
+                        ? 'Last updated: ${DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.parse(updatedAt))}'
+                        : 'Last updated: --',
+                  ),
                 ],
               )
             ],
-            onSubmit: () {},
+            onSubmit: () {
+              final value = double.tryParse(c.taxController.text) ?? 0;
+              c.updateSalaryInvoiceTax(
+                  isEnabled: (c.status.value == 'inactive') ? false : true,
+                  taxType: (c.feeType.value == 'percentage')
+                      ? 'PERCENTAGE'
+                      : 'AMOUNT',
+                  value: value.toInt());
+            },
           );
         }),
       ],
@@ -193,32 +345,69 @@ class GeneralPage extends StatelessWidget {
       title: "Academic Setup",
       icon: Icons.school,
       items: [
-        _Item(
-            "Syllabus", Icons.menu_book, (ctx) => Get.to(() => SyllabusPage())),
-        _Item("Course", Icons.book, (ctx) => Get.to(() => CoursePage())),
-        _Item("Package", Icons.inventory, (ctx) => Get.to(() => PackagePage())),
-        _Item(
-            "Category", Icons.category, (ctx) => Get.to(() => CategoryPage())),
-        _Item("Standard", Icons.class_, (ctx) => Get.to(() => StandardPage())),
+        _Item("Syllabus", Icons.menu_book, (ctx) async {
+          final c = Get.find<SettingsController>();
+
+          await c.getSyllabuses();
+
+          return Get.to(() => SyllabusPage());
+        }),
+        _Item("Course", Icons.book, (ctx) async {
+          final c = Get.find<SettingsController>();
+          await c.getCourses();
+
+          return Get.to(() => CoursePage());
+        }),
+        _Item("Package", Icons.inventory, (ctx) async {
+          final c = Get.find<SettingsController>();
+          await c.getPackageNames();
+
+          return Get.to(() => PackagePage());
+        }),
+        _Item("Category", Icons.category, (ctx) async {
+          final c = Get.find<SettingsController>();
+          await c.getCategories();
+
+          return Get.to(() => CategoryPage());
+        }),
+        _Item("Standard", Icons.class_, (ctx) async {
+          final c = Get.find<SettingsController>();
+          await c.getStandards();
+
+          return Get.to(() => StandardPage());
+        }),
       ],
     ),
     _Section(
       title: "User & Support",
       icon: Icons.support_agent,
       items: [
-        _Item("Support Category", Icons.headset_mic,
-            (ctx) => Get.to(SupportCategoryPage())),
-        _Item("Referral", Icons.share, (ctx) => Get.to(ReferralSourcePage())),
+        _Item("Support Category", Icons.headset_mic, (ctx) async {
+          final c = Get.find<SettingsController>();
+          await c.getSupportCategories();
+          return Get.to(SupportCategoryPage());
+        }),
+        _Item("Referral", Icons.share, (ctx) async {
+          final c = Get.find<SettingsController>();
+          await c.getReferralSources();
+          return Get.to(ReferralSourcePage());
+        }),
       ],
     ),
     _Section(
       title: "System Rules",
       icon: Icons.rule,
       items: [
-        _Item("Completion Deadline", Icons.timer,
-            (ctx) => Get.to(() => DeadlinePage())),
-        _Item("Assessment Questions", Icons.help_outline,
-            (ctx) => Get.to(() => AssessmentAttentionQuestionPage())),
+        _Item("Completion Deadline", Icons.timer, (ctx) async {
+          final c = Get.find<SettingsController>();
+          await c.getCompletionDeadlineSettings();
+          return Get.to(() => DeadlinePage());
+        }),
+        _Item("Assessment Questions", Icons.help_outline, (ctx) async {
+          final c = Get.find<SettingsController>();
+          await c.getAssessmentQuestions();
+          return Get.to(() => AssessmentAttentionQuestionPage());
+        }),
       ],
     ),
     _Section(

@@ -891,6 +891,24 @@ class CoordinatorDetailedPage extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: IconButton(
                         onPressed: () => CustomWidgets().showDeleteDialog(
+                          dltText: Obx(
+  () => c.isLoading.value
+      ? const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+      : Text(
+          "Yes",
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: Colors.white),
+        ),
+),
                           title: 'Confirm Action',
                           context: context,
                           text:

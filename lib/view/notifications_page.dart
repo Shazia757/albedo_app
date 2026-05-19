@@ -132,7 +132,6 @@ class NotificationCard extends StatelessWidget {
         highlightColor: Colors.transparent,
         onTap: () {
           CustomWidgets().showCustomDialog(
-            
             context: context,
             title: Text(data.title ?? "Notification"),
             formKey: GlobalKey(),
@@ -178,11 +177,12 @@ class NotificationCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        data.date != null
+                        data.dateAdded != ''
                             ? DateFormat(
                                 "dd MMM yyyy • hh:mm a",
                               ).format(
-                                data.date ?? DateTime.now(),
+                                DateTime.tryParse(data.dateAdded) ??
+                                    DateTime.now(),
                               )
                             : "No Date",
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
@@ -256,11 +256,11 @@ class NotificationCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    data.date != null
+                    data.dateAdded != ''
                         ? DateFormat(
                             "dd MMM yyyy • hh:mm a",
                           ).format(
-                            data.date ?? DateTime.now(),
+                            DateTime.tryParse(data.dateAdded) ?? DateTime.now(),
                           )
                         : "No Date",
                     style: Theme.of(context).textTheme.labelSmall!.copyWith(

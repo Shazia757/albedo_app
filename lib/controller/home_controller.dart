@@ -522,27 +522,27 @@ class HomeController extends GetxController {
 
   List<HiringView> getDummyHiring() {
     return [
-      HiringView(
-          teacher: Teacher(
-            id: "T01",
-            name: "Ameen",
-            status: "Active",
-            gender: "Male",
-            joinedAt: DateTime.now(),
-          ),
-          ad: HiringAd(
-            package: "Mathematics - Class 10",
-            image: "https://picsum.photos/400/200",
-            startDate: "May 1",
-            endDate: "May 30",
-            time: "10:00 AM - 11:00 AM",
-            days: [Days.monday, Days.friday],
-          ),
-          response: HiringResponse(
-              adId: '',
-              teacherId: '',
-              status: '',
-              respondedAt: DateTime.now())),
+      //   HiringView(
+      //       teacher: Teacher(
+      //         id: "T01",
+      //         name: "Ameen",
+      //         status: "Active",
+      //         gender: "Male",
+      //         joinedAt: DateTime.now(),
+      //       ),
+      //       // ad: HiringAd(
+      //       //   package: "Mathematics - Class 10",
+      //       //   image: "https://picsum.photos/400/200",
+      //       //   startDate: "May 1",
+      //       //   endDate: "May 30",
+      //       //   time: "10:00 AM - 11:00 AM",
+      //       //   days: [Days.monday, Days.friday],
+      //       // ),
+      //       response: HiringResponse(
+      //           adId: '',
+      //           teacherId: '',
+      //           status: '',
+      //           respondedAt: DateTime.now())),
     ];
   }
 

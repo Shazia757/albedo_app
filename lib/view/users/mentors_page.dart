@@ -252,7 +252,9 @@ class MentorsPage extends StatelessWidget {
                   color: cs.primary,
                 ),
                 tooltip: "Bulk Upload",
-                onPressed: () => Get.to(() => BulkUploadPage()),
+                onPressed: () {
+                  // Get.to(() => BulkUploadPage());
+                },
               ),
             ],
           ),

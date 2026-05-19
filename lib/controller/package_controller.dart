@@ -103,57 +103,52 @@ class PackageController extends GetxController {
     }
   }
 
- void loadPackage(Package package) {
-  selectedType.value =  'package';
+  void loadPackage(Package package) {
+    selectedType.value = 'package';
 
-  selectedPackage.value = package;
-  selectedCourse.value = package.course;
-  selectedSyllabus.value = package.syllabus;
-  selectedCategory.value = package.category;
-  selectedStandard.value = package.standard;
+    selectedPackage.value = package;
+    selectedCourse.value = package.course;
+    selectedSyllabus.value = package.syllabus;
+    selectedCategory.value = package.category;
+    selectedStandard.value = package.standard;
 
-  classCountController.text =
-      package.numberOfClasses?.toString() ?? '';
+    classCountController.text = package.numberOfClasses?.toString() ?? '';
 
-  timeController.text = package.time ?? '';
+    timeController.text = package.time ?? '';
 
-  selectedDuration.value = package.duration;
+    selectedDuration.value = package.duration;
 
-  durationDaysController.text =
-      package.durationDays?.toString() ?? '';
+    durationDaysController.text = package.durationDays?.toString() ?? '';
 
-  studentFeeController.text =
-      package.studentFeePerHour?.toString() ?? '';
+    studentFeeController.text = package.studentFeePerHour?.toString() ?? '';
 
-  totalPackageFeeController.text =
-      package.packageFee?.toString() ?? '';
+    totalPackageFeeController.text = package.packageFee?.toString() ?? '';
 
-  selectedTuitionMode.value = package.mode;
+    selectedTuitionMode.value = package.mode;
 
-  selectedTeacher.value = package.teacher;
+    selectedTeacher.value = package.teacher;
 
-  salaryController.text =
-      package.teacherSalaryPerHour?.toString() ?? '';
+    salaryController.text = package.teacherSalaryPerHour?.toString() ?? '';
 
-  if (package.days != null) {
-    selectedDateType.value = 'regular';
+    if (package.days != null) {
+      selectedDateType.value = 'regular';
 
-    selectedDays.clear();
+      selectedDays.clear();
 
-    /// if single enum
-    selectedDays.add(package.days!);
+      /// if single enum
+      selectedDays.add(package.days!);
 
-    /// if ALL selected
-    if (package.days == Days.all) {
-      selectedDays.assignAll(Days.values);
+      /// if ALL selected
+      if (package.days == Days.all) {
+        selectedDays.assignAll(Days.values);
+      }
+    }
+
+    if ((package.couponCode ?? '').isNotEmpty) {
+      applyCoupon.value = true;
+      couponController.text = package.couponCode!;
     }
   }
-
-  if ((package.couponCode ?? '').isNotEmpty) {
-    applyCoupon.value = true;
-    couponController.text = package.couponCode!;
-  }
-}
 
   void applyFilters() {
     final status = statusMap[selectedTab.value];
@@ -446,17 +441,17 @@ class PackageController extends GetxController {
         student: Student(
             studentId: "ST07",
             name: "Sneha",
-            assessment: [
-              Assessment(
-                  id: "A001",
-                  type: "Monthly Academic Assessment",
-                  testType: ["academic", "maths", "basics"],
-                  date: "06 May 2026",
-                  attentionQuestions: ["Focus", "Listening", "Participation"],
-                  attentionData: [
-                    AttentionItem(mark: '10', question: 'Focus', rating: 2)
-                  ]),
-            ],
+            // assessment: [
+            //   Assessment(
+            //       id: "A001",
+            //       type: "Monthly Academic Assessment",
+            //       testType: ["academic", "maths", "basics"],
+            //       date: "06 May 2026",
+            //       attentionQuestions: ["Focus", "Listening", "Participation"],
+            //       attentionData: [
+            //         AttentionItem(mark: '10', question: 'Focus', rating: 2)
+            //       ]),
+            // ],
             joinedAt: DateTime.now(),
             packages: [
               Package(

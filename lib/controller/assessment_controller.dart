@@ -86,24 +86,24 @@ final academicSubjects = <AcademicData>[].obs;
 
   void addAssessment() {}
 
-  void initForEdit(Assessment? assessment) {
-  if (assessment == null) return;
+//   void initForEdit(Assessment? assessment) {
+//   if (assessment == null) return;
 
-  selectedAssessment.value = assessment.type??'';
+//   selectedAssessment.value = assessment.type??'';
 
-  parentOpinionController.text = assessment.parentOpinion ?? "";
-  assessmentSummaryController.text = assessment.summary ?? "";
+//   parentOpinionController.text = assessment.parentOpinion ?? "";
+//   assessmentSummaryController.text = assessment.summary ?? "";
 
-  // Load dynamic lists safely
-  academicSubjects.assignAll(assessment.academicData ?? []);
-  languages.assignAll(assessment.languages ?? []);
-  mathTopics.assignAll(assessment.mathsData ?? []);
-  subjects.assignAll(assessment.subjectsData ?? []);
-  keypoints.assignAll(assessment.keypoints ?? []);
+//   // Load dynamic lists safely
+//   academicSubjects.assignAll(assessment.academicData ?? []);
+//   languages.assignAll(assessment.languages ?? []);
+//   mathTopics.assignAll(assessment.mathsData ?? []);
+//   subjects.assignAll(assessment.subjectsData ?? []);
+//   keypoints.assignAll(assessment.keypoints ?? []);
 
-  // attention
-  // attentionRatings.addAll(assessment.attentionRatings ?? {});
-}
+//   // attention
+//   // attentionRatings.addAll(assessment.attentionRatings ?? {});
+// }
 
   updateAssessment() {}
 }

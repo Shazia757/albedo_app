@@ -13,6 +13,7 @@ import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 extension PackageCalculations on Package {
   double get totalTeacherSalary {
@@ -1142,7 +1143,11 @@ class BatchDetailsPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      assessment.type ?? "Assessment",
+                      assessment.testTypes
+          ?.map((e) => e.name)
+          .where((e) => e != null && e.isNotEmpty)
+          .join(', ') ??
+      '-',
                       style: Get.textTheme.titleMedium,
                     ),
                   ),
@@ -1176,7 +1181,8 @@ class BatchDetailsPage extends StatelessWidget {
                       Icon(Icons.calendar_today, size: 16, color: cs.primary),
                       SizedBox(width: 6),
                       Text(
-                        assessment.date ?? "-",
+                        DateFormat('dd MMM yyyy • hh:mm a')
+      .format(assessment.dateAdded!),
                         style: Get.textTheme.titleSmall,
                       ),
                     ],

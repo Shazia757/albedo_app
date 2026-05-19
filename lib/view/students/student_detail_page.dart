@@ -15,6 +15,7 @@ import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 // ─── Color tokens (from your theme) ─────────────────────────
 const _blue = Color(0xFF058DCE);
@@ -147,10 +148,12 @@ class StudentDetailsPage extends StatelessWidget {
                   }),
                 ],
                 submitWidget: Text(
-      "Continue",
-      style:
-          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
+                  "Continue",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Colors.white),
+                ),
                 onSubmit: () {
                   FocusScope.of(context).unfocus();
 
@@ -865,9 +868,9 @@ class StudentDetailsPage extends StatelessWidget {
                 onTap: (i) => c.feedbackTabIndex.value = i,
               ),
             )),
-    
+
         const SizedBox(height: 12),
-    
+
         // ── FEEDBACK LIST ─────────────────────────────────
         Expanded(
           child: Obx(() {
@@ -875,7 +878,7 @@ class StudentDetailsPage extends StatelessWidget {
             final feedbacks =
                 isTeacher ? c.teacherFeedbacks : c.mentorFeedbacks;
             final label = isTeacher ? 'teacher' : 'mentor';
-    
+
             if (feedbacks.isEmpty) {
               return Center(
                 child: EmptyState(
@@ -886,7 +889,7 @@ class StudentDetailsPage extends StatelessWidget {
                 ),
               );
             }
-    
+
             return ListView.separated(
               itemCount: feedbacks.length,
               separatorBuilder: (_, __) => const SizedBox(height: 10),
@@ -1089,6 +1092,24 @@ class StudentDetailsPage extends StatelessWidget {
 
                           case "delete":
                             CustomWidgets().showDeleteDialog(
+                              dltText: Obx(
+  () => c.isLoading.value
+      ? const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+      : Text(
+          "Yes",
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: Colors.white),
+        ),
+),
                               context: context,
                               title: 'Are you sure?',
                               text:
@@ -1579,7 +1600,12 @@ class StudentDetailsPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(assessment.type ?? 'Assessment',
+                        Text(
+                            assessment.testTypes
+                                    ?.map((e) => e.name)
+                                    .where((e) => e != null && e.isNotEmpty)
+                                    .join(', ') ??
+                                '-',
                             style: Get.textTheme.titleMedium),
                         SizedBox(height: 4),
                         Row(
@@ -1587,9 +1613,14 @@ class StudentDetailsPage extends StatelessWidget {
                             Icon(Icons.calendar_today_outlined,
                                 size: 12, color: cs.outline),
                             SizedBox(width: 4),
-                            Text(assessment.date ?? '-',
-                                style: Get.textTheme.bodySmall!
-                                    .copyWith(color: cs.outline)),
+                            Text(
+                              DateFormat('dd MMM yyyy • hh:mm a')
+                                  .format(assessment.dateAdded!),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(color: cs.outline),
+                            ),
                             SizedBox(width: 12),
                             Icon(Icons.schedule_outlined,
                                 size: 12, color: cs.outline),
@@ -1611,6 +1642,24 @@ class StudentDetailsPage extends StatelessWidget {
                       icon:
                           Icon(Icons.delete_outline, size: 18, color: cs.error),
                       onPressed: () => CustomWidgets().showDeleteDialog(
+                        dltText: Obx(
+  () => c.isLoading.value
+      ? const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+      : Text(
+          "Yes",
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: Colors.white),
+        ),
+),
                             context: context,
                             title: 'Are you sure?',
                             text:

@@ -770,7 +770,7 @@ Widget hiringCard(BuildContext context, HiringView item) {
             children: [
               /// 🔹 SUBJECT / PACKAGE
               Text(
-                ad.package,
+                ad.package??"",
                 style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -793,10 +793,12 @@ Widget hiringCard(BuildContext context, HiringView item) {
                 children: [
                   Icon(Icons.calendar_today, size: 14, color: cs.outline),
                   SizedBox(width: 4),
-                  Text(
-                    "${ad.startDate ?? "-"} → ${ad.endDate ?? "-"}",
-                    style: context.textTheme.labelSmall,
-                  ),
+               Text(
+  "${ad.fromDate != null ? DateFormat('dd MMM yyyy').format(ad.fromDate!) : "-"} "
+  "→ "
+  "${ad.toDate != null ? DateFormat('dd MMM yyyy').format(ad.toDate!) : "-"}",
+  style: context.textTheme.labelSmall,
+),
                 ],
               ),
 
@@ -816,11 +818,11 @@ Widget hiringCard(BuildContext context, HiringView item) {
               SizedBox(height: 8),
 
               /// 🔹 DAYS
-              if (ad.days != null && ad.days!.isNotEmpty)
+              if (ad.regularDays != null && ad.regularDays!.isNotEmpty)
                 Wrap(
                   spacing: 6,
                   children:
-                      ad.days!.map((d) => dayChip(context, d.name)).toList(),
+                      ad.regularDays!.map((d) => dayChip(context, d)).toList(),
                 ),
 
               SizedBox(height: 10),

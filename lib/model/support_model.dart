@@ -38,14 +38,35 @@ class Macro {
   final String id;
   final String title;
   final String description;
+  final DateTime? dateAdded;
 
   Macro({
     required this.id,
     required this.title,
     required this.description,
+    this.dateAdded,
   });
-}
 
+  factory Macro.fromJson(Map<String, dynamic> json) {
+    return Macro(
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      dateAdded: json['date_added'] != null
+          ? DateTime.tryParse(json['date_added'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'date_added': dateAdded?.toIso8601String(),
+    };
+  }
+}
 class Reply {
   final String id;
   final String message;

@@ -20,12 +20,12 @@ class AddAssessmentPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     bool initialized = false;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!initialized) {
-        c.initForEdit(assessment);
-        initialized = true;
-      }
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (!initialized) {
+    //     c.initForEdit(assessment);
+    //     initialized = true;
+    //   }
+    // });
 
     return Scaffold(
       appBar: CustomAppBar(),

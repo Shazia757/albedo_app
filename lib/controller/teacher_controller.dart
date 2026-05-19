@@ -496,6 +496,24 @@ class TeacherController extends GetxController {
 
     if (user?.role == "coordinator") {
       CustomWidgets().showDeleteDialog(
+        dltText: Obx(
+  () => isLoading.value
+      ? const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+      : Text(
+          "Yes",
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: Colors.white),
+        ),
+),
         title: 'Are you sure?',
         context: context,
         text: "Do you want to request deletion of this teacher?",
@@ -503,6 +521,24 @@ class TeacherController extends GetxController {
       );
     } else {
       CustomWidgets().showDeleteDialog(
+        dltText: Obx(
+  () => isLoading.value
+      ? const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+      : Text(
+          "Yes",
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(color: Colors.white),
+        ),
+),
         title: 'Are you sure?',
         context: context,
         text: "Are you sure you want to delete this teacher permanently?",

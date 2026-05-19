@@ -5,74 +5,86 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class TermsPage extends StatelessWidget {
-  final c = Get.put(SettingsController());
-
   TermsPage({super.key});
+
+  final SettingsController c = Get.find<SettingsController>();
 
   @override
   Widget build(BuildContext context) {
-    final termsList = [
-      TermsItem("Student", c.studentTermsController),
-      TermsItem("Teacher", c.teacherTermsController),
-      TermsItem("Mentor", c.mentorTermsController),
-      TermsItem("Coordinator", c.coordinatorTermsController),
-      TermsItem("Other", c.otherTermsController),
-    ];
+    final termsList = <TermsItem>[
+      TermsItem('Student', 'STUDENT', c.studentTermsController),
+      TermsItem('Teacher', 'TEACHER', c.teacherTermsController),
+      TermsItem('Mentor', 'MENTOR', c.mentorTermsController),
+      TermsItem('Coordinator', 'COORDINATOR', c.coordinatorTermsController),
+      TermsItem('Other', 'OTHER', c.otherTermsController),
+    ].obs;
 
-    return CrudPage<TermsItem>(
-      title: "Terms & Conditions",
+    return CrudPage(
+      title: 'Terms & Conditions',
       items: termsList,
-      enableAdd: false, // 🚫 no add
-
+      enableAdd: false,
       itemBuilder: (item, i) {
         return ViewEditTile(
           value: item.title,
           icon: Icons.policy,
-          onEdit: () {
-            CustomWidgets().showCustomDialog(
-              context: context,
-              title: Text('Edit ${item.title}'),
-              formKey: GlobalKey<FormState>(),
-              sections: [
-                CustomWidgets().dropdownStyledTextField(
-                  context: context,
-                  hint: 'Edit Terms',
-                  isMultiline: true,
-                  controller: item.controller,
-                )
-              ],
-              onSubmit: () {
-                // optional save logic
-                Get.back();
-              },
-            );
-          },
-          onTap: () {
-            CustomWidgets().showCustomDialog(
-              context: context,
-              title: Text(item.title),
-              formKey: GlobalKey<FormState>(),
-              sections: [
-                Text(item.controller.text.isEmpty
-                    ? "No content"
-                    : item.controller.text)
-              ],
-              onSubmit: () {},
-            );
-          },
+          onEdit: () => _openEditDialog(context, item),
         );
       },
-
       onAdd: (_) async {},
       onUpdate: (_, __) async {},
       onDelete: (_) async {},
     );
   }
+
+  Future<void> _openEditDialog(BuildContext context, TermsItem item) async {
+    await c.getTerms(item.userType, item.id, item.controller);
+
+  
+
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text('Edit ${item.title}'),
+      icon: Icons.edit_rounded,
+      formKey: GlobalKey<FormState>(),
+      submitWidget: Obx(
+        () => c.isLoading.value
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : const Text(
+                'Update',
+                style: TextStyle(color: Colors.white),
+              ),
+      ),
+      sections: [
+        CustomWidgets().dropdownStyledTextField(
+          context: context,
+          hint: 'Edit Terms',
+          isMultiline: true,
+          controller: item.controller,
+        ),
+      ],
+      onSubmit: () {
+        c.updateTerms(
+          id: item.id.value,
+          content: item.controller.text,
+          userType: item.userType,
+        );
+      },
+    );
+  }
 }
 
 class TermsItem {
+  final RxString id = ''.obs;
   final String title;
+  final String userType;
   final TextEditingController controller;
 
-  TermsItem(this.title, this.controller);
+  TermsItem(this.title, this.userType, this.controller);
 }

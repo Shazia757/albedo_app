@@ -1,15 +1,17 @@
+import 'package:albedo_app/controller/settings_controller.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:get/get.dart';
 
 /// ==============================
 /// GENERIC CRUD PAGE
 /// ==============================
 class CrudPage<T> extends StatelessWidget {
   final String title;
-  final List<T> items;
+  final RxList<T> items;
   final Widget Function(T item, int index) itemBuilder;
   final Future<void> Function(String value) onAdd;
   final Future<void> Function(int index, String value) onUpdate;
@@ -65,14 +67,14 @@ class CrudPage<T> extends StatelessWidget {
                   child: Text(
                     title,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                        fontWeight: FontWeight.w700, color: cs.primary),
                   ),
                 ),
 
                 /// ── CONTENT ────────────────────────
                 Expanded(
-                  child: items.isEmpty
+                    child: Obx(
+                  () => items.isEmpty
                       ? _EmptyState(
                           onAdd: enableAdd ? () => _openAdd(context) : null,
                         )
@@ -109,7 +111,7 @@ class CrudPage<T> extends StatelessWidget {
                             );
                           },
                         ),
-                ),
+                )),
               ],
             ),
           ),
@@ -121,42 +123,46 @@ class CrudPage<T> extends StatelessWidget {
   void _openAdd(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     final ctrl = TextEditingController();
+    final controller = Get.find<SettingsController>();
 
-    showDialog(
+    CustomWidgets().showCustomDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        title: Text(
-          'Add Item',
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        content: Form(
-          key: formKey,
-          child: CustomWidgets().dropdownStyledTextField(
-            context: context,
-            controller: ctrl,
-            hint: 'Enter value',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
-          ),
-          FilledButton.icon(
-            onPressed: () async {
-              if (formKey.currentState?.validate() != true) return;
-
-              await onAdd(ctrl.text.trim());
-
-              Navigator.pop(context);
-            },
-            label: Text('Add'),
-          )
-        ],
+      title: const Text('Add Item'),
+      icon: Icons.add_rounded,
+      formKey: formKey,
+      submitWidget: Obx(
+        () => controller.isLoading.value
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : const Text(
+                'Add',
+                style: TextStyle(color: Colors.white),
+              ),
       ),
+      sections: [
+        CustomWidgets().dropdownStyledTextField(
+          context: context,
+          controller: ctrl,
+          hint: 'Enter value',
+        ),
+      ],
+      onSubmit: () async {
+        final value = ctrl.text.trim();
+
+        if (value.isEmpty) return;
+
+        await onAdd(value);
+
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+      },
     );
   }
 }
@@ -227,11 +233,12 @@ class _EmptyState extends StatelessWidget {
 /// ==============================
 /// EDITABLE TILE
 /// ==============================
-class EditableTile extends StatefulWidget {
+class EditableTile extends StatelessWidget {
   final String value;
-  final ValueChanged<String> onSave;
+  final Future<void> Function(String value) onSave;
   final VoidCallback? onDelete;
   final IconData icon;
+  final String editTitle;
 
   const EditableTile({
     super.key,
@@ -239,60 +246,56 @@ class EditableTile extends StatefulWidget {
     required this.onSave,
     this.onDelete,
     required this.icon,
+    this.editTitle = 'Edit Item',
   });
 
-  @override
-  State<EditableTile> createState() => _EditableTileState();
-}
+  void _openEdit(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
+    final ctrl = TextEditingController(text: value);
+    final controller = Get.find<SettingsController>();
 
-class _EditableTileState extends State<EditableTile> {
-  late TextEditingController _ctrl;
+    CustomWidgets().showCustomDialog(
+      context: context,
+      title: Text(editTitle),
+      icon: Icons.edit_rounded,
+      formKey: formKey,
+      submitWidget: Obx(
+        () => controller.isLoading.value
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : const Text(
+                'Save',
+                style: TextStyle(color: Colors.white),
+              ),
+      ),
+      sections: [
+        CustomWidgets().dropdownStyledTextField(
+          context: context,
+          controller: ctrl,
+          hint: 'Enter value',
+        ),
+      ],
+      onSubmit: () {
+        final v = ctrl.text.trim();
 
-  bool _editing = false;
+        if (v.isEmpty) return;
 
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = TextEditingController(text: widget.value);
-  }
-
-  @override
-  void didUpdateWidget(covariant EditableTile oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (!_editing && oldWidget.value != widget.value) {
-      _ctrl.text = widget.value;
-    }
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  void _save() {
-    final v = _ctrl.text.trim();
-
-    if (v.isEmpty) return;
-
-    widget.onSave(v);
-
-    setState(() => _editing = false);
-  }
-
-  void _cancel() {
-    _ctrl.text = widget.value;
-
-    setState(() => _editing = false);
+        onSave(v);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
+    return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: cs.onPrimary,
@@ -318,73 +321,38 @@ class _EditableTileState extends State<EditableTile> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
-              widget.icon,
+              icon,
               color: cs.primary,
             ),
           ),
           SizedBox(width: 14),
           Expanded(
-            child: _editing
-                ? TextField(
-                    controller: _ctrl,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: 'Enter value',
-                      filled: true,
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    onSubmitted: (_) => _save(),
-                  )
-                : Text(
-                    widget.value,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall!
-                        .copyWith(color: cs.onSurface),
-                  ),
+            child: Text(
+              value,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall!
+                  .copyWith(color: cs.onSurface),
+            ),
           ),
           SizedBox(width: 8),
-          if (_editing) ...[
-            IconButton(
-              tooltip: 'Save',
-              icon: Icon(
-                Icons.check_circle_rounded,
-                color: Colors.green.shade600,
-              ),
-              onPressed: _save,
+          IconButton(
+            tooltip: 'Edit',
+            icon: Icon(
+              Icons.edit_rounded,
+              color: cs.primary,
             ),
+            onPressed: () => _openEdit(context),
+          ),
+          if (onDelete != null)
             IconButton(
-              tooltip: 'Cancel',
-              icon: Icon(
-                Icons.cancel_rounded,
-                color: cs.outline,
+              tooltip: 'Delete',
+              icon: const Icon(
+                Icons.delete_rounded,
+                color: Colors.red,
               ),
-              onPressed: _cancel,
+              onPressed: onDelete,
             ),
-          ] else ...[
-            IconButton(
-              tooltip: 'Edit',
-              icon: Icon(
-                Icons.edit_rounded,
-                color: cs.primary,
-              ),
-              onPressed: () {
-                setState(() => _editing = true);
-              },
-            ),
-            if (widget.onDelete != null)
-              IconButton(
-                tooltip: 'Delete',
-                icon: const Icon(
-                  Icons.delete_rounded,
-                  color: Colors.red,
-                ),
-                onPressed: widget.onDelete,
-              ),
-          ]
         ],
       ),
     );

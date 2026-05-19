@@ -472,6 +472,7 @@ class CustomWidgets {
     required BuildContext context,
     required String title,
     required String text,
+    required Widget dltText,
     required VoidCallback onConfirm,
   }) {
     final cs = Theme.of(context).colorScheme;
@@ -580,13 +581,7 @@ class CustomWidgets {
                         ),
                         elevation: 0,
                       ),
-                      child: Text(
-                        "Yes",
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall!
-                            .copyWith(color: Colors.white),
-                      ),
+                      child: dltText
                     ),
                   ),
                 ],
@@ -1321,7 +1316,7 @@ class CustomWidgets {
     required List<Widget> sections,
     required VoidCallback onSubmit,
     bool isViewOnly = false,
-     Widget? submitWidget,
+    Widget? submitWidget,
   }) {
     final cs = Theme.of(context).colorScheme;
     Get.dialog(
@@ -1581,6 +1576,7 @@ class CustomWidgets {
     required BuildContext context,
     required String hint,
     String? label,
+    IconData? icon,
     TextEditingController? controller,
     int? minlines,
     bool isMultiline = false,
@@ -1628,6 +1624,7 @@ class CustomWidgets {
       textInputAction:
           isMultiline ? TextInputAction.newline : TextInputAction.done,
       decoration: InputDecoration(
+        prefixIcon: (icon != null) ? Icon(icon) : null,
         labelText: label,
         hintText: hint,
         hintStyle: textTheme.bodySmall?.copyWith(
