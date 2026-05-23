@@ -99,25 +99,26 @@ class CompletionDeadline {
         .toList();
   }
 
-CompletionDeadline copyWith({
-  String? id,
-  String? role,
-  String? deadlineType,
-  int? value,
-  bool? isActive,
-  DateTime? dateAdded,
-  DateTime? dateUpdated,
-}) {
-  return CompletionDeadline(
-    id: id ?? this.id,
-    role: role ?? this.role,
-    deadlineType: deadlineType ?? this.deadlineType,
-    value: value ?? this.value,
-    isActive: isActive ?? this.isActive,
-    dateAdded: dateAdded ?? this.dateAdded,
-    dateUpdated: dateUpdated ?? this.dateUpdated,
-  );
-}}
+  CompletionDeadline copyWith({
+    String? id,
+    String? role,
+    String? deadlineType,
+    int? value,
+    bool? isActive,
+    DateTime? dateAdded,
+    DateTime? dateUpdated,
+  }) {
+    return CompletionDeadline(
+      id: id ?? this.id,
+      role: role ?? this.role,
+      deadlineType: deadlineType ?? this.deadlineType,
+      value: value ?? this.value,
+      isActive: isActive ?? this.isActive,
+      dateAdded: dateAdded ?? this.dateAdded,
+      dateUpdated: dateUpdated ?? this.dateUpdated,
+    );
+  }
+}
 
 class AssessmentAttentionQns {
   final String? id;

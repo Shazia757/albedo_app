@@ -82,10 +82,16 @@ class BatchDetailedPage extends StatelessWidget {
                 SizedBox(height: 10),
                 CustomWidgets().labelWithAsterisk('Upload Payment Receipt'),
                 SizedBox(height: 10),
-                CustomWidgets().attachmentStyledField(
-                  context: context,
-                  hint: 'Upload Payment Receipt',
-                ),
+         CustomWidgets().mediaPickerField(
+  context: context,
+  // fileName: c.selectedMedia.value?.path.split('/').last,
+  onTap: () async {
+    // await c.pickMedia();
+  },
+  onClear: () {
+    // c.selectedMedia.value = null;
+  },
+),
               ],
                submitWidget: Text(
       "Assign",
@@ -196,8 +202,16 @@ class BatchDetailedPage extends StatelessWidget {
                         children: [
                           CustomWidgets().labelWithAsterisk('Upload file'),
                           SizedBox(height: 10),
-                          CustomWidgets().attachmentStyledField(
-                              context: context, hint: 'Click to upload')
+                        CustomWidgets().mediaPickerField(
+  context: context,
+  // fileName: c.selectedMedia.value?.path.split('/').last,
+  onTap: () async {
+    // await c.pickMedia();
+  },
+  onClear: () {
+    // c.selectedMedia.value = null;
+  },
+),
                         ],
                       );
                     }

@@ -1,11 +1,13 @@
+import 'package:albedo_app/controller/settings_controller.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class BackupPage extends StatelessWidget {
   BackupPage({super.key});
 
-  final emailCtrl = TextEditingController();
+  final SettingsController c = Get.find<SettingsController>();
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +83,7 @@ class BackupPage extends StatelessWidget {
                 /// ── EMAIL FIELD ─────────────────
                 CustomWidgets().dropdownStyledTextField(
                   context: context,
-                  controller: emailCtrl,
+                  controller: c.emailCtrl,
                   hint: "Enter your email",
                 ),
 
@@ -92,8 +94,30 @@ class BackupPage extends StatelessWidget {
                   width: double.infinity,
                   height: 54,
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      /// backup logic
+                    onPressed: () async {
+                      final email = c.emailCtrl.text.trim();
+
+                      if (email.isEmpty) {
+                        Get.snackbar(
+                          "Error",
+                          "Email is required",
+                        );
+                        return;
+                      }
+
+                      final emailRegex = RegExp(
+                        r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$',
+                      );
+
+                      if (!emailRegex.hasMatch(email)) {
+                        Get.snackbar(
+                          "Error",
+                          "Enter a valid email address",
+                        );
+                        return;
+                      }
+
+                      await c.backup(email);
                     },
                     style: ElevatedButton.styleFrom(
                       elevation: 0,

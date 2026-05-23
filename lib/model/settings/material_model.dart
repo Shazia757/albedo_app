@@ -3,11 +3,11 @@ class Materials {
   final String? title;
   final String? description;
   final String? materialType;
-  final List<dynamic>? categories;
-  final List<dynamic>? courses;
-  final List<dynamic>? packages;
-  final List<dynamic>? standards;
-  final List<dynamic>? syllabi;
+  final List<String>? categories;
+  final List<String>? courses;
+  final List<String>? packages;
+  final List<String>? standards;
+  final List<String>? syllabi;
   final List<String>? batches;
   final String? contentType;
   final String? driveLink;
@@ -57,14 +57,19 @@ class Materials {
       title: json['title'],
       description: json['description'],
       materialType: json['material_type'],
-      categories: json['categories'] ?? [],
-      courses: json['courses'] ?? [],
-      packages: json['packages'] ?? [],
-      standards: json['standards'] ?? [],
-      syllabi: json['syllabi'] ?? [],
-      batches: json['batches'] != null
-          ? List<String>.from(json['batches'])
+      categories: json['categories'] != null
+          ? List<String>.from(json['categories'])
           : [],
+      courses:
+          json['courses'] != null ? List<String>.from(json['courses']) : [],
+      packages:
+          json['packages'] != null ? List<String>.from(json['packages']) : [],
+      standards:
+          json['standards'] != null ? List<String>.from(json['standards']) : [],
+      syllabi:
+          json['syllabi'] != null ? List<String>.from(json['syllabi']) : [],
+      batches:
+          json['batches'] != null ? List<String>.from(json['batches']) : [],
       contentType: json['content_type'],
       driveLink: json['drive_link'],
       youtubeLink: json['youtube_link'],

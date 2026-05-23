@@ -1,4 +1,3 @@
-import 'package:albedo_app/model/settings/syllabus_model.dart';
 import 'package:albedo_app/widgets/crud_page.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';

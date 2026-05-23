@@ -888,14 +888,16 @@ class SessionPage extends StatelessWidget {
                 SizedBox(height: 12),
                 CustomWidgets().labelWithAsterisk('Attachment'),
                 SizedBox(height: 8),
-                CustomWidgets().attachmentStyledField(
-                  context: context,
-                  label: "Attachment",
-                  hint: "Choose a file",
-                  fileName: c.selectedFile,
-                  onTap: () {},
-                  onClear: () {},
-                ),
+               CustomWidgets().mediaPickerField(
+  context: context,
+  // fileName: c.selectedFile.value?.path.split('/').last,
+  onTap: () async {
+    // await c.pickMedia();
+  },
+  onClear: () {
+    // c.selectedMedia.value = null;
+  },
+),
                 SizedBox(height: 12),
                 CustomWidgets()
                     .labelWithAsterisk('Description', required: true),

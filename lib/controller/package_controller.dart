@@ -1,6 +1,5 @@
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/model/settings/assessment_model.dart';
 import 'package:albedo_app/model/settings/hiring_ad_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';

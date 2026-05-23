@@ -324,7 +324,7 @@ Widget expenseChartCard(BuildContext context) {
                   borderData: FlBorderData(show: false),
                   lineTouchData: LineTouchData(
                     touchTooltipData: LineTouchTooltipData(
-                      tooltipRoundedRadius: 8,
+                      tooltipBorderRadius: BorderRadius.circular(8),
                       getTooltipItems: (spots) {
                         return spots.map((spot) {
                           return LineTooltipItem(
@@ -1660,7 +1660,8 @@ Widget chartCard(
               borderData: FlBorderData(show: false),
               lineTouchData: LineTouchData(
                 touchTooltipData: LineTouchTooltipData(
-                  tooltipRoundedRadius: 8,
+                                      tooltipBorderRadius: BorderRadius.circular(8),
+
                   getTooltipItems: (spots) {
                     return spots.map((spot) {
                       return LineTooltipItem(

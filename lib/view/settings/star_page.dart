@@ -12,6 +12,7 @@ class StarOfMonthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    
 
     return Scaffold(
       backgroundColor: cs.surface,
@@ -36,10 +37,9 @@ class StarOfMonthPage extends StatelessWidget {
                     /// ── PAGE TITLE ─────────────────────
                     Text(
                       "Star of Month",
-                      style:
-                          Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: Theme.of(context).colorScheme.primary),
                     ),
 
                     const SizedBox(height: 18),
@@ -128,6 +128,7 @@ class StarOfMonthPage extends StatelessWidget {
                               itemBuilder: (context, index) {
                                 final item =
                                     controller.ratingValues[index];
+                                    final isDefaultField = index < 5;
 
                                 return Container(
                                   padding: const EdgeInsets.all(14),
@@ -181,6 +182,7 @@ class StarOfMonthPage extends StatelessWidget {
                                       const SizedBox(width: 12),
 
                                       /// Delete
+                                       if (!isDefaultField)
                                       InkWell(
                                         borderRadius:
                                             BorderRadius.circular(12),
@@ -225,10 +227,9 @@ class StarOfMonthPage extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: FilledButton.icon(
-                                  onPressed: () {
-                                    
-                                  },
-                                  // controller.addField,
+                                  onPressed: 
+                                    controller.addField,
+                                   
                                   icon:
                                       const Icon(Icons.add_rounded),
                                   label: const Text("Add Field"),

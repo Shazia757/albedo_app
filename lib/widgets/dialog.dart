@@ -55,10 +55,16 @@ class DialogUtils {
         SizedBox(height: 10),
         CustomWidgets().labelWithAsterisk('Attachment'),
         SizedBox(height: 10),
-        CustomWidgets().attachmentStyledField(
-          context: context,
-          hint: 'Select Screenshot',
-        ),
+      CustomWidgets().mediaPickerField(
+  context: context,
+  // fileName: c.selectedMedia.value?.path.split('/').last,
+  onTap: () async {
+    // await c.pickMedia();
+  },
+  onClear: () {
+    // c.selectedMedia.value = null;
+  },
+),
       ],
       onSubmit: () {
         final amount = double.tryParse(amountController.text) ?? 0;

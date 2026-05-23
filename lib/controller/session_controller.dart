@@ -3,7 +3,6 @@ import 'package:albedo_app/controller/session_report_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/model/settings/assessment_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';

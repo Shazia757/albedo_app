@@ -1,4 +1,5 @@
 import 'package:albedo_app/controller/auth_controller.dart';
+import 'package:albedo_app/controller/notifications_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/settings_controller.dart';
 import 'package:albedo_app/view/settings/assessments_page.dart';
@@ -91,25 +92,32 @@ class SettingsPage extends StatelessWidget {
                         items: [
                           if (canShow("General"))
                             _TileData(
-                              title: "General",
-                              subtitle: "Manage application preferences",
-                              icon: Icons.settings,
-                              page: GeneralPage(),
-                            ),
-                          // if (canShow("Notifications"))
-                          //   _TileData(
-                          //     title: "Notifications",
-                          //     subtitle: "Configure alerts & notifications",
-                          //     icon: Icons.notifications,
-                          //     page: NotificationsPage(),
-                          //   ),
+                                title: "General",
+                                subtitle: "Manage application preferences",
+                                icon: Icons.settings,
+                                onTap: (context) async {
+                                  Get.to(() => GeneralPage());
+                                }),
+                          if (canShow("Notifications"))
+                            _TileData(
+                                title: "Notifications",
+                                subtitle: "Configure alerts & notifications",
+                                icon: Icons.notifications,
+                                onTap: (context) async {
+                                  final controller =
+                                      Get.find<NotificationsController>();
+                                  await controller.getNotifications();
+                                  Get.to(() => NotificationsPage());
+                                }),
                           if (canShow("Backup"))
                             _TileData(
-                              title: "Backup",
-                              subtitle: "Backup and restore system data",
-                              icon: Icons.backup,
-                              page: BackupPage(),
-                            ),
+                                title: "Backup",
+                                subtitle: "Backup and restore system data",
+                                icon: Icons.backup,
+                                onTap: (context) async {
+                                  c.emailCtrl.clear();
+                                  Get.to(() => BackupPage());
+                                }),
                         ],
                       ),
                       SizedBox(height: 28),
@@ -127,25 +135,32 @@ class SettingsPage extends StatelessWidget {
                         context,
                         items: [
                           if (canShow("Banner Ads"))
-                            // _TileData(
-                            //   title: "Banner Ads",
-                            //   subtitle: "Manage promotional banners",
-                            //   icon: Icons.campaign,
-                            //   page: BannerAdsPage(),
-                            // ),
-                          // if (canShow("Coupons"))
-                          //   _TileData(
-                          //     title: "Coupons",
-                          //     subtitle: "Create and manage coupons",
-                          //     icon: Icons.confirmation_number,
-                          //     page: CouponsPage(),
-                          //   ),
+                            _TileData(
+                                title: "Banner Ads",
+                                subtitle: "Manage promotional banners",
+                                icon: Icons.campaign,
+                                onTap: (context) async {
+                                  Get.to(() => BannerAdsPage());
+                                }),
+                          if (canShow("Coupons"))
+                            _TileData(
+                                title: "Coupons",
+                                subtitle: "Create and manage coupons",
+                                icon: Icons.confirmation_number,
+                                onTap: (context) async {
+                                  await c.getCoupons();
+                                  Get.to(() {
+                                    return CouponsPage();
+                                  });
+                                }),
                           if (canShow("Star of Month"))
                             _TileData(
                               title: "Star of Month",
                               subtitle: "Manage monthly recognitions",
                               icon: Icons.star,
-                              page: StarOfMonthPage(),
+                              onTap: (context) async {
+                                Get.to(() => StarOfMonthPage());
+                              },
                             ),
                         ],
                       ),
@@ -164,27 +179,36 @@ class SettingsPage extends StatelessWidget {
                         cs: cs,
                         context,
                         items: [
-                          // if (canShow("Assessments"))
-                          //   _TileData(
-                          //     title: "Assessments",
-                          //     subtitle: "Manage tests and evaluations",
-                          //     icon: Icons.assignment,
-                          //     page: AssessmentsPage(),
-                          //   ),
-                          // if (canShow("Materials"))
-                          //   _TileData(
-                          //     title: "Materials",
-                          //     subtitle: "Learning resources & materials",
-                          //     icon: Icons.menu_book,
-                          //     page: MaterialsPage(),
-                          //   ),
-                          // if (canShow("Recommendation"))
-                          //   _TileData(
-                          //     title: "Recommendation",
-                          //     subtitle: "Recommendation settings",
-                          //     icon: Icons.thumb_up,
-                          //     page: RecommendationPage(),
-                          //   ),
+                          if (canShow("Assessments"))
+                            _TileData(
+                                title: "Assessments",
+                                subtitle: "Manage tests and evaluations",
+                                icon: Icons.assignment,
+                                onTap: (context) async {
+                                  Get.to(() {
+                                    return AssessmentsPage();
+                                  });
+                                }),
+                          if (canShow("Materials"))
+                            _TileData(
+                                title: "Materials",
+                                subtitle: "Learning resources & materials",
+                                icon: Icons.menu_book,
+                                onTap: (context) async {
+                                  Get.to(() {
+                                    return MaterialsPage();
+                                  });
+                                }),
+                          if (canShow("Recommendation"))
+                            _TileData(
+                                title: "Recommendation",
+                                subtitle: "Recommendation settings",
+                                icon: Icons.thumb_up,
+                                onTap: (context) async {
+                                  Get.to(() {
+                                    return RecommendationPage();
+                                  });
+                                }),
                         ],
                       ),
 
@@ -202,27 +226,39 @@ class SettingsPage extends StatelessWidget {
                         cs: cs,
                         context,
                         items: [
-                          // if (canShow("Hiring"))
-                          //   _TileData(
-                          //     title: "Hiring",
-                          //     subtitle: "Manage recruitment settings",
-                          //     icon: Icons.work,
-                          //     page: HiringPage(),
-                          //   ),
-                          // if (canShow("Automation"))
-                          //   _TileData(
-                          //     title: "Automation",
-                          //     subtitle: "Macros and automation tools",
-                          //     icon: Icons.auto_mode,
-                          //     page: MacroPage(),
-                          //   ),
-                          // if (canShow("Bulk Upload"))
-                          //   _TileData(
-                          //     title: "Bulk Upload",
-                          //     subtitle: "Upload large datasets easily",
-                          //     icon: Icons.upload_file,
-                          //     page: BulkUploadPage(),
-                          //   ),
+                          if (canShow("Hiring"))
+                            _TileData(
+                              title: "Hiring",
+                              subtitle: "Manage recruitment settings",
+                              icon: Icons.work,
+                                onTap: (context) async {
+                                  Get.to(() {
+                                    return HiringPage();
+                                  });
+                                }
+                            ),
+                          if (canShow("Automation"))
+                            _TileData(
+                              title: "Automation",
+                              subtitle: "Macros and automation tools",
+                              icon: Icons.auto_mode,
+                              onTap: (context) async {
+                                  Get.to(() {
+                                    return MacroPage();
+                                  });
+                                }
+                            ),
+                          if (canShow("Bulk Upload"))
+                            _TileData(
+                              title: "Bulk Upload",
+                              subtitle: "Upload large datasets easily",
+                              icon: Icons.upload_file,
+                                onTap: (context) async {
+                                  Get.to(() {
+                                    return BulkUploadPage();
+                                  });
+                                }
+                            ),
                         ],
                       ),
                     ],
@@ -272,7 +308,7 @@ class SettingsPage extends StatelessWidget {
                 title: item.title,
                 subtitle: item.subtitle,
                 icon: item.icon,
-                page: item.page,
+                onTap: () => item.onTap(context),
               ),
               if (index != filtered.length - 1)
                 Divider(
@@ -291,13 +327,13 @@ class SettingsPage extends StatelessWidget {
     required String title,
     required String subtitle,
     required IconData icon,
-    required Widget page,
+    required VoidCallback onTap,
   }) {
     final cs = Theme.of(context).colorScheme;
 
     return InkWell(
       borderRadius: BorderRadius.circular(18),
-      onTap: () => Get.to(() => page),
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -353,12 +389,12 @@ class _TileData {
   final String title;
   final String subtitle;
   final IconData icon;
-  final Widget page;
+  final Future<void> Function(BuildContext context) onTap;
 
   _TileData({
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.page,
+    required this.onTap,
   });
 }

@@ -1,13 +1,22 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:albedo_app/config/urls.dart';
 import 'package:albedo_app/config/utils.dart';
 import 'package:albedo_app/database/local_storage.dart';
 import 'package:albedo_app/model/settings/assessment_model.dart';
+import 'package:albedo_app/model/settings/banners_model.dart';
+import 'package:albedo_app/model/settings/coupons_model.dart';
+import 'package:albedo_app/model/settings/hiring_ad_model.dart';
+import 'package:albedo_app/model/settings/material_model.dart';
+import 'package:albedo_app/model/settings/notification_model.dart';
 import 'package:albedo_app/model/settings/rating_value_model.dart';
+import 'package:albedo_app/model/settings/recommendations_model.dart';
 import 'package:albedo_app/model/settings/syllabus_model.dart';
+import 'package:albedo_app/model/support_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class Api {
@@ -440,6 +449,87 @@ class Api {
     }
   }
 
+  Future<Notifications?> addNotification({
+    required String title,
+    required String message,
+    required List<String> dashboardTarget,
+    required bool isImportant,
+  }) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.post(
+          Uri.parse(Urls.notifications),
+          headers: getHeader(),
+          body: jsonEncode({
+            "title": title,
+            "message": message,
+            "dashboard_target": dashboardTarget,
+            "is_important": isImportant,
+          }),
+        );
+      });
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+
+        return Notifications.fromJson(json);
+      }
+
+      log(response.body);
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateNotification({
+    required String id,
+    required String title,
+    required String message,
+    required List<String> dashboardTarget,
+    required bool isImportant,
+  }) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.put(
+          Uri.parse(Urls.notificationById(id)),
+          headers: getHeader(),
+          body: jsonEncode({
+            "title": title,
+            "message": message,
+            "dashboard_target": dashboardTarget,
+            "is_important": isImportant,
+          }),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteNotification(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.notificationById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
   Future<Syllabus?> addSyllabus(String? name) async {
     try {
       final response = await safeRequest((headers) {
@@ -838,6 +928,7 @@ class Api {
       return false;
     }
   }
+
   Future<AssessmentAttentionQns?> addAssessmentAttentionQn(String? name) async {
     try {
       final response = await safeRequest((headers) {
@@ -886,8 +977,356 @@ class Api {
         );
       });
 
-      return response.statusCode == 200 ||
-          response.statusCode == 201;
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<Assessment?> addAssessment({required Map<String, Object> body}) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.post(
+          Uri.parse(Urls.assessmentReportType),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+        return Assessment.fromJson(json);
+      }
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateAssessment(String id, Map<String, Object> body) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.put(
+          Uri.parse(Urls.assessmentReportTypeById(id)),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteAssessment(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.assessmentReportTypeById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<Materials?> addMaterial({required Map<String, Object?> body}) async {
+    try {
+      final response = await safeRequest((headers) {
+        log(jsonEncode(body));
+        return http.post(
+          Uri.parse(Urls.materials),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+      log('STATUS CODE: ${response.statusCode}');
+      log('RESPONSE BODY: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+        return Materials.fromJson(json);
+      }
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateMaterial(String id, Map<String, Object?> body) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.put(
+          Uri.parse(Urls.materialById(id)),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteMaterial(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.materialById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<RecommendationItem?> addPackageRecommendation(
+      {required Map<String, Object?> body}) async {
+    try {
+      final response = await safeRequest((headers) {
+        log(jsonEncode(body));
+        return http.post(
+          Uri.parse(Urls.packageRecommendations),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+      log('STATUS CODE: ${response.statusCode}');
+      log('RESPONSE BODY: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+        return RecommendationItem.fromJson(json);
+      }
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateRecommendation(
+      String id, Map<String, Object?> body) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.put(
+          Uri.parse(Urls.packageRecommendationById(id)),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteRecommendation(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.packageRecommendationById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<RecommendationItem?> addBatchRecommendation(
+      {required Map<String, Object?> body}) async {
+    try {
+      final response = await safeRequest((headers) {
+        log(jsonEncode(body));
+        return http.post(
+          Uri.parse(Urls.batchRecommendations),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+      log('STATUS CODE: ${response.statusCode}');
+      log('RESPONSE BODY: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+        return RecommendationItem.fromJson(json);
+      }
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateBatchRecommendation(
+      String id, Map<String, Object?> body) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.put(
+          Uri.parse(Urls.batchPackageById(id)),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteBatchRecommendation(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.batchPackageById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<HiringAd?> addHiringAd({required Map<String, Object?> body}) async {
+    try {
+      final response = await safeRequest((headers) {
+        log(jsonEncode(body));
+        return http.post(
+          Uri.parse(Urls.hiringAds),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+      log('STATUS CODE: ${response.statusCode}');
+      log('RESPONSE BODY: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+        return HiringAd.fromJson(json);
+      }
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateHiringAd(String id, Map<String, Object?> body) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.put(
+          Uri.parse(Urls.hiringAdById(id)),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteHiringAd(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.hiringAdById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<Macro?> addMacro({required Map<String, Object?> body}) async {
+    try {
+      final response = await safeRequest((headers) {
+        log(jsonEncode(body));
+        return http.post(
+          Uri.parse(Urls.supportMacros),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+      log('STATUS CODE: ${response.statusCode}');
+      log('RESPONSE BODY: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+        return Macro.fromJson(json);
+      }
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateMacro(String id, Map<String, Object?> body) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.put(
+          Uri.parse(Urls.supportMacroById(id)),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteMacro(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.supportMacroById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       log('API error: $e');
       return false;
@@ -917,6 +1356,7 @@ class Api {
       return false;
     }
   }
+
   Future<bool> updateDeadline({
     required String id,
     required String role,
@@ -939,6 +1379,143 @@ class Api {
       });
 
       return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<Banners?> addBanner({required Map<String, Object> body}) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.post(
+          Uri.parse(Urls.banners),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+
+        return Banners.fromJson(json);
+      }
+
+      log(response.body);
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateBannerAd(String bannerId, Map<String, Object> body) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.put(
+          Uri.parse(Urls.bannerById(bannerId)),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      }).timeout(const Duration(seconds: 60));
+
+      log("STATUS CODE: ${response.statusCode}");
+      log("RESPONSE BODY: ${response.body}");
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      checkConnectivity();
+      log('Api error during update banner ad: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteBannerAd(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.bannerById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<Coupons?> addCouponCode({required Map<String, Object?> body}) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.post(
+          Uri.parse(Urls.coupons),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+
+        return Coupons.fromJson(json);
+      }
+
+      log(response.body);
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<Coupons?> updateCouponCode(
+    String codeId,
+    Map<String, Object?> body,
+  ) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.put(
+          Uri.parse(Urls.couponById(codeId)),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      }).timeout(const Duration(seconds: 60));
+
+      log("STATUS CODE: ${response.statusCode}");
+      log("RESPONSE BODY: ${response.body}");
+
+      final decoded = jsonDecode(response.body);
+
+      return Coupons.fromJson(decoded);
+    } catch (e) {
+      checkConnectivity();
+
+      log(
+        'Api error during update coupon code: $e',
+      );
+
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteCouponCode(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.couponById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204;
     } catch (e) {
       log('API error: $e');
       return false;
@@ -999,6 +1576,10 @@ class Api {
     return await commonGetRequest(Urls.banners);
   }
 
+  Future<dynamic> getBatches() async {
+    return await commonGetRequest(Urls.batches);
+  }
+
   Future<dynamic> getCategories() async {
     return await commonGetRequest(Urls.categories);
   }
@@ -1043,8 +1624,39 @@ class Api {
     return await commonGetRequest(Urls.supportMacros);
   }
 
+  Future<dynamic> getTestType() async {
+    return await commonGetRequest(Urls.testType);
+  }
+
   Future<dynamic> getTerms(String userType) async {
     return await commonGetRequest(Urls.termsByUserType(userType));
+  }
+
+  Future<String?> backup(String email) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.post(
+          Uri.parse(Urls.dbBackup),
+          headers: getHeader(),
+          body: jsonEncode({
+            "recipient_email": email,
+          }),
+        );
+      });
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+
+        return json["message"];
+      }
+
+      log(response.body);
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
   }
 
   Future<dynamic> getPrivacyPolicies(String userType) async {
@@ -1137,6 +1749,35 @@ class Api {
     return null;
   }
 
+  Future<bool> bulkUploadFile({
+    required File file,
+    required String type,
+  }) async {
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse(getBulkUrl(type)),
+    );
+
+    request.files.add(
+      await http.MultipartFile.fromPath('file', file.path),
+    );
+
+    final response = await request.send();
+
+    return response.statusCode == 200 || response.statusCode == 201;
+  }
+
+  String getBulkUrl(String type) {
+    switch (type) {
+      case 'student':
+        return Urls.studentsBulkCreate;
+      case 'mentor':
+        return Urls.mentorsBulkCreate;
+      default:
+        return Urls.studentsBulkCreate;
+    }
+  }
+
   //------------------Logout---------------------------//
 
   Future<bool> logout() async {
@@ -1167,6 +1808,31 @@ class Api {
     }
 
     return false;
+  }
+
+  Future<void> saveRatingValues(
+    Map<String, dynamic> body,
+  ) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.post(
+          Uri.parse(Urls.globalRatingValues),
+          headers: getHeader(),
+          body: jsonEncode(body),
+        );
+      });
+
+      log("STATUS CODE: ${response.statusCode}");
+      log("RESPONSE: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+    } catch (e) {
+      log(
+        "Save rating values error: $e",
+      );
+    }
   }
   //------------------Change Password---------------------------//
 

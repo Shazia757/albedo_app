@@ -93,3 +93,102 @@ class Batch {
     };
   }
 }
+
+class BatchDetail {
+  final String? id;
+  final String? name;
+  final String? code;
+  final Mentor? mentor;
+  final FinancialSummary? financialSummary;
+
+  BatchDetail({
+    this.id,
+    this.name,
+    this.code,
+    this.mentor,
+    this.financialSummary,
+  });
+
+  factory BatchDetail.fromJson(Map<String, dynamic> json) {
+    return BatchDetail(
+      id: json['id'],
+      name: json['name'],
+      code: json['code'],
+      mentor: json['mentor'] != null
+          ? Mentor.fromJson(json['mentor'])
+          : null,
+      financialSummary: json['financial_summary'] != null
+          ? FinancialSummary.fromJson(json['financial_summary'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'code': code,
+      'mentor': mentor?.toJson(),
+      'financial_summary': financialSummary?.toJson(),
+    };
+  }
+
+  static List<Batch> fromJsonList(List<dynamic> jsonList) {
+    return jsonList
+        .map((e) => Batch.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+}
+
+
+class FinancialSummary {
+  final double? totalFee;
+  final double? totalPaid;
+  final double? totalPending;
+  final double? totalDeclined;
+  final double? balance;
+  final int? studentCount;
+  final int? pendingCount;
+  final int? approvedCount;
+  final int? declinedCount;
+
+  FinancialSummary({
+    this.totalFee,
+    this.totalPaid,
+    this.totalPending,
+    this.totalDeclined,
+    this.balance,
+    this.studentCount,
+    this.pendingCount,
+    this.approvedCount,
+    this.declinedCount,
+  });
+
+  factory FinancialSummary.fromJson(Map<String, dynamic> json) {
+    return FinancialSummary(
+      totalFee: (json['total_fee'] ?? 0).toDouble(),
+      totalPaid: (json['total_paid'] ?? 0).toDouble(),
+      totalPending: (json['total_pending'] ?? 0).toDouble(),
+      totalDeclined: (json['total_declined'] ?? 0).toDouble(),
+      balance: (json['balance'] ?? 0).toDouble(),
+      studentCount: json['student_count'],
+      pendingCount: json['pending_count'],
+      approvedCount: json['approved_count'],
+      declinedCount: json['declined_count'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total_fee': totalFee,
+      'total_paid': totalPaid,
+      'total_pending': totalPending,
+      'total_declined': totalDeclined,
+      'balance': balance,
+      'student_count': studentCount,
+      'pending_count': pendingCount,
+      'approved_count': approvedCount,
+      'declined_count': declinedCount,
+    };
+  }
+}

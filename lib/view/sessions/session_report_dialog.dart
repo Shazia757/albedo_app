@@ -52,9 +52,10 @@ class SessionReportDialogBody extends StatelessWidget {
 
           SizedBox(height: 10),
 
-          CustomWidgets().attachmentStyledField(
+          CustomWidgets().mediaPickerField(
             context: context,
-            hint: 'Upload files (optional)',
+            onTap: () async {},
+            onClear: () {},
           ),
         ],
       );

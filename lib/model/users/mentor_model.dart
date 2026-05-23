@@ -39,7 +39,7 @@ class Mentor {
   Mentor({
     required this.name,
     this.id,
-    required this.empId,
+    this.empId,
     this.joinedAt,
     this.email,
     this.gender,
@@ -69,4 +69,18 @@ class Mentor {
     this.qualification,
     this.upiId,
   });
+
+  factory Mentor.fromJson(Map<String, dynamic> json) {
+    return Mentor(
+      id: json['id'],
+      name: json['name'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
+  }
 }

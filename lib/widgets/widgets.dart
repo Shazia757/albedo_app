@@ -568,21 +568,20 @@ class CustomWidgets {
                   /// DELETE
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        onConfirm();
-                        Get.back();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: cs.error,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        onPressed: () {
+                          onConfirm();
+                          Get.back();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: cs.error,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
                         ),
-                        elevation: 0,
-                      ),
-                      child: dltText
-                    ),
+                        child: dltText),
                   ),
                 ],
               ),
@@ -1499,10 +1498,8 @@ class CustomWidgets {
     );
   }
 
-  Widget attachmentStyledField({
+  Widget mediaPickerField({
     required BuildContext context,
-    required String hint,
-    String? label,
     String? fileName,
     VoidCallback? onTap,
     VoidCallback? onClear,
@@ -1514,58 +1511,71 @@ class CustomWidgets {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: appBoxDecoration(context),
-        child: Row(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 28,
+        ),
+        decoration: BoxDecoration(
+          color: cs.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: hasFile
+                ? cs.primary.withOpacity(0.5)
+                : cs.outline.withOpacity(0.3),
+            width: 1.2,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.attach_file,
-              size: 18,
-              color: cs.onSurface.withOpacity(0.7),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (label != null)
-                    Text(
-                      label,
-                      style: textTheme.labelSmall?.copyWith(
-                        color: cs.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                  Text(
-                    hasFile ? fileName : hint,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: hasFile
-                          ? cs.onSurface
-                          : cs.onSurface.withOpacity(0.5),
-                    ),
-                  ),
-                ],
+            /// upload icon
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: cs.primary.withOpacity(0.1),
+              ),
+              child: Icon(
+                hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
+                size: 34,
+                color: hasFile ? Colors.green : cs.primary,
               ),
             ),
-            if (hasFile && onClear != null)
-              IconButton(
-                icon: Icon(
-                  Icons.close,
-                  size: 16,
-                  color: cs.error,
-                ),
+
+            const SizedBox(height: 16),
+
+            /// title
+            Text(
+              hasFile ? 'File Selected' : 'Click to Upload',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            /// subtitle / filename
+            Text(
+              hasFile ? fileName : 'Upload PDF, Image, Video or Document',
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.bodySmall?.copyWith(
+                color: cs.onSurface.withOpacity(0.6),
+              ),
+            ),
+
+            if (hasFile && onClear != null) ...[
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
                 onPressed: onClear,
-                splashRadius: 18,
-              )
-            else
-              Icon(
-                Icons.upload_file,
-                size: 18,
-                color: cs.onSurface.withOpacity(0.5),
+                icon: const Icon(Icons.delete_outline),
+                label: const Text('Remove File'),
               ),
+            ],
           ],
         ),
       ),

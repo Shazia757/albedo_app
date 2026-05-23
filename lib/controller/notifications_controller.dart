@@ -7,11 +7,11 @@ import 'package:get/get.dart';
 class NotificationsController extends GetxController {
   var selectedTab = 0.obs;
   var msgs = <Notifications>[].obs;
-  var isLoading = true.obs;
+  var isLoading = false.obs;
+  var isImportant = false.obs;
   var errorMessage = ''.obs;
   RxBool isDeleteButtonLoading = false.obs;
   RxList<VisibleTo> selected = <VisibleTo>[].obs;
-
 
   var filteredMessages = <Notifications>[].obs;
   final tabs = ["All", "Important", "Updates"];
@@ -63,6 +63,41 @@ class NotificationsController extends GetxController {
     }
   }
 
+  Future<Notifications?> addNotification() async {
+    isLoading.value = true;
+
+    try {
+      final result = await Api().addNotification(
+        title: titleController.text.trim(),
+        message: messageController.text.trim(),
+        dashboardTarget: selected.map((e) => e.apiValue).toList(),
+        isImportant: isImportant.value,
+      );
+      if (result != null) {
+        Get.back();
+
+        Get.snackbar(
+          "Success",
+          "Notification added successfully",
+        );
+      } else {
+        Get.snackbar(
+          "Error",
+          "Failed to add notification",
+        );
+      }
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   int getCount(int index) {
     switch (index) {
       case 0:
@@ -79,22 +114,29 @@ class NotificationsController extends GetxController {
     }
   }
 
-  delete(id) {
-    isDeleteButtonLoading.value = true;
-    // Api().deleteProgram(id).then(
-    //   (value) {
-    //     if (value?.status == true) {
-    //       isDeleteButtonLoading.value = false;
-    //       Get.back();
-    //       Get.back();
-    //       Get.snackbar(
-    //           "Success", value?.message ?? "Program deleted successfully.");
-    //     } else {
-    //       // CustomWidgets.showSnackBar(
-    //       //     "Error", value?.message ?? 'Failed to delete program.');
-    //     }
-    //   },
-    // );
+  Future<bool> deleteNotification(
+    String id,
+  ) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().deleteNotification(id);
+
+      if (success) {
+        msgs.removeWhere((e) => e.id == id);
+
+        Get.snackbar("Success", "Deleted successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Delete failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void applyFilters() {
@@ -138,4 +180,40 @@ class NotificationsController extends GetxController {
     }
   }
 
+  Future<void> updateNotification({
+    required String id,
+  }) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().updateNotification(
+        id: id,
+        title: titleController.text.trim(),
+        message: messageController.text.trim(),
+        dashboardTarget: selected.map((e) => e.apiValue).toList(),
+        isImportant: isImportant.value,
+      );
+
+      if (success) {
+        Get.back();
+
+        Get.snackbar(
+          "Success",
+          "Notification updated",
+        );
+      } else {
+        Get.snackbar(
+          "Error",
+          "Update failed",
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

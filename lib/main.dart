@@ -3,6 +3,7 @@ import 'package:albedo_app/config/text_theme.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/home_controller.dart';
 import 'package:albedo_app/controller/mentor_controller.dart';
+import 'package:albedo_app/controller/notifications_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/controller/student_wallet_controller.dart';
@@ -26,6 +27,8 @@ Future<void> main() async {
   Get.put(TeacherController(), permanent: true);
   Get.put(MentorController(), permanent: true);
   Get.put(StudentWalletController(), permanent: true);
+  Get.put(NotificationsController(), permanent: true);
+
   runApp(MyApp());
 }
 

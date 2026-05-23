@@ -263,14 +263,14 @@ class ReportsController extends GetxController {
 
   List<Recommendations> _getDummyRecommendations() {
     return [
-      Recommendations(
-        id: "REC001",
-        package: "Flutter Training",
-        batch: "Batch A",
-        startDate: "2025-05-01",
-        endDate: "2025-08-01",
-        visibleTo: ["SYL001"],
-      ),
+      // Recommendations(
+      //   id: "REC001",
+      //   package: "Flutter Training",
+      //   batch: "Batch A",
+      //   startDate: "2025-05-01",
+      //   endDate: "2025-08-01",
+      //   visibleTo: ["SYL001"],
+      // ),
     ];
   }
 

@@ -567,57 +567,59 @@ class HomeController extends GetxController {
 
   List<RecommendationView> getDummyRecommendations() {
     return [
-      RecommendationView(
-        student: Student(
-          studentId: "STU001",
-          name: "Aisha",
-          joinedAt: DateTime.now(),
-        ),
-        recommendation: Recommendations(
-          id: "REC001",
-          visibleTo: ["student"],
-        ),
-        response: RecommendationResponse(
-          adId: "AD001",
-          studentId: "STU001",
-          status: "pending",
-          respondedAt: DateTime.now(),
-        ),
-      ),
-      RecommendationView(
-        student: Student(
-          studentId: "STU002",
-          name: "Rahul",
-          joinedAt: DateTime.now(),
-        ),
-        recommendation: Recommendations(
-          id: "REC002",
-          visibleTo: ["student"],
-        ),
-        response: RecommendationResponse(
-          adId: "AD002",
-          studentId: "STU002",
-          status: "interested",
-          respondedAt: DateTime.now(),
-        ),
-      ),
-      RecommendationView(
-        student: Student(
-          studentId: "STU003",
-          name: "Fatima",
-          joinedAt: DateTime.now(),
-        ),
-        recommendation: Recommendations(
-          id: "REC003",
-          visibleTo: ["student"],
-        ),
-        response: RecommendationResponse(
-          adId: "AD003",
-          studentId: "STU003",
-          status: "not_interested",
-          respondedAt: DateTime.now(),
-        ),
-      ),
+      // RecommendationView(
+      //   student: Student(
+      //     studentId: "STU001",
+      //     name: "Aisha",
+      //     joinedAt: DateTime.now(),
+      //   ),
+      //   // recommendation: Recommendations(
+
+      //   //   id: "REC001",
+      //   //   visibleTo: ["student"],
+      //   // ),
+      //   response: RecommendationResponse(
+      //     adId: "AD001",
+      //     studentId: "STU001",
+      //     status: "pending",
+      //     respondedAt: DateTime.now(),
+      //   ),
+      // ),
+      // RecommendationView(
+      //   student: Student(
+      //     studentId: "STU002",
+      //     name: "Rahul",
+      //     joinedAt: DateTime.now(),
+      //   ),
+      //   recommendation: Recommendations(
+      //     id: "REC002",
+      //     visibleTo: ["student"],
+      //   ),
+      //   response: RecommendationResponse(
+      //     adId: "AD002",
+      //     studentId: "STU002",
+      //     status: "interested",
+      //     respondedAt: DateTime.now(),
+      //   ),
+      // ),
+      // RecommendationView(
+      //   student: Student(
+      //     studentId: "STU003",
+      //     name: "Fatima",
+      //     joinedAt: DateTime.now(),
+      //   ),
+      //   recommendation: Recommendations(
+      //     id: "REC003",
+      //     visibleTo: ["student"],
+      //   ),
+      //   response: RecommendationResponse(
+      //     adId: "AD003",
+      //     studentId: "STU003",
+      //     status: "not_interested",
+      //     respondedAt: DateTime.now(),
+      //   ),
+      // ),
+   
     ];
   }
 

@@ -3,7 +3,6 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
-import 'package:albedo_app/view/settings/bulk_upload_page.dart';
 import 'package:albedo_app/view/students/refund_request_page.dart';
 import 'package:albedo_app/view/students/student_detail_page.dart';
 import 'package:albedo_app/view/users/add_student_page.dart';

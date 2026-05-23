@@ -1,30 +1,23 @@
 import 'dart:developer';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:albedo_app/api.dart';
+import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/settings/assessment_model.dart';
 import 'package:albedo_app/model/settings/banners_model.dart';
 import 'package:albedo_app/model/settings/coupons_model.dart';
 import 'package:albedo_app/model/settings/hiring_ad_model.dart';
 import 'package:albedo_app/model/settings/material_model.dart';
-import 'package:albedo_app/model/settings/notification_model.dart';
 import 'package:albedo_app/model/settings/rating_value_model.dart';
 import 'package:albedo_app/model/settings/recommendations_model.dart';
 import 'package:albedo_app/model/settings/syllabus_model.dart';
 import 'package:albedo_app/model/support_model.dart';
-import 'package:albedo_app/model/users/user_model.dart';
-import 'package:albedo_app/view/settings/general/assessment_attention_question_page.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-enum VisibleTo {
-  all,
-  admin,
-  student,
-  teacher,
-  mentor,
-  coordinator,
-  other,
-}
+import 'package:image_picker/image_picker.dart';
 
 class SettingsController extends GetxController {
   RxBool isLoading = true.obs;
@@ -34,6 +27,8 @@ class SettingsController extends GetxController {
 
   final RxString feeType = "percentage".obs;
   final RxString status = "inactive".obs;
+  final bannerMediaPath = ''.obs;
+  final isVideo = false.obs;
   var syllabusList = <String>[].obs;
   RxList<Syllabus> syllabus = <Syllabus>[].obs;
   RxList<Syllabus> supportCategories = <Syllabus>[].obs;
@@ -52,34 +47,43 @@ class SettingsController extends GetxController {
 
   var packageRecommendations = <PackageRecommendations>[].obs;
   var batchRecommendations = [].obs;
-  var assessmentQuestions = [].obs;
   final assessmentReportTypes = <Assessment>[].obs;
   var hiringAds = [].obs;
   var privacyPolicies = [].obs;
   final salaryInvoiceTaxSettings = Rxn<dynamic>();
   var refundPolicies = [].obs;
   RxList<Macro> supportMacros = <Macro>[].obs;
-  var terms = [].obs;
-  var assessmentAttentionQn = <String>[].obs;
   var users = [].obs;
   var banners = <Banners>[].obs;
+  var batches = <BatchDetail>[].obs;
   var coupons = <Coupons>[].obs;
-  RxList<Object> recommendations = <Object>[].obs;
+  RxList<RecommendationItem> recommendations = <RecommendationItem>[].obs;
   var hiringAd = <HiringAd>[].obs;
   RxList<Map<String, dynamic>> ratingValues = <Map<String, dynamic>>[].obs;
   var supports = <Macro>[].obs;
   var materials = <Materials>[].obs;
-  var testTypes = <String>[].obs;
-
+  var testTypes = <TestType>[].obs;
   RxBool isDeleteButtonLoading = false.obs;
 
   RxList<VisibleTo> selected = <VisibleTo>[].obs;
+  Rx<File?> selectedMedia = Rx<File?>(null);
   RxList selectedSyllabus = [].obs;
+  final RxString selectedBulkType = 'student'.obs;
   var selectedStartDate = Rxn<DateTime>();
+  var selectedPackage = Rxn<Syllabus>();
+  var selectedBatch = Rxn<BatchDetail>();
   var selectedEndDate = Rxn<DateTime>();
+  RxList<Days> availableDays = <Days>[].obs;
   RxList<Days> selectedDays = <Days>[].obs;
-  RxList<String> selectedTestType = <String>[].obs;
-  RxList selectedAttentionQns = [].obs;
+  RxList<TestType> selectedTestType = <TestType>[].obs;
+  RxList<AssessmentAttentionQns> selectedAttentionQns =
+      <AssessmentAttentionQns>[].obs;
+  Rx<Uint8List?> selectedRecommendationImage = Rx<Uint8List?>(null);
+  Rx<Uint8List?> selectedHiringAdImage = Rx<Uint8List?>(null);
+
+  PlatformFile? selectedRecommendationFile;
+  PlatformFile? selectedHiringFile;
+  File? selectedCsvFile;
 
   TextEditingController monthController = TextEditingController();
   TextEditingController hourController = TextEditingController();
@@ -101,11 +105,14 @@ class SettingsController extends GetxController {
   TextEditingController mentorPrivacyController = TextEditingController();
   TextEditingController coordinatorPrivacyController = TextEditingController();
   TextEditingController otherPrivacyController = TextEditingController();
+  final emailCtrl = TextEditingController();
 
   TextEditingController titleController = TextEditingController();
   TextEditingController messageController = TextEditingController();
 
   TextEditingController urlController = TextEditingController();
+  TextEditingController driveUrlController = TextEditingController();
+  TextEditingController youtubeUrlController = TextEditingController();
   TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
 
@@ -124,10 +131,19 @@ class SettingsController extends GetxController {
   var hours = "".obs;
   var dayOfMonth = "".obs;
   var isActive = true.obs;
+  final RxInt ratingId = 0.obs;
   Rx<String> selectedDiscountType = 'percentage'.obs;
   Rx<String> selectedRecommendationType = 'package'.obs;
   Rx<String> selectedMaterialType = 'drive'.obs;
   Rx<String> selectedUser = 'batch'.obs;
+
+  RxList<BatchDetail> selectedBatches = <BatchDetail>[].obs;
+
+  RxList<Syllabus> selectedPackages = <Syllabus>[].obs;
+  RxList<Syllabus> selectedCategories = <Syllabus>[].obs;
+  RxList<Syllabus> selectedCourses = <Syllabus>[].obs;
+  RxList<Syllabus> selectedSyllabi = <Syllabus>[].obs;
+  RxList<Syllabus> selectedStandards = <Syllabus>[].obs;
 
   TextEditingController timeController = TextEditingController();
 
@@ -346,14 +362,20 @@ class SettingsController extends GetxController {
   }
 
   Future<void> getCoupons() async {
-    coupons.value = await commonFetch(
+    final data = await commonFetch(
       apiCall: () => Api().getCoupons(),
+    );
+    coupons.assignAll(
+      data.map<Coupons>((e) => Coupons.fromJson(e)).toList(),
     );
   }
 
   Future<void> getMaterials() async {
-    materials.value = await commonFetch(
+    final data = await commonFetch(
       apiCall: () => Api().getMaterials(),
+    );
+    materials.assignAll(
+      data.map<Materials>((e) => Materials.fromJson(e)).toList(),
     );
   }
 
@@ -960,6 +982,7 @@ class SettingsController extends GetxController {
       isLoading.value = false;
     }
   }
+
   Future<AssessmentAttentionQns?> addAssessmentAttentionQn(String name) async {
     isLoading.value = true;
 
@@ -985,7 +1008,7 @@ class SettingsController extends GetxController {
     isLoading.value = true;
 
     try {
-      final success = await Api().updateCourse(id, question);
+      final success = await Api().updateAssessmentAttentionQn(id, question);
 
       if (success) {
         Get.snackbar("Success", "Updated successfully");
@@ -1008,10 +1031,340 @@ class SettingsController extends GetxController {
     isLoading.value = true;
 
     try {
-      final success = await Api().deleteStandard(id);
+      final success = await Api().deleteAssessmentAttentionQn(id);
 
       if (success) {
-        course.removeWhere((e) => e.id == id);
+        assessmentAttentionQns.removeWhere((e) => e.id == id);
+
+        Get.snackbar("Success", "Deleted successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Delete failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<Assessment?> addAssessment({required Map<String, Object> body}) async {
+    isLoading.value = true;
+
+    try {
+      final result = await Api().addAssessment(body: body);
+
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> updateAssessment(
+      {required String id, required Map<String, Object> body}) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().updateAssessment(id, body);
+
+      if (success) {
+        Get.snackbar("Success", "Updated successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Update failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> deleteAssessment({
+    required String id,
+  }) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().deleteAssessment(id);
+
+      if (success) {
+        assessmentReportTypes.removeWhere((e) => e.id == id);
+
+        Get.snackbar("Success", "Deleted successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Delete failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<Materials?> addMaterial({required Map<String, Object?> body}) async {
+    isLoading.value = true;
+
+    try {
+      final result = await Api().addMaterial(body: body);
+
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> updateMaterial(
+      {required String id, required Map<String, Object?> body}) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().updateMaterial(id, body);
+
+      if (success) {
+        Get.snackbar("Success", "Updated successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Update failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> deleteMaterial(
+    String id,
+  ) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().deleteMaterial(id);
+
+      if (success) {
+        materials.removeWhere((e) => e.id == id);
+
+        Get.snackbar("Success", "Deleted successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Delete failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<RecommendationItem?> addRecommendation(
+      {required Map<String, Object?> body}) async {
+    isLoading.value = true;
+
+    try {
+      final type = body['type'];
+
+      final result = type == 'package'
+          ? await Api().addPackageRecommendation(body: body)
+          : await Api().addBatchRecommendation(body: body);
+
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> updateRecommendation(
+      {required String id, required Map<String, Object?> body}) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().updateRecommendation(id, body);
+
+      if (success) {
+        Get.snackbar("Success", "Updated successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Update failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> deleteRecommendation(
+    String id,
+  ) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().deleteRecommendation(id);
+
+      if (success) {
+        hiringAd.removeWhere((e) => e.id == id);
+
+        Get.snackbar("Success", "Deleted successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Delete failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<HiringAd?> addHiringAd({required Map<String, Object?> body}) async {
+    isLoading.value = true;
+
+    try {
+      final result = await Api().addHiringAd(body: body);
+
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> updateHiringAd(
+      {required String id, required Map<String, Object?> body}) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().updateHiringAd(id, body);
+
+      if (success) {
+        Get.snackbar("Success", "Updated successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Update failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> deleteHiringAd(
+    String id,
+  ) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().deleteHiringAd(id);
+
+      if (success) {
+        hiringAd.removeWhere((e) => e.id == id);
+
+        Get.snackbar("Success", "Deleted successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Delete failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<Macro?> addMacro({required Map<String, Object?> body}) async {
+    isLoading.value = true;
+
+    try {
+      final result = await Api().addMacro(body: body);
+
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> updateMacro(
+      {required String id, required Map<String, Object?> body}) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().updateMacro(id, body);
+
+      if (success) {
+        Get.snackbar("Success", "Updated successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Update failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> deleteMacro(
+    String id,
+  ) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().deleteHiringAd(id);
+
+      if (success) {
+        supportMacros.removeWhere((e) => e.id == id);
 
         Get.snackbar("Success", "Deleted successfully");
         return true;
@@ -1030,7 +1383,7 @@ class SettingsController extends GetxController {
   Future<bool> updateTerms(
       {required String id,
       required String content,
-      required String userType}) async{
+      required String userType}) async {
     isLoading.value = true;
 
     try {
@@ -1202,8 +1555,47 @@ class SettingsController extends GetxController {
     }
   }
 
+  Future<void> fetchBatches() async {
+    errorMessage.value = '';
+
+    try {
+      isLoading.value = true;
+
+      final result = await Api().getBatches();
+
+      if (result is String) {
+        Get.snackbar(
+          'Error',
+          result,
+          colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+        );
+
+        return;
+      }
+
+      batches.assignAll(
+        result
+            .map<BatchDetail>(
+              (e) => BatchDetail.fromJson(e),
+            )
+            .toList(),
+      );
+      log(batches.length.toString());
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        colorText: Theme.of(Get.context!).colorScheme.onPrimary,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   VisibleTo visibleToFromString(String value) {
     switch (value.toUpperCase()) {
+      case 'ALL':
+        return VisibleTo.all;
       case 'ADMIN':
         return VisibleTo.admin;
 
@@ -1215,6 +1607,9 @@ class SettingsController extends GetxController {
 
       case 'MENTOR':
         return VisibleTo.mentor;
+
+      case 'ASSISTANT_ADMIN':
+        return VisibleTo.coordinator;
 
       case 'COORDINATOR':
         return VisibleTo.coordinator;
@@ -1254,33 +1649,49 @@ class SettingsController extends GetxController {
       final packageResponse = responses[0];
       final batchResponse = responses[1];
 
-      List<Object> allRecommendations = [];
+      List<RecommendationItem> allRecommendations = [];
 
-      /// PACKAGE RECOMMENDATIONS
+      /// PACKAGE
       if (packageResponse != null) {
         final List data = packageResponse as List;
 
-        final packageList =
-            data.map((e) => PackageRecommendations.fromJson(e)).toList();
+        final packageList = data.map((e) {
+          final item = PackageRecommendations.fromJson(e);
 
-        allRecommendations.addAll(packageList);
-
-        if (packageList.isNotEmpty) {
-          selectedSyllabus.assignAll(
-            packageList.first.showToSyllabuses
-                    ?.map((e) => e.name ?? '')
-                    .toList() ??
-                [],
+          return RecommendationItem(
+            id: item.id,
+            title: item.recommendedPackage,
+            recommendedPackage: item.recommendedPackage,
+            type: "package",
+            image: item.image,
+            fromDate: item.fromDate,
+            toDate: item.toDate,
+            syllabuses:
+                item.showToSyllabuses?.map((e) => e.name ?? '').toList() ?? [],
           );
-        }
+        }).toList();
+        allRecommendations.addAll(packageList);
       }
 
-      /// BATCH RECOMMENDATIONS
+      /// BATCH
       if (batchResponse != null) {
         final List data = batchResponse as List;
 
-        final batchList =
-            data.map((e) => BatchRecommendations.fromJson(e)).toList();
+        final batchList = data.map((e) {
+          final item = BatchRecommendations.fromJson(e);
+
+          return RecommendationItem(
+            id: item.id,
+            title: item.recommendedBatch,
+            recommendedBatch: item.recommendedBatch,
+            type: "batch",
+            image: item.image,
+            fromDate: item.fromDate,
+            toDate: item.toDate,
+            syllabuses:
+                item.showToSyllabuses?.map((e) => e.name ?? '').toList() ?? [],
+          );
+        }).toList();
 
         allRecommendations.addAll(batchList);
       }
@@ -1310,9 +1721,6 @@ class SettingsController extends GetxController {
       hiringAd.assignAll(
         (response as List).map((e) => HiringAd.fromJson(e)).toList(),
       );
-      // if (hiringAd.isNotEmpty) {
-      //   selectedSyllabus.assignAll(recommendations.first.visibleTo);
-      // }
     } catch (e) {
       print('Error fetching hiring ads: $e');
     } finally {
@@ -1328,6 +1736,34 @@ class SettingsController extends GetxController {
   //   selectedDays.assignAll(ad.days ?? []);
   // }
 
+  Future<String?> backup(String email) async {
+    isLoading.value = true;
+
+    try {
+      final result = await Api().backup(emailCtrl.text);
+      if (result != null) {
+        Get.snackbar(
+          "Success",
+          result,
+        );
+      } else {
+        Get.snackbar(
+          "Error",
+          "Backup failed",
+        );
+      }
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> fetchRatingValues() async {
     try {
       isLoading.value = true;
@@ -1335,6 +1771,10 @@ class SettingsController extends GetxController {
       final response = await Api().globalRatingValues();
 
       if (response is RatingValue) {
+        ratingId.value = response.id ?? 0;
+
+        /// STORE DATE
+        startDateController.text = response.validFrom ?? '';
         final data = [
           {"label": "MV1", "value": response.values.mv1},
           {"label": "MV2", "value": response.values.mv2},
@@ -1361,12 +1801,21 @@ class SettingsController extends GetxController {
       isLoading.value = false;
     }
   }
-  // void addField({String defaultValue = "0"}) {
-  //   textControllers.add(TextEditingController(text: defaultValue));
-  //   ratingValues.add(RatingValue(
-  //       label: "MV${ratingValues.length + 1}",
-  //       value: double.tryParse(defaultValue) ?? 0));
-  // }
+
+  void addField() {
+    final nextIndex = ratingValues.length + 1;
+
+    ratingValues.add({
+      "label": "MV$nextIndex",
+      "value": "",
+    });
+
+    textControllers.add(
+      TextEditingController(),
+    );
+
+    ratingValues.refresh();
+  }
 
   void removeField(int index) {
     if (ratingValues.length > 5) {
@@ -1378,13 +1827,73 @@ class SettingsController extends GetxController {
     }
   }
 
-  void saveSettings() {
-    // Collect data from controllers
-    for (int i = 0; i < textControllers.length; i++) {
-      print("Saving MV${i + 1}: ${textControllers[i].text}");
+  Future<void> saveSettings() async {
+    try {
+      isLoading.value = true;
+
+      /// CREATE VALUES MAP
+      final Map<String, dynamic> values = {};
+
+      for (int i = 0; i < ratingValues.length; i++) {
+        final label = ratingValues[i]["label"];
+        final text = textControllers[i].text.trim();
+
+        /// VALIDATE EMPTY FIELD
+        if (text.isEmpty) {
+          Get.snackbar(
+            "Error",
+            "$label value cannot be empty",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+
+          isLoading.value = false;
+          return;
+        }
+
+        /// VALIDATE NUMBER
+        final parsedValue = double.tryParse(text);
+
+        if (parsedValue == null) {
+          Get.snackbar(
+            "Error",
+            "$label must be a valid number",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+
+          isLoading.value = false;
+          return;
+        }
+
+        values[label] = parsedValue;
+      }
+
+      final body = {
+        "id": ratingId.value,
+        "valid_from": startDateController.text,
+        "values": values,
+      };
+
+      log(body.toString());
+
+      /// API CALL
+      await Api().saveRatingValues(body);
+
+      Get.snackbar(
+        "Success",
+        "Settings saved successfully",
+      );
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString().replaceAll("Exception:", "").trim(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
     }
-    Get.snackbar("Success", "Settings saved successfully",
-        backgroundColor: Colors.green, colorText: Colors.white);
   }
 
   void fetchSupports() async {
@@ -1444,16 +1953,26 @@ class SettingsController extends GetxController {
       isLoading.value = false;
     }
   }
-  // void loadMaterials(Materials material) {
-  //   selectedUser.value = material.type!.toLowerCase();
-  //   titleController.text = material.title ?? '';
-  //   packageController.text = material.package ?? '';
-  //   categoryController.text = material.category ?? '';
-  //   courseController.text = material.course ?? '';
-  //   batchController.text = material.batch ?? '';
-  //   messageController.text = material.description ?? '';
-  //   urlController.text = material.link ?? '';
-  // }
+
+  Future<void> fetchTestTypes() async {
+    try {
+      isLoading.value = true;
+
+      final response = await Api().getTestType();
+
+      if (response != null) {
+        final List data = response as List;
+
+        testTypes.assignAll(
+          data.map((e) => TestType.fromJson(e)).toList(),
+        );
+      }
+    } catch (e) {
+      debugPrint('fetch test types error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   void clearController() {
     titleController.clear();
@@ -1496,4 +2015,307 @@ class SettingsController extends GetxController {
 
     return a.compareTo(b);
   }
+
+  void delete(String? id) {}
+
+  Future<void> updateBanner(
+      {required String bannerId, required Map<String, Object> body}) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().updateBannerAd(bannerId, body);
+
+      if (success) {
+        Get.back();
+        Get.snackbar("Success", "Banner Ad updated");
+      } else {
+        Get.snackbar("Error", "Update failed");
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<Banners?> addBanner({required Map<String, Object> body}) async {
+    isLoading.value = true;
+
+    try {
+      final result = await Api().addBanner(body: body);
+
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> deleteBanner({
+    required String id,
+  }) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().deleteBannerAd(id);
+
+      if (success) {
+        syllabus.removeWhere((e) => e.id == id);
+
+        Get.snackbar("Success", "Deleted successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Delete failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<Coupons?> updateCouponCode({
+    required String couponId,
+    required Map<String, String?> body,
+  }) async {
+    isLoading.value = true;
+
+    try {
+      final result = await Api().updateCouponCode(
+        couponId,
+        body,
+      );
+
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<Coupons?> addCouponCode({required Map<String, String?> body}) async {
+    isLoading.value = true;
+
+    try {
+      log(body.toString());
+      final result = await Api().addCouponCode(body: body);
+
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> deleteCouponCode({
+    required String id,
+  }) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().deleteCouponCode(id);
+
+      if (success) {
+        coupons.removeWhere((e) => e.id == id);
+
+        Get.snackbar("Success", "Deleted successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Delete failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  bool isVideoFile(String path) {
+    final lower = path.toLowerCase();
+
+    return lower.endsWith('.mp4') ||
+        lower.endsWith('.mov') ||
+        lower.endsWith('.webm') ||
+        lower.endsWith('.mkv');
+  }
+
+  Future<void> pickMedia() async {
+    final picker = ImagePicker();
+
+    final picked = await picker.pickMedia();
+
+    if (picked != null) {
+      selectedMedia.value = File(picked.path);
+    }
+  }
+
+  Future<void> pickRecommendationImage() async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      selectedRecommendationFile = result.files.first;
+
+      selectedRecommendationImage.value = result.files.first.bytes;
+    }
+  }
+
+  Future<void> pickHiringAdImage() async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      selectedHiringFile = result.files.first;
+
+      selectedHiringAdImage.value = result.files.first.bytes;
+    }
+  }
+
+  Future<File?> pickCsvFile() async {
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        return File(result.files.single.path!);
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    }
+
+    return null;
+  }
+
+  Future<void> bulkUpload() async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().bulkUploadFile(
+        file: selectedCsvFile!,
+        type: selectedBulkType.value,
+      );
+
+      if (success) {
+        Get.snackbar("Success", "Uploaded successfully");
+      } else {
+        Get.snackbar("Error", "Upload failed");
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void clearMaterialForm() {
+    titleController.clear();
+    messageController.clear();
+
+    driveUrlController.clear();
+    youtubeUrlController.clear();
+
+    batchController.clear();
+    packageController.clear();
+    categoryController.clear();
+    courseController.clear();
+    syllabusController.clear();
+    standardController.clear();
+
+    selectedBatches.clear();
+    selectedPackages.clear();
+    selectedCategories.clear();
+    selectedCourses.clear();
+    selectedSyllabi.clear();
+    selectedStandards.clear();
+
+    selectedUser.value = 'batch';
+    selectedMaterialType.value = 'drive';
+
+    selectedMedia.value = null;
+  }
+}
+
+enum VisibleTo {
+  all,
+  admin,
+  student,
+  teacher,
+  mentor,
+  coordinator,
+  other,
+}
+
+extension VisibleToExtension on VisibleTo {
+  String get apiValue {
+    switch (this) {
+      case VisibleTo.all:
+        return 'ALL';
+      case VisibleTo.admin:
+        return 'ADMIN';
+      case VisibleTo.student:
+        return 'STUDENT';
+      case VisibleTo.teacher:
+        return 'TEACHER';
+      case VisibleTo.mentor:
+        return 'MENTOR';
+      case VisibleTo.coordinator:
+        return 'ASSISTANT_ADMIN';
+      case VisibleTo.other:
+        return 'OTHERS';
+    }
+  }
+
+  static VisibleTo fromString(String value) {
+    switch (_normalize(value)) {
+      case 'ALL':
+        return VisibleTo.all;
+      case 'ADMIN':
+        return VisibleTo.admin;
+      case 'STUDENT':
+        return VisibleTo.student;
+      case 'TEACHER':
+        return VisibleTo.teacher;
+      case 'MENTOR':
+        return VisibleTo.mentor;
+      case 'ASSISTANT_ADMIN':
+        return VisibleTo.coordinator;
+      case 'OTHERS':
+        return VisibleTo.other;
+      default:
+        return VisibleTo.other;
+    }
+  }
+}
+
+String _normalize(String value) {
+  return value.trim().toUpperCase();
 }
