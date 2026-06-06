@@ -1,11 +1,14 @@
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/settings/hiring_ad_model.dart';
+import 'package:albedo_app/model/settings/syllabus_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
+import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,17 +18,18 @@ class PackageController extends GetxController {
   var sessions = <Session>[].obs;
   var filteredSessions = <Session>[].obs;
   RxList<Package> packagesList = <Package>[].obs;
+  RxList<Syllabus> packageNamesList = <Syllabus>[].obs;
   RxList<Teacher> teacherList = <Teacher>[].obs;
-  RxList<String> courseList = <String>[].obs;
-  RxList<String> syllabusList = <String>[].obs;
-  RxList<String> categoryList = <String>[].obs;
-  RxList<String> standardList = <String>[].obs;
-  Rx<Package?> selectedPackage = Rx<Package?>(null);
+  RxList<Syllabus> courseList = <Syllabus>[].obs;
+  RxList<Syllabus> syllabusList = <Syllabus>[].obs;
+  RxList<Syllabus> categoryList = <Syllabus>[].obs;
+  RxList<Syllabus> standardList = <Syllabus>[].obs;
+  Rx<Syllabus?> selectedPackage = Rx<Syllabus?>(null);
   Rx<Teacher?> selectedTeacher = Rx<Teacher?>(null);
-  Rx<String?> selectedCourse = Rx<String?>(null);
-  Rx<String?> selectedSyllabus = Rx<String?>(null);
-  Rx<String?> selectedCategory = Rx<String?>(null);
-  Rx<String?> selectedStandard = Rx<String?>(null);
+  Rx<Syllabus?> selectedCourse = Rx<Syllabus?>(null);
+  Rx<Syllabus?> selectedSyllabus = Rx<Syllabus?>(null);
+  Rx<Syllabus?> selectedCategory = Rx<Syllabus?>(null);
+  Rx<Syllabus?> selectedStandard = Rx<Syllabus?>(null);
   Rx<String?> selectedTuitionMode = Rx<String?>(null);
   RxList<Days> selectedDays = <Days>[].obs;
   RxList<DateTime> selectedDates = <DateTime>[].obs;
@@ -102,18 +106,110 @@ class PackageController extends GetxController {
     }
   }
 
-  void loadPackage(Package package) {
+  Future<void> initForm() async {
+    try {
+      final packageData = await Api().getPackageNames();
+      packageNamesList.assignAll(
+        packageData.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+
+      final courseData = await Api().getCourses();
+      courseList.assignAll(
+        courseData.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+
+      final syllabusData = await Api().getSyllabuses();
+      syllabusList.assignAll(
+        syllabusData.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+
+      final categoryData = await Api().getCategories();
+      categoryList.assignAll(
+        categoryData.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+      final standardData = await Api().getStandards();
+      standardList.assignAll(
+        standardData.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+
+      final teacherData = await Api().getTeacherList();
+      teacherList.assignAll(teacherData);
+    } catch (e) {
+      debugPrint('Init form error: $e');
+    }
+  }
+
+  void loadPackage(Package package) async {
     selectedType.value = 'package';
 
-    selectedPackage.value = package;
-    selectedCourse.value = package.course;
-    selectedSyllabus.value = package.syllabus;
-    selectedCategory.value = package.category;
-    selectedStandard.value = package.standard;
+    if (packageNamesList.isEmpty) {
+      final data = await Api().getPackageNames();
+
+      packageNamesList.assignAll(
+        data.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+    }
+
+    selectedPackage.value = packageNamesList.firstWhereOrNull(
+      (p) => p.name == package.packageName || p.name == package.name,
+    );
+    if (courseList.isEmpty) {
+      final data = await Api().getCourses();
+
+      courseList.assignAll(
+        data.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+    }
+
+    selectedCourse.value = courseList.firstWhereOrNull(
+      (p) => p.name == package.course || p.name == package.name,
+    );
+    if (syllabusList.isEmpty) {
+      final data = await Api().getSyllabuses();
+
+      syllabusList.assignAll(
+        data.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+    }
+
+    selectedSyllabus.value = syllabusList.firstWhereOrNull(
+      (p) => p.name == package.syllabus || p.name == package.name,
+    );
+    if (categoryList.isEmpty) {
+      final data = await Api().getCategories();
+
+      categoryList.assignAll(
+        data.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+    }
+
+    selectedCategory.value = categoryList.firstWhereOrNull(
+      (p) => p.name == package.category || p.name == package.name,
+    );
+    if (standardList.isEmpty) {
+      final data = await Api().getStandards();
+
+      standardList.assignAll(
+        data.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
+      );
+    }
+
+    selectedStandard.value = standardList.firstWhereOrNull(
+      (p) => p.name == package.standard || p.name == package.name,
+    );
+    if (teacherList.isEmpty) {
+      final data = await Api().getTeacherList();
+
+      teacherList.assignAll(data);
+    }
+
+    selectedTeacher.value = teacherList.firstWhereOrNull(
+      (p) => p.name == package.teacher?.name || p.name == package.name,
+    );
 
     classCountController.text = package.numberOfClasses?.toString() ?? '';
 
-    timeController.text = package.time ?? '';
+    timeController.text = formatTime(package.classTime);
 
     selectedDuration.value = package.duration;
 
@@ -124,8 +220,6 @@ class PackageController extends GetxController {
     totalPackageFeeController.text = package.packageFee?.toString() ?? '';
 
     selectedTuitionMode.value = package.mode;
-
-    selectedTeacher.value = package.teacher;
 
     salaryController.text = package.teacherSalaryPerHour?.toString() ?? '';
 
@@ -185,16 +279,14 @@ class PackageController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             sessions: [Session(id: '1', status: 'active')],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "CBSE Mathematics",
-        className: "Class 10",
         teacher: Teacher(
           id: "T001",
           name: "Ameen Rahman",
@@ -215,9 +307,7 @@ class PackageController extends GetxController {
         advisor: Advisor(
           id: "ADV001",
           name: "Fathima",
-          joinedAt: DateTime.now(),
         ),
-        date: DateTime(2026, 4, 23),
         status: "started",
       ),
       Session(
@@ -239,15 +329,13 @@ class PackageController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "SCERT",
-        className: "9B",
         teacher: Teacher(
           id: "T002",
           name: "David",
@@ -260,7 +348,6 @@ class PackageController extends GetxController {
           name: "David",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now().add(const Duration(days: 1)),
         status: "upcoming",
       ),
       Session(
@@ -282,15 +369,13 @@ class PackageController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "CBSE",
-        className: "8C",
         teacher: Teacher(
           id: "T001",
           name: "John",
@@ -303,7 +388,6 @@ class PackageController extends GetxController {
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now(),
         status: "pending",
       ),
       Session(
@@ -325,15 +409,13 @@ class PackageController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "SCERT",
-        className: "11A",
         teacher: Teacher(
           id: "T003",
           name: "Meera",
@@ -346,7 +428,6 @@ class PackageController extends GetxController {
           name: "David",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now().subtract(const Duration(days: 3)),
         status: "completed",
       ),
       Session(
@@ -368,15 +449,13 @@ class PackageController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "CBSE",
-        className: "12B",
         teacher: Teacher(
           id: "T002",
           name: "David",
@@ -389,7 +468,6 @@ class PackageController extends GetxController {
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now(),
         status: "no_balance",
       ),
       Session(
@@ -411,15 +489,13 @@ class PackageController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "SCERT",
-        className: "10A",
         teacher: Teacher(
           id: "T003",
           name: "Meera",
@@ -432,7 +508,6 @@ class PackageController extends GetxController {
           name: "David",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now().subtract(const Duration(hours: 5)),
         status: "meet_done",
       ),
       Session(
@@ -465,8 +540,8 @@ class PackageController extends GetxController {
                   standard: '',
                   syllabus: '',
                   status: '',
-                  packageFee: 0,
-                  takenFee: 0,
+                  // packageFee: 0,
+                  // takenFee: 0,
                   balance: 0,
                   withdrawals: [],
                   time: '',
@@ -485,15 +560,13 @@ class PackageController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "CBSE",
-        className: "9A",
         teacher: Teacher(
           id: "T001",
           name: "Ameen Rahman",
@@ -506,7 +579,6 @@ class PackageController extends GetxController {
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now().add(const Duration(hours: 3)),
         status: "started",
       ),
     ];

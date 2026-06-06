@@ -249,7 +249,7 @@ class Urls {
   static String assistantMentors(String assistantId) =>
       '$base/custom_admin/assistant/$assistantId/mentors/';
 
-       static String combinedReport = '$base/custom_admin/combined-report/';
+  static String combinedReport = '$base/custom_admin/combined-report/';
 
   static String deadlineOverrides = '$base/custom_admin/deadline-overrides/';
 
@@ -573,8 +573,6 @@ class Urls {
   static String regenerateBatchPackageMeetLink(String id) =>
       '$base/student/batch-packages/$id/regenerate-meet-link/';
 
-
-
   //------------------ Batch Schedules ---------------------------//
 
   static String batchSchedules = '$base/student/batch-schedules/';
@@ -775,6 +773,14 @@ class Urls {
   static String unassignedStudents = '$base/student/unassigned-students/';
 
   //------------------ Teacher ---------------------------//
+
+  static String teachers = '$base/teacher/teachers/';
+
+  static String teachersActive = '$base/teacher/teachers/active/';
+
+  static String teachersWithBatches = '$base/teacher/teachers-with-batches/';
+
+  static String teachersList = '$base/teacher/teachers-list/';
 
   static String hiringInterests = '$base/teacher/hiring-interests/';
 

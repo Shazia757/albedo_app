@@ -58,7 +58,7 @@ class DrawerMenu extends StatelessWidget {
               if (user == null) {
                 return Center(child: CircularProgressIndicator());
               }
-              final role = auth.activeUser?.position;
+              final role = auth.activeUser?.role;
               final normalizedRole = role?.trim().toLowerCase();
 
               final isAdmin = normalizedRole == "admin";

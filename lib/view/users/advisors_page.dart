@@ -125,25 +125,27 @@ class AdvisorsPage extends StatelessWidget {
                               final cs = Theme.of(context).colorScheme;
 
                               return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 4),
                                 child: Align(
                                   alignment: Alignment.center,
                                   child: ConstrainedBox(
                                     constraints:
                                         const BoxConstraints(maxWidth: 700),
                                     child: PremiumInfoCard(
-                                      id: advisor.id ?? "",
+                                      id: advisor.empId ?? "",
                                       title: advisor.name ?? "",
                                       subtitle: advisor.email ?? "",
-                                      status: advisor.status,
-                                      statusColor:
-                                          getStatusColor(advisor.status),
-                                      footerText:
-                                          "Joined • ${advisor.joinedAt.toString().substring(0, 16)}",
-                                      extraInfo: advisor.phone != null
+                                      status: (advisor.isResigned == true)
+                                          ? 'Inactive'
+                                          : 'Active',
+                                      statusColor: getStatusColor(
+                                          (advisor.isResigned == true)
+                                              ? 'Inactive'
+                                              : 'Active'),
+                                      footerText: advisor.phone != null
                                           ? "Contact • ${advisor.phone}"
-                                          : null,
+                                          : "",
                                       onTap: () {
                                         {
                                           Get.to(() => AdvisorDetailedPage(
@@ -168,7 +170,7 @@ class AdvisorsPage extends StatelessWidget {
                                           icon: Icons.edit,
                                           color: cs.secondary,
                                           onTap: () {
-                                            c.loadAdvisors(advisor);
+                                            // c.loadAdvisors(advisor);
                                             Get.to(() =>
                                                 AddAdvisorPage(isEdit: true));
                                           },
@@ -189,24 +191,27 @@ class AdvisorsPage extends StatelessWidget {
                                           color: cs.error,
                                           onTap: () =>
                                               CustomWidgets().showDeleteDialog(
-                                                dltText: Obx(
-  () => c.isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
-        ),
-),
+                                            dltText: Obx(
+                                              () => c.isLoading.value
+                                                  ? const SizedBox(
+                                                      width: 18,
+                                                      height: 18,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: Colors.white,
+                                                      ),
+                                                    )
+                                                  : Text(
+                                                      "Yes",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleSmall!
+                                                          .copyWith(
+                                                              color:
+                                                                  Colors.white),
+                                                    ),
+                                            ),
                                             title: 'Are you sure?',
                                             text:
                                                 'Are you sure you want to delete this advisor permanently?',

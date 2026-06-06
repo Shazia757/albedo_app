@@ -4,11 +4,9 @@ import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
-SingleChildScrollView studentWalletTab(
-    BuildContext context, Student student, StudentController c) {
+SingleChildScrollView studentWalletTab(BuildContext context, Student student,
+    StudentWallet wallet, StudentController c) {
   final cs = Theme.of(context).colorScheme;
-  final wallet = student.wallet ?? StudentWallet();
-  final balance = wallet.balance ?? 0;
 
   return SingleChildScrollView(
     padding: const EdgeInsets.fromLTRB(0, 0, 0, 32),
@@ -16,7 +14,7 @@ SingleChildScrollView studentWalletTab(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ── Balance hero card ────────────────────────────────────
-        _BalanceCard(balance: balance, wallet: wallet, cs: cs),
+        _BalanceCard(wallet: wallet, cs: cs),
 
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 14, 0, 0),
@@ -24,7 +22,7 @@ SingleChildScrollView studentWalletTab(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Filter row ─────────────────────────────────────
-              _FilterRow(c: c, student: student),
+              _FilterRow(c: c, student: student, wallet: wallet),
 
               SizedBox(height: 12),
 
@@ -32,7 +30,11 @@ SingleChildScrollView studentWalletTab(
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () => _showWalletSummary(context, student, wallet),
+                  onPressed: () => _showWalletSummary(
+                    context,
+                    student,
+                    wallet,
+                  ),
                   iconAlignment: IconAlignment.end,
                   icon: const Icon(Icons.bar_chart_outlined,
                       size: 18, color: Colors.white),
@@ -54,23 +56,23 @@ SingleChildScrollView studentWalletTab(
               SizedBox(height: 14),
 
               // ── Credit summary ─────────────────────────────────
-              _CreditSummaryCard(student: student, cs: cs),
+              _CreditSummaryCard(wallet: wallet, cs: cs),
               SizedBox(height: 10),
 
               // ── Deposits ───────────────────────────────────────
-              _DepositsCard(student: student, cs: cs),
+              _DepositsCard(wallet: wallet, cs: cs),
               SizedBox(height: 10),
 
               // ── Wallet usage ───────────────────────────────────
-              _WalletUsageCard(student: student, cs: cs),
+              _WalletUsageCard(student: student, wallet: wallet, cs: cs),
               SizedBox(height: 10),
 
               // ── Credit transactions ────────────────────────────
-              _CreditTransactionsCard(student: student, cs: cs),
+              _CreditTransactionsCard(wallet: wallet, cs: cs),
               SizedBox(height: 10),
 
               // ── Registration fee ───────────────────────────────
-              _RegistrationFeeCard(student: student, cs: cs),
+              _RegistrationFeeCard(wallet: wallet, cs: cs),
               SizedBox(height: 10),
 
               // ── Packages ───────────────────────────────────────
@@ -87,12 +89,10 @@ SingleChildScrollView studentWalletTab(
 // BALANCE HERO CARD
 // ─────────────────────────────────────────────────────────────────────
 class _BalanceCard extends StatelessWidget {
-  final double balance;
   final StudentWallet wallet;
   final ColorScheme cs;
 
-  const _BalanceCard(
-      {required this.balance, required this.wallet, required this.cs});
+  const _BalanceCard({required this.wallet, required this.cs});
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +111,7 @@ class _BalanceCard extends StatelessWidget {
                   color: cs.onPrimary.withOpacity(0.7), letterSpacing: 0.6)),
           SizedBox(height: 4),
           Text(
-            "₹${balance.toStringAsFixed(0)}",
+            "₹${wallet.balance?.toStringAsFixed(0)}",
             style: Theme.of(context)
                 .textTheme
                 .headlineLarge!
@@ -122,11 +122,11 @@ class _BalanceCard extends StatelessWidget {
             children: [
               _BalanceStat(
                   label: "Available",
-                  value: "₹${wallet.available.toStringAsFixed(0) ?? '0'}"),
+                  value: "₹${wallet.available?.toStringAsFixed(0) ?? '0'}"),
               SizedBox(width: 32),
               _BalanceStat(
                   label: "On Hold",
-                  value: "₹${wallet.onHold.toStringAsFixed(0) ?? '0'}"),
+                  value: "₹${wallet.onHold?.toStringAsFixed(0) ?? '0'}"),
             ],
           ),
         ],
@@ -167,8 +167,10 @@ class _BalanceStat extends StatelessWidget {
 class _FilterRow extends StatelessWidget {
   final StudentController c;
   final Student student;
+  final StudentWallet wallet;
 
-  const _FilterRow({required this.c, required this.student});
+  const _FilterRow(
+      {required this.c, required this.student, required this.wallet});
 
   @override
   Widget build(BuildContext context) {
@@ -211,10 +213,12 @@ class _FilterRow extends StatelessWidget {
                 }
               },
               submitWidget: Text(
-      "Validate & Apply",
-      style:
-          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
+                "Validate & Apply",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Colors.white),
+              ),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -233,7 +237,7 @@ class _FilterRow extends StatelessWidget {
         Tooltip(
           message: 'Request refund',
           child: ElevatedButton(
-            onPressed: () => _showRefundDialog(context, student, c, cs),
+            onPressed: () => _showRefundDialog(context, wallet, c, cs),
             style: ElevatedButton.styleFrom(
               backgroundColor: cs.error,
               shape: RoundedRectangleBorder(
@@ -248,7 +252,7 @@ class _FilterRow extends StatelessWidget {
     );
   }
 
-  void _showRefundDialog(BuildContext context, Student student,
+  void _showRefundDialog(BuildContext context, StudentWallet wallet,
       StudentController c, ColorScheme cs) {
     CustomWidgets().showCustomDialog(
       context: context,
@@ -260,8 +264,7 @@ class _FilterRow extends StatelessWidget {
             Expanded(
               child: _RefundStatCell(
                 title: "Total Deposit",
-                value:
-                    "₹${student.wallet?.totalDeposited.toStringAsFixed(0) ?? '0'}",
+                value: "₹${wallet.totalDeposited?.toStringAsFixed(0) ?? '0'}",
                 color: const Color(0xFF0F6E56),
                 cs: cs,
               ),
@@ -308,7 +311,7 @@ class _FilterRow extends StatelessWidget {
         SizedBox(height: 8),
         CustomWidgets().dropdownStyledTextField(
           context: context,
-          hint: 'e.g. 250 (max: ₹${student.wallet?.totalDeposited})',
+          hint: 'e.g. 250 (max: ₹${wallet.totalDeposited})',
           controller: c.refundAmountController,
         ),
         SizedBox(height: 12),
@@ -330,14 +333,18 @@ class _FilterRow extends StatelessWidget {
         ),
         SizedBox(height: 10),
       ],
-       submitWidget: Text(
-      "Request",
-      style:
-          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
-      onSubmit: () {if (c.validateRequest(context)) {
-        c.requestRefund();
-      }},
+      submitWidget: Text(
+        "Request",
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
+      ),
+      onSubmit: () {
+        if (c.validateRequest(context)) {
+          c.requestRefund();
+        }
+      },
     );
   }
 }
@@ -397,13 +404,12 @@ class _WalletSection extends StatelessWidget {
 // CREDIT SUMMARY CARD
 // ─────────────────────────────────────────────────────────────────────
 class _CreditSummaryCard extends StatelessWidget {
-  final Student student;
+  final StudentWallet wallet;
   final ColorScheme cs;
-  const _CreditSummaryCard({required this.student, required this.cs});
+  const _CreditSummaryCard({required this.wallet, required this.cs});
 
   @override
   Widget build(BuildContext context) {
-    final wallet = student.wallet ?? StudentWallet();
     final limit = wallet.creditLimit ?? 0;
     final used = wallet.creditUsed ?? 0;
     final balance = limit - used;
@@ -450,9 +456,9 @@ class _CreditSummaryCard extends StatelessWidget {
 // DEPOSITS CARD
 // ─────────────────────────────────────────────────────────────────────
 class _DepositsCard extends StatelessWidget {
-  final Student student;
+  final StudentWallet wallet;
   final ColorScheme cs;
-  const _DepositsCard({required this.student, required this.cs});
+  const _DepositsCard({required this.wallet, required this.cs});
 
   @override
   Widget build(BuildContext context) {
@@ -464,8 +470,7 @@ class _DepositsCard extends StatelessWidget {
           Expanded(
             child: _MetricCell(
               label: "Pending",
-              value:
-                  "₹${student.wallet?.pendingDeposits.toStringAsFixed(0) ?? '0'}",
+              value: "₹${wallet?.pendingDeposits?.toStringAsFixed(0) ?? '0'}",
               color: const Color(0xFF854F0B),
               cs: cs,
             ),
@@ -474,8 +479,7 @@ class _DepositsCard extends StatelessWidget {
           Expanded(
             child: _MetricCell(
               label: "Lifetime",
-              value:
-                  "₹${student.wallet?.totalDeposited.toStringAsFixed(0) ?? '0'}",
+              value: "₹${wallet?.totalDeposited?.toStringAsFixed(0) ?? '0'}",
               color: const Color(0xFF0F6E56),
               cs: cs,
             ),
@@ -491,8 +495,10 @@ class _DepositsCard extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────
 class _WalletUsageCard extends StatelessWidget {
   final Student student;
+  final StudentWallet wallet;
   final ColorScheme cs;
-  const _WalletUsageCard({required this.student, required this.cs});
+  const _WalletUsageCard(
+      {required this.student, required this.wallet, required this.cs});
 
   @override
   Widget build(BuildContext context) {
@@ -505,14 +511,13 @@ class _WalletUsageCard extends StatelessWidget {
         children: [
           _UsageRow(
             label: "Wallet Used",
-            value: "₹${student.wallet?.walletUsed.toStringAsFixed(0) ?? '0'}",
+            value: "₹${wallet?.walletUsed?.toStringAsFixed(0) ?? '0'}",
             cs: cs,
           ),
           SizedBox(height: 6),
           _UsageRow(
             label: "Credit Used",
-            value:
-                "₹${student.wallet?.creditUsedAmount.toStringAsFixed(0) ?? '0'}",
+            value: "₹${wallet?.creditUsedAmount?.toStringAsFixed(0) ?? '0'}",
             cs: cs,
           ),
           if (packages.isNotEmpty) ...[
@@ -521,7 +526,7 @@ class _WalletUsageCard extends StatelessWidget {
                 thickness: 0.5,
                 color: cs.outlineVariant.withOpacity(0.4)),
             ...packages.map((p) {
-              final taken = p.takenFee ?? 0;
+              final taken = p.totalPaidFee ?? 0;
               final isActive = p.status == "Active";
               final statusColor =
                   isActive ? const Color(0xFF1D9E75) : const Color(0xFFBA7517);
@@ -590,51 +595,50 @@ class _WalletUsageCard extends StatelessWidget {
 // CREDIT TRANSACTIONS CARD
 // ─────────────────────────────────────────────────────────────────────
 class _CreditTransactionsCard extends StatelessWidget {
-  final Student student;
+  final StudentWallet wallet;
   final ColorScheme cs;
-  const _CreditTransactionsCard({required this.student, required this.cs});
+  const _CreditTransactionsCard({required this.wallet, required this.cs});
 
   @override
   Widget build(BuildContext context) {
-    final txns = student.wallet?.creditTransactions ?? [];
-    final limitChanges = txns.where((e) => e.type == "limit_change").length;
-    final repayments = txns.where((e) => e.type == "repayment").length;
-    final classPayments = txns.where((e) => e.type == "class_payment").length;
+    // final limitChanges = wallet.txns.where((e) => e.type == "limit_change").length;
+    // final repayments = txns.where((e) => e.type == "repayment").length;
+    // final classPayments = txns.where((e) => e.type == "class_payment").length;
 
     return _WalletSection(
       title: "Credit Transactions",
       cs: cs,
       child: Row(
         children: [
-          Expanded(
-            child: _CreditStatCell(
-              title: "Limit Changes",
-              value: limitChanges.toString(),
-              icon: Icons.trending_up_rounded,
-              color: cs.primary,
-              cs: cs,
-            ),
-          ),
-          SizedBox(width: 8),
-          Expanded(
-            child: _CreditStatCell(
-              title: "Repayments",
-              value: repayments.toString(),
-              icon: Icons.account_balance_wallet_outlined,
-              color: const Color(0xFF0F6E56),
-              cs: cs,
-            ),
-          ),
-          SizedBox(width: 8),
-          Expanded(
-            child: _CreditStatCell(
-              title: "Class Payments",
-              value: classPayments.toString(),
-              icon: Icons.school_outlined,
-              color: const Color(0xFF854F0B),
-              cs: cs,
-            ),
-          ),
+          // Expanded(
+          //   child: _CreditStatCell(
+          //     title: "Limit Changes",
+          //     value: limitChanges.toString(),
+          //     icon: Icons.trending_up_rounded,
+          //     color: cs.primary,
+          //     cs: cs,
+          //   ),
+          // ),
+          // SizedBox(width: 8),
+          // Expanded(
+          //   child: _CreditStatCell(
+          //     title: "Repayments",
+          //     value: repayments.toString(),
+          //     icon: Icons.account_balance_wallet_outlined,
+          //     color: const Color(0xFF0F6E56),
+          //     cs: cs,
+          //   ),
+          // ),
+          // SizedBox(width: 8),
+          // Expanded(
+          //   child: _CreditStatCell(
+          //     title: "Class Payments",
+          //     value: classPayments.toString(),
+          //     icon: Icons.school_outlined,
+          //     color: const Color(0xFF854F0B),
+          //     cs: cs,
+          //   ),
+          // ),
         ],
       ),
     );
@@ -645,15 +649,15 @@ class _CreditTransactionsCard extends StatelessWidget {
 // REGISTRATION FEE CARD
 // ─────────────────────────────────────────────────────────────────────
 class _RegistrationFeeCard extends StatelessWidget {
-  final Student student;
+  final StudentWallet wallet;
   final ColorScheme cs;
-  const _RegistrationFeeCard({required this.student, required this.cs});
+  const _RegistrationFeeCard({required this.wallet, required this.cs});
 
   @override
   Widget build(BuildContext context) {
-    final fee = student.wallet?.registrationFee ?? 0;
-    final isPaid = (student.regFee ?? 0) > 0;
-    final paidColor = isPaid ? const Color(0xFF1D9E75) : cs.error;
+    final fee = wallet?.registrationFee ?? 0;
+    // final isPaid = (student.regFee ?? 0) > 0;
+    // final paidColor = isPaid ? const Color(0xFF1D9E75) : cs.error;
 
     return _WalletSection(
       title: "Registration Fee",
@@ -672,42 +676,42 @@ class _RegistrationFeeCard extends StatelessWidget {
                       .copyWith(color: cs.onSurface),
                 ),
                 SizedBox(height: 3),
-                Text(
-                  student.admissionDate != null
-                      ? "${student.wallet?.registrationPaidAt?.toLocal()}"
-                          .split('.')[0]
-                      : "—",
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall!
-                      .copyWith(color: cs.onSurface.withOpacity(0.4)),
-                ),
+                // Text(
+                //   student.admissionDate != null
+                //       ? "${student.wallet?.registrationPaidAt?.toLocal()}"
+                //           .split('.')[0]
+                //       : "—",
+                //   style: Theme.of(context)
+                //       .textTheme
+                //       .labelSmall!
+                //       .copyWith(color: cs.onSurface.withOpacity(0.4)),
+                // ),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: paidColor.withOpacity(0.09),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: paidColor.withOpacity(0.3), width: 0.5),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                    isPaid ? Icons.check_circle_outline : Icons.cancel_outlined,
-                    size: 14,
-                    color: paidColor),
-                SizedBox(width: 5),
-                Text(isPaid ? "Paid" : "Unpaid",
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelMedium!
-                        .copyWith(color: paidColor)),
-              ],
-            ),
-          ),
+          // Container(
+          //   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          //   decoration: BoxDecoration(
+          //     color: paidColor.withOpacity(0.09),
+          //     borderRadius: BorderRadius.circular(6),
+          //     border: Border.all(color: paidColor.withOpacity(0.3), width: 0.5),
+          //   ),
+          //   child: Row(
+          //     mainAxisSize: MainAxisSize.min,
+          //     children: [
+          //       Icon(
+          //           isPaid ? Icons.check_circle_outline : Icons.cancel_outlined,
+          //           size: 14,
+          //           color: paidColor),
+          //       SizedBox(width: 5),
+          //       Text(isPaid ? "Paid" : "Unpaid",
+          //           style: Theme.of(context)
+          //               .textTheme
+          //               .labelMedium!
+          //               .copyWith(color: paidColor)),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );
@@ -845,13 +849,12 @@ void _showWalletSummary(
   final totalDeposits = transactions
       .where((t) => t.type == "deposit" && t.status == "approved")
       .fold(0.0, (s, t) => s + t.amount);
-  final creditRepayments = wallet.creditTransactions
-          .where((t) => t.type == "repayment")
-          .fold(0, (s, t) => s + t.count) ??
-      0;
+  // final creditRepayments = wallet.creditTransactions
+  //         .where((t) => t.type == "repayment")
+  //         .fold(0, (s, t) => s + t.count) ??
+  //     0;
 
   CustomWidgets().showCustomDialog(
-   
     context: context,
     title: Text('Wallet Summary ($totalTransactions transactions)'),
     formKey: GlobalKey(),
@@ -907,8 +910,9 @@ void _showWalletSummary(
             _WalletSummaryItem(
                 title: "Approved Deposits",
                 value: "₹${totalDeposits.toStringAsFixed(0)}"),
-            _WalletSummaryItem(
-                title: "Approved Credit Repayments", value: creditRepayments.toString()),
+            // _WalletSummaryItem(
+            //     title: "Approved Credit Repayments",
+            //     value: creditRepayments.toString()),
           ];
           return ExpandableSummaryCard(
             title: items[i].title,

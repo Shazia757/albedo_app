@@ -1,8 +1,12 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/session_report_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/settings/syllabus_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
@@ -18,21 +22,36 @@ class BatchListController extends GetxController {
 
   /// 🔁 Toggle
   final bool useMock = true;
+  final totalCount = 0.obs;
 
   /// 🔄 State
   var isLoading = true.obs;
+  RxBool isSessionDetailLoading = false.obs;
+
   var isDeleteButtonLoading = false.obs;
   RxBool isSearching = false.obs;
 
   var selectedTab = 0.obs;
   var searchQuery = ''.obs;
   Rx<Package?> selectedPackage = Rx<Package?>(null);
+  final activeCount = 0.obs;
+  final upcomingCount = 0.obs;
+  final pendingCount = 0.obs;
+  final completedCount = 0.obs;
+  final currentPage = 0.obs;
+  final pageSize = 20.obs;
+
+  int get totalPages => (totalCount.value / pageSize.value).ceil();
+
+  final RxInt currentSessionIndex = 0.obs;
+
 
   /// 📦 Data
+  final RxList<BatchSession> filteredBatchSessions = <BatchSession>[].obs;
 
   final RxList<Batch> batchList = <Batch>[].obs;
-  final RxList<Session> sessionList = <Session>[].obs;
-  RxList<String> categoryList = <String>[].obs;
+  final RxList<BatchSession> sessionList = <BatchSession>[].obs;
+  RxList<Syllabus> categoryList = <Syllabus>[].obs;
   RxList<Student> studentsList = <Student>[].obs;
   RxList<Teacher> teacherList = <Teacher>[].obs;
   RxList<Package> packagesList = <Package>[].obs;
@@ -88,176 +107,123 @@ class BatchListController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchAllCounts();
     fetchData();
   }
 
-  /// 🌐 FETCH MAIN DATA
   Future<void> fetchData() async {
     try {
       isLoading.value = true;
 
-      final user = auth.activeUser;
+      String category = "active";
 
-      final allSessions =
-          useMock ? await _mockSessions() : await _apiSessions();
+      switch (selectedTab.value) {
+        case 0:
+          category = "active";
+          break;
 
-      List<Session> result = [];
+        case 1:
+          category = "upcoming";
+          break;
 
-      if (user?.role == "Admin") {
-        result = allSessions;
-      } else if (user?.role == "Coordinator") {
-        result =
-            allSessions.where((s) => s.coordinator?.id == user!.id).toList();
-      } else if (user?.role == "Teacher") {
-        result = allSessions.where((b) => b.teacher?.id == user!.id).toList();
+        case 2:
+          category = "pending";
+          break;
+
+        case 3:
+          category = "completed";
+          break;
       }
 
-      sessionList.assignAll(result);
+      final response = await Api().getBatchSessionDetails(
+        category: category,
+        page: currentPage.value + 1,
+        pageSize: pageSize.value,
+      );
+
+      sessionList.assignAll(response.results);
+
+      totalCount.value = response.count;
+
+      applyFilters();
     } catch (e) {
-      print("Batch Fetch Error: $e");
+      log(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// 🧪 MOCK DATA
-  Future<List<Session>> _mockSessions() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return _getDummySessions();
-  }
-
-  /// 🌐 API DATA
-  Future<List<Session>> _apiSessions() async {
+  Future<void> fetchAllCounts() async {
     try {
-      // final res = await ApiService.getBatches();
-      // return res.map<Batch>((e) => Batch.fromJson(e)).toList();
+      final active = await Api().getBatchSessionDetails(
+        category: "active",
+        page: 1,
+        pageSize: 1,
+      );
 
-      throw UnimplementedError();
+      final upcoming = await Api().getBatchSessionDetails(
+        category: "upcoming",
+        page: 1,
+        pageSize: 1,
+      );
+
+      final pending = await Api().getBatchSessionDetails(
+        category: "pending",
+        page: 1,
+        pageSize: 1,
+      );
+
+      final completed = await Api().getBatchSessionDetails(
+        category: "completed",
+        page: 1,
+        pageSize: 1,
+      );
+
+      activeCount.value = active.count;
+      upcomingCount.value = upcoming.count;
+      pendingCount.value = pending.count;
+      completedCount.value = completed.count;
     } catch (e) {
-      print("API Batch Error: $e");
-      return [];
+      log(e.toString());
     }
   }
 
-  /// 📊 FILTERED LIST (MAIN LOGIC)
-  List<Session> get filteredSessions {
-    final status = statusMap[selectedTab.value];
-
-    List<Session> filtered = sessionList.where((s) {
-      final matchesStatus = s.status == status;
-
-      final query = searchQuery.value.toLowerCase();
-
-      final matchesSearch =
-          (s.batch?.batchName?.toLowerCase().contains(query) ?? false) ||
-              (s.batch?.batchID?.toLowerCase().contains(query) ?? false) ||
-              (s.id.toLowerCase().contains(query)) ||
-              (s.package?.name?.toLowerCase().contains(query) ?? false) ||
-              (s.package?.teacher?.name.toLowerCase().contains(query) ??
-                  false) ||
-              (s.package?.teacher?.id.toLowerCase().contains(query) ?? false) ||
-              (s.package?.standard?.toLowerCase().contains(query) ?? false) ||
-              (s.package?.syllabus?.toLowerCase().contains(query) ?? false) ||
-              (s.date?.toString().toLowerCase().contains(query) ?? false);
-
-      return matchesStatus && matchesSearch;
-    }).toList();
-
-    /// Optional teacher filter
-    // if (selectedTeacher.value != null &&
-    //     selectedTeacher.value != '') {
-    //   filtered = filtered.where((s) {
-    //     return s.package?.teacher?.name ==
-    //         selectedTeacher.value;
-    //   }).toList();
-    // }
-
-    /// Sort latest first
-    filtered.sort(
-      (a, b) => (b.date ?? DateTime.now()).compareTo(a.date ?? DateTime.now()),
-    );
-
-    return filtered;
-  }
-
   void applyFilters() {
-    List<Session> temp = sessionList;
-
-    final status = statusMap[selectedTab.value];
-
-    /// Status Filter
-    temp = temp.where((s) {
-      return s.status.toLowerCase() == status.toLowerCase();
-    }).toList();
+    List<BatchSession> temp = sessionList;
 
     /// Search Filter
     if (searchQuery.value.isNotEmpty) {
       final query = searchQuery.value.toLowerCase();
 
       temp = temp.where((s) {
-        return (s.batch?.batchName?.toLowerCase().contains(query) ?? false) ||
-            (s.batch?.batchID?.toLowerCase().contains(query) ?? false) ||
-            s.id.toLowerCase().contains(query) ||
-            (s.package?.name?.toLowerCase().contains(query) ?? false) ||
-            (s.package?.teacher?.name.toLowerCase().contains(query) ?? false) ||
-            (s.package?.teacher?.id.toLowerCase().contains(query) ?? false) ||
-            (s.package?.standard?.toLowerCase().contains(query) ?? false) ||
-            (s.package?.syllabus?.toLowerCase().contains(query) ?? false);
+        return (s.batchName?.toLowerCase().contains(query) ?? false) ||
+            (s.batchID?.toLowerCase().contains(query) ?? false) ||
+            s.id!.toLowerCase().contains(query) ||
+            (s.packageName?.toLowerCase().contains(query) ?? false);
+        // (s.package.teacher?.name.toLowerCase().contains(query) ?? false) ||
+        // (s.package?.teacher?.id.toLowerCase().contains(query) ?? false) ||
+        // (s.package?.standard?.toLowerCase().contains(query) ?? false) ||
+        // (s.package?.syllabus?.toLowerCase().contains(query) ?? false);
       }).toList();
     }
 
     /// Latest first
-    temp.sort(
-      (a, b) => (b.date ?? DateTime.now()).compareTo(a.date ?? DateTime.now()),
-    );
+    // temp.sort(
+    //   (a, b) => (b.date ?? DateTime.now()).compareTo(a.date ?? DateTime.now()),
+    // );
 
-    filteredSessions.assignAll(temp);
+    filteredBatchSessions.assignAll(temp);
   }
 
-  /// 👨‍🏫 FETCH USERS (API + MOCK)
-  Future<void> fetchTeachers() async {
+  Future<BatchSessionDetail?> fetchSessionDetail(String id) async {
     try {
-      isLoading.value = true;
+      isSessionDetailLoading.value = true;
 
-      if (useMock) {
-        await Future.delayed(const Duration(milliseconds: 500));
-        teacherList.assignAll([
-          Teacher(
-            gender: 'Male',
-            id: "T001",
-            name: "Ameen Rahman",
-            status: "Active",
-            joinedAt: DateTime.now(),
-          ),
-          Teacher(
-            gender: 'Female',
-            id: "T002",
-            name: "Fathima Noor",
-            status: "Active",
-            joinedAt: DateTime.now(),
-          ),
-        ]);
-      } else {
-        // final res = await ApiService.getTeachers();
-        // teacherList.assignAll(res);
-        throw UnimplementedError();
-      }
+      return await Api().getBatchSessionDetail(id);
     } catch (e) {
-      print("Teacher Fetch Error: $e");
+      log(e.toString());
     } finally {
-      isLoading.value = false;
-    }
-  }
-
-  /// 🔍 HELPERS
-  Batch? getBatchById(String id) {
-    try {
-      return sessionList
-          .map((e) => e.batch)
-          .whereType<Batch>()
-          .firstWhere((e) => e.batchID == id);
-    } catch (e) {
-      return null;
+      isSessionDetailLoading.value = false;
     }
   }
 
@@ -270,18 +236,18 @@ class BatchListController extends GetxController {
   }
 
   /// ✏️ LOAD FOR EDIT
-  void loadSession(Session session) {
-    dateController.text = session.date != null ? formatDate(session.date!) : '';
+  void loadSession(Batch session) {
+    // dateController.text = session.date != null ? formatDate(session.date!) : '';
 
-    timeController.text = session.startTime ?? '';
+    // timeController.text = session.startTime ?? '';
 
-    selectedDuration.value = session.duration;
+    // selectedDuration.value = session.duration;
 
     /// teacher
     // selectedTeacher.value = session.teacher;
 
     /// salary
-    salaryController.text = session.teacherSalary?.toString() ?? '';
+    // salaryController.text = session.teacherSalary?.toString() ?? '';
   }
 
   /// 🗑 DELETE
@@ -293,7 +259,7 @@ class BatchListController extends GetxController {
         // await ApiService.deleteBatch(id);
       }
 
-      sessionList.removeWhere((b) => b.id == id);
+      batchList.removeWhere((b) => b.id == id);
 
       Get.snackbar("Success", "Batch deleted successfully");
     } catch (e) {
@@ -314,10 +280,10 @@ class BatchListController extends GetxController {
     }
   }
 
-  void openSessionReportDialog(Session session) {
+  void openSessionReportDialog(BatchSession session) {
     final controller = Get.put(SessionReportController());
 
-    controller.initFromSession(session);
+    // controller.initFromSession(session);
 
     CustomWidgets().showCustomDialog(
       context: Get.context!,
@@ -337,64 +303,6 @@ class BatchListController extends GetxController {
         SessionReportDialogBody(controller: controller),
       ],
     );
-  }
-
-  /// 🧪 DUMMY DATA
-  List<Session> _getDummySessions() {
-    return [
-      Session(
-        id: "SES001",
-        status: "started",
-        date: DateTime.now(),
-        startTime: "10:00 AM",
-        endTime: "11:00 AM",
-        duration: 60,
-        teacherSalary: 500,
-        batch: Batch(
-          id: "B001",
-          batchID: "BT01",
-          batchName: "10A Science",
-        ),
-        package: Package(
-          name: "Physics Crash Course",
-          standard: "10",
-          syllabus: "CBSE",
-          teacher: Teacher(
-            id: "T001",
-            name: "Ameen Rahman",
-            gender: "Male",
-            status: "active",
-            joinedAt: DateTime.now(),
-          ),
-        ),
-      ),
-      Session(
-        id: "SES002",
-        status: "upcoming",
-        date: DateTime.now().add(const Duration(days: 1)),
-        startTime: "03:00 PM",
-        endTime: "04:30 PM",
-        duration: 90,
-        teacherSalary: 650,
-        batch: Batch(
-          id: "B002",
-          batchID: "BT02",
-          batchName: "9B Maths",
-        ),
-        package: Package(
-          name: "Mathematics Advanced",
-          standard: "9",
-          syllabus: "State",
-          teacher: Teacher(
-            id: "T002",
-            name: "Fathima Noor",
-            gender: "Female",
-            status: "active",
-            joinedAt: DateTime.now(),
-          ),
-        ),
-      ),
-    ];
   }
 
   void onBatchSelected(Batch batch) {

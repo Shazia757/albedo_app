@@ -1,3 +1,4 @@
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/other_users_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
@@ -18,6 +19,9 @@ class OtherUsersController extends GetxController {
   var isDeleteButtonLoading = true.obs;
   var selectedPosition = ''.obs;
   var selectedRole = "all".obs;
+  final currentPage = 0.obs;
+  final totalCount = 0.obs;
+
   var customPositionController = TextEditingController();
 
   var experiences = <Experience>[].obs;
@@ -45,35 +49,11 @@ class OtherUsersController extends GetxController {
     try {
       isLoading.value = true;
 
-      await Future.delayed(const Duration(seconds: 2));
+      final response = await Api()
+          .getOtherUserDetails(page: currentPage.value + 1, pageSize: 10);
 
-      otherUsers.assignAll([
-        OtherUsers(
-            id: "EMP1001",
-            name: "Maria",
-            email: "maria@email.com",
-            status: 'Active',
-            phone: "123456",
-            joinedAt: DateTime.now(),
-            role: 'finance'),
-        OtherUsers(
-            id: "EMP1002",
-            name: "Nick",
-            status: 'Active',
-            email: "nick@email.com",
-            phone: "+9876543210",
-            joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-            role: 'hr'),
-        OtherUsers(
-            id: "EMP1002",
-            name: "Unknown",
-            status: 'Active',
-            email: "nick@email.com",
-            phone: "+9876543210",
-            joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-            role: 'Intern'),
-      ]);
-
+      otherUsers.assignAll(response.results);
+      totalCount.value = response.count;
       applyFilters();
     } finally {
       isLoading.value = false;
@@ -95,29 +75,29 @@ class OtherUsersController extends GetxController {
     if (selectedRole.value != "all") {
       temp = temp
           .where((t) =>
-              (t.role ?? "-").toLowerCase().trim() ==
+              (t.position ?? "-").toLowerCase().trim() ==
               selectedRole.value.toLowerCase().trim())
           .toList();
     }
 
     /// 🔃 SORTING
-    switch (sortType.value) {
-      case SortType.newest:
-        temp.sort((a, b) =>
-            (b.joinedAt ?? DateTime(0)).compareTo(a.joinedAt ?? DateTime(0)));
-        break;
+    // switch (sortType.value) {
+    //   case SortType.newest:
+    //     temp.sort((a, b) =>
+    //         (b.joinedAt ?? DateTime(0)).compareTo(a.joinedAt ?? DateTime(0)));
+    //     break;
 
-      case SortType.oldest:
-        temp.sort((a, b) =>
-            (a.joinedAt ?? DateTime(0)).compareTo(b.joinedAt ?? DateTime(0)));
-        break;
+    //   case SortType.oldest:
+    //     temp.sort((a, b) =>
+    //         (a.joinedAt ?? DateTime(0)).compareTo(b.joinedAt ?? DateTime(0)));
+    //     break;
 
-      case SortType.name:
-        temp.sort((a, b) => (a.name ?? "")
-            .toLowerCase()
-            .compareTo((b.name ?? "").toLowerCase()));
-        break;
-    }
+    //   case SortType.name:
+    //     temp.sort((a, b) => (a.name ?? "")
+    //         .toLowerCase()
+    //         .compareTo((b.name ?? "").toLowerCase()));
+    //     break;
+    // }
 
     filteredOtherUsers.assignAll(temp);
   }

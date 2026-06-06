@@ -13,6 +13,8 @@ class Mentor {
   String? gender;
   double? rating;
   DateTime? joinedAt;
+  DateTime? assignedAt;
+
   String? phone;
   String? whatsapp;
   String? dob;
@@ -24,6 +26,8 @@ class Mentor {
   String? timezone;
   final Coordinator? coordinator;
   String? prefLanguage;
+
+  // Payment
   String? accountNumber;
   String? ifscCode;
   String? accountHolder;
@@ -31,6 +35,7 @@ class Mentor {
   String? accountType;
   String? bankName;
   String? bankBranch;
+
   int? salary;
   double? balance;
   Wallet? wallet;
@@ -54,6 +59,7 @@ class Mentor {
     this.experience,
     this.timezone,
     this.balance,
+    this.assignedAt,
     this.wallet,
     this.salary,
     this.accountHolder,
@@ -71,16 +77,87 @@ class Mentor {
   });
 
   factory Mentor.fromJson(Map<String, dynamic> json) {
+    final payment = json['payment_details'];
+
     return Mentor(
       id: json['id'],
-      name: json['name'],
+      empId: json['mentor_emp_id'] ?? json['emp_id'],
+      name: json['mentor_name'] ?? json['name'],
+      email: json['email'],
+      phone: json['phone_number'],
+      whatsapp: json['whatsapp_number'],
+      dob: json['date_of_birth'],
+      qualification: json['qualification'],
+      place: json['place'],
+      pincode: json['pincode'],
+      address: json['address'],
+      timezone: json['timezone'],
+      prefLanguage: json['preferred_language'],
+      imageUrl: json['photo'],
+      rating: (json['average_rating'] ?? 0).toDouble(),
+      status: (json['is_resigned'] ?? false) ? "Inactive" : "Active",
+
+      joinedAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'])
+          : null,
+
+      coordinator: json['assistant_admin'] != null
+          ? Coordinator(
+              id: json['assistant_admin_id'],
+              name: json['assistant_admin_name'] ?? '',
+            )
+          : null,
+      assignedAt: json['assignment_date'] != null
+          ? DateTime.tryParse(json['assignment_date'])
+          : null,
+      // Payment Details
+      bankName: payment?['bank_name'],
+      bankBranch: payment?['branch_name'],
+      accountNumber: payment?['account_number'],
+      ifscCode: payment?['ifsc_code'],
+      accountHolder: payment?['account_holder_name'],
+      upiId: payment?['upi_id'],
+      accountType: payment?['account_type'],
+
+      // Experience
+      experience: json['work_experiences'] != null
+          ? (json['work_experiences'] as List)
+              .map((e) => Experience.fromJson(e))
+              .toList()
+          : [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'emp_id': empId,
       'name': name,
+      'email': email,
+      'phone_number': phone,
+      'whatsapp_number': whatsapp,
+      'date_of_birth': dob,
+      'qualification': qualification,
+      'place': place,
+      'pincode': pincode,
+      'address': address,
+      'timezone': timezone,
+      'preferred_language': prefLanguage,
+      'photo': imageUrl,
     };
   }
+}
+
+class PaginatedMentorResponse {
+  final int count;
+  final String? next;
+  final String? previous;
+  final List<Mentor> results;
+
+  PaginatedMentorResponse({
+    required this.count,
+    required this.results,
+    this.next,
+    this.previous,
+  });
 }

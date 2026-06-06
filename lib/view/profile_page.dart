@@ -224,7 +224,7 @@ class _ProfileHeroCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    user?.position ?? "Member",
+                    user?.role ?? "Member",
                     style: Theme.of(context).textTheme.titleSmall!.copyWith(
                         color: Colors.white.withOpacity(0.9),
                         letterSpacing: 0.3),
@@ -412,7 +412,7 @@ class _ProfileHeroCard extends StatelessWidget {
       c.empIdController.text = user?.empId ?? '';
       c.emailController.text = user?.email ?? '';
       c.phoneController.text = user?.contact ?? '';
-      c.positionController.text = user?.position ?? '';
+      c.positionController.text = user?.role ?? '';
 
       c.profileImagePath.value = ''; // reset picked image
       c.remoteProfileImage.value = user?.profileImage ?? '';

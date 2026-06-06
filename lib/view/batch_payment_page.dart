@@ -11,7 +11,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
 class BatchPaymentPage extends StatelessWidget {
-  final PaymentController c = Get.put(PaymentController(isStudent: false));
+  final PaymentController c = Get.put(PaymentController(isStudent: null));
 
   BatchPaymentPage({super.key});
 
@@ -51,7 +51,7 @@ class BatchPaymentPage extends StatelessWidget {
                       c.selectedTab.value = index;
                       c.applyFilters();
                     },
-                    getCount: (index) => c.tabData[index]['count'],
+                    getCount: (index) => c.batchTabData[index]['count'],
                   ),
                 ),
 
@@ -63,12 +63,18 @@ class BatchPaymentPage extends StatelessWidget {
                     final batches = c.filteredBatchPayments;
                     final count = batches.length;
 
+                    if (c.isLoadingPayments.value && count == 0) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
                     if (count == 0) {
                       return EmptyState(
                         cs: cs,
+                        icon: Icons.not_interested_rounded,
                         title: 'No payments found',
-                        subtitle: 'Try adjusting your search or filter',
-                        icon: Icons.payment,
+                        subtitle: '',
                       );
                     }
 
@@ -163,7 +169,7 @@ class BatchPaymentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      model.batch.batchName ?? "-",
+                      model.name ?? "-",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context)
@@ -173,7 +179,7 @@ class BatchPaymentCard extends StatelessWidget {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      model.batch.batchID ?? "",
+                      model.code ?? "",
                       style: Theme.of(context)
                           .textTheme
                           .bodySmall!
@@ -229,7 +235,7 @@ class BatchPaymentCard extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        model.batch.mentor?.name ?? "No mentor assigned",
+                        model.mentor?.name ?? "No mentor assigned",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context)
@@ -247,45 +253,111 @@ class BatchPaymentCard extends StatelessWidget {
           SizedBox(height: 10),
 
           /// ── FOOTER ──────────────────────────
-          Row(
-            children: [
-              Icon(
-                Icons.payments_outlined,
-                size: 18,
-                color: cs.primary,
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
+            decoration: BoxDecoration(
+              color: cs.surfaceContainerHighest.withOpacity(.18),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: cs.outline.withOpacity(.08),
               ),
-              SizedBox(width: 6),
-              Text(
-                "${model.payments.length} Payments",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall!
-                    .copyWith(color: cs.onSurface),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
+            ),
+            child: Row(
+              children: [
+                /// Batch Fee
+                Expanded(
+                  child: _FooterAmountTile(
+                    context: context,
+                    title: "Batch Fee",
+                    amount: model.totalFee ?? 0,
+                    color: cs.primary,
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: model.status == "approved"
-                      ? Colors.green.withOpacity(.10)
-                      : Colors.orange.withOpacity(.10),
+
+                /// Divider
+                Container(
+                  width: 1,
+                  height: 42,
+                  color: cs.outline.withOpacity(.12),
                 ),
-                child: Text(
-                  (model.status ?? "").toUpperCase(),
-                  style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                      color: model.status == "approved"
-                          ? Colors.green
-                          : Colors.orange),
+
+                /// Paid
+                Expanded(
+                  child: _FooterAmountTile(
+                    context: context,
+                    title: "Paid",
+                    amount: model.totalPaid ?? 0,
+                    color: Colors.green,
+                  ),
                 ),
-              ),
-            ],
+
+                /// Divider
+                Container(
+                  width: 1,
+                  height: 42,
+                  color: cs.outline.withOpacity(.12),
+                ),
+
+                /// Pending
+                Expanded(
+                  child: _FooterAmountTile(
+                    context: context,
+                    title: "Pending",
+                    amount: model.totalPending ?? 0,
+                    color: Colors.orange,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _FooterAmountTile extends StatelessWidget {
+  final BuildContext context;
+  final String title;
+  final num amount;
+  final Color color;
+
+  const _FooterAmountTile({
+    required this.context,
+    required this.title,
+    required this.amount,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          title.toUpperCase(),
+          style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                color: cs.outline,
+                letterSpacing: .8,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          "₹ ${amount.toStringAsFixed(0)}",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+      ],
     );
   }
 }

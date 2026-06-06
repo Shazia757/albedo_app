@@ -531,7 +531,7 @@ class CoordinatorDetailedPage extends StatelessWidget {
                   offset: const Offset(0, -20),
                   child: Column(
                     children: [
-                      Text(coordinator.name,
+                      Text(coordinator.name??'',
                           style: Get.textTheme.titleLarge),
                       SizedBox(height: 4),
                       Text(coordinator.email ?? '-',
@@ -817,8 +817,10 @@ class CoordinatorDetailedPage extends StatelessWidget {
             final mentor = mentors[index];
 
             return InkWell(
-              onTap: () => Get.to(
-                  () => MentorDetailsPage(mentor: mentor, initialIndex: index)),
+              onTap: () {
+                // Get.to(
+                //   () => MentorDetailsPage(mentor: mentor, initialIndex: index));
+              },
               borderRadius: BorderRadius.circular(14),
               child: Container(
                 margin: const EdgeInsets.only(bottom: 12),

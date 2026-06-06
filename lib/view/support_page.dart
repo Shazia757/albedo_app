@@ -2,7 +2,10 @@ import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/permissions_controller.dart';
 import 'package:albedo_app/controller/support_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/settings/syllabus_model.dart';
 import 'package:albedo_app/model/support_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -24,6 +27,7 @@ class SupportsPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final normalizedRole = role?.trim().toLowerCase();
 
     final isCustom = ![
       "admin",
@@ -35,15 +39,22 @@ class SupportsPage extends StatelessWidget {
       "finance",
       "sales",
       "hr"
-    ].contains(role);
+    ].contains(normalizedRole);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(),
-      floatingActionButton:
-          (!isCustom || PermissionService.can("add_coordinators"))
-              ? addTicket(context)
-              : null,
+      floatingActionButton: (!isCustom || PermissionService.can("add_tickets"))
+          ? FloatingActionButton(
+              onPressed: () => editTicket(context),
+              mini: true,
+              backgroundColor: context.theme.colorScheme.primary,
+              child: Icon(
+                Icons.add,
+                color: context.theme.colorScheme.onPrimary,
+              ),
+            )
+          : null,
       drawer: isDesktop ? null : const DrawerMenu(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -97,13 +108,14 @@ class SupportsPage extends StatelessWidget {
             crossAxisCount: crossAxisCount,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
             itemCount: data.length,
             itemBuilder: (_, i) {
               final s = data[i];
-              final isOpen = s.status == "open";
+              final isOpen = s.status == "OPEN";
               final auth = Get.find<AuthController>();
               final role = auth.activeUser?.role;
+              final normalizedRole = role?.trim().toLowerCase();
 
               final isCustom = ![
                 "admin",
@@ -115,14 +127,14 @@ class SupportsPage extends StatelessWidget {
                 "finance",
                 "sales",
                 "hr"
-              ].contains(role);
+              ].contains(normalizedRole);
 
               return PremiumInfoCard(
-                  id: s.id,
+                  id: s.ticketId,
 
                   /// 🔹 Main content
                   title: s.title ?? "No Title",
-                  subtitle: s.description ?? "",
+                  subtitle: s.category ?? "",
 
                   /// 🔹 Status
                   status: isOpen ? "Open" : "Closed",
@@ -131,48 +143,50 @@ class SupportsPage extends StatelessWidget {
                       : Theme.of(context).colorScheme.error,
 
                   /// 🔹 Extra + Footer
-                  extraInfo: null,
-                  footerText: "",
+
+                  footerText:
+                      'By: ${s.student?.name ?? s.teacher?.name ?? "-"}',
 
                   /// 🔹 Actions
                   actions: [
                     if ((!isCustom || PermissionService.can("edit_tickets")))
                       InfoAction(
                         icon: Icons.edit,
+                        label: "Edit",
                         color: Theme.of(context).colorScheme.primary,
                         onTap: () {
-                          c.loadTicket(s);
-                          editTicket(context);
+                          editTicket(context, ticket: s);
                         },
                       ),
                     if ((!isCustom || PermissionService.can("delete_tickets")))
                       InfoAction(
                         icon: Icons.delete,
+                        label: 'Delete',
                         color: Theme.of(context).colorScheme.error,
                         onTap: () => CustomWidgets().showDeleteDialog(
                           dltText: Obx(
-  () => c.isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
-        ),
-),
+                            () => c.isLoading.value
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    "Yes",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall!
+                                        .copyWith(color: Colors.white),
+                                  ),
+                          ),
                           title: 'Are you sure?',
                           text:
                               'Are you sure you want to delete this ticket permanently?',
                           context: context,
-                          onConfirm: () => c.delete(s.id),
+                          onConfirm: () => c.deleteTicket(s.id),
                         ),
                       ),
                   ],
@@ -303,92 +317,183 @@ class SupportsPage extends StatelessWidget {
     );
   }
 
-  void editTicket(BuildContext context) {
+  void editTicket(BuildContext context, {Ticket? ticket}) {
+    final isEdit = ticket != null;
+    if (isEdit) {
+      c.titleController.text = ticket.title ?? '';
+      c.categoryController.text = ticket.category ?? '';
+      c.priorityController.text = ticket.priority ?? '';
+      c.descriptionController.text = ticket.description ?? '';
+
+      c.selectedType.value = ticket.userType ?? 'student';
+
+      // optional selected user preload
+      // c.selectedStudentController.text = ticket.studentName ?? '';
+      // c.selectedTeacherController.text = ticket.teacherName ?? '';
+    } else {
+      c.titleController.clear();
+      c.categoryController.clear();
+      c.priorityController.clear();
+      c.descriptionController.clear();
+
+      c.selectedType.value = 'student';
+
+      // optional clear
+      // c.selectedStudentController.clear();
+      // c.selectedTeacherController.clear();
+    }
+
     CustomWidgets().showCustomDialog(
-     
       context: context,
-      title: Text('Edit Ticket'),
-      icon: Icons.edit,
+      title: Text(ticket != null ? 'Edit Ticket' : 'Add Ticket'),
+      icon: ticket != null ? Icons.edit : Icons.add,
       formKey: GlobalKey<FormState>(),
+      submitWidget: Obx(
+        () => SizedBox(
+          width: 80,
+          child: Center(
+            child: c.isLoading.value
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(
+                    isEdit ? "Update" : "Add",
+                    style: TextStyle(color: Colors.white),
+                  ),
+          ),
+        ),
+      ),
       sections: [
         SizedBox(
-            height: MediaQuery.of(context).size.height * 0.5,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  CustomWidgets().labelWithAsterisk('Title', required: true),
-                  SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.titleController),
-                  SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Category', required: true),
-                  SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.categoryController),
-                  SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('Priority', required: true),
-                  SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.priorityController),
-                  SizedBox(height: 10),
-                  CustomWidgets().labelWithAsterisk('User', required: true),
-                  SizedBox(height: 10),
-                  Obx(
-                    () => Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile(
-                            dense: true,
-                            title: Text('Student'),
-                            value: "student",
-                            groupValue: c.selectedType.value,
-                            onChanged: (value) => c.selectedType.value = value!,
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile(
-                            title: Text('Teacher'),
-                            value: "teacher",
-                            groupValue: c.selectedType.value,
-                            onChanged: (value) => c.selectedType.value = value!,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Obx(() {
-                    if (c.selectedType.value == 'student') {
-                      return CustomWidgets().dropdownStyledTextField(
-                          context: context, hint: 'Select Student');
-                    }
-                    if (c.selectedType.value == 'teacher') {
-                      return CustomWidgets().dropdownStyledTextField(
-                          context: context, hint: 'Select Teacher');
-                    }
-                    return SizedBox();
-                  }),
-                  SizedBox(height: 10),
-                  CustomWidgets()
-                      .labelWithAsterisk('Description', required: true),
-                  SizedBox(height: 10),
-                  CustomWidgets().dropdownStyledTextField(
+          height: MediaQuery.of(context).size.height * 0.5,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                CustomWidgets().labelWithAsterisk(
+                  'Title',
+                  required: true,
+                ),
+                SizedBox(height: 10),
+                CustomWidgets().dropdownStyledTextField(
+                  context: context,
+                  hint: 'Title',
+                  controller: c.titleController,
+                ),
+                SizedBox(height: 10),
+                CustomWidgets().labelWithAsterisk(
+                  'Category',
+                  required: true,
+                ),
+                SizedBox(height: 10),
+                CustomWidgets().customDropdownField<Syllabus>(
                     context: context,
-                    hint: '',
-                    controller: c.descriptionController,
-                    isMultiline: true,
+                    hint: 'Select Category',
+                    items: c.categories,
+                    itemLabel: (item) => item.name ?? '',
+                    onChanged: (p0) {},
+                    initialValue: c.selectedCategory.value),
+                SizedBox(height: 10),
+                CustomWidgets().labelWithAsterisk(
+                  'Priority',
+                  required: true,
+                ),
+                SizedBox(height: 10),
+                CustomWidgets().customDropdownField<String>(
+                    context: context,
+                    hint: 'Select Priority',
+                    items: ['High', 'Medium', 'Low'],
+                    itemLabel: (item) => item ?? '',
+                    onChanged: (p0) {},
+                    initialValue: c.selectedPriorityList.value),
+                SizedBox(height: 10),
+                CustomWidgets().labelWithAsterisk(
+                  'User',
+                  required: true,
+                ),
+                SizedBox(height: 10),
+                Obx(
+                  () => Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile(
+                          dense: true,
+                          title: Text('Student'),
+                          value: "student",
+                          groupValue: c.selectedType.value,
+                          onChanged: (value) {
+                            c.selectedType.value = value!;
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile(
+                          dense: true,
+                          title: Text('Teacher'),
+                          value: "teacher",
+                          groupValue: c.selectedType.value,
+                          onChanged: (value) {
+                            c.selectedType.value = value!;
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ))
+                ),
+                SizedBox(height: 10),
+                Obx(() {
+                  if (c.selectedType.value == 'student') {
+                    return CustomWidgets().customDropdownField<Student>(
+                        context: context,
+                        hint: 'Select Student',
+                        items: c.students,
+                        itemLabel: (item) =>
+                            "${item.name} (${item.studentId})" ?? '',
+                        onChanged: (p0) {},
+                        initialValue: c.selectedStudent.value);
+                  }
+
+                  if (c.selectedType.value == 'teacher') {
+                    return CustomWidgets().customDropdownField<Teacher>(
+                        context: context,
+                        hint: 'Select Teacher',
+                        items: c.teachers,
+                        itemLabel: (item) =>
+                            "${item.name} (${item.teacherId})" ?? '',
+                        onChanged: (p0) {},
+                        initialValue: c.selectedTeacher.value);
+                  }
+
+                  return SizedBox();
+                }),
+                SizedBox(height: 10),
+                CustomWidgets().labelWithAsterisk(
+                  'Description',
+                  required: true,
+                ),
+                SizedBox(height: 10),
+                CustomWidgets().dropdownStyledTextField(
+                  context: context,
+                  hint: '',
+                  controller: c.descriptionController,
+                  isMultiline: true,
+                ),
+              ],
+            ),
+          ),
+        )
       ],
-      onSubmit: () {},
+      onSubmit: () {
+        if (ticket != null) {
+          c.updateTicket(id: ticket.id, ticket: ticket.title);
+        } else {
+          c.addTicket(ticket?.title ?? '');
+        }
+      },
     );
   }
 
@@ -404,7 +509,6 @@ class SupportsPage extends StatelessWidget {
     });
 
     CustomWidgets().showCustomDialog(
-   
       context: context,
       icon: Icons.confirmation_number,
       title: Text("Ticket #${s.id}"),
@@ -691,106 +795,6 @@ class SupportsPage extends StatelessWidget {
             style: Get.textTheme.labelSmall,
           ),
         ],
-      ),
-    );
-  }
-
-  FloatingActionButton addTicket(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () => CustomWidgets().showCustomDialog(
-        context: context,
-        title: Text('Add New Ticket'),
-        formKey: GlobalKey<FormState>(),
-        sections: [
-          SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    CustomWidgets().labelWithAsterisk('Title', required: true),
-                    SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: '',
-                        controller: c.titleController),
-                    SizedBox(height: 10),
-                    CustomWidgets()
-                        .labelWithAsterisk('Category', required: true),
-                    SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: '',
-                        controller: c.categoryController),
-                    SizedBox(height: 10),
-                    CustomWidgets()
-                        .labelWithAsterisk('Priority', required: true),
-                    SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                        context: context,
-                        hint: '',
-                        controller: c.priorityController),
-                    SizedBox(height: 10),
-                    CustomWidgets().labelWithAsterisk('User', required: true),
-                    SizedBox(height: 10),
-                    Obx(
-                      () => Row(
-                        children: [
-                          Expanded(
-                            child: RadioListTile(
-                              dense: true,
-                              title: Text('Student'),
-                              value: "student",
-                              groupValue: c.selectedType.value,
-                              onChanged: (value) =>
-                                  c.selectedType.value = value!,
-                            ),
-                          ),
-                          Expanded(
-                            child: RadioListTile(
-                              title: Text('Teacher'),
-                              value: "teacher",
-                              groupValue: c.selectedType.value,
-                              onChanged: (value) =>
-                                  c.selectedType.value = value!,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Obx(() {
-                      if (c.selectedType.value == 'student') {
-                        return CustomWidgets().dropdownStyledTextField(
-                            context: context, hint: 'Select Student');
-                      }
-                      if (c.selectedType.value == 'teacher') {
-                        return CustomWidgets().dropdownStyledTextField(
-                            context: context, hint: 'Select Teacher');
-                      }
-                      return SizedBox();
-                    }),
-                    SizedBox(height: 10),
-                    CustomWidgets()
-                        .labelWithAsterisk('Description', required: true),
-                    SizedBox(height: 10),
-                    CustomWidgets().dropdownStyledTextField(
-                      context: context,
-                      hint: '',
-                      controller: c.descriptionController,
-                      isMultiline: true,
-                    ),
-                    SizedBox(height: 20),
-                  ],
-                ),
-              ))
-        ],
-        onSubmit: () {},
-      ),
-      mini: true,
-      backgroundColor: context.theme.colorScheme.primary,
-      child: Icon(
-        Icons.add,
-        color: context.theme.colorScheme.onPrimary,
       ),
     );
   }

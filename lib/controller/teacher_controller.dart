@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
+import 'package:albedo_app/config/urls.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
@@ -50,27 +54,22 @@ class TeacherController extends GetxController {
   final RxString unlockFrom = ''.obs;
   final RxString unlockTo = ''.obs;
   final RxString reLockAfter = ''.obs;
+  final allCount = 0.obs;
+  final activeCount = 0.obs;
+  final batchCount = 0.obs;
+  final inactiveCount = 0.obs;
+  final totalCount = 0.obs;
+  final currentPage = 0.obs;
 
   final RxString targetType = 'All Students'.obs;
 
   RxInt feedbackTabIndex = 0.obs;
 
-  // --------------------------
-  // Counts for tabs
-  // --------------------------
-  int get allCount => teachers.length;
-
-  int get activeCount => teachers.where((e) => e.status == "Active").length;
-
-  int get batchCount => teachers.where((e) => e.type == "Batch").length;
-
-  int get inactiveCount => teachers.where((e) => e.status == "Inactive").length;
-
   List<Map<String, dynamic>> get tabData => [
-        {"label": "All", "count": allCount},
-        {"label": "Active", "count": activeCount},
-        {"label": "Batch", "count": batchCount},
-        {"label": "Inactive", "count": inactiveCount},
+        {"label": "All", "count": allCount.value},
+        {"label": "Active", "count": activeCount.value},
+        {"label": "Batch", "count": batchCount.value},
+        {"label": "Inactive", "count": inactiveCount.value},
       ];
 
   List<String> detailedTabs = [
@@ -151,6 +150,7 @@ class TeacherController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    loadTeacherTabCounts();
     fetchTeachers();
     selectedStudents.add({
       "id": "all",
@@ -162,225 +162,76 @@ class TeacherController extends GetxController {
   Future<void> fetchTeachers() async {
     try {
       isLoading.value = true;
+      String url = Urls.teachers;
 
-      final user = auth.activeUser;
+      switch (selectedTab.value) {
+        case 1:
+          url = "${Urls.teachers}?is_live=true";
+          break;
 
-      await Future.delayed(const Duration(seconds: 2));
+        case 2:
+          url = Urls.teachersWithBatches;
+          break;
 
-      final allTeachers = _getDummyTeachers();
+        case 3:
+          url = "${Urls.teachers}?is_live=false";
+          break;
 
-      List<Teacher> result;
-
-      if (user?.role == "admin") {
-        result = allTeachers;
-      } else if (user?.role == "coordinator") {
-        result =
-            allTeachers.where((t) => t.coordinator?.id == user!.id).toList();
-      } else if (user?.role == "mentor") {
-        result = allTeachers.where((t) => t.mentor?.id == user!.id).toList();
-      } else {
-        result = []; // teachers shouldn't see other teachers usually
+        default:
+          url = Urls.teachers;
       }
 
-      teachers.assignAll(result);
+      final response = await Api().getTeacherDetails(
+        url: url,
+        page: currentPage.value + 1,
+        pageSize: 10,
+      );
+
+      teachers.assignAll(response.results);
+
+      totalCount.value = response.count;
+
       applyFilters();
     } catch (e) {
-      print("Error: $e");
+      log(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
-  List<Teacher> _getDummyTeachers() {
-    return [
-      Teacher(
-          id: "TEA1001",
-          name: "John Doe",
-          email: "john@email.com",
-          imageUrl: "https://randomuser.me/api/portraits/men/1.jpg",
-          status: "Active",
-          gender: "Male",
-          type: "Batch",
-          joinedAt: DateTime.now(),
-          phone: "9876543210",
-          whatsapp: "9876543210",
-          dob: "1995-08-15",
-          qualification: "MSc Mathematics",
-          place: "Kozhikode",
-          pincode: "673001",
-          address: "Green Villa, Kozhikode, Kerala",
-          timezone: "Asia/Kolkata",
-          prefLanguage: "English",
-          tuitionMode: "Online",
-          accountNumber: "123456789012",
-          accountHolder: "John Doe",
-          upiId: "john@upi",
-          ifscCode: "SBIN0001234",
-          accountType: "Savings",
-          bankName: "State Bank of India",
-          bankBranch: "Kozhikode Main",
-          totalStudents: 45,
-          totalPackages: 18,
-          salary: 85000,
-          paid: 60000,
-          balance: 25000,
-          totalSessions: 120,
-          totalHours: 240,
-          student: [
-            Student(
-              studentId: "STU1001",
-              name: "Riya Shah",
-              email: "riya.shah@email.com",
-              phone: "9876543210",
-              whatsapp: "9876543210",
-              imageUrl: "https://randomuser.me/api/portraits/women/45.jpg",
+  Future<void> loadTeacherTabCounts() async {
+    try {
+      final all = await Api().getTeacherDetails(
+        url: Urls.teachers,
+        page: 1,
+        pageSize: 1,
+      );
 
-              status: "Active",
-              type: "Batch",
-              category: "Regular",
-              batch: [
-                Batch(
-                    batchID: 'BAT101',
-                    batchName: '10th CBSE',
-                    status: 'Active',
-                    amountPaid: '12000',
-                    paidDate: DateTime.now())
-              ],
+      final active = await Api().getTeacherDetails(
+        url: "${Urls.teachers}?is_live=true",
+        page: 1,
+        pageSize: 1,
+      );
 
-              joinedAt: DateTime.now(),
-              admissionDate: DateTime.parse('2023-01-15 12:00:00'),
+      final batch = await Api().getTeacherDetails(
+        url: Urls.teachersWithBatches,
+        page: 1,
+        pageSize: 1,
+      );
 
-              gender: "Female",
-              timezone: "Asia/Kolkata",
-              address: "12, MG Road",
-              place: "Mumbai",
+      final inactive = await Api().getTeacherDetails(
+        url: "${Urls.teachers}?is_live=false",
+        page: 1,
+        pageSize: 1,
+      );
 
-              parentName: "Rajesh Shah",
-              parentOccupation: "Businessman",
-
-              createdBy: "Admin",
-              referredBy: "Google",
-              referralName: "Anita",
-              referralRole: "Parent",
-
-              isFeePaid: true,
-
-              /// 🔷 Academic Info
-              course: "CBSE",
-              subjects: "Maths, Science, English",
-              syllabus: "CBSE 2023",
-              syllabusId: "SYL001",
-              standard: 8,
-
-              /// 🔷 Class Tracking
-              classHours: 40,
-              classesTaken: 32,
-              totalHour: 100,
-              totalSession: 50,
-
-              /// 🔷 Fees
-              amount: 20000,
-              amountPerHour: 500,
-              totalAmount: 25000,
-              regFee: 2000,
-              totalPaid: 18000,
-              balance: 7000,
-
-              /// 🔷 Teacher / Staff
-              teacherId: "T001",
-              advisorName: "Mr. Joseph",
-              advisorId: "A101",
-
-              mentor: Mentor(
-                name: "Sarah Williams",
-                empId: "MNT-441",
-                joinedAt: DateTime.now(),
-              ),
-
-              coordinator: Coordinator(
-                name: "John Mathew",
-                id: "CRD-782",
-                joinedAt: DateTime.now(),
-              ),
-
-              advisor: Advisor(
-                name: "Joseph Sir",
-                id: "ADV-12",
-                joinedAt: DateTime.now(),
-              ),
-
-              /// 🔷 Packages
-              packages: [
-                Package(
-                    status: 'active',
-                    subjectId: "PKG001",
-                    name: "Maths Advanced",
-                    standard: '10',
-                    duration: '50',
-                    packageFee: 15000,
-                    sessions: [
-                      Session(
-                          id: '1',
-                          status: 'completed',
-                          date: DateTime.now().subtract(Duration(hours: 100))),
-                      Session(id: '2', status: 'upcoming'),
-                    ]),
-                Package(
-                  status: 'Inactive',
-                  subjectId: "PKG002",
-                  name: "Science Foundation",
-                  duration: '40',
-                  packageFee: 12000,
-                ),
-              ],
-            ),
-          ],
-          coordinator: Coordinator(
-            id: "CRD1001",
-            name: "Sarah Williams",
-            imageUrl: "https://randomuser.me/api/portraits/women/2.jpg",
-            joinedAt: DateTime.now(),
-          ),
-          mentor: Mentor(
-            id: "MNT1001",
-            empId: "EMP4521",
-            name: "Michael Chen",
-            imageUrl: "https://randomuser.me/api/portraits/men/3.jpg",
-            joinedAt: DateTime.now(),
-          ),
-          batch: [
-            Batch(
-              id: "BAT1001",
-              batchName: "NEET Crash Batch",
-              status: "Active",
-            ),
-            Batch(
-              id: "BAT1002",
-              batchName: "JEE Advanced Batch",
-              status: "Completed",
-            ),
-          ],
-          experience: [
-            Experience(companyName: 'Albedo', months: 2, years: 1),
-            Experience(companyName: 'Star', months: 7)
-          ]),
-      Teacher(
-        id: "TEA1002",
-        name: "Ms. Smith",
-        email: "smith@email.com",
-        status: "Inactive",
-        type: "Batch",
-        phone: "+9876543210",
-        joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-        gender: 'Female',
-        coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
-        mentor: Mentor(
-          name: '',
-          empId: '',
-          joinedAt: DateTime.now(),
-        ),
-      )
-    ];
+      allCount.value = all.count;
+      activeCount.value = active.count;
+      batchCount.value = batch.count;
+      inactiveCount.value = inactive.count;
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   Users teacherToUser(Teacher t) {
@@ -393,18 +244,6 @@ class TeacherController extends GetxController {
 
   void applyFilters() {
     List<Teacher> temp = teachers;
-
-    switch (selectedTab.value) {
-      case 1:
-        temp = temp.where((t) => t.status == "Active").toList();
-        break;
-      case 2:
-        temp = temp.where((t) => t.type == "Batch").toList();
-        break;
-      case 3:
-        temp = temp.where((t) => t.status == "Inactive").toList();
-        break;
-    }
 
     if (searchQuery.value.isNotEmpty) {
       temp = temp
@@ -497,23 +336,23 @@ class TeacherController extends GetxController {
     if (user?.role == "coordinator") {
       CustomWidgets().showDeleteDialog(
         dltText: Obx(
-  () => isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
+          () => isLoading.value
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  "Yes",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: Colors.white),
+                ),
         ),
-),
         title: 'Are you sure?',
         context: context,
         text: "Do you want to request deletion of this teacher?",
@@ -522,23 +361,23 @@ class TeacherController extends GetxController {
     } else {
       CustomWidgets().showDeleteDialog(
         dltText: Obx(
-  () => isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
+          () => isLoading.value
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  "Yes",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: Colors.white),
+                ),
         ),
-),
         title: 'Are you sure?',
         context: context,
         text: "Are you sure you want to delete this teacher permanently?",

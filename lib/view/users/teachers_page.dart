@@ -27,6 +27,7 @@ class TeachersPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final normalizedRole = role?.trim().toLowerCase();
 
     final isCustom = ![
       "admin",
@@ -38,7 +39,7 @@ class TeachersPage extends StatelessWidget {
       "finance",
       "sales",
       "hr"
-    ].contains(role);
+    ].contains(normalizedRole);
     final canSeeTeacherFeedbacks =
         !isCustom || PermissionService.can("teacher_feedbacks");
 
@@ -155,30 +156,20 @@ class TeachersPage extends StatelessWidget {
                   ),
                   SizedBox(height: 5),
 
-
                   /// 🧭 Tabs
                   Obx(
                     () => CustomWidgets().customTabs(
                       context,
                       tabs: c.tabs,
                       selectedIndex: c.selectedTab.value,
-                      onTap: (index) {
+                      onTap: (index) async {
                         c.selectedTab.value = index;
-                        c.applyFilters();
+                        c.currentPage.value = 0;
+
+                        await c.fetchTeachers();
                       },
                       getCount: (index) {
-                        switch (index) {
-                          case 0:
-                            return c.allCount;
-                          case 1:
-                            return c.activeCount;
-                          case 2:
-                            return c.batchCount;
-                          case 3:
-                            return c.inactiveCount;
-                          default:
-                            return 0;
-                        }
+                        return c.tabData[index]['count'];
                       },
                     ),
                   ),
@@ -213,23 +204,21 @@ class TeachersPage extends StatelessWidget {
                               final cs = Theme.of(context).colorScheme;
 
                               return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 4),
                                 child: ConstrainedBox(
                                     constraints:
                                         const BoxConstraints(maxWidth: 700),
                                     child: PremiumInfoCard(
-                                      id: teacher.id ?? "",
+                                      id: teacher.teacherId ?? "",
                                       title: teacher.name ?? "",
                                       subtitle: teacher.email ?? "",
                                       status: teacher.status,
                                       statusColor:
                                           getStatusColor(teacher.status),
-                                      footerText:
-                                          "Joined • ${teacher.joinedAt.toString().substring(0, 16)}",
-                                      extraInfo: teacher.phone != null
+                                      footerText: teacher.phone != null
                                           ? "Contact • ${teacher.phone}"
-                                          : null,
+                                          : "",
                                       onTap: () {
                                         (!isCustom ||
                                                 PermissionService.can(

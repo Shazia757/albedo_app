@@ -28,6 +28,7 @@ class StudentsPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final normalizedRole = role?.trim().toLowerCase();
     final isCustom = ![
       "admin",
       "mentor",
@@ -38,7 +39,7 @@ class StudentsPage extends StatelessWidget {
       "finance",
       "sales",
       "hr"
-    ].contains(role);
+    ].contains(normalizedRole);
     final canSeeRequests = !isCustom || PermissionService.can("refunds");
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -149,25 +150,14 @@ class StudentsPage extends StatelessWidget {
                       context,
                       tabs: tabs,
                       selectedIndex: c.selectedTab.value,
-                      onTap: (index) {
+                      onTap: (index) async {
                         c.selectedTab.value = index;
-                        c.applyFilters();
+                        c.currentPage.value = 0;
+
+                        await c.fetchStudents();
                       },
                       getCount: (index) {
-                        switch (index) {
-                          case 0:
-                            return c.allCount;
-                          case 1:
-                            return c.activeCount;
-                          case 2:
-                            return c.batchCount;
-                          case 3:
-                            return c.tbaCount;
-                          case 4:
-                            return c.inactiveCount;
-                          default:
-                            return 0;
-                        }
+                        return c.tabData[index]['count'];
                       },
                     ),
                   ),
@@ -210,27 +200,29 @@ class StudentsPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 12),
+                                      horizontal: 4, vertical: 4),
                                   child: PremiumInfoCard(
-                                    extraInfo: '',
                                     id: student.studentId ?? "-",
                                     title: student.name ?? "-",
                                     subtitle: student.email ?? "-",
                                     status: student.status,
                                     statusColor:
                                         isActive ? cs.primary : cs.error,
-                                    onTap: () => (!isCustom ||
-                                            PermissionService.can(
-                                                "view_students"))
-                                        ? Get.to(() => StudentDetailsPage(
-                                            student: student,
-                                            initialIndex: index))
-                                        : null,
+                                    onTap: () {
+                                      (!isCustom ||
+                                              PermissionService.can(
+                                                  "view_students"))
+                                          ? Get.to(() => StudentDetailsPage(
+                                              studentId: student.id ?? '',
+                                              initialIndex: index))
+                                          : null;
+                                    },
                                     footerText:
                                         "Joined • ${student.joinedAt.toString().substring(0, 16)}",
                                     actions: [
                                       InfoAction(
                                         icon: Icons.dashboard,
+                                        label: 'Dashboard',
                                         color: cs.primary,
                                         onTap: () {
                                           final auth =
@@ -246,6 +238,7 @@ class StudentsPage extends StatelessWidget {
                                                   "edit_students")) &&
                                           student.status != 'Inactive')
                                         InfoAction(
+                                          label: 'Edit',
                                           icon: Icons.edit,
                                           color: cs.secondary,
                                           onTap: () {
@@ -258,6 +251,7 @@ class StudentsPage extends StatelessWidget {
                                           PermissionService.can(
                                               "deactivate_students"))
                                         InfoAction(
+                                          label: 'Deactivate',
                                           icon: Icons.block,
                                           color: cs.error,
                                           onTap: () => c.handleDeactivate(
@@ -267,6 +261,7 @@ class StudentsPage extends StatelessWidget {
                                           (PermissionService.can(
                                               "delete_students")))
                                         InfoAction(
+                                            label: 'Delete',
                                             icon: Icons.delete,
                                             color: cs.error,
                                             onTap: () => c.handleDelete(
@@ -279,6 +274,48 @@ class StudentsPage extends StatelessWidget {
                       });
                     }),
                   ),
+                  Obx(() {
+                    if (c.totalPages <= 1) {
+                      return const SizedBox();
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: 14,
+                        top: 6,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: c.currentPage.value > 0
+                                ? () async {
+                                    c.currentPage.value--;
+                                    await c.fetchStudents();
+                                  }
+                                : null,
+                            icon: const Icon(
+                              Icons.chevron_left_rounded,
+                            ),
+                          ),
+                          Text(
+                            "Page ${c.currentPage.value + 1} of ${c.totalPages}",
+                          ),
+                          IconButton(
+                            onPressed: c.currentPage.value < c.totalPages - 1
+                                ? () async {
+                                    c.currentPage.value++;
+                                    await c.fetchStudents();
+                                  }
+                                : null,
+                            icon: const Icon(
+                              Icons.chevron_right_rounded,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  })
                 ],
               ),
             ),

@@ -24,6 +24,7 @@ class BatchesPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final normalizedRole = role?.trim().toLowerCase();
 
     final isCustom = ![
       "admin",
@@ -35,7 +36,7 @@ class BatchesPage extends StatelessWidget {
       "finance",
       "sales",
       "hr"
-    ].contains(role);
+    ].contains(normalizedRole);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -90,9 +91,11 @@ class BatchesPage extends StatelessWidget {
                       context,
                       tabs: c.tabs,
                       selectedIndex: c.selectedTab.value,
-                      onTap: (index) {
+                      onTap: (index) async {
                         c.selectedTab.value = index;
-                        c.applyFilters();
+                        c.currentPage.value = 0;
+
+                        await c.fetchBatches();
                       },
                       getCount: (index) => c.tabData[index]['count'],
                     ),
@@ -126,8 +129,8 @@ class BatchesPage extends StatelessWidget {
                               final batch = c.filteredBatches[index];
 
                               return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 4),
                                 child: Align(
                                   alignment: Alignment.center,
                                   child: ConstrainedBox(
@@ -135,23 +138,30 @@ class BatchesPage extends StatelessWidget {
                                         const BoxConstraints(maxWidth: 700),
                                     child: PremiumInfoCard(
                                       id: batch.id ?? "",
-                                      title: batch.batchName ?? "",
-                                      subtitle: batch.batchID ?? "",
-                                      status: batch.status,
-                                      statusColor: getStatusColor(batch.status),
-                                      extraInfo: "",
+                                      title: batch.name ?? "",
+                                      subtitle: batch.code ?? "",
+                                      status:
+                                          // (batch.isLive == true)
+                                          //     ?  'Active' :
+                                          "Inactive",
+                                      statusColor: getStatusColor(
+                                          // (batch.isLive == true)
+                                          //     ? 'Active' :
+                                          "Inactive"),
                                       footerText: "",
                                       onTap: (!isCustom ||
                                               PermissionService.can(
                                                   "view_batch"))
-                                          ? () => Get.to(
-                                                () => BatchDetailedPage(
-                                                    batch: batch,
-                                                    initialIndex: index),
-                                                binding: BindingsBuilder(() {
-                                                  Get.put(BatchController());
-                                                }),
-                                              )
+                                          ? () {
+                                              // Get.to(
+                                              //     () => BatchDetailedPage(
+                                              //         batch: batch,
+                                              //         initialIndex: index),
+                                              //     binding: BindingsBuilder(() {
+                                              //       Get.put(BatchController());
+                                              //     }),
+                                              //   );
+                                            }
                                           : null,
                                       actions: [
                                         if ((!isCustom ||
@@ -186,6 +196,40 @@ class BatchesPage extends StatelessWidget {
                       });
                     }),
                   ),
+                  Obx(() {
+                    if (c.totalPages <= 1) return const SizedBox();
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 14, top: 6),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: c.currentPage.value > 0
+                                ? () async {
+                                    c.currentPage.value--;
+                                    await c.fetchBatches();
+                                  }
+                                : null,
+                            icon: const Icon(Icons.chevron_left_rounded),
+                          ),
+                          Text(
+                            "Page ${c.currentPage.value + 1} of ${c.totalPages}",
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          IconButton(
+                            onPressed: c.currentPage.value < c.totalPages - 1
+                                ? () async {
+                                    c.currentPage.value++;
+                                    await c.fetchBatches();
+                                  }
+                                : null,
+                            icon: const Icon(Icons.chevron_right_rounded),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),

@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:albedo_app/config/root.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/student_controller.dart';
+import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/feedback_model.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/settings/assessment_model.dart';
+import 'package:albedo_app/model/stu_wallet_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/view/students/add_assessment_page.dart';
 import 'package:albedo_app/view/students/add_package_page.dart';
@@ -36,7 +40,7 @@ extension PackageCalculations on Package {
     return rate * sessions;
   }
 
-  double get totalStudentPaid => takenFee ?? 0;
+  double get totalStudentPaid => totalPaidFee ?? 0;
   double get totalStudentBalance => balance ?? 0;
 
   double get progressPercent {
@@ -50,17 +54,58 @@ extension PackageCalculations on Package {
 // ============================================================
 //  PAGE
 // ============================================================
-class StudentDetailsPage extends StatelessWidget {
-  final Student student;
+class StudentDetailsPage extends StatefulWidget {
+  final String studentId;
   final int initialIndex;
 
-  StudentDetailsPage({
+  const StudentDetailsPage({
     super.key,
-    required this.student,
+    required this.studentId,
     required this.initialIndex,
   });
 
+  @override
+  State<StudentDetailsPage> createState() => _StudentDetailsPageState();
+}
+
+class _StudentDetailsPageState extends State<StudentDetailsPage> {
   final c = Get.find<StudentController>();
+
+  Student? student;
+  StudentWallet? wallet;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStudent();
+  }
+
+  Future<void> fetchStudent() async {
+    try {
+      final studentData = await c.fetchStudentById(widget.studentId);
+
+      final packages = await c.fetchStudentPackagesById(widget.studentId);
+      final batches = await c.fetchStudentBatchesById(widget.studentId);
+      final walletData = await c.fetchStudentWalletById(widget.studentId);
+
+      if (studentData != null) {
+        studentData.packages = packages;
+        studentData.batches = batches;
+      }
+
+      setState(() {
+        student = studentData;
+        wallet = walletData;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +113,6 @@ class StudentDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(),
-      // ── FAB is untouched ────────────────────────────────────
       floatingActionButton: Obx(() {
         final index = c.selectedIndex.value;
 
@@ -135,7 +179,7 @@ class StudentDetailsPage extends StatelessWidget {
                         CustomWidgets().customDropdownField<Package>(
                           context: context,
                           hint: 'Choose a package',
-                          items: student.packages ?? [],
+                          items: student?.packages ?? [],
                           onChanged: (p0) => c.selectedPackage.value = p0,
                           itemLabel: (item) => item.name ?? '',
                         ),
@@ -179,11 +223,9 @@ class StudentDetailsPage extends StatelessWidget {
         }
         return SizedBox();
       }),
-
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Tabs (untouched) ───────────────────────────────
           Padding(
             padding: const EdgeInsets.all(8),
             child: Obx(() => CustomWidgets().customTabs(
@@ -193,21 +235,22 @@ class StudentDetailsPage extends StatelessWidget {
                   onTap: (i) => c.selectedIndex.value = i,
                 )),
           ),
-
-          // ── Tab bodies (upgraded) ──────────────────────────
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Obx(() {
                 final index = c.selectedIndex.value;
-                final packages = student.packages ?? [];
-                final assessments = student.assessment ?? [];
+                final packages = student?.packages ?? [];
+                final batches = student?.batches ?? [];
+
+                final assessments = student?.assessment ?? [];
 
                 // ─── PROFILE ───────────────────────────────────
                 if (c.tabs[index] == 'Profile') return _profileTab(context, cs);
 
                 // ─── PACKAGES ──────────────────────────────────
                 if (c.tabs[index] == 'Packages') {
+                  debugPrint("Packages: ${student?.packages?.length}");
                   if (packages.isEmpty) {
                     return EmptyState(
                       cs: cs,
@@ -221,7 +264,8 @@ class StudentDetailsPage extends StatelessWidget {
 
                 // ─── BATCHES ───────────────────────────────────
                 if (c.tabs[index] == 'Batches') {
-                  final batches = student.batch ?? [];
+                  debugPrint("Batches: ${student?.batches?.length}");
+
                   if (batches.isEmpty) {
                     return EmptyState(
                         cs: cs,
@@ -234,23 +278,24 @@ class StudentDetailsPage extends StatelessWidget {
 
                 // ─── WALLET ────────────────────────────────────
                 if (c.tabs[index] == 'Wallet') {
-                  return studentWalletTab(context, student, c);
+                  return studentWalletTab(
+                      context, student??Student(name: ''), wallet ?? StudentWallet(), c);
                 }
 
                 // ─── BATCH PAYMENTS ────────────────────────────
                 if (c.tabs[index] == 'Batch Payments') {
-                  final batches = student.batch ?? [];
-                  final hasPayments = batches.any((b) =>
-                      b.amountPaid != null &&
-                      b.amountPaid.toString().trim().isNotEmpty);
-                  if (!hasPayments) {
-                    return EmptyState(
-                      icon: Icons.receipt_long_outlined,
-                      cs: cs,
-                      title: 'No batch payments found',
-                      subtitle: '',
-                    );
-                  }
+                  final batches = student?.batches ?? [];
+                  // final hasPayments = batches.any((b) =>
+                  //     b.amountPaid != null &&
+                  //     b.amountPaid.toString().trim().isNotEmpty);
+                  // if (!hasPayments) {
+                  //   return EmptyState(
+                  //     icon: Icons.receipt_long_outlined,
+                  //     cs: cs,
+                  //     title: 'No batch payments found',
+                  //     subtitle: '',
+                  //   );
+                  // }
                   return _batchPaymentsTab(context, cs, batches);
                 }
 
@@ -293,7 +338,7 @@ class StudentDetailsPage extends StatelessWidget {
 
                 // ─── CERTIFICATES ──────────────────────────────
                 if (c.tabs[index] == 'Certificates') {
-                  final certs = student.certificate ?? [];
+                  final certs = student?.certificate ?? [];
                   if (certs.isEmpty) {
                     return EmptyState(
                         cs: cs,
@@ -319,9 +364,6 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  PROFILE TAB
-  // ══════════════════════════════════════════════════════════
   Widget _profileTab(BuildContext context, ColorScheme cs) {
     return SingleChildScrollView(
       child: Column(
@@ -341,15 +383,15 @@ class StudentDetailsPage extends StatelessWidget {
                 _divider(cs),
                 _infoGridRow(context,
                     label1: 'Created By',
-                    value1: student.createdBy ?? '-',
+                    value1: student?.createdByName ?? '-',
                     label2: 'Created At',
-                    value2: 'Oct 10, 2024'),
+                    value2: formatDate(student?.createdAt ?? DateTime.now())),
                 SizedBox(height: 14),
                 _contactRow(context, Icons.phone_outlined, 'Mobile',
-                    student.phone ?? '-'),
+                    student?.phone ?? '-'),
                 SizedBox(height: 10),
                 _contactRow(context, Icons.chat_bubble_outline, 'WhatsApp',
-                    student.whatsapp ?? '-'),
+                    student?.whatsapp ?? '-'),
                 _divider(cs),
                 _parentSection(context),
               ],
@@ -378,21 +420,20 @@ class StudentDetailsPage extends StatelessWidget {
                   ],
                 ),
                 _divider(cs),
-                _labelValue('Current Address', student.address ?? '-'),
+                _labelValue('Current Address', student?.address ?? '-'),
                 SizedBox(height: 14),
                 _divider(cs),
                 Row(
                   children: [
                     Expanded(
                         child: _statPill(context, 'Category',
-                            student.category ?? '-', Icons.category_outlined)),
+                            student?.category ?? '-', Icons.category_outlined)),
                     SizedBox(width: 12),
-                    Expanded(
-                        child: _statPill(
-                            context,
-                            'Standard',
-                            student.standard?.toString() ?? '-',
-                            Icons.menu_book_outlined)),
+                    _statPill(
+                        context,
+                        'Standard',
+                        student?.standard?.toString() ?? '-',
+                        Icons.menu_book_outlined),
                   ],
                 ),
               ],
@@ -409,16 +450,26 @@ class StudentDetailsPage extends StatelessWidget {
             _supportTile(
                 context,
                 'Coordinator',
-                student.coordinator?.name ?? '-',
-                student.coordinator?.id ?? '-',
-                'Oct 12, 2024',
-                imageUrl: student.coordinator?.imageUrl),
-            _supportTile(context, 'Mentor', student.mentor?.name ?? '-',
-                student.mentor?.id ?? '-', 'Oct 15, 2024 - 02:30 PM'),
-            _supportTile(context, 'Advisor', student.advisorName ?? '-',
-                student.advisorId ?? '-', 'Oct 11, 2024 - 10:00 AM'),
-            _supportTile(context, 'Referral', student.referralName ?? '-', '',
-                'Oct 05, 2024 - 09:00 AM'),
+                student?.coordinator?.name ?? '-',
+                student?.coordinator?.id ?? '-',
+                formatDate(student?.coordinator?.assignedAt),
+                imageUrl: student?.coordinator?.imageUrl),
+            _supportTile(
+              context,
+              'Mentor',
+              student?.mentor?.name ?? '-',
+              student?.mentor?.id ?? '-',
+              formatDate(student?.mentor?.assignedAt),
+            ),
+            _supportTile(
+              context,
+              'Advisor',
+              student?.advisor?.name ?? '-',
+              student?.advisor?.empId ?? '-',
+              formatDate(student?.advisor?.assignedAt),
+            ),
+            _supportTile(context, 'Referral', student?.referral?.name ?? '-',
+                '', 'Oct 05, 2024 - 09:00 AM'),
           ].map((w) =>
               Padding(padding: const EdgeInsets.only(bottom: 10), child: w)),
         ],
@@ -426,11 +477,9 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  PACKAGES TAB
-  // ══════════════════════════════════════════════════════════
   Widget _packagesTab(
       BuildContext context, ColorScheme cs, List<Package> packages) {
+    log("Packages: ${packages.length}");
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -447,8 +496,8 @@ class StudentDetailsPage extends StatelessWidget {
                     totalHours = 0,
                     totalTeacherSalary = 0;
                 for (var pkg in packages) {
-                  totalPackageAmount += pkg.packageFee ?? 0;
-                  totalPaid += pkg.takenFee ?? 0;
+                  // totalPackageAmount += pkg.packageFee ?? 0;
+                  totalPaid += pkg.totalPaidFee ?? 0;
                   totalHours += pkg.sessionsCompleted ?? 0;
                   totalTeacherSalary += pkg.totalTeacherSalary;
                 }
@@ -535,17 +584,16 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  BATCHES TAB  (redesigned)
-  // ══════════════════════════════════════════════════════════
-  Widget _batchesTab(BuildContext context, ColorScheme cs, List batches) {
+  Widget _batchesTab(
+      BuildContext context, ColorScheme cs, List<Batch> batches) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: batches.length,
       itemBuilder: (context, i) {
         final batch = batches[i];
-        final isActive = batch.status == 'Active';
+        final isActive = (batch.isLive == true);
+        final isActiveText = (batch.isLive == true) ? 'Active' : 'Inactive';
         final statusColor =
             isActive ? const Color(0xFF22C55E) : const Color(0xFFF59E0B);
 
@@ -580,26 +628,26 @@ class StudentDetailsPage extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        CustomWidgets().squareAvatar(batch.imageUrl, 44),
+                        // CustomWidgets().squareAvatar(batch.image, 44),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                batch.batchName ?? 'No Name',
+                                batch.name ?? 'No Name',
                                 style: Get.textTheme.titleMedium,
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'ID: ${batch.id ?? '-'}',
+                                batch.code ?? '-',
                                 style: Get.textTheme.labelSmall!
                                     .copyWith(color: cs.outline),
                               ),
                             ],
                           ),
                         ),
-                        _statusBadge(batch.status ?? '-', statusColor),
+                        _statusBadge(isActiveText ?? '-', statusColor),
                       ],
                     ),
 
@@ -622,7 +670,7 @@ class StudentDetailsPage extends StatelessWidget {
                             SizedBox(height: 2),
                             Text(batch.mentor?.name ?? '-',
                                 style: Get.textTheme.titleSmall),
-                            Text('ID: ${batch.mentor?.id ?? '-'}',
+                            Text('ID: ${batch.mentor?.empId ?? '-'}',
                                 style: Get.textTheme.labelSmall!
                                     .copyWith(color: cs.outline)),
                           ],
@@ -639,9 +687,6 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  BATCH PAYMENTS TAB  (redesigned)
-  // ══════════════════════════════════════════════════════════
   Widget _batchPaymentsTab(BuildContext context, ColorScheme cs, List batches) {
     return ListView.builder(
       shrinkWrap: true,
@@ -748,9 +793,6 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  SESSIONS TAB
-  // ══════════════════════════════════════════════════════════
   Widget _sessionsTab(
       BuildContext context, ColorScheme cs, List<Package> packages) {
     return Column(
@@ -763,7 +805,7 @@ class StudentDetailsPage extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () {
-              final allSessions = student.packages
+              final allSessions = student?.packages
                       ?.expand((pkg) => pkg.sessions ?? [])
                       .toList() ??
                   [];
@@ -852,9 +894,6 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  FEEDBACKS TAB
-  // ══════════════════════════════════════════════════════════
   Widget _feedbacksTab(BuildContext context, ColorScheme cs) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -901,9 +940,6 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  PROFILE CARD  (upgraded)
-  // ══════════════════════════════════════════════════════════
   Widget _profileCard(BuildContext context) {
     final cs = Get.theme.colorScheme;
 
@@ -949,7 +985,7 @@ class StudentDetailsPage extends StatelessWidget {
                       ],
                     ),
                     child: CustomWidgets()
-                        .squareAvatar(student.imageUrl, 64, radius: 12),
+                        .squareAvatar(student?.imageUrl, 64, radius: 12),
                   ),
                 ),
 
@@ -957,9 +993,10 @@ class StudentDetailsPage extends StatelessWidget {
                   offset: const Offset(0, -20),
                   child: Column(
                     children: [
-                      Text(student.name, style: Get.textTheme.titleLarge),
+                      Text(student?.name ?? '',
+                          style: Get.textTheme.titleLarge),
                       SizedBox(height: 4),
-                      Text(student.email ?? '-',
+                      Text(student?.email ?? '-',
                           style: Get.textTheme.bodySmall!
                               .copyWith(color: cs.outline)),
                       SizedBox(height: 10),
@@ -972,7 +1009,7 @@ class StudentDetailsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(color: _blue.withOpacity(0.3)),
                         ),
-                        child: Text('ID: ${student.studentId}',
+                        child: Text('ID: ${student?.studentId}',
                             style: Get.textTheme.titleSmall!
                                 .copyWith(color: _blue)),
                       ),
@@ -980,7 +1017,7 @@ class StudentDetailsPage extends StatelessWidget {
                       SizedBox(height: 12),
 
                       // Fee status chip
-                      _feeStatusChip(context, student.isFeePaid),
+                      _feeStatusChip(context, student?.isFeePaid ?? false),
 
                       SizedBox(height: 16),
 
@@ -990,7 +1027,7 @@ class StudentDetailsPage extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             final auth = Get.find<AuthController>();
-                            final user = studentToUser(student);
+                            final user = studentToUser(student!);
 
                             auth.startImpersonation(user);
                             Get.offAll(() => const Root());
@@ -1021,20 +1058,19 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  PACKAGE CARD  (upgraded)
-  // ══════════════════════════════════════════════════════════
   Widget studentPackageCard(BuildContext context, Package package) {
     final cs = Get.theme.colorScheme;
-    final packageFee = package.packageFee ?? 0;
-    final paidFee = package.takenFee ?? 0;
-    final balance = package.balance ?? (packageFee - paidFee);
-    final hourly = package.hourlyRate ?? 0;
-    final totalSessions = student.totalSession ?? 0;
-    final completedSessions = student.classesTaken ?? 0;
+
+    final paidFee = package.totalPaidFee ?? 0;
+
+    final hourly = package.packageFee ?? 0;
+    final total = package.totalFee ?? 0;
+    final bal = total - paidFee;
+    final totalSessions = student?.totalSession ?? 0;
+    final completedSessions = student?.classesTaken ?? 0;
     final sessionProgress =
         totalSessions == 0 ? 0.0 : completedSessions / totalSessions;
-    final feeProgress = packageFee == 0 ? 0.0 : paidFee / packageFee;
+    // final feeProgress = packageFee == 0 ? 0.0 : paidFee / packageFee;
     final isActive = (package.status ?? '').toLowerCase() == 'active';
     final statusColor =
         isActive ? const Color(0xFF22C55E) : const Color(0xFFF59E0B);
@@ -1067,7 +1103,7 @@ class StudentDetailsPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(package.name ?? '-',
+                          Text(package.packageName ?? '-',
                               style: Get.textTheme.titleMedium),
                           SizedBox(height: 6),
                           if (package.status != null && package.status != '')
@@ -1093,23 +1129,23 @@ class StudentDetailsPage extends StatelessWidget {
                           case "delete":
                             CustomWidgets().showDeleteDialog(
                               dltText: Obx(
-  () => c.isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
-        ),
-),
+                                () => c.isLoading.value
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : Text(
+                                        "Yes",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall!
+                                            .copyWith(color: Colors.white),
+                                      ),
+                              ),
                               context: context,
                               title: 'Are you sure?',
                               text:
@@ -1119,11 +1155,11 @@ class StudentDetailsPage extends StatelessWidget {
 
                             break;
                           case "refund":
-                            c.init(
-                              packageFee: package.packageFee ?? 0,
-                              takenFee: package.takenFee ?? 0,
-                              totalPaid: package.totalStudentPaid ?? 0,
-                            );
+                            // c.init(
+                            //   packageFee: package.packageFee ?? 0,
+                            //   takenFee: package.takenFee ?? 0,
+                            //   totalPaid: package.totalStudentPaid ?? 0,
+                            // );
                             CustomWidgets().showCustomDialog(
                                 context: context,
                                 formKey: GlobalKey(),
@@ -1208,7 +1244,8 @@ class StudentDetailsPage extends StatelessWidget {
                                       infoRow(
                                         label: "Class Taken",
                                         value:
-                                            package.takenFee?.toString() ?? "-",
+                                            package.totalPaidFee?.toString() ??
+                                                "-",
                                       ),
                                       infoRow(
                                         label: "Teacher",
@@ -1323,7 +1360,7 @@ class StudentDetailsPage extends StatelessWidget {
                     Icon(Icons.calendar_today_outlined,
                         size: 12, color: cs.outline),
                     SizedBox(width: 5),
-                    Text('Enrolled: 12 Oct 2024 • 10:30 AM',
+                    Text('Enrolled: ${formatDate(student?.joinedAt)}',
                         style: Get.textTheme.bodySmall!
                             .copyWith(color: cs.outline)),
                   ],
@@ -1339,18 +1376,20 @@ class StudentDetailsPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _metaChip(context, Icons.menu_book_outlined,
-                              'Std ${student.standard}'),
-                          SizedBox(height: 6),
-                          _metaChip(context, Icons.science_outlined,
-                              package.subjectName ?? '-'),
-                          SizedBox(height: 6),
-                          _metaChip(context, Icons.school_outlined,
-                              student.course ?? '-'),
+                          _metaChip(
+                            context,
+                            Icons.menu_book_outlined,
+                            '${student?.standard ?? '-'} Std ${package.syllabus ?? '-'}',
+                          ),
+                          const SizedBox(height: 6),
+                          _metaChip(
+                            context,
+                            Icons.school_outlined,
+                            package.course ?? '-',
+                          ),
                         ],
                       ),
-                    ),
-                    // Teacher
+                    ), // Teacher
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -1380,7 +1419,7 @@ class StudentDetailsPage extends StatelessWidget {
                     _iconStat(context, Icons.videocam_outlined, 'Mode',
                         package.mode ?? '-'),
                     _iconStat(context, Icons.schedule_outlined, 'Time',
-                        package.time ?? '-'),
+                        formatTime(package.classTime)),
                     _iconStat(context, Icons.timer_outlined, 'Duration',
                         package.duration ?? '-'),
                   ],
@@ -1397,14 +1436,14 @@ class StudentDetailsPage extends StatelessWidget {
                     _progressRow(
                         context, 'Sessions', sessionProgress, cs.primary),
                     SizedBox(height: 8),
-                    _progressRow(
-                        context, 'Fees', feeProgress, const Color(0xFF22C55E)),
+                    // _progressRow(
+                    //     context, 'Fees', feeProgress, const Color(0xFF22C55E)),
                     SizedBox(height: 8),
-                    Text(
-                      '$completedSessions/$totalSessions sessions  •  ${student.totalHour ?? 0} hrs  •  ${(feeProgress * 100).toStringAsFixed(0)}% fee',
-                      style:
-                          Get.textTheme.labelSmall!.copyWith(color: cs.outline),
-                    ),
+                    // Text(
+                    //   '$completedSessions/$totalSessions sessions  •  ${student.totalHour ?? 0} hrs  •  ${(feeProgress * 100).toStringAsFixed(0)}% fee',
+                    //   style:
+                    //       Get.textTheme.labelSmall!.copyWith(color: cs.outline),
+                    // ),
                   ],
                 ),
 
@@ -1480,11 +1519,12 @@ class StudentDetailsPage extends StatelessWidget {
                   icon: Icons.school_outlined,
                   color: _blue,
                   items: [
-                    _feeRow('Hourly', '₹${hourly.toStringAsFixed(0)}'),
-                    _feeRow('Package', '₹${packageFee.toStringAsFixed(0)}'),
+                    _feeRow('Hourly Fee', '₹${hourly.toStringAsFixed(0)}'),
+                    _feeRow(
+                        'Total Package Fee', '₹${total.toStringAsFixed(0)}'),
                     _feeRow('Collected', '₹${paidFee.toStringAsFixed(0)}',
                         valueColor: const Color(0xFF22C55E)),
-                    _feeRow('Balance', '₹${balance.toStringAsFixed(0)}',
+                    _feeRow('Balance', '₹${bal.toStringAsFixed(0)}',
                         valueColor: cs.error, bold: true),
                   ],
                 ),
@@ -1496,9 +1536,6 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  SESSION CARD
-  // ══════════════════════════════════════════════════════════
   Widget studentPackageSessionCard(BuildContext context, Package package) {
     if ((package.name ?? '').trim().isEmpty) return SizedBox();
     final cs = Get.theme.colorScheme;
@@ -1550,9 +1587,6 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  ASSESSMENT CARD
-  // ══════════════════════════════════════════════════════════
   Widget studentAssessmentCard(BuildContext context, Assessment assessment) {
     final cs = Get.theme.colorScheme;
 
@@ -1642,24 +1676,24 @@ class StudentDetailsPage extends StatelessWidget {
                       icon:
                           Icon(Icons.delete_outline, size: 18, color: cs.error),
                       onPressed: () => CustomWidgets().showDeleteDialog(
-                        dltText: Obx(
-  () => c.isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
-        ),
-),
+                            dltText: Obx(
+                              () => c.isLoading.value
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(
+                                      "Yes",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .copyWith(color: Colors.white),
+                                    ),
+                            ),
                             context: context,
                             title: 'Are you sure?',
                             text:
@@ -1675,9 +1709,6 @@ class StudentDetailsPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  FEEDBACK CARD
-  // ══════════════════════════════════════════════════════════
   Widget feedbackCard(Feedbacks f, BuildContext context) {
     final cs = Get.theme.colorScheme;
     return Container(
@@ -1857,9 +1888,9 @@ class StudentDetailsPage extends StatelessWidget {
         Text('Parent Details',
             style: Get.textTheme.titleSmall!.copyWith(color: cs.outline)),
         SizedBox(height: 4),
-        Text(student.parentName ?? '-', style: Get.textTheme.titleSmall),
-        if (student.parentOccupation != null)
-          Text(student.parentOccupation!,
+        Text(student?.parentName ?? '-', style: Get.textTheme.titleSmall),
+        if (student?.parentOccupation != null)
+          Text(student?.parentOccupation ?? '',
               style: Get.textTheme.bodySmall!.copyWith(color: cs.outline)),
       ],
     );

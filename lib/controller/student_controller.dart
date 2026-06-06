@@ -1,14 +1,13 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
+import 'package:albedo_app/config/urls.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/feedback_model.dart';
 import 'package:albedo_app/model/package_model.dart';
-import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/stu_wallet_model.dart';
-import 'package:albedo_app/model/users/advisor_model.dart';
-import 'package:albedo_app/model/users/coordinator_model.dart';
-import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
-import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/wallet_model.dart';
 import 'package:albedo_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -66,33 +65,91 @@ class StudentController extends GetxController {
   final RxString selectedAdvisor = ''.obs;
   final RxString selectedReferralSource = ''.obs;
   final certificateFormKey = GlobalKey<FormState>();
+  final allCount = 0.obs;
+  final activeCount = 0.obs;
+  final batchCount = 0.obs;
+  final tbaCount = 0.obs;
+  final inactiveCount = 0.obs;
 
   RxInt feedbackTabIndex = 0.obs;
 
   // --------------------------
   // Counts for tabs
   // --------------------------
-  int get allCount => students.length;
+  Future<void> loadStudentTabCounts() async {
+    try {
+      final all = await Api().getStudentDetails(
+        url: Urls.studentsDetails,
+        page: 1,
+        pageSize: 1,
+      );
 
-  int get activeCount => students.where((e) => e.status == "Active").length;
+      final active = await Api().getStudentDetails(
+        url: Urls.studentsDetailsActive,
+        page: 1,
+        pageSize: 1,
+      );
 
-  int get batchCount => students.where((e) => e.type == "Batch").length;
+      final batch = await Api().getStudentDetails(
+        url: Urls.studentsWithBatches,
+        page: 1,
+        pageSize: 1,
+      );
 
-  int get tbaCount => students.where((e) => e.type == "TBA").length;
+      final tba = await Api().getStudentDetails(
+        url: "${Urls.studentsDetails}?tba=true",
+        page: 1,
+        pageSize: 1,
+      );
 
-  int get inactiveCount => students.where((e) => e.status == "Inactive").length;
+      final inactive = await Api().getStudentDetails(
+        url: "${Urls.studentsDetails}?is_live=false",
+        page: 1,
+        pageSize: 1,
+      );
+
+      allCount.value = all.count;
+      activeCount.value = active.count;
+      batchCount.value = batch.count;
+      tbaCount.value = tba.count;
+      inactiveCount.value = inactive.count;
+    } catch (e) {
+      log(e.toString());
+    }
+  }
 
   List<Map<String, dynamic>> get tabData => [
-        {"label": "All", "count": allCount},
-        {"label": "Active", "count": activeCount},
-        {"label": "Batch", "count": batchCount},
-        {"label": "TBA", "count": tbaCount},
-        {"label": "Inactive", "count": inactiveCount},
+        {
+          "label": "All",
+          "count": allCount.value,
+        },
+        {
+          "label": "Active",
+          "count": activeCount.value,
+        },
+        {
+          "label": "Batch",
+          "count": batchCount.value,
+        },
+        {
+          "label": "TBA",
+          "count": tbaCount.value,
+        },
+        {
+          "label": "Inactive",
+          "count": inactiveCount.value,
+        },
       ];
 
   // 🎯 Student-specific fields
   RxBool isAdmissionFeePaid = false.obs;
   var selectedRole = ''.obs;
+
+  final totalCount = 0.obs;
+  final currentPage = 0.obs;
+  final pageSize = 10.obs;
+
+  int get totalPages => (totalCount.value / pageSize.value).ceil();
 
   var step = 1.obs;
   RxList<String> packageList = <String>[].obs;
@@ -123,6 +180,7 @@ class StudentController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    loadStudentTabCounts();
     fetchStudents();
     refundedC.addListener(_updateConvenience);
   }
@@ -154,210 +212,42 @@ class StudentController extends GetxController {
   Future<void> fetchStudents() async {
     try {
       isLoading.value = true;
+      String url = Urls.studentsDetails;
 
-      final user = auth.activeUser;
+      switch (selectedTab.value) {
+        case 1:
+          url = Urls.studentsDetailsActive;
+          break;
 
-      await Future.delayed(const Duration(seconds: 2));
+        case 2:
+          url = "${Urls.base}/student/students-with-batches/";
+          break;
 
-      final allStudents = _getDummyStudents();
+        case 3:
+          url = "${Urls.studentsDetails}?tba=true";
+          break;
 
-      List<Student> result;
-
-      if (user?.role == "admin") {
-        result = allStudents; // full access
-      } else if (user?.role == "coordinator") {
-        result =
-            allStudents.where((s) => s.coordinator?.id == user!.id).toList();
-      } else if (user?.role == "teacher") {
-        result = allStudents.where((s) => s.teacherId == user!.id).toList();
-      } else if (user?.role == "mentor") {
-        result = allStudents.where((s) => s.mentor?.id == user!.id).toList();
-      } else {
-        result = [];
+        case 4:
+          url = "${Urls.studentsDetails}?is_live=false";
+          break;
       }
 
-      students.assignAll(result);
-      filteredStudents.assignAll(result);
+      final response = await Api().getStudentDetails(
+        url: url,
+        page: currentPage.value + 1,
+        pageSize: pageSize.value,
+      );
+
+      students.assignAll(response.results);
+
+      totalCount.value = response.count;
+
+      applyFilters();
     } catch (e) {
-      print("Error: $e");
+      log(e.toString());
     } finally {
       isLoading.value = false;
     }
-  }
-
-  List<Student> _getDummyStudents() {
-    return [
-      Student(
-        studentId: "STU1001",
-        name: "Riya Shah",
-        email: "riya.shah@email.com",
-        phone: "9876543210",
-        whatsapp: "9876543210",
-        imageUrl: "https://randomuser.me/api/portraits/women/45.jpg",
-
-        status: "Active",
-        type: "Batch",
-        category: "Regular",
-        batch: [
-          Batch(
-              batchID: 'BAT101',
-              batchName: '10th CBSE',
-              status: 'Active',
-              amountPaid: '12000',
-              paidDate: DateTime.now())
-        ],
-
-        joinedAt: DateTime.now(),
-        admissionDate: DateTime.parse('2023-01-15 12:00:00'),
-
-        gender: "Female",
-        timezone: "Asia/Kolkata",
-        address: "12, MG Road",
-        place: "Mumbai",
-
-        parentName: "Rajesh Shah",
-        parentOccupation: "Businessman",
-
-        createdBy: "Admin",
-        referredBy: "Google",
-        referralName: "Anita",
-        referralRole: "Parent",
-
-        isFeePaid: true,
-
-        /// 🔷 Academic Info
-        course: "CBSE",
-        subjects: "Maths, Science, English",
-        syllabus: "CBSE 2023",
-        syllabusId: "SYL001",
-        standard: 8,
-
-        /// 🔷 Class Tracking
-        classHours: 40,
-        classesTaken: 32,
-        totalHour: 100,
-        totalSession: 50,
-
-        /// 🔷 Fees
-        amount: 20000,
-        amountPerHour: 500,
-        totalAmount: 25000,
-        regFee: 2000,
-        totalPaid: 18000,
-        balance: 7000,
-
-        /// 🔷 Wallet
-        wallet: StudentWallet(
-          balance: 1500,
-          totalDeposited: 5000,
-        ),
-
-        /// 🔷 Teacher / Staff
-        teacherId: "T001",
-        advisorName: "Mr. Joseph",
-        advisorId: "A101",
-
-        mentor: Mentor(
-          name: "Sarah Williams",
-          empId: "MNT-441",
-          joinedAt: DateTime.now(),
-        ),
-
-        coordinator: Coordinator(
-          name: "John Mathew",
-          id: "CRD-782",
-          joinedAt: DateTime.now(),
-        ),
-
-        advisor: Advisor(
-          name: "Joseph Sir",
-          id: "ADV-12",
-          joinedAt: DateTime.now(),
-        ),
-
-        /// 🔷 Packages
-        packages: [
-          Package(
-              status: 'active',
-              subjectId: "PKG001",
-              name: "Maths Advanced",
-              standard: '10',
-              duration: '50',
-              packageFee: 15000,
-              takenFee: 5000,
-              sessions: [
-                Session(
-                    id: '1',
-                    status: 'completed',
-                    date: DateTime.now().subtract(Duration(hours: 100))),
-                Session(id: '2', status: 'upcoming'),
-              ]),
-          Package(
-            status: 'Inactive',
-            subjectId: "PKG002",
-            name: "Science Foundation",
-            duration: '40',
-            packageFee: 12000,
-          ),
-        ],
-
-        /// 🔷 Assessments
-        assessment: [
-        //   Assessment(
-        //     id: "ASM001",
-        //     type: "Mid Term Assessment",
-        //     date: "2025-02-10",
-        //     testType: ["Online"],
-        //     attentionQuestions: ["Focus", "Listening"],
-        //   ),
-        //   Assessment(
-        //     id: "ASM002",
-        //     type: "Final Evaluation",
-        //     date: "2025-03-20",
-        //     testType: ["Offline"],
-        //     attentionQuestions: ["Participation"],
-        //   ),
-         ],
-      ),
-      Student(
-        studentId: "STU1002",
-        name: "Ameen",
-        email: "ameen@email.com",
-        status: "Inactive",
-        type: "TBA",
-        joinedAt: DateTime.now(),
-        admissionDate: DateTime.parse('2023-01-15 12:00:00'),
-        teacherId: "T002",
-        mentor: Mentor(name: '', empId: '', joinedAt: DateTime.now()),
-        coordinator: Coordinator(name: '', id: '', joinedAt: DateTime.now()),
-      ),
-      Student(
-          studentId: "ST07",
-          name: "Sneha",
-          joinedAt: DateTime.now(),
-          packages: [
-            Package(
-                name: 'Maths',
-                teacher: Teacher(
-                    id: '',
-                    name: '',
-                    status: '',
-                    joinedAt: DateTime.now(),
-                    gender: ''),
-                subjectId: 'subjectId',
-                subjectName: 'subjectName',
-                standard: 'standard',
-                syllabus: 'syllabus',
-                status: 'status',
-                packageFee: 0,
-                takenFee: 0,
-                balance: 0,
-                withdrawals: [],
-                time: 'time',
-                duration: 'duration',
-                note: 'no')
-          ]),
-    ];
   }
 
   /// --------------------------
@@ -365,22 +255,6 @@ class StudentController extends GetxController {
   /// --------------------------
   void applyFilters() {
     List<Student> temp = students;
-
-    // Tabs
-    switch (selectedTab.value) {
-      case 1:
-        temp = temp.where((s) => s.status == "Active").toList();
-        break;
-      case 2:
-        temp = temp.where((s) => s.type == "Batch").toList();
-        break;
-      case 3:
-        temp = temp.where((s) => s.type == "TBA").toList();
-        break;
-      case 4:
-        temp = temp.where((s) => s.status == "Inactive").toList();
-        break;
-    }
 
     // Search
     if (searchQuery.value.isNotEmpty) {
@@ -460,23 +334,23 @@ class StudentController extends GetxController {
     if (user?.role == "coordinator") {
       CustomWidgets().showDeleteDialog(
         dltText: Obx(
-  () => isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
+          () => isLoading.value
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  "Yes",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: Colors.white),
+                ),
         ),
-),
         title: 'Are you sure?',
         context: context,
         text: "Do you want to request deletion of this student?",
@@ -485,23 +359,23 @@ class StudentController extends GetxController {
     } else {
       CustomWidgets().showDeleteDialog(
         dltText: Obx(
-  () => isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
+          () => isLoading.value
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  "Yes",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: Colors.white),
+                ),
         ),
-),
         title: 'Are you sure?',
         context: context,
         text: "Are you sure you want to delete this student permanently?",
@@ -780,4 +654,40 @@ class StudentController extends GetxController {
     return true;
   }
 
+  Future<Student?> fetchStudentById(String id) async {
+    try {
+      return await Api().getStudentById(id);
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
+  }
+
+  Future<List<Package>> fetchStudentPackagesById(String id) async {
+    try {
+      return await Api().getStudentPackagesById(id);
+    } catch (e) {
+      debugPrint(e.toString());
+      return [];
+    }
+  }
+
+  Future<List<Batch>> fetchStudentBatchesById(String id) async {
+    try {
+      return await Api().getStudentBatchesById(id);
+    } catch (e) {
+      debugPrint(e.toString());
+      return [];
+    }
+  }
+
+  Future<StudentWallet?> fetchStudentWalletById(String id) async {
+    try {
+      debugPrint('Fetching wallet for: $id');
+      return await Api().getStudentWalletById(id);
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
+  }
 }

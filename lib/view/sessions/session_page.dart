@@ -1,3 +1,4 @@
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/controller/advisor_controller.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/coordinator_controller.dart';
@@ -8,6 +9,10 @@ import 'package:albedo_app/controller/student_controller.dart';
 import 'package:albedo_app/controller/teacher_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/settings/syllabus_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/view/advisor_detailed_page.dart';
 import 'package:albedo_app/view/coordinator_detailed_page.dart';
@@ -16,6 +21,7 @@ import 'package:albedo_app/view/sessions/add_session_page.dart';
 import 'package:albedo_app/view/sessions/reschedule_request_page.dart';
 import 'package:albedo_app/view/students/student_detail_page.dart';
 import 'package:albedo_app/view/teacher/tr_detailed_page.dart';
+import 'package:albedo_app/widgets/batch_widgets.dart';
 import 'package:albedo_app/widgets/custom_card.dart';
 import 'package:albedo_app/widgets/header_with_search.dart';
 import 'package:albedo_app/widgets/responsive.dart';
@@ -39,6 +45,7 @@ class SessionPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final normalizedRole = role?.trim().toLowerCase();
 
     final isCustom = ![
       "admin",
@@ -50,7 +57,7 @@ class SessionPage extends StatelessWidget {
       "finance",
       "sales",
       "hr"
-    ].contains(role);
+    ].contains(normalizedRole);
 
     return Scaffold(
       appBar: const CustomAppBar(),
@@ -88,19 +95,34 @@ class SessionPage extends StatelessWidget {
                       tabs: c.tabs,
                       selectedIndex: c.selectedTab.value,
                       getCount: (index) {
-                        final tab = c.statusMap[index];
+                        switch (index) {
+                          case 0:
+                            return c.activeCount.value;
 
-                        if (tab == "meet_done") {
-                          return c.meets
-                              .where((m) => m.status == "finished")
-                              .length;
+                          case 1:
+                            return c.actionCount.value;
+
+                          case 2:
+                            return c.upcomingCount.value;
+
+                          case 3:
+                            return c.pendingCount.value;
+
+                          case 4:
+                            return c.completedCount.value;
+
+                          case 5:
+                            return c.meetCount.value;
+
+                          default:
+                            return 0;
                         }
-
-                        return c.sessions.where((s) => s.status == tab).length;
                       },
-                      onTap: (index) {
+                      onTap: (index) async {
                         c.selectedTab.value = index;
-                        c.applyFilters();
+                        c.currentPage.value = 0;
+
+                        await c.fetchData();
                       },
                     ),
                   ),
@@ -110,10 +132,8 @@ class SessionPage extends StatelessWidget {
                   // ── SESSION GRID ────────────────────────────────────
                   Expanded(
                     child: Obx(() {
-                      bool isMeetTab =
-                          c.statusMap[c.selectedTab.value] == "meet_done";
+                      bool isMeetTab = c.selectedTab.value == 5;
 
-                      final sessions = c.filteredSessions;
                       final meets = c.filteredMeets;
 
                       if (c.isLoading.value) {
@@ -125,7 +145,9 @@ class SessionPage extends StatelessWidget {
                         );
                       }
 
-                      if (isMeetTab ? meets.isEmpty : sessions.isEmpty) {
+                      if (isMeetTab
+                          ? meets.isEmpty
+                          : c.filteredSessions.isEmpty) {
                         return EmptyState(
                           cs: cs,
                           icon: Icons.event_busy_outlined,
@@ -154,8 +176,9 @@ class SessionPage extends StatelessWidget {
                                 crossAxisCount: crossAxisCount,
                                 mainAxisSpacing: 8,
                                 crossAxisSpacing: 8,
-                                itemCount:
-                                    isMeetTab ? meets.length : sessions.length,
+                                itemCount: isMeetTab
+                                    ? meets.length
+                                    : c.filteredSessions.length,
                                 itemBuilder: (_, i) {
                                   if (isMeetTab) {
                                     final meet = meets[i];
@@ -164,16 +187,13 @@ class SessionPage extends StatelessWidget {
                                       id: meet.id ?? "-",
                                       title: meet.title ?? "Untitled Meet",
 
-                                      subtitle: _formatDate(meet.date),
+                                      subtitle: _formatDate(meet.dateAdded),
 
                                       // 👉 Status
                                       status: meet.status,
                                       statusColor:
                                           _getStatusColor(meet.status, context),
 
-                                      // 👉 Extra Info (time + members)
-                                      extraInfo:
-                                          "${meet.startTime} - ${meet.endTime}",
                                       extraWidget:
                                           _buildMembersChips(meet, context),
 
@@ -185,17 +205,19 @@ class SessionPage extends StatelessWidget {
                                     );
                                   }
 
-                                  final session = sessions[i];
+                                  final session = c.filteredSessions[i];
 
                                   return _SessionCard(
                                     session: session,
                                     statusColor:
                                         getStatusColor(context, session.status),
-                                    onTap: () =>
-                                        // Get.to(() => SessionDetailsPage(
-                                        //     sessions: sessions, initialIndex: i))
-                                        _openSessionDetails(
-                                            context, sessions, i),
+                                    onTap: () {
+                                      _openSessionDetails(
+                                        context,
+                                        c.filteredSessions,
+                                        i,
+                                      );
+                                    },
                                   );
                                 },
                               ),
@@ -204,7 +226,49 @@ class SessionPage extends StatelessWidget {
                         },
                       );
                     }),
-                  )
+                  ),
+                  Obx(() {
+                    if (c.totalPages <= 1) {
+                      return const SizedBox();
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: 14,
+                        top: 6,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: c.currentPage.value > 0
+                                ? () async {
+                                    c.currentPage.value--;
+                                    await c.fetchData();
+                                  }
+                                : null,
+                            icon: const Icon(
+                              Icons.chevron_left_rounded,
+                            ),
+                          ),
+                          Text(
+                            "Page ${c.currentPage.value + 1} of ${c.totalPages}",
+                          ),
+                          IconButton(
+                            onPressed: c.currentPage.value < c.totalPages - 1
+                                ? () async {
+                                    c.currentPage.value++;
+                                    await c.fetchData();
+                                  }
+                                : null,
+                            icon: const Icon(
+                              Icons.chevron_right_rounded,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  })
                 ],
               ),
             ),
@@ -222,7 +286,7 @@ class SessionPage extends StatelessWidget {
   Widget _buildMembersChips(Meet meet, BuildContext context) {
     final cs = Get.theme.colorScheme;
 
-    final roles = meet.members.map((m) => m.role).toSet().toList();
+    final roles = meet.mentors.map((m) => m.role).toSet().toList();
 
     return Wrap(
       spacing: 6,
@@ -264,10 +328,11 @@ class SessionPage extends StatelessWidget {
     BuildContext context,
     List<Session> sessions,
     int initialIndex,
-  ) {
+  ) async {
     final auth = Get.find<AuthController>();
     final isCoordinator = auth.activeUser?.role == "coordinator";
     final role = auth.activeUser?.role;
+    final normalizedRole = role?.trim().toLowerCase();
 
     final isCustom = ![
       "admin",
@@ -279,12 +344,18 @@ class SessionPage extends StatelessWidget {
       "finance",
       "sales",
       "hr"
-    ].contains(role);
+    ].contains(normalizedRole);
 
     final c = Get.find<SessionController>();
 
     // set initial index once
     c.currentSessionIndex.value = initialIndex;
+
+    final session = sessions[initialIndex];
+
+    final detail = await c.fetchSessionDetail(session.id);
+
+    if (detail == null) return;
 
     CustomWidgets().showCustomDialog(
       isViewOnly: true,
@@ -368,49 +439,57 @@ class SessionPage extends StatelessWidget {
                             title: "Student",
                             name: data.student?.name ?? '',
                             id: data.student?.studentId ?? '',
-                            onTap: () => Get.to(
-                                  () => StudentDetailsPage(
-                                      student: data.student!,
-                                      initialIndex: initialIndex),
-                                  binding: BindingsBuilder(() {
-                                    Get.put(StudentController());
-                                  }),
-                                )),
+                            onTap: () {
+                              // Get.to(
+                              //     () => StudentDetailsPage(
+                              //         student: data.student!,
+                              //         initialIndex: initialIndex),
+                              //     binding: BindingsBuilder(() {
+                              //       Get.put(StudentController());
+                              //     }),
+                              //   );
+                            }),
 
                         detailCard(context,
                             title: "Teacher",
                             name: data.teacher?.name ?? '',
-                            id: data.teacher?.id ?? '',
-                            onTap: () => Get.to(
-                                  () => TeacherDetailsPage(
-                                      teacher: data.teacher!,
-                                      initialIndex: initialIndex),
-                                  binding: BindingsBuilder(() {
-                                    Get.put(TeacherController());
-                                  }),
-                                )),
+                            id: data.teacher?.teacherId ?? '',
+                            onTap: () {
+                              // Get.to(
+                              //     () => TeacherDetailsPage(
+                              //         teacher: data.teacher!,
+                              //         initialIndex: initialIndex),
+                              //     binding: BindingsBuilder(() {
+                              //       Get.put(TeacherController());
+                              //     }),
+                              //   );
+                            }),
 
                         buildRoleCard(
                           context: context,
                           title: "Mentor",
-                          user: data.mentor,
-                          onTap: (id) => Get.to(
-                            () => MentorDetailsPage(
-                                mentor: data.mentor!,
-                                initialIndex: initialIndex),
-                            binding: BindingsBuilder(() {
-                              Get.put(MentorController());
-                            }),
-                          ),
+                          user: detail.student?.mentor,
+                          onTap: (id) {
+                          //   return Get.to(
+                          //   () => MentorDetailsPage(
+                          //       mentor:
+                          //           detail.student?.mentor ?? Mentor(name: ''),
+                          //       initialIndex: initialIndex),
+                          //   binding: BindingsBuilder(() {
+                          //     Get.put(MentorController());
+                          //   }),
+                          // );
+                          },
                         ),
 
                         buildRoleCard(
                           context: context,
                           title: "Coordinator",
-                          user: data.coordinator,
+                          user: detail.student?.coordinator,
                           onTap: (id) => Get.to(
                             () => CoordinatorDetailedPage(
-                                coordinator: data.coordinator!,
+                                coordinator: detail.student?.coordinator ??
+                                    Coordinator(id: '', name: ''),
                                 initialIndex: initialIndex),
                             binding: BindingsBuilder(() {
                               Get.put(CoordinatorController());
@@ -421,7 +500,7 @@ class SessionPage extends StatelessWidget {
                         buildRoleCard(
                           context: context,
                           title: "Advisor",
-                          user: data.advisor,
+                          user: detail.student?.advisor,
                           onTap: (id) => Get.to(
                             () => AdvisorDetailedPage(
                                 advisor: data.advisor!,
@@ -445,11 +524,14 @@ class SessionPage extends StatelessWidget {
                           type: "schedule",
                           icon: Icons.schedule_outlined,
                           title: "Schedule",
-                          date: formatDate(data.date ?? DateTime.now()),
+                          date: formatDate(data.sessionDate ?? DateTime.now()),
                           time: formatTime(
-                            TimeOfDay.fromDateTime(data.date ?? DateTime.now()),
+                            TimeOfDay.fromDateTime(
+                                data.sessionDate ?? DateTime.now()),
                           ),
-                          duration: data.duration?.toString() ?? "-",
+                          duration: data.duration != null
+                              ? "${data.duration?.inHours} hr ${session.duration?.inMinutes.remainder(60)} min"
+                              : "-",
                           onSave: (date, time) {},
                         ),
 
@@ -461,11 +543,11 @@ class SessionPage extends StatelessWidget {
                           children: [
                             infoRow(
                               label: "Subject",
-                              value: data.package?.subjectName ?? "-",
+                              value: data.package?.packageName ?? "-",
                             ),
                             infoRow(
                               label: "Syllabus",
-                              value: data.syllabus ?? "-",
+                              value: data.package?.syllabus ?? "-",
                             ),
                           ],
                         ),
@@ -666,7 +748,52 @@ class SessionPage extends StatelessWidget {
                             label: "Support",
                             icon: Icons.support_agent_outlined,
                             color: cs.tertiary,
-                            onTap: () => _addSupport(context),
+                            onTap: () async {
+                              try {
+                                // Show loading if needed
+
+                                final results = await Future.wait([
+                                  Api().getStudentList(),
+                                  Api().getTeacherList(),
+                                  Api().getSupportCategories(),
+                                ]);
+
+                                c.studentsList
+                                    .assignAll(results[0] as List<Student>);
+                                c.teacherList
+                                    .assignAll(results[1] as List<Teacher>);
+                                c.categoryList
+                                    .assignAll(results[2] as List<Syllabus>);
+
+                                showSupportDialog(
+                                    context: context,
+                                    titleController: c.titleController,
+                                    descriptionController:
+                                        c.descriptionController,
+                                    categoryList: c.categoryList,
+                                    studentsList: c.studentsList,
+                                    teacherList: c.teacherList,
+                                    selectedType: c.selectedType,
+                                    categoryLabel: (item) => item.name,
+                                    onCategoryChanged: (category) {
+                                      // c.selectedCategory.value = category;
+                                    },
+                                    onStudentChanged: (student) {
+                                      // c.selectedStudent.value = student;
+                                    },
+                                    onTeacherChanged: (teacher) {
+                                      c.selectedTeacher.value = teacher;
+                                    },
+                                    onSubmit: () {
+                                      // c.createTicket();
+                                    });
+                              } catch (e) {
+                                Get.snackbar(
+                                  'Error',
+                                  'Failed to load support data',
+                                );
+                              }
+                            },
                           ),
                         ),
                         if (data.status == 'pending') ...[
@@ -678,7 +805,7 @@ class SessionPage extends StatelessWidget {
                               color: cs.primary,
                               onTap: () => _markSessionCompleted(
                                 context,
-                                data.date ?? DateTime.now(),
+                                data.sessionDate ?? DateTime.now(),
                               ),
                             ),
                           ),
@@ -692,23 +819,23 @@ class SessionPage extends StatelessWidget {
                               color: cs.error,
                               onTap: () => CustomWidgets().showDeleteDialog(
                                 dltText: Obx(
-  () => c.isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
-        ),
-),
+                                  () => c.isLoading.value
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Text(
+                                          "Yes",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall!
+                                              .copyWith(color: Colors.white),
+                                        ),
+                                ),
                                 title: 'Are you sure?',
                                 text:
                                     'Are you sure you want to delete this session permanently?',
@@ -791,155 +918,33 @@ class SessionPage extends StatelessWidget {
     );
   }
 
-  // ── SUPPORT TICKET DIALOG ─────────────────────────────────────────────
-  void _addSupport(BuildContext context) {
-    CustomWidgets().showCustomDialog(
-      context: context,
-      title: Text('Add New Ticket'),
-     submitWidget: Text(
-      "Add",
-      style:
-          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
-      icon: Icons.support_agent_outlined,
-      formKey: GlobalKey<FormState>(),
-      sections: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.5,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomWidgets().labelWithAsterisk('Title', required: true),
-                SizedBox(height: 8),
-                CustomWidgets().dropdownStyledTextField(
-                    context: context,
-                    hint: 'Enter ticket title',
-                    controller: c.titleController),
-                SizedBox(height: 12),
-                CustomWidgets().labelWithAsterisk('Category', required: true),
-                SizedBox(height: 8),
-                CustomWidgets().customDropdownField(
-                  context: context,
-                  hint: 'Select category',
-                  itemLabel: (item) => item,
-                  items: c.categoryList,
-                  onChanged: (p0) {},
-                ),
-                SizedBox(height: 12),
-                CustomWidgets().labelWithAsterisk('Priority', required: true),
-                SizedBox(height: 8),
-                CustomWidgets().customDropdownField(
-                  context: context,
-                  hint: 'Select priority',
-                  itemLabel: (item) => item,
-                  items: ['High', 'Medium', 'Low'],
-                  onChanged: (p0) {},
-                ),
-                SizedBox(height: 12),
-                CustomWidgets().labelWithAsterisk('User', required: true),
-                SizedBox(height: 8),
-                Obx(() => Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile(
-                            dense: true,
-                            title: Text('Student'),
-                            value: "student",
-                            groupValue: c.selectedType.value,
-                            onChanged: (value) {
-                              if (value != null) {
-                                c.selectedType.value = value;
-                              }
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile(
-                            dense: true,
-                            title: Text('Teacher'),
-                            value: "teacher",
-                            groupValue: c.selectedType.value,
-                            onChanged: (value) => c.selectedType.value = value!,
-                          ),
-                        ),
-                      ],
-                    )),
-                SizedBox(height: 8),
-                Obx(() {
-                  if (c.selectedType.value == 'student') {
-                    return CustomWidgets().customDropdownField(
-                        items: c.studentsList,
-                        onChanged: (p0) {},
-                        context: context,
-                        itemLabel: (item) => item.name,
-                        hint: 'Select student');
-                  }
-                  if (c.selectedType.value == 'teacher') {
-                    return CustomWidgets().customDropdownField<Teacher>(
-                        items: c.teacherList,
-                        onChanged: (p0) {},
-                        context: context,
-                        itemLabel: (item) => item.name,
-                        hint: 'Select teacher');
-                  }
-                  return SizedBox();
-                }),
-                SizedBox(height: 12),
-                CustomWidgets().labelWithAsterisk('Attachment'),
-                SizedBox(height: 8),
-               CustomWidgets().mediaPickerField(
-  context: context,
-  // fileName: c.selectedFile.value?.path.split('/').last,
-  onTap: () async {
-    // await c.pickMedia();
-  },
-  onClear: () {
-    // c.selectedMedia.value = null;
-  },
-),
-                SizedBox(height: 12),
-                CustomWidgets()
-                    .labelWithAsterisk('Description', required: true),
-                SizedBox(height: 8),
-                CustomWidgets().dropdownStyledTextField(
-                  context: context,
-                  hint: 'Describe the issue...',
-                  controller: c.descriptionController,
-                  isMultiline: true,
-                ),
-                SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ),
-      ],
-      onSubmit: () {},
-    );
-  }
-
   // ── EDIT SESSION DIALOG ───────────────────────────────────────────────
   void editSession(BuildContext context, Session data) {
     // Local values for edit form only
     final selectedTeacher = Rxn<Teacher>(data.teacher);
-    final selectedDate = Rxn<DateTime>(data.date);
-    final selectedTime = Rxn<TimeOfDay>();
-    final selectedDuration = RxInt(data.duration ?? 0);
+    final selectedDate = Rxn<DateTime>(data.sessionDate);
+    final selectedTime = Rxn<TimeOfDay>(data.startTime);
+    if (data.startTime != null) {
+      c.timeController.text = formatTime(data.startTime!);
+    }
 
     // Controllers
-    c.dateController.text = DateFormat('dd/MM/yyyy').format(data.date!);
+    c.dateController.text = DateFormat('dd/MM/yyyy').format(data.sessionDate!);
 
-    c.salaryController.text = data.teacherSalary?.toString() ?? '';
+    c.salaryController.text =
+        data.package?.teacherSalaryPerHour?.toString() ?? '';
 
     CustomWidgets().showCustomDialog(
       context: context,
       title: Text('Edit Session'),
       icon: Icons.edit_outlined,
       submitWidget: Text(
-      "Update",
-      style:
-          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
+        "Update",
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
+      ),
       formKey: GlobalKey<FormState>(),
       sections: [
         DialogSectionCard(
@@ -1000,12 +1005,14 @@ class SessionPage extends StatelessWidget {
                 hint: 'Select Duration',
                 itemLabel: (item) => item,
                 items: c.durationOptions.map((e) => "$e minutes").toList(),
-                value: "${data.duration} minutes",
+                value: data.duration != null
+                    ? "${data.duration!.inMinutes} minutes"
+                    : null,
                 onChanged: (p0) {
-                  selectedDuration.value = int.tryParse(
-                        p0.split(" ").first ?? "0",
-                      ) ??
-                      0;
+                  // selectedDuration.value = int.tryParse(
+                  //       p0.split(" ").first ?? "0",
+                  //     ) ??
+                  //     0;
                 },
               ),
               SizedBox(height: 12),
@@ -1126,10 +1133,12 @@ class SessionPage extends StatelessWidget {
       formKey: formKey,
       isViewOnly: true, // 👈 no save button
       submitWidget: Text(
-      "Close",
-      style:
-          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
+        "Close",
+        style: Theme.of(Get.context!)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
+      ),
 
       onSubmit: () {},
 
@@ -1146,7 +1155,7 @@ class SessionPage extends StatelessWidget {
             child: Column(
               children: [
                 _infoRow("Meet ID", meet.id),
-                _infoRow("Date", _formatDate(meet.date)),
+                _infoRow("Date", _formatDate(meet.dateUpdated)),
                 _infoRow("Time", "${meet.startTime} - ${meet.endTime}"),
                 _infoRow("Status", meet.status),
               ],
@@ -1162,7 +1171,7 @@ class SessionPage extends StatelessWidget {
         SizedBox(height: 8),
 
         // 👥 MEMBERS LIST
-        ...meet.members.map((m) {
+        ...meet.mentors.map((m) {
           return Container(
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(10),
@@ -1282,11 +1291,14 @@ class _SessionCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              session.id ?? "—",
+                              session.id != null && session.id!.length >= 4
+                                  ? session.id!
+                                      .substring(session.id!.length - 4)
+                                  : "—",
                               style: Get.textTheme.labelSmall!.copyWith(
-                                  fontFamily: 'monospace',
-                                  color: textSecondary,
-                                  letterSpacing: 0.3),
+                                color: textSecondary,
+                                letterSpacing: 0.3,
+                              ),
                             ),
                           ),
                           StatusBadge(
@@ -1334,11 +1346,11 @@ class _SessionCard extends StatelessWidget {
                                       ),
                                       SizedBox(height: 2),
                                       Text(
-                                        "ID: ${session.student?.studentId ?? '—'}",
-                                        style: Get.textTheme.labelSmall!
-                                            .copyWith(
-                                                color: textSecondary,
-                                                fontFamily: 'monospace'),
+                                        "${session.student?.studentId ?? '—'}",
+                                        style:
+                                            Get.textTheme.labelSmall!.copyWith(
+                                          color: textSecondary,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -1378,11 +1390,11 @@ class _SessionCard extends StatelessWidget {
                                       ),
                                       SizedBox(height: 2),
                                       Text(
-                                        "ID: ${session.teacher?.id ?? '—'}",
-                                        style: Get.textTheme.labelSmall!
-                                            .copyWith(
-                                                color: textSecondary,
-                                                fontFamily: 'monospace'),
+                                        " ${session.teacher?.teacherId ?? '—'}",
+                                        style:
+                                            Get.textTheme.labelSmall!.copyWith(
+                                          color: textSecondary,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -1403,41 +1415,61 @@ class _SessionCard extends StatelessWidget {
 
                       // ── Row 3: Subject / Date / Class / Time ──────────────
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          /// SUBJECT
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                MetaItem(
-                                    label: "Subject",
-                                    value: session.package?.subjectName ?? "—",
-                                    textSecondary: textSecondary),
-                                SizedBox(height: 4),
-                                MetaItem(
-                                    label: "Class",
-                                    value: session.className ?? "—",
-                                    textSecondary: textSecondary),
+                                Text(
+                                  "Subject",
+                                  style: Get.textTheme.labelSmall!.copyWith(
+                                    color: textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  session.package?.packageName ?? "-",
+                                  style: Get.textTheme.labelMedium,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  session.package?.syllabus ?? "-",
+                                  style: Get.textTheme.bodySmall!.copyWith(
+                                    color: textSecondary,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          SizedBox(width: 12),
+
+                          const SizedBox(width: 16),
+
+                          /// TIME
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                MetaItem(
-                                    label: "Date",
-                                    value: formatDate(
-                                        session.date ?? DateTime.now()),
-                                    textSecondary: textSecondary),
-                                SizedBox(height: 4),
-                                MetaItem(
-                                    label: "Time",
-                                    value: formatTime(
-                                      TimeOfDay.fromDateTime(
-                                          session.date ?? DateTime.now()),
-                                    ),
-                                    textSecondary: textSecondary),
+                                Text(
+                                  "Schedule",
+                                  style: Get.textTheme.labelSmall!.copyWith(
+                                    color: textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  formatDate(
+                                      session.sessionDate ?? DateTime.now()),
+                                  style: Get.textTheme.labelMedium,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "${formatTime(session.startTime)} - ${formatTime(session.endTime)}",
+                                  style: Get.textTheme.bodySmall!.copyWith(
+                                    color: textSecondary,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -1482,6 +1514,20 @@ class _SessionCard extends StatelessWidget {
     );
   }
 
+  String formatTime(TimeOfDay? time) {
+    if (time == null) return "-";
+
+    final dt = DateTime(
+      2000,
+      1,
+      1,
+      time.hour,
+      time.minute,
+    );
+
+    return DateFormat('hh:mm a').format(dt);
+  }
+
   void _openRescheduleDialog(BuildContext context, Session session) {
     final reasonController = TextEditingController();
     final dateController = TextEditingController();
@@ -1491,11 +1537,13 @@ class _SessionCard extends StatelessWidget {
       context: context,
       formKey: GlobalKey<FormState>(),
       title: Text("Reschedule Session"),
-     submitWidget: Text(
-      "Reschedule",
-      style:
-          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
+      submitWidget: Text(
+        "Reschedule",
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
+      ),
       isViewOnly: false,
       onSubmit: () {
         // TODO: submit logic
@@ -1618,4 +1666,3 @@ class _TopBar extends StatelessWidget {
     );
   }
 }
-

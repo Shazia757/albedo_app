@@ -5,13 +5,15 @@ import 'package:albedo_app/model/stu_wallet_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/user_model.dart';
+import 'package:flutter/material.dart';
 
 class Student {
+  String? id;
   String? studentId;
   String? phone;
   String? imageUrl;
   String? whatsapp;
-  String? createdBy;
   String? parentName;
   String? parentOccupation;
   String? gender;
@@ -24,7 +26,7 @@ class Student {
   List<Package>? packages;
   List<Assessment>? assessment;
   List<Certificate>? certificate;
-  List<Batch>? batch;
+  List<Batch>? batches;
 
   int? classHours;
   int? pincode;
@@ -39,12 +41,14 @@ class Student {
   double? regFee;
   double? totalPaid;
   double? balance;
-  StudentWallet? wallet;
 
   String? course;
   String? subjects;
   String? syllabus;
   String? syllabusId;
+  String? createdById;
+  DateTime? createdAt;
+  String? createdByName;
 
   String? advisorName;
   String? advisorId;
@@ -53,8 +57,7 @@ class Student {
   Advisor? advisor;
   final String? teacherId;
 
-  String? referralName;
-  String? referralRole;
+  Users? referral;
 
   String? status;
   String name;
@@ -69,9 +72,12 @@ class Student {
     required this.name,
     this.joinedAt,
     this.email,
-    this.batch,
+    this.id,
+    this.studentId,
+    this.batches,
     this.admissionDate,
     this.assessment,
+    this.referral,
     this.certificate,
     this.parentName,
     this.parentOccupation,
@@ -79,17 +85,15 @@ class Student {
     this.spotFee,
     this.packages,
     this.mentor,
-    this.wallet,
     this.teacherId,
     this.imageUrl,
+    this.createdAt,
     this.type,
-    this.createdBy,
     this.address,
     this.gender,
     this.isFeePaid = false,
     this.timezone,
     this.place,
-    this.studentId,
     this.phone,
     this.whatsapp,
     this.classHours,
@@ -103,10 +107,10 @@ class Student {
     this.totalPaid,
     this.balance,
     this.course,
+    this.createdById,
+    this.createdByName,
     this.advisorName,
     this.advisorId,
-    this.referralName,
-    this.referralRole,
     this.subjects,
     this.syllabusId,
     this.syllabus,
@@ -117,26 +121,57 @@ class Student {
     this.totalSession,
   });
 
-  /// 🔹 FROM JSON (Backend Ready)
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
       name: json['name'] ?? '',
-      joinedAt: DateTime.parse(json['joinedAt']),
-      studentId: json['studentId'],
+      joinedAt: json['joinedAt'] != null
+          ? DateTime.parse(json['joinedAt'])
+          : json['date_added'] != null
+              ? DateTime.parse(json['date_added'])
+              : null,
+      id: json['id'],
+      studentId: json['registration_id'],
+      imageUrl: json['photo'],
       email: json['email'],
-      phone: json['phone'],
-      whatsapp: json['whatsapp'],
-      parentName: json['parentName'],
-      parentOccupation: json['parentOccupation'],
+      phone: json['phone_number'],
+      whatsapp: json['whatsapp_number'],
+      parentName: json['parent_name'],
+      parentOccupation: json['parent_occupation'],
       gender: json['gender'],
-      mentor: json['mentor'],
+      createdById: json['creator_profile']?['emp_id'],
+      createdByName: json['creator_profile']?['name'],
+      mentor: json['mentor_assignment'] is Map<String, dynamic>
+          ? Mentor.fromJson(json['mentor_assignment'])
+          : json['mentor_assignment'] is List &&
+                  (json['mentor_assignment'] as List).isNotEmpty
+              ? Mentor.fromJson((json['mentor_assignment'] as List).first)
+              : null,
+      packages: json['packages'] != null
+          ? (json['packages'] as List).map((e) => Package.fromJson(e)).toList()
+          : [],
+      batches: json['batch_assignment'] != null
+          ? (json['batch_assignment'] as List)
+              .map((e) => Batch.fromJson(e))
+              .toList()
+          : [],
+      coordinator: json['assistant_admin'] != null
+          ? Coordinator.fromJson(json['assistant_admin'])
+          : null,
+      advisor:
+          json['advisor'] != null ? Advisor.fromJson(json['advisor']) : null,
       timezone: json['timezone'],
       address: json['address'],
       place: json['place'],
       referredBy: json['referredBy'],
       classHours: json['classHours'],
       classesTaken: json['classesTaken'],
-      standard: json['standard'],
+      category: json['course_profile'] != null
+          ? json['course_profile']['category']
+          : json['category'],
+      standard: int.tryParse(
+        (json['course_profile']?['standard'] ?? json['standard'])?.toString() ??
+            '',
+      ),
       totalHour: json['totalHour'],
       amount: (json['amount'] as num?)?.toDouble(),
       amountPerHour: (json['amountPerHour'] as num?)?.toDouble(),
@@ -147,14 +182,12 @@ class Student {
       course: json['course'],
       subjects: json['subjects'],
       syllabus: json['syllabus'],
-      advisorName: json['advisorName'],
-      advisorId: json['advisorId'],
-      referralName: json['referralName'],
-      referralRole: json['referralRole'],
       status: json['status'],
-      category: json['category'],
       admissionDate: json['admissionDate'] != null
           ? DateTime.parse(json['admissionDate'])
+          : null,
+      createdAt: json['date_added'] != null
+          ? DateTime.parse(json['date_added'])
           : null,
       type: json['type'],
       totalSession: json['totalSession'],
@@ -170,10 +203,11 @@ class Student {
       'email': email,
       'phone': phone,
       'whatsapp': whatsapp,
+      'photo': imageUrl,
       'parentName': parentName,
       'parentOccupation': parentOccupation,
       'gender': gender,
-      'mentor': mentor,
+      'mentor_assignment': mentor,
       'timezone': timezone,
       'address': address,
       'place': place,
@@ -193,8 +227,6 @@ class Student {
       'syllabus': syllabus,
       'advisorName': advisorName,
       'advisorId': advisorId,
-      'referralName': referralName,
-      'referralRole': referralRole,
       'status': status,
       'category': category,
       'admissionDate': admissionDate?.toIso8601String(),
@@ -219,6 +251,20 @@ class Student {
       studentId: studentId,
     );
   }
+}
+
+class PaginatedStudentResponse {
+  final int count;
+  final String? next;
+  final String? previous;
+  final List<Student> results;
+
+  PaginatedStudentResponse({
+    required this.count,
+    required this.results,
+    this.next,
+    this.previous,
+  });
 }
 
 class Certificate {}

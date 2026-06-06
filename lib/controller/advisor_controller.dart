@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/student_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
@@ -12,6 +15,8 @@ class AdvisorController extends GetxController {
   var sortType = SortType.newest.obs;
   var advisors = <Advisor>[].obs;
   var selectedTab = 0.obs;
+  final currentPage = 0.obs;
+
   var filteredAdvisors = <Advisor>[].obs;
   final tabs = ["Active", "Expired"];
   var isLoading = true.obs;
@@ -19,6 +24,8 @@ class AdvisorController extends GetxController {
   var isDeleteButtonLoading = true.obs;
   var isDeactivateButtonLoading = true.obs;
   var selectedIndex = 0.obs;
+  final totalCount = 0.obs;
+
   final RxList<Map<String, dynamic>> accessOverrides =
       <Map<String, dynamic>>[].obs;
 
@@ -37,9 +44,12 @@ class AdvisorController extends GetxController {
     "Students",
     "Access",
   ];
-  int get activeCount => advisors.where((e) => e.status == "Active").length;
 
-  int get inactiveCount => advisors.where((e) => e.status == "Inactive").length;
+  int get activeCount =>
+      advisors.where((e) => e.isResigned == false).length;
+
+  int get inactiveCount =>
+      advisors.where((e) => e.isResigned == true).length;
 
   List<Map<String, dynamic>> get tabData => [
         {"label": "Active", "count": activeCount},
@@ -72,81 +82,72 @@ class AdvisorController extends GetxController {
     addExperience();
   }
 
-  void fetchAdvisors() async {
-    try {
-      isLoading.value = true;
+Future<void> fetchAdvisors() async {
+  try {
+    isLoading.value = true;
 
-      await Future.delayed(const Duration(seconds: 2));
+    final response = await Api().getAdvisorDetails(
+      page: currentPage.value + 1,
+      pageSize: 10,
+    );
 
-      advisors.assignAll([
-        Advisor(
-            id: "ADV1001",
-            name: "Anjana",
-            email: "anjana@email.com",
-            status: "Active",
-            phone: "123456",
-            joinedAt: DateTime.now(),
-            student: [Student(name: 'Riya', studentId: 'STU001')]),
-        Advisor(
-          id: "ADV1002",
-          name: "Ardra",
-          email: "ardra@email.com",
-          status: "Inactive",
-          phone: "+9876543210",
-          joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-        ),
-      ]);
+    advisors.assignAll(response.results);
+    totalCount.value = response.count;
 
-      applyFilters();
-    } finally {
-      isLoading.value = false;
-    }
+    applyFilters();
+  } catch (e) {
+    log(e.toString());
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+void applyFilters() {
+  List<Advisor> temp = List.from(advisors);
+
+  switch (selectedTab.value) {
+    case 0:
+      // Active
+      temp = temp.where((t) => t.isResigned == false).toList();
+      break;
+
+    case 1:
+      // Inactive
+      temp = temp.where((t) => t.isResigned == true).toList();
+      break;
   }
 
-  void applyFilters() {
-    List<Advisor> temp = advisors;
+  if (searchQuery.value.isNotEmpty) {
+    final q = searchQuery.value.toLowerCase();
 
-    switch (selectedTab.value) {
-      case 0:
-        temp = temp.where((t) => t.status == "Active").toList();
-        break;
-
-      case 1:
-        temp = temp.where((t) => t.status == "Inactive").toList();
-        break;
-    }
-
-    if (searchQuery.value.isNotEmpty) {
-      temp = temp
-          .where((t) =>
-              t.name.toLowerCase().contains(searchQuery.value.toLowerCase()))
-          .toList();
-    }
-
-    // Sort
-    if (sortType.value == SortType.newest) {
-      temp.sort((a, b) => b.joinedAt.compareTo(a.joinedAt));
-    } else if (sortType.value == SortType.oldest) {
-      temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
-    } else if (sortType.value == SortType.name) {
-      temp.sort((a, b) => a.name.compareTo(b.name));
-    }
-
-    filteredAdvisors.assignAll(temp);
+    temp = temp.where((t) {
+      return (t.name ?? '').toLowerCase().contains(q);
+    }).toList();
   }
 
-  void loadAdvisors(Advisor a) {
-    nameController.text = a.name.toString();
-    empIdController.text = a.id.toString();
-    emailController.text = a.email.toString();
-    phoneController.text = a.phone.toString();
-    whatsappController.text = a.whatsapp.toString();
-    dobController.text = a.dob.toString();
-    qualificationController.text = a.qualification.toString();
-    placeController.text = a.place.toString();
-    pincodeController.text = a.pincode.toString();
-    addressController.text = a.address.toString();
+  if (sortType.value == SortType.newest) {
+    temp.sort((a, b) => b.id.compareTo(a.id));
+  } else if (sortType.value == SortType.oldest) {
+    temp.sort((a, b) => a.id.compareTo(b.id));
+  } else if (sortType.value == SortType.name) {
+    temp.sort((a, b) => a.name.compareTo(b.name));
   }
+
+  filteredAdvisors.assignAll(temp);
+}
+ 
+  // void loadAdvisors(Advisor a) {
+  //   nameController.text = a.name.toString();
+  //   empIdController.text = a.id.toString();
+  //   emailController.text = a.email.toString();
+  //   phoneController.text = a.phone.toString();
+  //   whatsappController.text = a.whatsapp.toString();
+  //   dobController.text = a.dob.toString();
+  //   qualificationController.text = a.qualification.toString();
+  //   placeController.text = a.place.toString();
+  //   pincodeController.text = a.pincode.toString();
+  //   addressController.text = a.address.toString();
+  // }
 
   // void addExperience() {
   //   experiences.add(

@@ -43,7 +43,7 @@ class AddBatchSessionPage extends StatelessWidget {
                         hint: 'Select Batch',
                         items: c.batchList,
                         value: c.selectedBatch.value,
-                        itemLabel: (s) => s.batchName ?? '',
+                        itemLabel: (s) => s.name ?? '',
                         onChanged: (batch) => c.onBatchSelected(batch),
                       ),
                       SizedBox(height: 10),

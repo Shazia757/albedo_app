@@ -35,8 +35,9 @@ class AddSessionPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Add Session',
-                        style: Theme.of(context).textTheme.titleLarge,
+                        "Add Session",
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.primary),
                       ),
                       SizedBox(height: 10),
                       CustomWidgets()
@@ -332,7 +333,7 @@ class AddSessionPage extends StatelessWidget {
           list: c.coordinatorsList,
           selectedList: c.selectedCoordinators,
           selectAll: c.selectAllCoordinators,
-          itemLabel: (t) => t.name,
+          itemLabel: (t) => t.name ?? '',
         ),
         _buildMultiSelect<Advisor>(
           context: context,

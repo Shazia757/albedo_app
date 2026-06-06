@@ -158,7 +158,7 @@ class AdvisorDetailedPage extends StatelessWidget {
                       context,
                       Icons.chat_bubble_outline,
                       'WhatsApp',
-                      advisor.whatsapp ?? '-',
+                      advisor.phone ?? '-',
                     ),
                   ),
                 ],
@@ -167,12 +167,12 @@ class AdvisorDetailedPage extends StatelessWidget {
               _divider(cs),
 
               /// Converted Students Count
-              _infoTile(
-                context,
-                icon: Icons.people_alt_outlined,
-                title: 'Converted Students',
-                value: '${advisor.convertedStudents ?? 0}',
-              ),
+              // _infoTile(
+              //   context,
+              //   icon: Icons.people_alt_outlined,
+              //   title: 'Converted Students',
+              //   value: '${advisor.convertedStudents ?? 0}',
+              // ),
             ],
           ),
         ),
@@ -184,16 +184,16 @@ class AdvisorDetailedPage extends StatelessWidget {
   //  PROFESSIONAL TAB
   // ══════════════════════════════════════════════════════════
   Widget _professionalTab(BuildContext context, ColorScheme cs) {
-    final experiences = advisor.experience ?? [];
+    // final experiences = advisor.experience ?? [];
 
     int totalYears = 0;
     int totalMonths = 0;
 
     /// 🔹 Add all experience entries
-    for (final exp in experiences) {
-      totalYears += exp.years ?? 0;
-      totalMonths += exp.months ?? 0;
-    }
+    // for (final exp in experiences) {
+    //   totalYears += exp.years ?? 0;
+    //   totalMonths += exp.months ?? 0;
+    // }
 
     /// 🔹 Convert extra months into years
     totalYears += totalMonths ~/ 12;
@@ -224,14 +224,14 @@ class AdvisorDetailedPage extends StatelessWidget {
               /// Qualification + Experience
               Row(
                 children: [
-                  Expanded(
-                    child: _infoTile(
-                      context,
-                      title: 'Qualification',
-                      value: advisor.qualification ?? '-',
-                      icon: Icons.school_outlined,
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: _infoTile(
+                  //     context,
+                  //     title: 'Qualification',
+                  //     value: advisor.qualification ?? '-',
+                  //     icon: Icons.school_outlined,
+                  //   ),
+                  // ),
                   SizedBox(width: 12),
                   Expanded(
                     child: _infoTile(
@@ -269,63 +269,64 @@ class AdvisorDetailedPage extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if ((advisor.experience ?? []).isEmpty)
-                          Text(
-                            'No work experience added',
-                            style: Get.textTheme
-                                .bodySmall!
-                                .copyWith(color: cs.outline),
-                          )
-                        else
-                          Column(
-                            children: (advisor.experience ?? []).map((exp) {
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      height: 36,
-                                      width: 36,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: cs.primary.withOpacity(0.08),
-                                      ),
-                                      child: Icon(
-                                        Icons.business_center_outlined,
-                                        size: 18,
-                                        color: cs.primary,
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.6,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            exp.companyName ?? '-',
-                                            style: Get.textTheme
-                                                .titleSmall!
-                                                .copyWith(color: cs.onSurface),
-                                          ),
-                                          SizedBox(height: 2),
-                                          Text(
-                                            '${exp.years ?? 0} Years ${exp.months ?? 0} Months',
-                                            style: Get.textTheme
-                                                .labelSmall!
-                                                .copyWith(color: cs.outline),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          )
+                        // if ((advisor.experience ?? []).isEmpty)
+                        //   Text(
+                        //     'No work experience added',
+                        //     style: Get.textTheme
+                        //         .bodySmall!
+                        //         .copyWith(color: cs.outline),
+                        //   )
+                        // else
+                        //   Column(
+                        //     children: (advisor.experience ?? []).map((exp) {
+                        //       return Container(
+                        //         margin: const EdgeInsets.only(bottom: 10),
+                        //         child: Row(
+                        //           crossAxisAlignment: CrossAxisAlignment.start,
+                        //           children: [
+                        //             Container(
+                        //               height: 36,
+                        //               width: 36,
+                        //               decoration: BoxDecoration(
+                        //                 borderRadius: BorderRadius.circular(10),
+                        //                 color: cs.primary.withOpacity(0.08),
+                        //               ),
+                        //               child: Icon(
+                        //                 Icons.business_center_outlined,
+                        //                 size: 18,
+                        //                 color: cs.primary,
+                        //               ),
+                        //             ),
+                        //             SizedBox(width: 10),
+                        //             SizedBox(
+                        //               width: MediaQuery.of(context).size.width *
+                        //                   0.6,
+                        //               child: Column(
+                        //                 crossAxisAlignment:
+                        //                     CrossAxisAlignment.start,
+                        //                 children: [
+                        //                   Text(
+                        //                     exp.companyName ?? '-',
+                        //                     style: Get.textTheme
+                        //                         .titleSmall!
+                        //                         .copyWith(color: cs.onSurface),
+                        //                   ),
+                        //                   SizedBox(height: 2),
+                        //                   Text(
+                        //                     '${exp.years ?? 0} Years ${exp.months ?? 0} Months',
+                        //                     style: Get.textTheme
+                        //                         .labelSmall!
+                        //                         .copyWith(color: cs.outline),
+                        //                   ),
+                        //                 ],
+                        //               ),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       );
+                        //     }).toList(),
+                        //   )
+                  
                       ],
                     ),
                   ],
@@ -447,7 +448,7 @@ class AdvisorDetailedPage extends StatelessWidget {
                       ],
                     ),
                     child:CustomWidgets(). squareAvatar(
-                      advisor.imageUrl,
+                      advisor.photo,
                       64,
                       radius: 12,
                     ),
@@ -753,15 +754,15 @@ class AdvisorDetailedPage extends StatelessWidget {
 
 
   Widget _studentsTab(BuildContext context, ColorScheme cs) {
-    final students = advisor.student ?? [];
+    // final students = advisor.student ?? [];
 
-    if (students.isEmpty) {
-      return EmptyState(
-          cs: cs,
-          title: 'No students assigned',
-          subtitle: '',
-          icon: Icons.group);
-    }
+    // if (students.isEmpty) {
+    //   return EmptyState(
+    //       cs: cs,
+    //       title: 'No students assigned',
+    //       subtitle: '',
+    //       icon: Icons.group);
+    // }
 
     return Column(
       children: [
@@ -771,233 +772,234 @@ class AdvisorDetailedPage extends StatelessWidget {
           onChanged: (p0) {},
         ),
         SizedBox(height: 10),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: students.length,
-          itemBuilder: (context, index) {
-            final student = students[index];
+        // ListView.builder(
+        //   shrinkWrap: true,
+        //   physics: const NeverScrollableScrollPhysics(),
+        //   itemCount: students.length,
+        //   itemBuilder: (context, index) {
+        //     final student = students[index];
 
-            final packageCount = student.packages?.length ?? 0;
+        //     final packageCount = student.packages?.length ?? 0;
 
-            return InkWell(
-              onTap: packageCount == 0
-                  ? null
-                  : () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (_) {
-                          final packages = student.packages ?? [];
+        //     return InkWell(
+        //       onTap: packageCount == 0
+        //           ? null
+        //           : () {
+        //               showModalBottomSheet(
+        //                 context: context,
+        //                 isScrollControlled: true,
+        //                 backgroundColor: Colors.transparent,
+        //                 builder: (_) {
+        //                   final packages = student.packages ?? [];
 
-                          return Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: cs.surface,
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(24),
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                /// Handle
-                                Center(
-                                  child: Container(
-                                    width: 50,
-                                    height: 5,
-                                    decoration: BoxDecoration(
-                                      color: cs.outline.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                ),
+        //                   return Container(
+        //                     padding: const EdgeInsets.all(16),
+        //                     decoration: BoxDecoration(
+        //                       color: cs.surface,
+        //                       borderRadius: const BorderRadius.vertical(
+        //                         top: Radius.circular(24),
+        //                       ),
+        //                     ),
+        //                     child: Column(
+        //                       mainAxisSize: MainAxisSize.min,
+        //                       crossAxisAlignment: CrossAxisAlignment.start,
+        //                       children: [
+        //                         /// Handle
+        //                         Center(
+        //                           child: Container(
+        //                             width: 50,
+        //                             height: 5,
+        //                             decoration: BoxDecoration(
+        //                               color: cs.outline.withOpacity(0.3),
+        //                               borderRadius: BorderRadius.circular(20),
+        //                             ),
+        //                           ),
+        //                         ),
 
-                                SizedBox(height: 18),
+        //                         SizedBox(height: 18),
 
-                                Text(
-                                  student.name,
-                                  style: Get.textTheme
-                                      .titleLarge!
-                                      .copyWith(color: cs.onSurface),
-                                ),
+        //                         Text(
+        //                           student.name,
+        //                           style: Get.textTheme
+        //                               .titleLarge!
+        //                               .copyWith(color: cs.onSurface),
+        //                         ),
 
-                                SizedBox(height: 16),
+        //                         SizedBox(height: 16),
 
-                                packages.isEmpty
-                                    ? Center(
-                                        child: Text(
-                                          'No packages available',
-                                          style: Get.textTheme
-                                              .bodyMedium!
-                                              .copyWith(color: cs.outline),
-                                        ),
-                                      )
-                                    : ListView.separated(
-                                        shrinkWrap: true,
-                                        itemCount: packages.length,
-                                        separatorBuilder: (_, __) =>
-                                            SizedBox(height: 12),
-                                        itemBuilder: (context, i) {
-                                          final package = packages[i];
+        //                         packages.isEmpty
+        //                             ? Center(
+        //                                 child: Text(
+        //                                   'No packages available',
+        //                                   style: Get.textTheme
+        //                                       .bodyMedium!
+        //                                       .copyWith(color: cs.outline),
+        //                                 ),
+        //                               )
+        //                             : ListView.separated(
+        //                                 shrinkWrap: true,
+        //                                 itemCount: packages.length,
+        //                                 separatorBuilder: (_, __) =>
+        //                                     SizedBox(height: 12),
+        //                                 itemBuilder: (context, i) {
+        //                                   final package = packages[i];
 
-                                          return Container(
-                                            padding: const EdgeInsets.all(14),
-                                            decoration: BoxDecoration(
-                                              color: cs.onPrimary,
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              border: Border.all(
-                                                color: cs.outline
-                                                    .withOpacity(0.25),
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                  width: 48,
-                                                  height: 48,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                    color: cs.primary
-                                                        .withOpacity(0.1),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.menu_book_rounded,
-                                                    color: cs.primary,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 14),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        package.name ?? '-',
-                                                        style: Get.textTheme
-                                                            .titleMedium,
-                                                      ),
-                                                      SizedBox(height: 6),
-                                                      Text(
-                                                        package.standard ?? '-',
-                                                        style: Get.textTheme
-                                                            .bodySmall!
-                                                            .copyWith(
-                                                                color:
-                                                                    cs.outline),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: cs.onPrimary,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: cs.outline.withOpacity(0.5),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: cs.shadow.withOpacity(0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    /// 🔹 Profile Image
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: cs.primary.withOpacity(0.08),
-                        image: student.imageUrl != null &&
-                                student.imageUrl!.isNotEmpty
-                            ? DecorationImage(
-                                image: NetworkImage(student.imageUrl!),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
-                      ),
-                      child: (student.imageUrl == null ||
-                              student.imageUrl!.isEmpty)
-                          ? Icon(
-                              Icons.person_outline,
-                              color: cs.primary,
-                              size: 24,
-                            )
-                          : null,
-                    ),
+        //                                   return Container(
+        //                                     padding: const EdgeInsets.all(14),
+        //                                     decoration: BoxDecoration(
+        //                                       color: cs.onPrimary,
+        //                                       borderRadius:
+        //                                           BorderRadius.circular(16),
+        //                                       border: Border.all(
+        //                                         color: cs.outline
+        //                                             .withOpacity(0.25),
+        //                                       ),
+        //                                     ),
+        //                                     child: Row(
+        //                                       children: [
+        //                                         Container(
+        //                                           width: 48,
+        //                                           height: 48,
+        //                                           decoration: BoxDecoration(
+        //                                             borderRadius:
+        //                                                 BorderRadius.circular(
+        //                                                     12),
+        //                                             color: cs.primary
+        //                                                 .withOpacity(0.1),
+        //                                           ),
+        //                                           child: Icon(
+        //                                             Icons.menu_book_rounded,
+        //                                             color: cs.primary,
+        //                                           ),
+        //                                         ),
+        //                                         SizedBox(width: 14),
+        //                                         Expanded(
+        //                                           child: Column(
+        //                                             crossAxisAlignment:
+        //                                                 CrossAxisAlignment
+        //                                                     .start,
+        //                                             children: [
+        //                                               Text(
+        //                                                 package.name ?? '-',
+        //                                                 style: Get.textTheme
+        //                                                     .titleMedium,
+        //                                               ),
+        //                                               SizedBox(height: 6),
+        //                                               Text(
+        //                                                 package.standard ?? '-',
+        //                                                 style: Get.textTheme
+        //                                                     .bodySmall!
+        //                                                     .copyWith(
+        //                                                         color:
+        //                                                             cs.outline),
+        //                                               ),
+        //                                             ],
+        //                                           ),
+        //                                         ),
+        //                                       ],
+        //                                     ),
+        //                                   );
+        //                                 },
+        //                               ),
+        //                       ],
+        //                     ),
+        //                   );
+        //                 },
+        //               );
+        //             },
+        //       borderRadius: BorderRadius.circular(14),
+        //       child: Container(
+        //         margin: const EdgeInsets.only(bottom: 12),
+        //         padding: const EdgeInsets.all(16),
+        //         decoration: BoxDecoration(
+        //           color: cs.onPrimary,
+        //           borderRadius: BorderRadius.circular(14),
+        //           border: Border.all(
+        //             color: cs.outline.withOpacity(0.5),
+        //           ),
+        //           boxShadow: [
+        //             BoxShadow(
+        //               color: cs.shadow.withOpacity(0.04),
+        //               blurRadius: 10,
+        //               offset: const Offset(0, 4),
+        //             ),
+        //           ],
+        //         ),
+        //         child: Row(
+        //           children: [
+        //             /// 🔹 Profile Image
+        //             Container(
+        //               width: 50,
+        //               height: 50,
+        //               decoration: BoxDecoration(
+        //                 borderRadius: BorderRadius.circular(12),
+        //                 color: cs.primary.withOpacity(0.08),
+        //                 image: student.imageUrl != null &&
+        //                         student.imageUrl!.isNotEmpty
+        //                     ? DecorationImage(
+        //                         image: NetworkImage(student.imageUrl!),
+        //                         fit: BoxFit.cover,
+        //                       )
+        //                     : null,
+        //               ),
+        //               child: (student.imageUrl == null ||
+        //                       student.imageUrl!.isEmpty)
+        //                   ? Icon(
+        //                       Icons.person_outline,
+        //                       color: cs.primary,
+        //                       size: 24,
+        //                     )
+        //                   : null,
+        //             ),
 
-                    SizedBox(width: 12),
+        //             SizedBox(width: 12),
 
-                    /// 🔹 Student Details
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            student.name,
-                            style: Get.textTheme
-                                .titleMedium!
-                                .copyWith(color: cs.onSurface),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            student.studentId ?? '-',
-                            style: Get.textTheme
-                                .bodySmall!
-                                .copyWith(color: cs.outline),
-                          ),
-                        ],
-                      ),
-                    ),
+        //             /// 🔹 Student Details
+        //             Expanded(
+        //               child: Column(
+        //                 crossAxisAlignment: CrossAxisAlignment.start,
+        //                 children: [
+        //                   Text(
+        //                     student.name,
+        //                     style: Get.textTheme
+        //                         .titleMedium!
+        //                         .copyWith(color: cs.onSurface),
+        //                   ),
+        //                   SizedBox(height: 4),
+        //                   Text(
+        //                     student.studentId ?? '-',
+        //                     style: Get.textTheme
+        //                         .bodySmall!
+        //                         .copyWith(color: cs.outline),
+        //                   ),
+        //                 ],
+        //               ),
+        //             ),
 
-                    /// 🔹 Package Count
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: cs.primary.withOpacity(0.12),
-                      ),
-                      child: Text(
-                        '$packageCount Packages',
-                        style: Get.textTheme
-                            .titleSmall!
-                            .copyWith(color: cs.primary),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+        //             /// 🔹 Package Count
+        //             Container(
+        //               padding: const EdgeInsets.symmetric(
+        //                 horizontal: 12,
+        //                 vertical: 6,
+        //               ),
+        //               decoration: BoxDecoration(
+        //                 borderRadius: BorderRadius.circular(20),
+        //                 color: cs.primary.withOpacity(0.12),
+        //               ),
+        //               child: Text(
+        //                 '$packageCount Packages',
+        //                 style: Get.textTheme
+        //                     .titleSmall!
+        //                     .copyWith(color: cs.primary),
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     );
+        //   },
+        // ),
+     
       ],
     );
   }

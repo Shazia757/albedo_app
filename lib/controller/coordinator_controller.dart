@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
 import 'package:albedo_app/view/users/add_teacher_page.dart';
@@ -37,10 +40,11 @@ class CoordinatorController extends GetxController {
   // Counts for tabs
   // --------------------------
 
-  int get activeCount => coordinators.where((e) => e.status == "Active").length;
+  int get activeCount =>
+      coordinators.where((e) => e.isResigned == false).length;
 
   int get expiredCount =>
-      coordinators.where((e) => e.status == "Expired").length;
+      coordinators.where((e) => e.isResigned == true).length;
 
   List<Map<String, dynamic>> get tabData => [
         {"label": "Active", "count": activeCount},
@@ -96,35 +100,21 @@ class CoordinatorController extends GetxController {
     addExperience();
   }
 
-  void fetchCoordinators() async {
+  Future<void> fetchCoordinators() async {
     try {
       isLoading.value = true;
 
-      await Future.delayed(const Duration(seconds: 2));
+      final List<Coordinator> coordinatorList =
+          await Api().getCoordinatorList();
 
-      coordinators.assignAll([
-        Coordinator(
-            id: "COO1001",
-            name: "Maria",
-            email: "maria@email.com",
-            status: "Active",
-            phone: "123456",
-            joinedAt: DateTime.now(),
-            mentor: [
-              Mentor(name: 'Joy', empId: 'MEN001'),
-              Mentor(name: 'Naila', empId: 'MEN002')
-            ]),
-        Coordinator(
-          id: "COO1002",
-          name: "Nick",
-          email: "nick@email.com",
-          status: "Expired",
-          phone: "+9876543210",
-          joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-        ),
-      ]);
-
-      applyFilters();
+      coordinators.assignAll(coordinatorList);
+    } catch (e) {
+      log(e.toString());
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        colorText: Theme.of(Get.context!).colorScheme.shadow,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -135,28 +125,38 @@ class CoordinatorController extends GetxController {
 
     switch (selectedTab.value) {
       case 0:
-        temp = temp.where((t) => t.status == "Active").toList();
+        // Active = not resigned
+        temp = temp.where((t) => t.isResigned == false).toList();
         break;
 
       case 1:
-        temp = temp.where((t) => t.status == "Expired").toList();
+        // Inactive = resigned
+        temp = temp.where((t) => t.isResigned == true).toList();
         break;
     }
 
     if (searchQuery.value.isNotEmpty) {
       temp = temp
           .where((t) =>
-              t.name.toLowerCase().contains(searchQuery.value.toLowerCase()))
+              t.name!.toLowerCase().contains(searchQuery.value.toLowerCase()))
           .toList();
     }
 
     // Sort
     if (sortType.value == SortType.newest) {
-      temp.sort((a, b) => b.joinedAt.compareTo(a.joinedAt));
+      temp.sort((a, b) {
+        final aDate = a.joinedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bDate = b.joinedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bDate.compareTo(aDate);
+      });
     } else if (sortType.value == SortType.oldest) {
-      temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
+      temp.sort((a, b) {
+        final aDate = a.joinedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bDate = b.joinedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return aDate.compareTo(bDate);
+      });
     } else if (sortType.value == SortType.name) {
-      temp.sort((a, b) => a.name.compareTo(b.name));
+      temp.sort((a, b) => a.name!.compareTo(b.name!));
     }
 
     filteredCoordinators.assignAll(temp);

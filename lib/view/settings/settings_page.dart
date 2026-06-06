@@ -42,7 +42,7 @@ class SettingsPage extends StatelessWidget {
             child: Obx(
               () {
                 final auth = Get.find<AuthController>();
-                final role = auth.activeUser?.position;
+                final role = auth.activeUser?.role;
                 final normalizedRole = role?.trim().toLowerCase();
 
                 final isCustom = ![
@@ -228,37 +228,34 @@ class SettingsPage extends StatelessWidget {
                         items: [
                           if (canShow("Hiring"))
                             _TileData(
-                              title: "Hiring",
-                              subtitle: "Manage recruitment settings",
-                              icon: Icons.work,
+                                title: "Hiring",
+                                subtitle: "Manage recruitment settings",
+                                icon: Icons.work,
                                 onTap: (context) async {
                                   Get.to(() {
                                     return HiringPage();
                                   });
-                                }
-                            ),
+                                }),
                           if (canShow("Automation"))
                             _TileData(
-                              title: "Automation",
-                              subtitle: "Macros and automation tools",
-                              icon: Icons.auto_mode,
-                              onTap: (context) async {
+                                title: "Automation",
+                                subtitle: "Macros and automation tools",
+                                icon: Icons.auto_mode,
+                                onTap: (context) async {
                                   Get.to(() {
                                     return MacroPage();
                                   });
-                                }
-                            ),
+                                }),
                           if (canShow("Bulk Upload"))
                             _TileData(
-                              title: "Bulk Upload",
-                              subtitle: "Upload large datasets easily",
-                              icon: Icons.upload_file,
+                                title: "Bulk Upload",
+                                subtitle: "Upload large datasets easily",
+                                icon: Icons.upload_file,
                                 onTap: (context) async {
                                   Get.to(() {
                                     return BulkUploadPage();
                                   });
-                                }
-                            ),
+                                }),
                         ],
                       ),
                     ],

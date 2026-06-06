@@ -27,12 +27,6 @@ class PaymentPage extends StatelessWidget {
       ),
       tag: type.name,
     );
-
-    if (type == PaymentUserType.student) {
-      c.fetchStudents();
-    } else {
-      c.fetchTeachers();
-    }
   }
   bool get _isStudent => type == PaymentUserType.student;
 
@@ -69,11 +63,17 @@ class PaymentPage extends StatelessWidget {
                   () {
                     return CustomWidgets().customTabs(
                       context,
-                      tabs: c.isStudent ? c.studentTabs : c.tabs,
+                      tabs: (c.isStudent == true) ? c.studentTabs : c.tabs,
                       selectedIndex: c.selectedTab.value,
-                      onTap: (index) {
+                      onTap: (index) async {
                         c.selectedTab.value = index;
-                        c.applyFilters();
+                        c.currentPage.value = 0;
+
+                        if (_isStudent) {
+                          await c.fetchWalletStudentTransactions();
+                        } else {
+                          await c.fetchWalletTeacherTransactions();
+                        }
                       },
                       getCount: (index) {
                         if (_isStudent) {
@@ -95,6 +95,12 @@ class PaymentPage extends StatelessWidget {
                     final teachers = c.filteredTeacherPayments;
                     final count =
                         _isStudent ? students.length : teachers.length;
+
+                    if (c.isLoadingPayments.value && count == 0) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
 
                     if (count == 0) {
                       return EmptyState(
@@ -131,6 +137,52 @@ class PaymentPage extends StatelessWidget {
                     });
                   }),
                 ),
+                Obx(() {
+                  if (c.totalPages <= 1) {
+                    return const SizedBox();
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 14, top: 6),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: c.currentPage.value > 0
+                              ? () async {
+                                  c.currentPage.value--;
+
+                                  if (_isStudent) {
+                                    await c.fetchWalletStudentTransactions();
+                                  } else {
+                                    await c.fetchWalletTeacherTransactions();
+                                  }
+                                }
+                              : null,
+                          icon: const Icon(Icons.chevron_left_rounded),
+                        ),
+                        Text(
+                          "Page ${c.currentPage.value + 1} of ${c.totalPages}",
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        IconButton(
+                          onPressed: c.currentPage.value < c.totalPages - 1
+                              ? () async {
+                                  c.currentPage.value++;
+
+                                  if (_isStudent) {
+                                    await c.fetchWalletStudentTransactions();
+                                  } else {
+                                    await c.fetchWalletTeacherTransactions();
+                                  }
+                                }
+                              : null,
+                          icon: const Icon(Icons.chevron_right_rounded),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
               ],
             ),
           ),
@@ -161,16 +213,11 @@ class _PaymentCard extends StatelessWidget {
     final isStudent = student != null;
 
     final name = isStudent ? student!.name : teacher!.name;
-    final id = isStudent ? student!.id : teacher!.id;
-    final status = isStudent
-        ? (student!.status ?? 'pending')
-        : (teacher!.status ?? 'pending');
+    final id = isStudent ? student!.studentId : teacher!.teacherId;
 
     final balance = isStudent
-        ? ((student!.courseFee ?? 0) - (student!.depositedAmount ?? 0))
+        ? ((student!.courseFee ?? 0) - (student!.totalPaid ?? 0))
         : ((teacher!.totalEarned ?? 0) - (teacher!.alreadyPaid ?? 0));
-
-    final statusColor = status == 'approved' ? Colors.green : Colors.orange;
 
     return InkWell(
       borderRadius: BorderRadius.circular(22),
@@ -240,30 +287,13 @@ class _PaymentCard extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        id,
+                        id ?? "",
                         style: Theme.of(context)
                             .textTheme
                             .labelSmall!
                             .copyWith(color: cs.outline),
                       ),
                     ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    color: statusColor.withOpacity(.12),
-                  ),
-                  child: Text(
-                    status.toUpperCase(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelMedium!
-                        .copyWith(color: statusColor),
                   ),
                 ),
               ],
@@ -306,7 +336,7 @@ class _PaymentCard extends StatelessWidget {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          "₹${balance.toStringAsFixed(0)}",
+                          "₹${balance.toStringAsFixed(2)}",
                           style:
                               Theme.of(context).textTheme.titleLarge!.copyWith(
 
@@ -444,7 +474,7 @@ class _PaymentCard extends StatelessWidget {
                         child: _info(
                           context,
                           "Already Paid",
-                          "₹${student!.depositedAmount ?? 0}",
+                          "₹${student!.totalPaid ?? 0}",
                         ),
                       ),
                     ],
@@ -493,7 +523,7 @@ class _PaymentCard extends StatelessWidget {
                         child: _info(
                           context,
                           "Withdrawal Requests",
-                          "₹${teacher!.withdrawalRequests ?? 0}",
+                          "${teacher!.withdrawalRequests ?? 0}",
                         ),
                       ),
                       Expanded(
@@ -512,14 +542,14 @@ class _PaymentCard extends StatelessWidget {
                         child: _info(
                           context,
                           "Total Earned",
-                          "₹${teacher!.totalEarned ?? 0}",
+                          "₹${(teacher!.totalEarned ?? 0).toStringAsFixed(2)}",
                         ),
                       ),
                       Expanded(
                         child: _info(
                           context,
                           "Already Paid",
-                          "${teacher!.alreadyPaid ?? 0}",
+                          "₹${(teacher!.alreadyPaid ?? 0).toStringAsFixed(2)}",
                         ),
                       ),
                     ],

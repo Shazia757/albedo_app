@@ -29,9 +29,9 @@ class BatchPaymentDetailPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(batchModel.batch.batchName ?? "",
+                Text(batchModel.name  ?? "",
                     style: Theme.of(context).textTheme.titleLarge),
-                Text(batchModel.batch.batchID ?? ""),
+                Text(batchModel.id ?? ""),
               ],
             ),
           ),
@@ -39,18 +39,18 @@ class BatchPaymentDetailPage extends StatelessWidget {
           SizedBox(height: 10),
 
           // ── Payments List ─────────────────────
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: batchModel.payments.length,
-              separatorBuilder: (_, __) => SizedBox(height: 10),
-              itemBuilder: (_, i) {
-                final p = batchModel.payments[i];
+          // Expanded(
+          //   child: ListView.separated(
+          //     padding: const EdgeInsets.all(16),
+          //     itemCount: batchModel.,
+          //     separatorBuilder: (_, __) => SizedBox(height: 10),
+          //     itemBuilder: (_, i) {
+          //       final p = batchModel.payments[i];
 
-                return PaymentCard(payment: p);
-              },
-            ),
-          ),
+          //       return PaymentCard(payment: p);
+          //     },
+          //   ),
+          // ),
         ],
       ),
     );

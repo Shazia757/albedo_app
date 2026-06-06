@@ -705,10 +705,10 @@ class TeacherDetailsPage extends StatelessWidget {
       itemCount: batches.length,
       itemBuilder: (context, i) {
         final batch = batches[i];
-        final status = batch.status ?? 'Unknown';
-        final isActive = status == 'Active';
-        final statusColor =
-            isActive ? const Color(0xFF22C55E) : const Color(0xFFF59E0B);
+        // final status = batch.status ?? 'Unknown';
+        // final isActive = status == 'Active';
+        // final statusColor =
+        //     isActive ? const Color(0xFF22C55E) : const Color(0xFFF59E0B);
 
         return Container(
           margin: const EdgeInsets.only(bottom: 14),
@@ -743,11 +743,11 @@ class TeacherDetailsPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            batch.batchName ?? 'No Name',
+                            batch.name ?? 'No Name',
                             style: Get.textTheme.titleMedium,
                           ),
                         ),
-                        _statusBadge(status, statusColor),
+                        // _statusBadge(status, statusColor),
                       ],
                     ),
                     SizedBox(height: 4),

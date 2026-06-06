@@ -76,23 +76,25 @@ class OthersPage extends StatelessWidget {
                               final cs = Theme.of(context).colorScheme;
 
                               return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 4),
                                 child: ConstrainedBox(
                                   constraints:
                                       const BoxConstraints(maxWidth: 700),
                                   child: PremiumInfoCard(
-                                    id: otherUsers.id ?? "",
+                                    id: otherUsers.empId ?? "",
                                     title: otherUsers.name ?? "",
                                     subtitle: otherUsers.email ?? "",
-                                    status: otherUsers.status,
-                                    statusColor:
-                                        getStatusColor(otherUsers.status),
-                                    footerText:
-                                        "Joined • ${otherUsers.joinedAt.toString().substring(0, 16)}",
-                                    extraInfo: otherUsers.phone != null
+                                    status: (otherUsers.isResigned == true)
+                                        ? 'Inactive'
+                                        : 'Active',
+                                    statusColor: getStatusColor(
+                                        (otherUsers.isResigned == true)
+                                            ? 'Inactive'
+                                            : 'Active'),
+                                    footerText: otherUsers.phone != null
                                         ? "Contact • ${otherUsers.phone}"
-                                        : null,
+                                        : '',
                                     onTap: () {
                                       {
                                         showDialog(
@@ -113,8 +115,7 @@ class OthersPage extends StatelessWidget {
                                                     radius: 40,
                                                     // backgroundImage:
                                                     //     user.imageUrl != null ? NetworkImage(user.imageUrl!) : null,
-                                                    child: otherUsers
-                                                                .imageUrl ==
+                                                    child: otherUsers.photo ==
                                                             null
                                                         ? Image.asset(
                                                             'assets/images/logo.png')
@@ -135,7 +136,8 @@ class OthersPage extends StatelessWidget {
 
                                                   /// 🔹 Role
                                                   Text(
-                                                    otherUsers.role ?? "User",
+                                                    otherUsers.position ??
+                                                        "User",
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .bodyMedium!
@@ -189,13 +191,13 @@ class OthersPage extends StatelessWidget {
                                                           },
                                                         ),
                                                       ),
-                                                      if (otherUsers.role !=
+                                                      if (otherUsers.position !=
                                                               'finance' &&
-                                                          otherUsers.role !=
+                                                          otherUsers.position !=
                                                               'sales' &&
-                                                          otherUsers.role !=
+                                                          otherUsers.position !=
                                                               'admin' &&
-                                                          otherUsers.role !=
+                                                          otherUsers.position !=
                                                               'hr')
                                                         InfoActionButton(
                                                           action: InfoAction(
@@ -231,24 +233,31 @@ class OthersPage extends StatelessWidget {
                                                           onTap: () =>
                                                               CustomWidgets()
                                                                   .showDeleteDialog(
-                                                                    dltText: Obx(
-  () => c.isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
-        ),
-),
+                                                            dltText: Obx(
+                                                              () => c.isLoading
+                                                                      .value
+                                                                  ? const SizedBox(
+                                                                      width: 18,
+                                                                      height:
+                                                                          18,
+                                                                      child:
+                                                                          CircularProgressIndicator(
+                                                                        strokeWidth:
+                                                                            2,
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                    )
+                                                                  : Text(
+                                                                      "Yes",
+                                                                      style: Theme.of(
+                                                                              context)
+                                                                          .textTheme
+                                                                          .titleSmall!
+                                                                          .copyWith(
+                                                                              color: Colors.white),
+                                                                    ),
+                                                            ),
                                                             title:
                                                                 'Are you sure?',
                                                             text:
@@ -637,7 +646,7 @@ class OthersPage extends StatelessWidget {
     return Users(
       empId: a.id,
       name: a.name,
-      role: a.role,
+      role: a.position,
     );
   }
 }

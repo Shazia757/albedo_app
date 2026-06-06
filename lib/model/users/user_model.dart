@@ -5,7 +5,6 @@ class Users {
   String? empId;
 
   String? role;
-  String? position;
   String? customPosition;
 
   String? email;
@@ -39,7 +38,6 @@ class Users {
     this.name,
     this.empId,
     this.role,
-    this.position,
     this.customPosition,
     this.email,
     this.contact,
@@ -64,8 +62,7 @@ class Users {
       id: json['id']?.toString(),
       name: json['name'] ?? json['username'] ?? '',
       empId: json['emp_id'],
-      role: json['role'],
-      position: json['position'],
+      role: json['role'] ?? json['position'],
       customPosition: json['custom_position'],
       email: json['email'],
       contact: json['phone_number'] ?? json['contact'],
@@ -93,7 +90,6 @@ class Users {
       'username': name,
       'emp_id': empId,
       'role': role,
-      'position': position,
       'custom_position': customPosition,
       'email': email,
       'phone_number': contact,

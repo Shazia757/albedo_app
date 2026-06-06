@@ -1,5 +1,8 @@
 import 'package:albedo_app/controller/batch_list_controller.dart';
+import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/responsive.dart';
 import 'package:albedo_app/widgets/session_widgets.dart';
 import 'package:albedo_app/widgets/widgets.dart';
@@ -72,7 +75,7 @@ class BatchTopBar extends StatelessWidget {
 }
 
 class BatchCard extends StatelessWidget {
-  final Session batch;
+  final BatchSession batch;
   final Color statusColor;
   final VoidCallback onTap;
 
@@ -89,7 +92,7 @@ class BatchCard extends StatelessWidget {
     final textPrimary = cs.onSurface;
     final textSecondary = cs.onSurface.withOpacity(0.5);
     final dividerColor = cs.outline.withOpacity(0.12);
-    final teacher = batch.package?.teacher;
+    final teacher = batch.teachers;
 
     return Material(
       color: cs.onPrimary,
@@ -118,17 +121,19 @@ class BatchCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        batch.id ?? "—",
-                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                            fontFamily: 'monospace',
-                            color: textSecondary,
-                            letterSpacing: 0.3),
+                        batch.id != null && batch.id!.length >= 4
+                            ? batch.id!.substring(batch.id!.length - 4)
+                            : "—",
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelSmall!
+                            .copyWith(color: textSecondary, letterSpacing: 0.3),
                       ),
                     ),
-                    StatusBadge(
-                      status: batch.status ?? "",
-                      color: statusColor,
-                    ),
+                    // StatusBadge(
+                    //   status: batch.status ?? "",
+                    //   color: statusColor,
+                    // ),
                   ],
                 ),
 
@@ -164,7 +169,7 @@ class BatchCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  batch.batch?.batchName ?? "—",
+                                  batch.batchName ?? "—",
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleSmall!
@@ -173,13 +178,11 @@ class BatchCard extends StatelessWidget {
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  "Batch ID: ${batch.id ?? '—'}",
+                                  batch.batchID ?? '—',
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelSmall!
-                                      .copyWith(
-                                          color: textSecondary,
-                                          fontFamily: 'monospace'),
+                                      .copyWith(color: textSecondary),
                                 ),
                               ],
                             ),
@@ -219,13 +222,13 @@ class BatchCard extends StatelessWidget {
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  "ID: ${teacher?.id ?? '—'}",
+                                  teacher?.teacherId ?? '—',
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelSmall!
                                       .copyWith(
-                                          color: textSecondary,
-                                          fontFamily: 'monospace'),
+                                        color: textSecondary,
+                                      ),
                                 ),
                               ],
                             ),
@@ -246,38 +249,66 @@ class BatchCard extends StatelessWidget {
 
                 SizedBox(height: 10),
 
-                // ── Row 3: Meta ───────────────────────────────
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    /// SUBJECT
                     Expanded(
-                      child: MetaItem(
-                        label: "Date",
-                        value: formatDate(
-                          batch.date ?? DateTime.now(),
-                        ),
-                        textSecondary: textSecondary,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Subject",
+                            style: Get.textTheme.labelSmall!.copyWith(
+                              color: textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            batch.packageName ?? "-",
+                            style: Get.textTheme.labelMedium,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            batch.syllabus ?? "-",
+                            style: Get.textTheme.bodySmall!.copyWith(
+                              color: textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(width: 12),
+
+                    const SizedBox(width: 16),
+
+                    /// TIME
                     Expanded(
-                      child: MetaItem(
-                        label: "Time",
-                        value:
-                            "${batch.startTime ?? "-"} - ${batch.endTime ?? "-"}",
-                        textSecondary: textSecondary,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Schedule",
+                            style: Get.textTheme.labelSmall!.copyWith(
+                              color: textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            formatDate(batch.date ?? DateTime.now()),
+                            style: Get.textTheme.labelMedium,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "${formatTime(batch.startTime)} - ${formatTime(batch.endTime)}",
+                            style: Get.textTheme.bodySmall!.copyWith(
+                              color: textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-
-                if (batch.syllabus != null && batch.syllabus!.isNotEmpty) ...[
-                  SizedBox(height: 10),
-                  MetaItem(
-                    label: "Syllabus",
-                    value: batch.syllabus!,
-                    textSecondary: textSecondary,
-                  ),
-                ],
+                )
               ],
             ),
           ),
@@ -285,4 +316,195 @@ class BatchCard extends StatelessWidget {
       ),
     );
   }
+}
+
+void showSupportDialog({
+  required BuildContext context,
+  required TextEditingController titleController,
+  required TextEditingController descriptionController,
+
+  required List<dynamic> categoryList,
+  required List<Student> studentsList,
+  required List<Teacher> teacherList,
+
+  required RxString selectedType,
+
+  required String Function(dynamic) categoryLabel,
+  required VoidCallback onSubmit,
+
+  Function(dynamic)? onCategoryChanged,
+  Function(String?)? onPriorityChanged,
+  Function(Student?)? onStudentChanged,
+  Function(Teacher?)? onTeacherChanged,
+
+  Future<void> Function()? onAttachmentTap,
+  VoidCallback? onAttachmentClear,
+}) {
+  CustomWidgets().showCustomDialog(
+    context: context,
+    title: const Text('Add New Ticket'),
+    submitWidget: Text(
+      "Add",
+      style: Theme.of(context)
+          .textTheme
+          .bodyMedium!
+          .copyWith(color: Colors.white),
+    ),
+    icon: Icons.support_agent_outlined,
+    formKey: GlobalKey<FormState>(),
+    sections: [
+      SizedBox(
+        height: MediaQuery.of(context).size.height * 0.5,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomWidgets().labelWithAsterisk(
+                'Title',
+                required: true,
+              ),
+              const SizedBox(height: 8),
+              CustomWidgets().dropdownStyledTextField(
+                context: context,
+                hint: 'Enter ticket title',
+                controller: titleController,
+              ),
+
+              const SizedBox(height: 12),
+
+              CustomWidgets().labelWithAsterisk(
+                'Category',
+                required: true,
+              ),
+              const SizedBox(height: 8),
+
+              CustomWidgets().customDropdownField(
+                context: context,
+                hint: 'Select category',
+                itemLabel: categoryLabel,
+                items: categoryList,
+                onChanged:(p0) {
+                  onCategoryChanged?.call(p0);
+                } 
+              ),
+
+              const SizedBox(height: 12),
+
+              CustomWidgets().labelWithAsterisk(
+                'Priority',
+                required: true,
+              ),
+              const SizedBox(height: 8),
+
+              CustomWidgets().customDropdownField<String>(
+                context: context,
+                hint: 'Select priority',
+                itemLabel: (item) => item,
+                items: const ['High', 'Medium', 'Low'],
+            onChanged: (value) {
+  onPriorityChanged?.call(value);
+},
+              ),
+
+              const SizedBox(height: 12),
+
+              CustomWidgets().labelWithAsterisk(
+                'User',
+                required: true,
+              ),
+              const SizedBox(height: 8),
+
+              Obx(
+                () => Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<String>(
+                        dense: true,
+                        title: const Text('Student'),
+                        value: "student",
+                        groupValue: selectedType.value,
+                        onChanged: (value) {
+                          if (value != null) {
+                            selectedType.value = value;
+                          }
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<String>(
+                        dense: true,
+                        title: const Text('Teacher'),
+                        value: "teacher",
+                        groupValue: selectedType.value,
+                        onChanged: (value) {
+                          if (value != null) {
+                            selectedType.value = value;
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              Obx(() {
+                if (selectedType.value == 'student') {
+                  return CustomWidgets().customDropdownField<Student>(
+                    context: context,
+                    hint: 'Select student',
+                    items: studentsList,
+                    itemLabel: (item) =>
+                        '${item.name} (${item.studentId})',
+                 onChanged: (value) {
+  onStudentChanged?.call(value);
+},
+                  );
+                }
+
+                return CustomWidgets().customDropdownField<Teacher>(
+                  context: context,
+                  hint: 'Select teacher',
+                  items: teacherList,
+                  itemLabel: (item) =>
+                      '${item.name} (${item.teacherId})',
+                 onChanged: (value) {
+  onTeacherChanged?.call(value);
+},
+                );
+              }),
+
+              const SizedBox(height: 12),
+
+              CustomWidgets().labelWithAsterisk('Attachment'),
+              const SizedBox(height: 8),
+
+              CustomWidgets().mediaPickerField(
+                context: context,
+                onTap: onAttachmentTap,
+                onClear: onAttachmentClear,
+              ),
+
+              const SizedBox(height: 12),
+
+              CustomWidgets().labelWithAsterisk(
+                'Description',
+                required: true,
+              ),
+              const SizedBox(height: 8),
+
+              CustomWidgets().dropdownStyledTextField(
+                context: context,
+                hint: 'Describe the issue...',
+                controller: descriptionController,
+                isMultiline: true,
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+    onSubmit: onSubmit,
+  );
 }

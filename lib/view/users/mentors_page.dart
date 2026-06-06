@@ -28,6 +28,7 @@ class MentorsPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final normalizedRole = role?.trim().toLowerCase();
 
     final isCustom = ![
       "admin",
@@ -39,7 +40,7 @@ class MentorsPage extends StatelessWidget {
       "finance",
       "sales",
       "hr"
-    ].contains(role);
+    ].contains(normalizedRole);
 
     return Scaffold(
       appBar: const CustomAppBar(),
@@ -73,9 +74,11 @@ class MentorsPage extends StatelessWidget {
                       context,
                       tabs: c.tabs,
                       selectedIndex: c.selectedTab.value,
-                      onTap: (index) {
+                      onTap: (index) async {
                         c.selectedTab.value = index;
-                        c.applyFilters();
+                        c.currentPage.value = 0;
+
+                        await c.fetchMentors();
                       },
                       getCount: (index) => c.getCount(index),
                     ),
@@ -124,24 +127,24 @@ class MentorsPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 12),
+                                      horizontal: 4, vertical: 4),
                                   child: PremiumInfoCard(
-                                    id: mentor.id ?? "-",
+                                    id: mentor.empId ?? "-",
                                     title: mentor.name ?? "-",
                                     subtitle: mentor.email ?? "-",
                                     status: mentor.status,
                                     statusColor: getStatusColor(mentor.status),
-                                    footerText:
-                                        "Joined • ${mentor.joinedAt.toString().substring(0, 16)}",
-                                    extraInfo: mentor.phone != null
+                                    footerText: mentor.phone != null
                                         ? "Contact • ${mentor.phone}"
-                                        : null,
+                                        : "",
                                     onTap: (!isCustom ||
                                             PermissionService.can(
                                                 "view_mentors"))
-                                        ? () => Get.to(() => MentorDetailsPage(
-                                            mentor: mentor,
-                                            initialIndex: index))
+                                        ? () {
+                                          // Get.to(() => MentorDetailsPage(
+                                          //   mentor: mentor,
+                                          //   initialIndex: index));
+                                        }
                                         : null,
                                     actions: [
                                       InfoAction(
@@ -193,7 +196,42 @@ class MentorsPage extends StatelessWidget {
                             });
                       });
                     }),
-                  )
+                  ),
+                  Obx(() {
+                    if (c.totalPages <= 1) {
+                      return const SizedBox();
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 14, top: 6),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: c.currentPage.value > 0
+                                ? () async {
+                                    c.currentPage.value--;
+                                    await c.fetchMentors();
+                                  }
+                                : null,
+                            icon: const Icon(Icons.chevron_left_rounded),
+                          ),
+                          Text(
+                            "Page ${c.currentPage.value + 1} of ${c.totalPages}",
+                          ),
+                          IconButton(
+                            onPressed: c.currentPage.value < c.totalPages - 1
+                                ? () async {
+                                    c.currentPage.value++;
+                                    await c.fetchMentors();
+                                  }
+                                : null,
+                            icon: const Icon(Icons.chevron_right_rounded),
+                          ),
+                        ],
+                      ),
+                    );
+                  })
                 ],
               ),
             ),
@@ -207,6 +245,8 @@ class MentorsPage extends StatelessWidget {
     final isMobile = Responsive.isMobile(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final normalizedRole = role?.trim().toLowerCase();
+
     final cs = Theme.of(context).colorScheme;
 
     final isCustom = ![
@@ -219,7 +259,7 @@ class MentorsPage extends StatelessWidget {
       "finance",
       "sales",
       "hr"
-    ].contains(role);
+    ].contains(normalizedRole);
 
     if (isMobile) {
       return Column(

@@ -940,7 +940,7 @@ class CustomWidgets {
           overlayEntry = null;
 
           if (clearSearch) {
-            textController.clear(); // ✅ remove search text
+            textController.clear();
             filteredItems = List.from(items);
           }
 
@@ -2175,20 +2175,29 @@ class CustomWidgets {
   }
 
   Widget squareAvatar(String? imageUrl, double size, {double radius = 8}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(radius),
-        color: Colors.grey.shade200,
-        image: imageUrl != null && imageUrl.isNotEmpty
-            ? DecorationImage(
-                image: NetworkImage(imageUrl), fit: BoxFit.contain)
-            : null,
-      ),
-      child: imageUrl == null || imageUrl.isEmpty
-          ? Icon(Icons.person, size: size * 0.4, color: Colors.white70)
-          : null,
+    final url = imageUrl?.trim();
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: (url != null && url.isNotEmpty)
+          ? Image.network(
+              url,
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Image.asset(
+                "assets/images/logo.png",
+                width: size,
+                height: size,
+                fit: BoxFit.contain,
+              ),
+            )
+          : Image.asset(
+              "assets/images/logo.png",
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+            ),
     );
   }
 }

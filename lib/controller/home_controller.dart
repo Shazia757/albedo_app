@@ -156,15 +156,13 @@ class HomeController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "CBSE Mathematics",
-        className: "Class 10",
         teacher: Teacher(
           id: "TEA1001",
           name: "John",
@@ -185,9 +183,7 @@ class HomeController extends GetxController {
         advisor: Advisor(
           id: "ADV001",
           name: "Fathima",
-          joinedAt: DateTime.now(),
         ),
-        date: DateTime(2026, 4, 28),
         status: "started",
       ),
       Session(
@@ -209,15 +205,13 @@ class HomeController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "SCERT",
-        className: "9B",
         teacher: Teacher(
           id: "T002",
           name: "David",
@@ -230,7 +224,6 @@ class HomeController extends GetxController {
           name: "David",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now().add(const Duration(days: 1)),
         status: "upcoming",
       ),
       Session(
@@ -252,15 +245,13 @@ class HomeController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "CBSE",
-        className: "8C",
         teacher: Teacher(
           id: "T001",
           name: "John",
@@ -273,7 +264,6 @@ class HomeController extends GetxController {
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now(),
         status: "pending",
       ),
       Session(
@@ -295,15 +285,13 @@ class HomeController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "SCERT",
-        className: "11A",
         teacher: Teacher(
           id: "T003",
           name: "Meera",
@@ -316,7 +304,6 @@ class HomeController extends GetxController {
           name: "David",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now().subtract(const Duration(days: 3)),
         status: "completed",
       ),
       Session(
@@ -338,15 +325,13 @@ class HomeController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "CBSE",
-        className: "12B",
         teacher: Teacher(
           id: "T002",
           name: "David",
@@ -359,7 +344,6 @@ class HomeController extends GetxController {
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now(),
         status: "no_balance",
       ),
       Session(
@@ -381,15 +365,13 @@ class HomeController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "SCERT",
-        className: "10A",
         teacher: Teacher(
           id: "T003",
           name: "Meera",
@@ -402,7 +384,6 @@ class HomeController extends GetxController {
           name: "David",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now().subtract(const Duration(hours: 5)),
         status: "meet_done",
       ),
       Session(
@@ -424,8 +405,8 @@ class HomeController extends GetxController {
                   standard: 'standard',
                   syllabus: 'syllabus',
                   status: 'status',
-                  packageFee: 0,
-                  takenFee: 0,
+                  // packageFee: 0,
+                  // takenFee: 0,
                   balance: 0,
                   withdrawals: [],
                   time: 'time',
@@ -444,15 +425,13 @@ class HomeController extends GetxController {
             standard: '',
             syllabus: '',
             status: '',
-            packageFee: 0,
-            takenFee: 0,
+            // packageFee: 0,
+            // takenFee: 0,
             balance: 0,
             withdrawals: [],
             time: '',
             duration: '',
             note: ''),
-        syllabus: "CBSE",
-        className: "9A",
         teacher: Teacher(
           id: "T001",
           name: "Ameen Rahman",
@@ -465,7 +444,6 @@ class HomeController extends GetxController {
           name: "Saeeda",
           joinedAt: DateTime.now(),
         ),
-        date: DateTime.now().add(const Duration(hours: 3)),
         status: "started",
       ),
     ];
@@ -478,28 +456,28 @@ class HomeController extends GetxController {
     throw UnimplementedError();
   }
 
-  Session? get nextSession {
-    if (session.isEmpty) return null;
+  // Session? get nextSession {
+  //   if (session.isEmpty) return null;
 
-    final now = DateTime.now();
+  //   final now = DateTime.now();
 
-    /// ✅ COPY list (IMPORTANT)
-    final sortedSessions = List<Session>.from(session)
-      ..sort((a, b) => a.date!.compareTo(b.date!));
+  //   /// ✅ COPY list (IMPORTANT)
+  //   final sortedSessions = List<Session>.from(session)
+  //     ..sort((a, b) => a.date!.compareTo(b.date!));
 
-    // started
-    final started = sortedSessions.where((s) => s.status == "started");
-    if (started.isNotEmpty) return started.first;
+  //   // started
+  //   final started = sortedSessions.where((s) => s.status == "started");
+  //   if (started.isNotEmpty) return started.first;
 
-    // upcoming
-    final upcoming = sortedSessions.where((s) => s.date!.isAfter(now)).toList();
+  //   // upcoming
+  //   final upcoming = sortedSessions.where((s) => s.date!.isAfter(now)).toList();
 
-    if (upcoming.isNotEmpty) {
-      return upcoming.first;
-    }
+  //   if (upcoming.isNotEmpty) {
+  //     return upcoming.first;
+  //   }
 
-    return sortedSessions.first;
-  }
+  //   return sortedSessions.first;
+  // }
 
   Future<void> loadHiringAds() async {
     try {

@@ -1,8 +1,13 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
+import 'package:albedo_app/config/urls.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/controller/session_report_controller.dart';
 import 'package:albedo_app/model/meet_model.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/settings/syllabus_model.dart';
 import 'package:albedo_app/model/users/advisor_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
 import 'package:albedo_app/model/users/mentor_model.dart';
@@ -27,7 +32,17 @@ class SessionController extends GetxController {
   var selectedStatus = 0.obs;
   final RxInt currentSessionIndex = 0.obs;
   var searchQuery = ''.obs;
+  final pageSize = 20.obs;
+  final activeCount = 0.obs;
+  final actionCount = 0.obs;
+  final upcomingCount = 0.obs;
+  final pendingCount = 0.obs;
+  final completedCount = 0.obs;
+  final meetCount = 0.obs;
+  int get totalPages => (totalCount.value / pageSize.value).ceil();
+
   RxBool isSearching = false.obs;
+  RxBool isSessionDetailLoading = false.obs;
   var selectAllMentors = false.obs;
   var selectAllTeachers = false.obs;
   var selectAllStudents = false.obs;
@@ -48,6 +63,8 @@ class SessionController extends GetxController {
   Rx<Package?> selectedPackage = Rx<Package?>(null);
 
   RxList<Package> packagesList = <Package>[].obs;
+  final RxList<Session> filteredSessions = <Session>[].obs;
+  final RxList<Meet> filteredMeets = <Meet>[].obs;
   RxList<Student> selectedStudents = <Student>[].obs;
   RxList<Teacher> selectedTeachers = <Teacher>[].obs;
   RxList<Mentor> selectedMentors = <Mentor>[].obs;
@@ -60,12 +77,15 @@ class SessionController extends GetxController {
   var selectedDuration = Rxn<int>();
   var selectedDate = Rxn<DateTime>();
   var selectedTime = Rxn<TimeOfDay>();
+  final currentPage = 0.obs;
+  final totalCount = 0.obs;
+
   RxString selectedType = "session".obs;
   RxList<Student> studentsList = <Student>[].obs;
   String selectedFile = '';
   RxList<Teacher> teacherList = <Teacher>[].obs;
   RxList<Mentor> mentorsList = <Mentor>[].obs;
-  RxList<String> categoryList = <String>[].obs;
+  RxList<Syllabus> categoryList = <Syllabus>[].obs;
   RxList<Coordinator> coordinatorsList = <Coordinator>[].obs;
   RxList<Advisor> advisorsList = <Advisor>[].obs;
   RxList<OtherUsers> otherUsersList = <OtherUsers>[].obs;
@@ -109,119 +129,10 @@ class SessionController extends GetxController {
     "meet_done"
   ];
 
-  List<Session> get filteredSessions {
-    final status = statusMap[selectedTab.value];
-
-    // ✅ Step 1: Filter first
-    List<Session> filtered = sessions.where((s) {
-      final matchesStatus = s.status == status;
-      final subjectName = s.package?.subjectName ?? '';
-      final className = s.className ?? '';
-
-      final matchesSearch = s.student!.name
-              .toLowerCase()
-              .contains(searchQuery.value.toLowerCase()) ||
-          s.student!.studentId!
-              .toLowerCase()
-              .contains(searchQuery.value.toLowerCase()) ||
-          s.teacher!.id
-              .toLowerCase()
-              .contains(searchQuery.value.toLowerCase()) ||
-          s.teacher!.name
-              .toLowerCase()
-              .contains(searchQuery.value.toLowerCase()) ||
-          s.id.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          subjectName.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          className.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          s.date.toString().contains(searchQuery.value.toLowerCase());
-
-      return matchesStatus && matchesSearch;
-    }).toList();
-
-    // ✅ Step 2: Teacher filter
-    if (selectedTeacher.value != null) {
-      filtered = filtered
-          .where((s) => s.teacher?.name == selectedTeacher.value)
-          .toList();
-    }
-
-    // ✅ ⭐ Step 3: FilterType (ADD THIS BLOCK)
-    switch (filterType.value) {
-      case FilterType.all:
-        break;
-
-      case FilterType.classSession:
-        filtered = filtered.where((s) => s.status != "meet_done").toList();
-        break;
-
-      case FilterType.meetSession:
-        filtered = filtered.where((s) => s.status == "meet_done").toList();
-        break;
-    }
-
-    // 🔥 Step 4: Sorting
-    switch (sortType.value) {
-      case SessionSortType.newest:
-        filtered.sort((a, b) {
-          final ad = a.date;
-          final bd = b.date;
-
-          if (ad == null && bd == null) return 0;
-          if (ad == null) return 1; // a goes after b
-          if (bd == null) return -1; // a goes before b
-
-          return bd.compareTo(ad); // newest first
-        });
-        break;
-
-      case SessionSortType.oldest:
-        filtered.sort((a, b) {
-          final ad = a.date;
-          final bd = b.date;
-
-          if (ad == null && bd == null) return 0;
-          if (ad == null) return 1;
-          if (bd == null) return -1;
-
-          return ad.compareTo(bd); // oldest first
-        });
-        break;
-      case SessionSortType.student:
-        filtered.sort((a, b) => a.student!.name.compareTo(b.student!.name));
-        break;
-      case SessionSortType.teacher:
-        filtered.sort((a, b) => a.teacher!.name.compareTo(b.teacher!.name));
-        break;
-    }
-
-    // ✅ Step 5: Return
-    return filtered;
-  }
-
-  List<Meet> get filteredMeets {
-    final tab = statusMap[selectedTab.value];
-
-    List<Meet> filtered = meets.where((m) {
-      bool matchesStatus = true;
-
-      // 🎯 Map tab → meet status
-      if (tab == "meet_done") {
-        matchesStatus = m.status == "finished";
-      }
-
-      final matchesSearch =
-          m.title.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-              m.date.toString().contains(searchQuery.value.toLowerCase());
-
-      return matchesStatus && matchesSearch;
-    }).toList();
-
-    return filtered;
-  }
-
   @override
   void onInit() {
     super.onInit();
+    fetchAllCounts();
     fetchData();
     _mockUsers("student");
     _mockUsers("teacher");
@@ -233,576 +144,102 @@ class SessionController extends GetxController {
     try {
       isLoading.value = true;
 
-      final user = auth.activeUser;
+      /// Meet sessions uses different API
+      if (selectedTab.value == 5) {
+        final response = await Api().getMeetSessions();
 
-      final allSessions =
-          useMock ? await _mockSessions() : await _apiSessions();
+        meets.assignAll(response);
+        meetCount.value = response.length;
 
-      final allMeets = useMock ? await _mockMeets() : await _apiMeets();
-
-      List<Session> result = [];
-      List<Meet> meetResult = [];
-
-      if (user?.role == "admin") {
-        result = allSessions;
-        meetResult = allMeets;
-      } else if (user?.role == "coordinator") {
-        result =
-            allSessions.where((s) => s.coordinator?.id == user!.id).toList();
-
-        meetResult = allMeets
-            .where((m) => m.members.any((u) => u.id == user?.id))
-            .toList();
-      } else if (user?.role == "teacher") {
-        result = allSessions.where((s) => s.teacher?.id == user!.id).toList();
-
-        meetResult = allMeets
-            .where((m) => m.members.any((u) => u.id == user?.id))
-            .toList();
-      } else if (user?.role == "mentor") {
-        result = allSessions.where((s) => s.mentor?.id == user!.id).toList();
-
-        meetResult = allMeets
-            .where((m) => m.members.any((u) => u.id == user?.id))
-            .toList();
+        applyFilters();
+        return;
       }
 
-      sessions.assignAll(result);
-      meets.assignAll(meetResult);
+      String category = "active";
+
+      switch (selectedTab.value) {
+        case 0:
+          category = "active";
+          break;
+
+        case 1:
+          category = "needs_action";
+          break;
+
+        case 2:
+          category = "upcoming";
+          break;
+
+        case 3:
+          category = "pending";
+          break;
+
+        case 4:
+          category = "completed";
+          break;
+      }
+
+      final response = await Api().getSessionDetails(
+        category: category,
+        page: currentPage.value + 1,
+        pageSize: pageSize.value,
+      );
+
+      sessions.assignAll(response.results);
+
+      totalCount.value = response.count;
+
+      applyFilters();
     } catch (e) {
-      print("Error: $e");
+      log(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<List<Session>> _mockSessions() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return _getDummySessions();
-  }
+  Future<void> fetchAllCounts() async {
+    try {
+      final active = await Api().getSessionDetails(
+        category: "active",
+        page: 1,
+        pageSize: 1,
+      );
 
-  Future<List<Session>> _apiSessions() async {
-    throw UnimplementedError();
-  }
+      final action = await Api().getSessionDetails(
+        category: "needs_action",
+        page: 1,
+        pageSize: 1,
+      );
 
-  List<Session> _getDummySessions() {
-    return [
-      Session(
-        id: "S001",
-        student: Student(
-          studentId: "STU001",
-          name: "Aisha",
-          joinedAt: DateTime.now(),
-        ),
-        package: Package(
-            teacher: Teacher(
-                id: '',
-                name: '',
-                status: '',
-                joinedAt: DateTime.now(),
-                gender: ''),
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        syllabus: "CBSE Mathematics",
-        className: "Class 10",
-        teacher: Teacher(
-          id: "T001",
-          name: "Ameen Rahman",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          empId: "MTR001",
-          name: "Saeeda",
-          joinedAt: DateTime.now(),
-        ),
-        coordinator: Coordinator(
-          id: "COO1001",
-          name: "Maria",
-          joinedAt: DateTime.now(),
-        ),
-        advisor: Advisor(
-          id: "ADV001",
-          name: "Fathima",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime(2026, 4, 23),
-        status: "started",
-      ),
-      Session(
-        id: "S002",
-        student: Student(
-          studentId: "STU002",
-          name: "Rahul",
-          joinedAt: DateTime.now(),
-        ),
-        package: Package(
-            teacher: Teacher(
-                id: '',
-                name: '',
-                status: '',
-                joinedAt: DateTime.now(),
-                gender: ''),
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        syllabus: "SCERT",
-        className: "9B",
-        teacher: Teacher(
-          id: "T002",
-          name: "David",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          empId: "MTR002",
-          name: "David",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now().add(const Duration(days: 1)),
-        status: "upcoming",
-      ),
-      Session(
-        id: "S003",
-        student: Student(
-          studentId: "STU003",
-          name: "Fatima",
-          joinedAt: DateTime.now(),
-        ),
-        package: Package(
-            teacher: Teacher(
-                id: '',
-                name: '',
-                status: '',
-                joinedAt: DateTime.now(),
-                gender: ''),
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        syllabus: "CBSE",
-        className: "8C",
-        teacher: Teacher(
-          id: "T001",
-          name: "John",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          empId: "MTR001",
-          name: "Saeeda",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now(),
-        status: "pending",
-      ),
-      Session(
-        id: "S004",
-        student: Student(
-          studentId: "ST04",
-          name: "Arjun",
-          joinedAt: DateTime.now(),
-        ),
-        package: Package(
-            teacher: Teacher(
-                id: '',
-                name: '',
-                status: '',
-                joinedAt: DateTime.now(),
-                gender: ''),
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        syllabus: "SCERT",
-        className: "11A",
-        teacher: Teacher(
-          id: "T003",
-          name: "Meera",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          empId: "MTR002",
-          name: "David",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now().subtract(const Duration(days: 3)),
-        status: "completed",
-      ),
-      Session(
-        id: "S005",
-        student: Student(
-          studentId: "ST05",
-          name: "Nisha",
-          joinedAt: DateTime.now(),
-        ),
-        package: Package(
-            teacher: Teacher(
-                id: '',
-                name: '',
-                status: '',
-                joinedAt: DateTime.now(),
-                gender: ''),
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        syllabus: "CBSE",
-        className: "12B",
-        teacher: Teacher(
-          id: "T002",
-          name: "David",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          empId: "MTR001",
-          name: "Saeeda",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now(),
-        status: "no_balance",
-      ),
-      Session(
-        id: "S006",
-        student: Student(
-          studentId: "ST06",
-          name: "Ali",
-          joinedAt: DateTime.now(),
-        ),
-        package: Package(
-            teacher: Teacher(
-                id: '',
-                name: '',
-                status: '',
-                joinedAt: DateTime.now(),
-                gender: ''),
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        syllabus: "SCERT",
-        className: "10A",
-        teacher: Teacher(
-          id: "T003",
-          name: "Meera",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          empId: "MTR002",
-          name: "David",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now().subtract(const Duration(hours: 5)),
-        status: "meet_done",
-      ),
-      Session(
-        id: "S007",
-        student: Student(
-            studentId: "ST07",
-            name: "Sneha",
-            assessment: [
-              // Assessment(
-              //     id: "A001",
-              //     type: "Monthly Academic Assessment",
-              //     testType: ["academic", "maths", "basics"],
-              //     date: "06 May 2026",
-              //     attentionQuestions: ["Focus", "Listening", "Participation"],
-              //     attentionData: [
-              //       AttentionItem(mark: '10', question: 'Focus', rating: 2)
-              //     ]),
-            ],
-            joinedAt: DateTime.now(),
-            packages: [
-              Package(
-                  teacher: Teacher(
-                      id: '',
-                      name: '',
-                      status: '',
-                      joinedAt: DateTime.now(),
-                      gender: ''),
-                  subjectId: '',
-                  subjectName: '',
-                  standard: '',
-                  syllabus: '',
-                  status: '',
-                  packageFee: 0,
-                  takenFee: 0,
-                  balance: 0,
-                  withdrawals: [],
-                  time: '',
-                  duration: '',
-                  note: ''),
-            ]),
-        package: Package(
-            teacher: Teacher(
-                id: '',
-                name: '',
-                status: '',
-                joinedAt: DateTime.now(),
-                gender: ''),
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: ''),
-        syllabus: "CBSE",
-        className: "9A",
-        teacher: Teacher(
-          id: "T001",
-          name: "Ameen Rahman",
-          status: "Active",
-          gender: "Male",
-          joinedAt: DateTime.now(),
-        ),
-        mentor: Mentor(
-          empId: "MTR001",
-          name: "Saeeda",
-          joinedAt: DateTime.now(),
-        ),
-        date: DateTime.now().add(const Duration(hours: 3)),
-        status: "started",
-      ),
-    ];
-  }
+      final upcoming = await Api().getSessionDetails(
+        category: "upcoming",
+        page: 1,
+        pageSize: 1,
+      );
 
-  Future<List<Meet>> _mockMeets() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return _getDummyMeets();
-  }
+      final pending = await Api().getSessionDetails(
+        category: "pending",
+        page: 1,
+        pageSize: 1,
+      );
 
-  Future<List<Meet>> _apiMeets() async {
-    // final res = await ApiService.getMeets();
-    // return res.map((e) => Meet.fromJson(e)).toList();
+      final completed = await Api().getSessionDetails(
+        category: "completed",
+        page: 1,
+        pageSize: 1,
+      );
 
-    throw UnimplementedError();
-  }
+      final meets = await Api().getMeetSessions();
 
-  List<Meet> _getDummyMeets() {
-    return [
-      Meet(
-        id: "MT001",
-        title: "Math Revision Meet",
-        date: DateTime.now().subtract(const Duration(days: 1)),
-        startTime: "10:00 AM",
-        endTime: "11:00 AM",
-        status: "finished",
-        members: [
-          Users(
-            empId: "STU001",
-            name: "Aisha",
-            email: "aisha@mail.com",
-            role: "Student",
-          ),
-          Users(
-            empId: "T001",
-            name: "Ameen Rahman",
-            email: "ameen@mail.com",
-            role: "Teacher",
-          ),
-          Users(
-            empId: "MTR001",
-            name: "Saeeda",
-            email: "saeeda@mail.com",
-            role: "Mentor",
-          ),
-        ],
-      ),
-      Meet(
-        id: "MT002",
-        title: "Science Doubt Clearing",
-        date: DateTime.now(),
-        startTime: "09:30 AM",
-        endTime: "10:30 AM",
-        status: "ongoing",
-        members: [
-          Users(
-            empId: "STU002",
-            name: "Rahul",
-            email: "rahul@mail.com",
-            role: "Student",
-          ),
-          Users(
-            empId: "T002",
-            name: "David",
-            email: "david@mail.com",
-            role: "Teacher",
-          ),
-        ],
-      ),
-      Meet(
-        id: "MT003",
-        title: "English Speaking Practice",
-        date: DateTime.now().add(const Duration(days: 1)),
-        startTime: "11:00 AM",
-        endTime: "12:00 PM",
-        status: "upcoming",
-        members: [
-          Users(
-            empId: "STU003",
-            name: "Fatima",
-            email: "fatima@mail.com",
-            role: "Student",
-          ),
-          Users(
-            empId: "T003",
-            name: "John",
-            email: "john@mail.com",
-            role: "Teacher",
-          ),
-          Users(
-            empId: "ADV001",
-            name: "Fathima",
-            email: "advisor@mail.com",
-            role: "Advisor",
-          ),
-        ],
-      ),
-      Meet(
-        id: "MT004",
-        title: "Physics Problem Solving",
-        date: DateTime.now().subtract(const Duration(days: 2)),
-        startTime: "02:00 PM",
-        endTime: "03:00 PM",
-        status: "finished",
-        members: [
-          Users(
-            empId: "ST04",
-            name: "Arjun",
-            email: "arjun@mail.com",
-            role: "Student",
-          ),
-          Users(
-            empId: "T003",
-            name: "Meera",
-            email: "meera@mail.com",
-            role: "Teacher",
-          ),
-          Users(
-            empId: "COO1001",
-            name: "Maria",
-            email: "maria@mail.com",
-            role: "Coordinator",
-          ),
-        ],
-      ),
-      Meet(
-        id: "MT005",
-        title: "Chemistry Quick Revision",
-        date: DateTime.now().add(const Duration(hours: 5)),
-        startTime: "04:00 PM",
-        endTime: "05:00 PM",
-        status: "upcoming",
-        members: [
-          Users(
-            empId: "ST05",
-            name: "Nisha",
-            email: "nisha@mail.com",
-            role: "Student",
-          ),
-          Users(
-            empId: "T002",
-            name: "David",
-            email: "david@mail.com",
-            role: "Teacher",
-          ),
-        ],
-      ),
-      Meet(
-        id: "MT006",
-        title: "Biology Live Discussion",
-        date: DateTime.now(),
-        startTime: "08:30 AM",
-        endTime: "09:15 AM",
-        status: "finished",
-        members: [
-          Users(
-            empId: "ST06",
-            name: "Ali",
-            email: "ali@mail.com",
-            role: "Student",
-          ),
-          Users(
-            empId: "T003",
-            name: "Meera",
-            email: "meera@mail.com",
-            role: "Teacher",
-          ),
-          Users(
-            empId: "MTR002",
-            name: "David",
-            email: "mentor@mail.com",
-            role: "Mentor",
-          ),
-        ],
-      ),
-    ];
+      activeCount.value = active.count;
+      actionCount.value = action.count;
+      upcomingCount.value = upcoming.count;
+      pendingCount.value = pending.count;
+      completedCount.value = completed.count;
+      meetCount.value = meets.length;
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   void onStudentSelected(Student student) {
@@ -835,6 +272,18 @@ class SessionController extends GetxController {
     }
   }
 
+  Future<SessionDetail?> fetchSessionDetail(String id) async {
+    try {
+      isSessionDetailLoading.value = true;
+
+      return await Api().getSessionDetail(id);
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      isSessionDetailLoading.value = false;
+    }
+  }
+
   Future<void> _mockUsers(String type) async {
     await Future.delayed(const Duration(milliseconds: 500));
     switch (type) {
@@ -864,8 +313,8 @@ class SessionController extends GetxController {
                     standard: '',
                     syllabus: '',
                     status: '',
-                    packageFee: 0,
-                    takenFee: 0,
+                    // packageFee: 0,
+                    // takenFee: 0,
                     balance: 0,
                     withdrawals: [],
                     time: '',
@@ -947,7 +396,6 @@ class SessionController extends GetxController {
           Advisor(
             id: "ADV001",
             name: "Fathima",
-            joinedAt: DateTime.now(),
           ),
         ]);
         break;
@@ -1039,53 +487,53 @@ class SessionController extends GetxController {
   }
 
   void applyFilters() {
-    List<Session> temp = sessions;
-
-    /// 🎯 Tab-based status filter
-    final status = statusMap[selectedTab.value];
-    temp = temp.where((s) => s.status == status).toList();
+    List<Session> temp = List<Session>.from(sessions);
 
     /// 🔍 Search
     if (searchQuery.value.isNotEmpty) {
       final query = searchQuery.value.toLowerCase();
 
       temp = temp.where((s) {
-        return s.student!.name.toLowerCase().contains(query) ||
-            s.teacher!.name.toLowerCase().contains(query);
+        return (s.student?.name ?? '').toLowerCase().contains(query) ||
+            (s.teacher?.name ?? '').toLowerCase().contains(query);
       }).toList();
     }
 
-    /// ↕️ Sort (keep if needed)
+    /// ↕️ Sort
     if (sortType.value == SessionSortType.newest) {
       temp.sort((a, b) {
-        final ad = a.date;
-        final bd = b.date;
+        final ad = a.sessionDate;
+        final bd = b.sessionDate;
 
         if (ad == null && bd == null) return 0;
         if (ad == null) return 1;
         if (bd == null) return -1;
 
-        return bd.compareTo(ad); // newest first
+        return bd.compareTo(ad);
       });
     } else if (sortType.value == SessionSortType.oldest) {
       temp.sort((a, b) {
-        final ad = a.date;
-        final bd = b.date;
+        final ad = a.sessionDate;
+        final bd = b.sessionDate;
 
         if (ad == null && bd == null) return 0;
         if (ad == null) return 1;
         if (bd == null) return -1;
 
-        return ad.compareTo(bd); // oldest first
+        return ad.compareTo(bd);
       });
     } else if (sortType.value == SessionSortType.student) {
-      temp.sort((a, b) => a.student!.name.compareTo(b.student!.name));
+      temp.sort(
+          (a, b) => (a.student?.name ?? '').compareTo(b.student?.name ?? ''));
     } else if (sortType.value == SessionSortType.teacher) {
-      temp.sort((a, b) => a.teacher!.name.compareTo(b.teacher!.name));
+      temp.sort(
+          (a, b) => (a.teacher?.name ?? '').compareTo(b.teacher?.name ?? ''));
     }
 
-    /// ✅ Final update
     filteredSessions.assignAll(temp);
+
+    log("Sessions: ${sessions.length}");
+    log("Filtered: ${filteredSessions.length}");
   }
 
   Future<void> pickTime(BuildContext context) async {
@@ -1116,20 +564,20 @@ class SessionController extends GetxController {
     // teacherList.addAll(uniqueTeachers);
 
     // ✅ Set initial values safely
-    selectedDuration.value =
-        durationOptions.contains(data.duration) ? data.duration : null;
+    // selectedDuration.value =
+    //     durationOptions.contains(data.duration) ? data.duration : null;
 
     // selectedTeacher.value =
     //     teacherList.contains(data.teacher?.name) ? data.teacher?.name : null;
 
-    // Controllers
-    dateController = TextEditingController(
-      text: "${data.date?.day}/${data.date?.month}/${data.date?.year}",
-    );
+    // // Controllers
+    // dateController = TextEditingController(
+    //   text: "${data.sesdate?.day}/${data.date?.month}/${data.date?.year}",
+    // );
 
-    timeController = TextEditingController(
-      text: "${data.date?.hour}:${data.date?.minute}",
-    );
+    // timeController = TextEditingController(
+    //   text: "${data.date?.hour}:${data.date?.minute}",
+    // );
 
     salaryController =
         TextEditingController(text: data.teacherSalary.toString());
@@ -1153,14 +601,14 @@ class SessionController extends GetxController {
     // );
   }
 
-  void loadSession(Session session) {
-    dateController.text = DateFormat('dd/MM/yyyy').format(session.date!);
-    selectedDate.value = session.date!;
-    selectedDuration.value = session.duration;
-    selectedTeacher.value = session.teacher;
+  // void loadSession(Session session) {
+  //   dateController.text = DateFormat('dd/MM/yyyy').format(session.date!);
+  //   selectedDate.value = session.date!;
+  //   selectedDuration.value = session.duration;
+  //   selectedTeacher.value = session.teacher;
 
-    salaryController.text = session.teacherSalary?.toString() ?? '';
-  }
+  //   salaryController.text = session.teacherSalary?.toString() ?? '';
+  // }
 
   void updateSession(String id) {
     final updatedData = {
@@ -1196,11 +644,13 @@ class SessionController extends GetxController {
       icon: Icons.description,
       formKey: GlobalKey<FormState>(),
       isViewOnly: false,
-     submitWidget: Text(
-      "Save Report",
-      style:
-          Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(color: Colors.white),
-    ),
+      submitWidget: Text(
+        "Save Report",
+        style: Theme.of(Get.context!)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
+      ),
       onSubmit: controller.saveReport,
       sections: [
         SessionReportDialogBody(controller: controller),

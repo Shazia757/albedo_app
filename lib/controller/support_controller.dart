@@ -1,6 +1,12 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
+import 'package:albedo_app/model/settings/syllabus_model.dart';
 import 'package:albedo_app/model/support_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -31,19 +37,26 @@ class SupportController extends GetxController {
   var filteredTickets = <Ticket>[].obs;
   RxString selectedType = "student".obs;
   RxList<String> categoryList = <String>[].obs;
+  RxList<Syllabus> categories = <Syllabus>[].obs;
+  RxList<Student> students = <Student>[].obs;
+  RxList<Teacher> teachers = <Teacher>[].obs;
+  Rx<Syllabus?> selectedCategory = Rx<Syllabus?>(null);
+  Rx<Student?> selectedStudent = Rx<Student?>(null);
+  Rx<Teacher?> selectedTeacher = Rx<Teacher?>(null);
+  Rx<String?> selectedPriorityList = Rx<String?>(null);
 
   RxBool isSearching = false.obs;
   RxBool isLoading = true.obs;
   RxBool isDeleteButtonLoading = false.obs;
 
-  final statusMap = ['open', 'closed'];
+  final statusMap = ['OPEN', 'CLOSED'];
 
   TextEditingController titleController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
   TextEditingController priorityController = TextEditingController();
   TextEditingController userTypeController = TextEditingController();
-  TextEditingController stuNameController = TextEditingController();
-  TextEditingController teaNameController = TextEditingController();
+  TextEditingController studentController = TextEditingController();
+  TextEditingController teacherController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
   @override
@@ -58,64 +71,45 @@ class SupportController extends GetxController {
 
       final user = auth.activeUser;
 
-      await Future.delayed(const Duration(seconds: 2));
+      final List<Ticket> all = await Api().getSupportTickets();
 
-      final all = _getDummyTickets();
+      List<Ticket> filtered;
 
-      List<Ticket> result;
-
-      if (user?.role == "admin") {
-        result = all; // full access
-      } else if (user?.role == "coordinator") {
-        result = all.where((t) => t.coordinatorId == user!.id).toList();
-      } else if (user?.role == "teacher") {
-        result = all.where((t) => t.teacherId == user!.id).toList();
-      } else if (user?.role == "student") {
-        result = all.where((t) => t.studentId == user!.id).toList();
+      if (user?.role == "ADMIN") {
+        filtered = all; // full access
+      } else if (user?.role == "COORDINATOR") {
+        filtered = all.where((t) => t.coordinatorId == user!.id).toList();
+      } else if (user?.role == "TEACHER") {
+        filtered = all.where((t) => t.teacher!.id == user!.id).toList();
+      } else if (user?.role == "STUDENT") {
+        filtered = all.where((t) => t.student!.studentId == user!.id).toList();
       } else {
-        result = [];
+        filtered = [];
       }
 
-      allTickets.assignAll(result);
+      allTickets.assignAll(filtered);
+      log(allTickets.toString());
       applyFilters();
+
+      final List<Student> studentList = await Api().getStudentList();
+
+      students.assignAll(studentList);
+      final List<Teacher> teacherList = await Api().getTeacherList();
+
+      teachers.assignAll(teacherList);
+      final List<Syllabus> categoryList = await Api().getSupportCategories();
+
+      categories.assignAll(categoryList);
     } catch (e) {
-      print("Error: $e");
+      log(e.toString());
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        colorText: Theme.of(Get.context!).colorScheme.shadow,
+      );
     } finally {
       isLoading.value = false;
     }
-  }
-
-  List<Ticket> _getDummyTickets() {
-    return [
-      Ticket(
-        id: "SUP001",
-        title: "Login Issue",
-        description: "Unable to login",
-        status: "open",
-        studentId: "STU001",
-      ),
-      Ticket(
-        id: "SUP002",
-        title: "Payment Failed",
-        description: "Amount deducted",
-        status: "open",
-        teacherId: "T001",
-      ),
-      Ticket(
-        id: "SUP003",
-        title: "App Crash",
-        description: "Crash on dashboard",
-        status: "closed",
-        coordinatorId: "COO1001",
-      ),
-      Ticket(
-        id: "SUP004",
-        title: "Wrong Data",
-        description: "Incorrect data",
-        status: "closed",
-        studentId: "STU002",
-      ),
-    ];
   }
 
   void applyFilters() {
@@ -150,31 +144,70 @@ class SupportController extends GetxController {
     return allTickets.where((e) => e.status == statusMap[index]).length;
   }
 
-  void loadTicket(Ticket ticket) {
-    titleController.text = ticket.title.toString();
-    categoryController.text = ticket.category.toString();
-    priorityController.text = ticket.priority.toString();
-    userTypeController.text = ticket.userType.toString();
-    stuNameController.text = ticket.studentName.toString();
-    teaNameController.text = ticket.teacherName.toString();
+  Future<Ticket?> addTicket(String name) async {
+    isLoading.value = true;
+
+    try {
+      final result = await Api().addTicket(name);
+
+      return result;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+      );
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  delete(String id) {
-    isDeleteButtonLoading.value = true;
-    // Api().deleteProgram(id).then(
-    //   (value) {
-    //     if (value?.status == true) {
-    //       isDeleteButtonLoading.value = false;
-    //       Get.back();
-    //       Get.back();
-    //       Get.snackbar(
-    //           "Success", value?.message ?? "Program deleted successfully.");
-    //     } else {
-    //       // CustomWidgets.showSnackBar(
-    //       //     "Error", value?.message ?? 'Failed to delete program.');
-    //     }
-    //   },
-    // );
+  Future<bool> updateTicket(
+      {required String id, required String ticket}) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().updateTicket(id, ticket);
+
+      if (success) {
+        if (Get.isDialogOpen ?? false) Get.back();
+        Get.snackbar("Success", "Updated successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Update failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> deleteTicket(
+    String id,
+  ) async {
+    isLoading.value = true;
+
+    try {
+      final success = await Api().deleteTicket(id);
+
+      if (success) {
+        allTickets.removeWhere((e) => e.id == id);
+
+        Get.snackbar("Success", "Deleted successfully");
+        return true;
+      } else {
+        Get.snackbar("Error", "Delete failed");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void postReply({
@@ -195,11 +228,10 @@ class SupportController extends GetxController {
       createdAt: DateTime.now(),
     );
 
-    /// 🔥 Important: make list mutable
     final updatedReplies = List<Reply>.from(ticket.replies);
     updatedReplies.add(reply);
 
-    ticket.replies = updatedReplies;
+    // ticket.replies = updatedReplies;
 
     /// 🔁 trigger UI update
     filteredTickets.refresh();

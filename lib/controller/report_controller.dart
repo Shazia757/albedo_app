@@ -87,8 +87,8 @@ class ReportsController extends GetxController {
             allStudents.where((s) => s.coordinator?.id == user!.id).toList();
         teacherResult =
             allTeachers.where((s) => s.coordinator?.id == user!.id).toList();
-        advisorResult =
-            allAdvisors.where((a) => a.coordinatorId == user!.id).toList();
+        // advisorResult =
+        //     allAdvisors.where((a) => a.coordinatorId == user!.id).toList();
       } else if (user?.role == "teacher") {
         studentResult =
             allStudents.where((s) => s.teacherId == user!.id).toList();
@@ -99,8 +99,8 @@ class ReportsController extends GetxController {
             allStudents.where((s) => s.mentor?.id == user!.id).toList();
         teacherResult =
             allTeachers.where((s) => s.mentor?.id == user!.id).toList();
-        advisorResult =
-            allAdvisors.where((a) => a.mentorId == user!.id).toList();
+        // advisorResult =
+        //     allAdvisors.where((a) => a.mentorId == user!.id).toList();
       } else {
         studentResult = [];
         teacherResult = [];
@@ -109,10 +109,10 @@ class ReportsController extends GetxController {
 
       students.assignAll(studentResult);
       teachers.assignAll(teacherResult);
-      advisors.assignAll(advisorResult);
+      // advisors.assignAll(advisorResult);
       filteredStudents.assignAll(studentResult);
       filteredTeachers.assignAll(teacherResult);
-      filteredAdvisors.assignAll(advisorResult);
+      // filteredAdvisors.assignAll(advisorResult);
 
       final responses = _getDummyRecommendationResponses();
 
@@ -211,52 +211,24 @@ class ReportsController extends GetxController {
         id: "ADV1001",
         name: "Aisha Rahman",
         email: "aisha@email.com",
-        status: "Active",
-        gender: "Female",
-        joinedAt: DateTime.now(),
         phone: "+919876543210",
-        whatsapp: "+919876543210",
-        convertedStudents: 25,
-        qualification: "MBA",
-        place: "Malappuram",
-        pincode: "676505",
-        address: "Green Valley, Malappuram",
-        dob: "1995-06-12",
-        imageUrl: "",
+    
       ),
       Advisor(
         id: "ADV1002",
         name: "Rahul Nair",
         email: "rahul@email.com",
-        status: "Inactive",
-        gender: "Male",
-        joinedAt: DateTime.parse('2024-11-15 10:30:00'),
+      
         phone: "+919123456789",
-        whatsapp: "+919123456789",
-        convertedStudents: 12,
-        qualification: "B.Tech",
-        place: "Kozhikode",
-        pincode: "673001",
-        address: "City Center, Kozhikode",
-        dob: "1993-02-20",
-        imageUrl: "",
+      
       ),
       Advisor(
         id: "ADV1003",
         name: "Fatima Noor",
         email: "fatima@email.com",
-        status: "Active",
-        gender: "Female",
-        joinedAt: DateTime.parse('2025-01-10 08:00:00'),
+       
         phone: "+918765432198",
-        whatsapp: "+918765432198",
-        convertedStudents: 40,
-        qualification: "M.Com",
-        place: "Perintalmanna",
-        pincode: "679322",
-        address: "Near Town Hall, Perintalmanna",
-        dob: "1996-09-05",
-        imageUrl: "",
+      
       ),
     ];
   }

@@ -1,6 +1,7 @@
 import 'package:albedo_app/controller/package_controller.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/settings/hiring_ad_model.dart';
+import 'package:albedo_app/model/settings/syllabus_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -45,12 +46,12 @@ class AddBatchPackagePage extends StatelessWidget {
                           CustomWidgets().labelWithAsterisk('Package Name',
                               required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<Package>(
+                          CustomWidgets().customDropdownField<Syllabus>(
                             context: context,
                             hint: 'Select Package',
-                            items: c.packagesList,
+                            items: c.packageNamesList,
                             value: c.selectedPackage.value,
-                            itemLabel: (p) => p.subjectName ?? "",
+                            itemLabel: (p) => p.name ?? "",
                             onChanged: (p0) => c.selectedPackage.value = p0,
                           ),
                           SizedBox(height: 10),
@@ -58,38 +59,38 @@ class AddBatchPackagePage extends StatelessWidget {
                           CustomWidgets()
                               .labelWithAsterisk('Syllabus', required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<String>(
-                            context: context,
-                            hint: 'Select Syllabus',
-                            items: c.syllabusList,
-                            onChanged: (p0) => c.selectedSyllabus.value = p0,
-                            value: c.selectedSyllabus.value,
-                            itemLabel: (item) => item,
-                          ),
+                          // CustomWidgets().customDropdownField<String>(
+                          //   context: context,
+                          //   hint: 'Select Syllabus',
+                          //   items: c.syllabusList,
+                          //   onChanged: (p0) => c.selectedSyllabus.value = p0,
+                          //   value: c.selectedSyllabus.value,
+                          //   itemLabel: (item) => item,
+                          // ),
                           SizedBox(height: 10),
                           CustomWidgets()
                               .labelWithAsterisk('Category', required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<String>(
-                            context: context,
-                            hint: 'Select Category',
-                            items: c.categoryList,
-                            onChanged: (p0) => c.selectedCategory.value = p0,
-                            value: c.selectedCategory.value,
-                            itemLabel: (item) => item,
-                          ),
+                          // CustomWidgets().customDropdownField<String>(
+                          //   context: context,
+                          //   hint: 'Select Category',
+                          //   items: c.categoryList,
+                          //   onChanged: (p0) => c.selectedCategory.value = p0,
+                          //   value: c.selectedCategory.value,
+                          //   itemLabel: (item) => item,
+                          // ),
                           SizedBox(height: 10),
                           CustomWidgets()
                               .labelWithAsterisk('Standard', required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<String>(
-                            context: context,
-                            hint: 'Select Standard',
-                            items: c.categoryList,
-                            onChanged: (p0) => c.selectedStandard.value = p0,
-                            value: c.selectedStandard.value,
-                            itemLabel: (item) => item,
-                          ),
+                          // CustomWidgets().customDropdownField<String>(
+                          //   context: context,
+                          //   hint: 'Select Standard',
+                          //   items: c.categoryList,
+                          //   onChanged: (p0) => c.selectedStandard.value = p0,
+                          //   value: c.selectedStandard.value,
+                          //   itemLabel: (item) => item,
+                          // ),
                           SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Number of Classes',
                               required: true),

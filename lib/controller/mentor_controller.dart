@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
+import 'package:albedo_app/config/urls.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/users/coordinator_model.dart';
@@ -36,6 +40,15 @@ class MentorController extends GetxController {
   final RxString unlockFrom = ''.obs;
   final RxString unlockTo = ''.obs;
   final RxString reLockAfter = ''.obs;
+  final currentPage = 0.obs;
+  final totalCount = 0.obs;
+  final unassignedCount = 0.obs;
+  RxList<Coordinator> coordinators = <Coordinator>[].obs;
+  List<Mentor> allMentors = [];
+
+  final coordinatorCounts = <String, int>{}.obs;
+
+  int get totalPages => (totalCount.value / 10).ceil();
 
   final RxString targetType = 'All Students'.obs;
 
@@ -111,13 +124,13 @@ class MentorController extends GetxController {
 
     final tab = tabs[index];
 
-    if (tab == "All") return mentors.length;
+    if (tab == "All") return totalCount.value;
 
     if (tab == "Unassigned") {
-      return mentors.where((m) => m.coordinator == null).length;
+      return unassignedCount.value;
     }
 
-    return mentors.where((m) => m.coordinator?.name == tab).length;
+    return coordinatorCounts[tab] ?? 0;
   }
 
   TextEditingController nameController = TextEditingController();
@@ -161,8 +174,10 @@ class MentorController extends GetxController {
   ].obs;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
+    await fetchCoordinators();
+    buildTabs();
     fetchMentors();
     addExperience();
     selectedStudents.add({
@@ -171,108 +186,114 @@ class MentorController extends GetxController {
     });
   }
 
+  Future<void> fetchCoordinators() async {
+    try {
+      isLoading.value = true;
+
+      final List<Coordinator> coordinatorList =
+          await Api().getCoordinatorList();
+
+      coordinators.assignAll(coordinatorList);
+    } catch (e) {
+      log(e.toString());
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        colorText: Theme.of(Get.context!).colorScheme.shadow,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> fetchMentors() async {
     try {
       isLoading.value = true;
 
-      final user = auth.activeUser;
+      final response = await Api().getMentorDetails(
+        url: Urls.mentors,
+        page: 1,
+        pageSize: 1000,
+      );
 
-      await Future.delayed(const Duration(seconds: 2));
+      allMentors.assignAll(response.results);
 
-      final allMentors = _getDummyMentors();
-
-      List<Mentor> result;
-
-      if (user?.role == "admin") {
-        result = allMentors;
-      } else if (user?.role == "coordinator") {
-        result =
-            allMentors.where((m) => m.coordinator?.id == user!.id).toList();
-      } else if (user?.role == "mentor") {
-        // Mentor should usually see only themselves
-        result = allMentors.where((m) => m.id == user!.id).toList();
-      } else {
-        result = [];
-      }
-
-      mentors.assignAll(result);
-      buildTabs();
+      await loadMentorCounts();
       applyFilters();
-    } catch (e) {
-      print("Error: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
   void buildTabs() {
-    final coordinatorNames = mentors
-        .map((m) => m.coordinator?.name)
-        .whereType<String>() // removes null safely
-        .toSet()
-        .toList()
-      ..sort();
+    final names = coordinators.map((c) => c.name).toSet().toList()..sort();
 
     tabs.value = [
       "All",
-      ...coordinatorNames,
+      ...names,
       "Unassigned",
     ];
 
-    selectedTab.value = 0;
+    if (selectedTab.value >= tabs.length) {
+      selectedTab.value = 0;
+    }
   }
 
-  List<Mentor> _getDummyMentors() {
-    return [
-      Mentor(
-        empId: "MTR1001",
-        name: "Maria",
-        status: "Active",
-        phone: "123456",
-        joinedAt: DateTime.now(),
-        coordinator: Coordinator(
-          id: "COO1001",
-          name: "Ameen",
-          joinedAt: DateTime.now(),
-        ),
-      ),
-      Mentor(
-        empId: "MTR1002",
-        name: "Nick",
-        status: "Inactive",
-        phone: "+9876543210",
-        joinedAt: DateTime.parse('2024-12-01 09:00:00'),
-        coordinator: Coordinator(
-          id: "COO1002",
-          name: "Rahul",
-          joinedAt: DateTime.now(),
-        ),
-      ),
-      Mentor(
-        empId: "MTR1003",
-        name: "Sara",
-        status: "Active",
-        phone: "55555",
-        joinedAt: DateTime.now(),
-        coordinator: null, // 👈 Unassigned
-      ),
-    ];
+  Future<void> loadMentorCounts() async {
+    try {
+      /// ALL
+      final allResponse = await Api().getMentorDetails(
+        url: Urls.mentors,
+        page: 1,
+        pageSize: 1,
+      );
+
+      totalCount.value = allResponse.count;
+
+      /// UNASSIGNED
+      final unassignedResponse = await Api().getMentorDetails(
+        url: "${Urls.mentors}?assistant_admin=null",
+        page: 1,
+        pageSize: 1,
+      );
+
+      unassignedCount.value = unassignedResponse.count;
+
+      /// COORDINATOR COUNTS
+      for (final coordinator in coordinators) {
+        final response = await Api().getMentorDetails(
+          url: "${Urls.mentors}?assistant_admin=${coordinator.id}",
+          page: 1,
+          pageSize: 1,
+        );
+
+        coordinatorCounts[coordinator.name ?? ''] = response.count;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   void applyFilters() {
     if (tabs.isEmpty) return;
 
-    List<Mentor> temp = mentors;
+    List<Mentor> temp = List.from(allMentors);
 
     final selected = tabs[selectedTab.value];
 
-    // 🎯 Tab filter
-    if (selected == "All") {
-      // no filter
-    } else if (selected == "Unassigned") {
-      temp = temp.where((t) => t.coordinator == null).toList();
-    } else {
-      temp = temp.where((t) => t.coordinator?.name == selected).toList();
+    // --------------------------
+    // TAB FILTER (CRITICAL FIX)
+    // --------------------------
+    if (selected == "Unassigned") {
+      temp = temp.where((m) => m.coordinator?.id == null).toList();
+    } else if (selected != "All") {
+      final coordinator = coordinators.firstWhereOrNull(
+        (c) => c.name == selected,
+      );
+
+      if (coordinator != null) {
+        temp = temp.where((m) => m.coordinator?.id == coordinator.id).toList();
+      }
     }
 
     if (selectedRating.value != 0) {
@@ -345,23 +366,23 @@ class MentorController extends GetxController {
     if (user?.role == "coordinator") {
       CustomWidgets().showDeleteDialog(
         dltText: Obx(
-  () => isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
+          () => isLoading.value
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  "Yes",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: Colors.white),
+                ),
         ),
-),
         title: 'Are you sure?',
         context: context,
         text: "Do you want to request deletion of this mentor?",
@@ -370,23 +391,23 @@ class MentorController extends GetxController {
     } else {
       CustomWidgets().showDeleteDialog(
         dltText: Obx(
-  () => isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
+          () => isLoading.value
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  "Yes",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: Colors.white),
+                ),
         ),
-),
         title: 'Are you sure?',
         context: context,
         text: "Are you sure you want to delete this mentor permanently?",

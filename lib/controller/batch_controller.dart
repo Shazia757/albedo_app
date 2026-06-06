@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:albedo_app/api.dart';
 import 'package:albedo_app/controller/auth_controller.dart';
 import 'package:albedo_app/model/batch_model.dart';
 import 'package:albedo_app/model/package_model.dart';
@@ -17,12 +20,20 @@ class BatchController extends GetxController {
   var selectedIndex = 0.obs;
 
   var batches = <Batch>[].obs;
+
+  final currentPage = 1.obs;
+  final RxInt totalCount = 0.obs;
+  final isLoading = false.obs;
+  final hasMore = true.obs;
+
+  final int pageSize = 10;
+  final activeCount = 0.obs;
+  final inactiveCount = 0.obs;
   var filteredBatches = <Batch>[].obs;
   final tabs = ["Active", "Inactive"];
   var selectedTab = 0.obs;
   var searchQuery = ''.obs;
   var sortType = SortType.newest.obs;
-  var isLoading = true.obs;
   var isDeleteButtonLoading = true.obs;
   RxList<Student> studentsList = <Student>[].obs;
   Rx<Student?> selectedStudent = Rx<Student?>(null);
@@ -35,19 +46,6 @@ class BatchController extends GetxController {
     "Payments",
     "Materials",
   ];
-
-  // --------------------------
-  // Counts for tabs
-  // --------------------------
-
-  int get activeCount => batches.where((e) => e.status == "Active").length;
-
-  int get inactiveCount => batches.where((e) => e.status == "Inactive").length;
-
-  List<Map<String, dynamic>> get tabData => [
-        {"label": "Active", "count": activeCount},
-        {"label": "Inactive", "count": inactiveCount},
-      ];
 
   TextEditingController batchNameController = TextEditingController();
   TextEditingController batchCodeController = TextEditingController();
@@ -62,85 +60,61 @@ class BatchController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    loadTabCounts();
     fetchBatches();
   }
 
   /// --------------------------
   /// Fetch
   /// --------------------------
-  void fetchBatches() async {
+  Future<void> fetchBatches() async {
     try {
       isLoading.value = true;
 
-      // 🔥 Replace with your API call
-      await Future.delayed(const Duration(seconds: 2));
+      final bool isLive = selectedTab.value == 0;
 
-      batches.assignAll([
-        Batch(
-          student: [
-            Student(
-                name: 'Nivina',
-                spotFee: 1000,
-                totalAmount: 2000,
-                status: 'completed')
-          ],
-          payment: [
-            PaymentItem(
-                id: '1',
-                studentName: 'Nivina',
-                studentId: '',
-                paymentDate: DateTime.now(),
-                amount: 1000,
-                balance: 2000,
-                status: 'pending')
-          ],
-          packages: [
-            Package(
-              name: "NEET Biology Foundation",
-              standard: "Plus One",
-              syllabus: "CBSE",
-              timeCompleted: 1620,
-              timeTotal: 2700,
-              teacherSalaryPerHour: 850,
-              teacher: Teacher(
-                id: "TCH102",
-                name: "Afsal Rahman",
-                imageUrl: "https://i.pravatar.cc/300?img=12",
-              ),
-            ),
-            Package(
-              name: "JEE Advanced Physics",
-              standard: "Plus Two",
-              syllabus: "NCERT",
-              sessionsCompleted: 25,
-              sessionsTotal: 40,
-              timeCompleted: 2250,
-              timeTotal: 3600,
-              teacherSalaryPerHour: 1200,
-              teacher: Teacher(
-                id: "TCH204",
-                name: "Nihal Basheer",
-                imageUrl: "https://i.pravatar.cc/300?img=15",
-              ),
-            ),
-          ],
-          batchName: 'ATTC PROGRAME COURSE BATCH 1',
-          batchID: 'B-ATTAP2601',
-          status: "Active",
-        ),
-        Batch(
-          batchName: '10 TH CBSE BATCH 1 2026-2027',
-          batchID: 'B-10 MA2601',
-          status: "Active",
-        ),
-      ]);
-      filteredBatches.assignAll(batches);
+      final response = await Api().getStudentBatches(
+        page: currentPage.value + 1,
+        pageSize: 10,
+        isLive: isLive,
+      );
+
+      batches.assignAll(response.results);
+      totalCount.value = response.count;
+
+      applyFilters();
     } catch (e) {
-      print("Error: $e");
+      log(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
+
+  Future<void> loadTabCounts() async {
+    try {
+      final activeResponse = await Api().getStudentBatches(
+        page: 1,
+        pageSize: 1,
+        isLive: true,
+      );
+
+      final inactiveResponse = await Api().getStudentBatches(
+        page: 1,
+        pageSize: 1,
+        isLive: false,
+      );
+
+      activeCount.value = activeResponse.count;
+      inactiveCount.value = inactiveResponse.count;
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  List<Map<String, dynamic>> get tabData => [
+        {"label": "Active", "count": activeCount.value},
+        {"label": "Inactive", "count": inactiveCount.value},
+      ];
 
   /// --------------------------
   /// Filters
@@ -148,52 +122,48 @@ class BatchController extends GetxController {
   void applyFilters() {
     List<Batch> temp = batches;
 
-    // Tabs
-    switch (selectedTab.value) {
-      case 0:
-        temp = temp.where((s) => s.status == "Active").toList();
-        break;
-      case 1:
-        temp = temp.where((s) => s.status == "Inactive").toList();
-        break;
-    }
-
     // Search
     if (searchQuery.value.isNotEmpty) {
       temp = temp
           .where((s) =>
-              s.batchName!
+              s.name!
                   .toLowerCase()
                   .contains(searchQuery.value.toLowerCase()) ||
-              s.batchID!
+              s.id!
                   .toLowerCase()
                   .contains(searchQuery.value.toLowerCase()))
           .toList();
     }
 
-    // Sort
-    // if (sortType.value == SortType.newest) {
-    //   temp.sort((a, b) => b..compareTo(a.joinedAt));
-    // } else if (sortType.value == SortType.oldest) {
-    //   temp.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
-    // } else
     if (sortType.value == SortType.name) {
-      temp.sort((a, b) => a.batchName!.compareTo(b.batchName!));
+      temp.sort((a, b) => a.name!.compareTo(b.name!));
     }
 
     filteredBatches.assignAll(temp);
   }
 
   void loadBatches(Batch batch) {
-    batchNameController.text = batch.batchName.toString();
-    batchModeController.text = batch.mode.toString();
-    batchNameController.text = batch.batchName.toString();
+    batchNameController.text = batch.name.toString();
+    // batchModeController.text = batch.mode.toString();
     mentorController.text = batch.mentor?.name ?? '';
+  }
+
+  final itemsPerPage = 10;
+
+  int get totalPages => (totalCount.value / pageSize).ceil();
+
+  List<Batch> get paginatedBatches {
+    final start = currentPage.value * itemsPerPage;
+    final end = (start + itemsPerPage) > filteredBatches.length
+        ? filteredBatches.length
+        : (start + itemsPerPage);
+
+    return filteredBatches.sublist(start, end);
   }
 
   final batch = Batch(
     id: "BTH001",
-    batchName: "NEET Evening Batch",
+    name: "NEET Evening Batch",
   );
 
   final payments = [
@@ -245,23 +215,23 @@ class BatchController extends GetxController {
     if ((user?.role == "coordinator") || (user?.role == "mentor")) {
       CustomWidgets().showDeleteDialog(
         dltText: Obx(
-  () => isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
+          () => isLoading.value
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  "Yes",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: Colors.white),
+                ),
         ),
-),
         title: 'Are you sure?',
         context: context,
         text: "Do you want to request deletion of this batch?",
@@ -270,23 +240,23 @@ class BatchController extends GetxController {
     } else {
       CustomWidgets().showDeleteDialog(
         dltText: Obx(
-  () => isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
+          () => isLoading.value
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  "Yes",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: Colors.white),
+                ),
         ),
-),
         title: 'Are you sure?',
         context: context,
         text: "Are you sure you want to delete this batch permanently?",

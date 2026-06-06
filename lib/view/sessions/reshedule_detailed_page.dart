@@ -49,21 +49,21 @@ class RescheduleRequestsDetailedPage extends StatelessWidget {
                   /// HEADER CARD
                   InkWell(
                     onTap: () {
-                      if (isStudent) {
-                        Get.to(
-                          () => StudentDetailsPage(
-                            student: student!.student,
-                            initialIndex: 0,
-                          ),
-                        );
-                      } else {
-                        Get.to(
-                          () => TeacherDetailsPage(
-                            teacher: teacher!.teacher,
-                            initialIndex: 0,
-                          ),
-                        );
-                      }
+                      // if (isStudent) {
+                      //   Get.to(
+                      //     () => StudentDetailsPage(
+                      //       student: student!.student,
+                      //       initialIndex: 0,
+                      //     ),
+                      //   );
+                      // } else {
+                      //   Get.to(
+                      //     () => TeacherDetailsPage(
+                      //       teacher: teacher!.teacher,
+                      //       initialIndex: 0,
+                      //     ),
+                      //   );
+                      // }
                     },
                     child: Container(
                       padding: const EdgeInsets.all(16),

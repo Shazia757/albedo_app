@@ -26,6 +26,7 @@ class CoordinatorPage extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final auth = Get.find<AuthController>();
     final role = auth.activeUser?.role;
+    final normalizedRole = role?.trim().toLowerCase();
 
     final isCustom = ![
       "admin",
@@ -37,7 +38,7 @@ class CoordinatorPage extends StatelessWidget {
       "finance",
       "sales",
       "hr"
-    ].contains(role);
+    ].contains(normalizedRole);
 
     return SafeArea(
       child: Scaffold(
@@ -158,23 +159,26 @@ class CoordinatorPage extends StatelessWidget {
 
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 12),
+                                      horizontal: 4, vertical: 4),
                                   child: Align(
                                     alignment: Alignment.center,
                                     child: ConstrainedBox(
                                       constraints:
                                           const BoxConstraints(maxWidth: 700),
                                       child: PremiumInfoCard(
-                                        id: coordinator.id ?? "",
+                                        id: coordinator.empId ?? "",
                                         title: coordinator.name ?? "",
                                         subtitle: coordinator.email ?? "",
                                         status: coordinator.status,
                                         statusColor:
                                             getStatusColor(coordinator.status),
                                         footerText:
-                                            "Joined • ${coordinator.joinedAt.toString().substring(0, 16)}",
-                                        extraInfo: coordinator.phone != null
-                                            ? "Contact • ${coordinator.phone}"
+                                           coordinator.phone != null
+                                        ? "Contact • ${coordinator.phone}"
+                                        : "",
+                                        extraWidget: coordinator.phone != null
+                                            ? Text(
+                                                "Contact • ${coordinator.phone}")
                                             : null,
                                         onTap: () {
                                           (!isCustom ||
@@ -235,24 +239,28 @@ class CoordinatorPage extends StatelessWidget {
                                               color: cs.error,
                                               onTap: () => CustomWidgets()
                                                   .showDeleteDialog(
-                                                    dltText: Obx(
-  () => c.isLoading.value
-      ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
-      : Text(
-          "Yes",
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(color: Colors.white),
-        ),
-),
+                                                dltText: Obx(
+                                                  () => c.isLoading.value
+                                                      ? const SizedBox(
+                                                          width: 18,
+                                                          height: 18,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                            color: Colors.white,
+                                                          ),
+                                                        )
+                                                      : Text(
+                                                          "Yes",
+                                                          style: Theme.of(
+                                                                  context)
+                                                              .textTheme
+                                                              .titleSmall!
+                                                              .copyWith(
+                                                                  color: Colors
+                                                                      .white),
+                                                        ),
+                                                ),
                                                 title: 'Are you sure?',
                                                 text:
                                                     'Are you sure you want to delete this coordinator permanently?',

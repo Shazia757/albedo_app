@@ -5,6 +5,11 @@ import 'dart:io';
 import 'package:albedo_app/config/urls.dart';
 import 'package:albedo_app/config/utils.dart';
 import 'package:albedo_app/database/local_storage.dart';
+import 'package:albedo_app/model/batch_model.dart';
+import 'package:albedo_app/model/meet_model.dart';
+import 'package:albedo_app/model/package_model.dart';
+import 'package:albedo_app/model/payment_model.dart';
+import 'package:albedo_app/model/session_model.dart';
 import 'package:albedo_app/model/settings/assessment_model.dart';
 import 'package:albedo_app/model/settings/banners_model.dart';
 import 'package:albedo_app/model/settings/coupons_model.dart';
@@ -14,8 +19,16 @@ import 'package:albedo_app/model/settings/notification_model.dart';
 import 'package:albedo_app/model/settings/rating_value_model.dart';
 import 'package:albedo_app/model/settings/recommendations_model.dart';
 import 'package:albedo_app/model/settings/syllabus_model.dart';
+import 'package:albedo_app/model/stu_wallet_model.dart';
 import 'package:albedo_app/model/support_model.dart';
+import 'package:albedo_app/model/users/advisor_model.dart';
+import 'package:albedo_app/model/users/coordinator_model.dart';
+import 'package:albedo_app/model/users/mentor_model.dart';
+import 'package:albedo_app/model/users/other_users_model.dart';
+import 'package:albedo_app/model/users/student_model.dart';
+import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/model/users/user_model.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -86,7 +99,6 @@ class Api {
       }).timeout(const Duration(seconds: 60));
 
       log("STATUS CODE: ${response.statusCode}");
-      log("RESPONSE BODY: ${response.body}");
 
       final responseJson = jsonDecode(response.body);
 
@@ -574,6 +586,63 @@ class Api {
       final response = await safeRequest((headers) {
         return http.delete(
           Uri.parse(Urls.syllabusById(id)),
+          headers: getHeader(),
+        );
+      });
+
+      return response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<Ticket?> addTicket(String? name) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.post(
+          Uri.parse(Urls.supportTickets),
+          headers: getHeader(),
+          body: jsonEncode({'name': name}),
+        );
+      });
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final json = jsonDecode(response.body);
+        return Ticket.fromJson(json);
+      }
+
+      return null;
+    } catch (e) {
+      log('API error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateTicket(String id, String? name) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.patch(
+          Uri.parse(Urls.supportTicketById(id)),
+          headers: getHeader(),
+          body: jsonEncode({'name': name}),
+        );
+      });
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      log('API error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteTicket(String id) async {
+    try {
+      final response = await safeRequest((headers) {
+        return http.delete(
+          Uri.parse(Urls.supportTicketById(id)),
           headers: getHeader(),
         );
       });
@@ -1522,10 +1591,88 @@ class Api {
     }
   }
 
+//------------------Students---------------------------//
+  Future<List<Student>> getStudentList() async {
+    final response = await commonGetRequest(Urls.studentsList);
+
+    final List data = response['results'];
+
+    return data.map((e) => Student.fromJson(e)).toList();
+  }
+
+  Future<Student> getStudentById(String id) async {
+    final response = await commonGetRequest(
+      Urls.studentById(id),
+    );
+
+    return Student.fromJson(response);
+  }
+
+  Future<List<Package>> getStudentPackagesById(String id) async {
+    final response = await commonGetRequest(
+      Urls.studentPackages(id),
+    );
+
+    return (response as List).map((e) => Package.fromJson(e)).toList();
+  }
+
+  Future<List<Batch>> getStudentBatchesById(String studentId) async {
+    final response = await commonGetRequest(
+      '${Urls.batchesList}?student=$studentId',
+    );
+
+    final results = response['results'] as List;
+
+    return results
+        .map((e) => Batch.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<StudentWallet> getStudentWalletById(String studentId) async {
+    final url = '${Urls.userWallet}?profile_id=$studentId&profile_type=student';
+
+    debugPrint('Wallet URL: $url');
+
+    final response = await commonGetRequest(url);
+
+    debugPrint('Wallet Response: $response');
+
+    return StudentWallet.fromJson(response);
+  }
+
+//------------------Teachers---------------------------//
+  Future<List<Teacher>> getTeacherList() async {
+    final response = await commonGetRequest(Urls.teachersList);
+
+    final List data = response['teachers'];
+
+    return data.map((e) => Teacher.fromJson(e)).toList();
+  }
+
+  //------------------Students---------------------------//
+  Future<List<Coordinator>> getCoordinatorList() async {
+    try {
+      final response = await commonGetRequest(Urls.assistants);
+
+      return (response as List)
+          .map(
+            (e) => Coordinator.fromJson(e),
+          )
+          .toList();
+    } catch (e) {
+      log(e.toString());
+      return [];
+    }
+  }
+
 //------------------Settings---------------------------//
 
-  Future<dynamic> getSupportTickets() async {
-    return await commonGetRequest(Urls.supportTickets);
+  Future<List<Ticket>> getSupportTickets() async {
+    final response = await commonGetRequest(Urls.supportTickets);
+
+    final List data = response as List;
+
+    return data.map((e) => Ticket.fromJson(e)).toList();
   }
 
   Future<dynamic> getRegistrationFee() async {
@@ -1536,8 +1683,10 @@ class Api {
     return await commonGetRequest(Urls.starFactor);
   }
 
-  Future<dynamic> getSupportCategories() async {
-    return await commonGetRequest(Urls.supportCategories);
+  Future<List<Syllabus>> getSupportCategories() async {
+    final List<dynamic> data = await commonGetRequest(Urls.supportCategories);
+
+    return data.map<Syllabus>((e) => Syllabus.fromJson(e)).toList();
   }
 
   Future<dynamic> getSyllabuses() async {
@@ -1656,6 +1805,359 @@ class Api {
     } catch (e) {
       log('API error: $e');
       return null;
+    }
+  }
+
+  Future<PaginatedStudentPaymentResponse> getWalletStudentTransactions({
+    required int page,
+    required int pageSize,
+    required String status,
+  }) async {
+    try {
+      final response = await commonGetRequest(
+        "${Urls.walletStudentTransactions}"
+        "?paginate=true"
+        "&page=$page"
+        "&page_size=$pageSize"
+        "&status=$status",
+      );
+
+      return PaginatedStudentPaymentResponse(
+        count: response['count'] ?? 0,
+        results: (response['results'] as List)
+            .map(
+              (e) => StudentPaymentModel.fromJson(e),
+            )
+            .toList(),
+      );
+    } catch (e) {
+      log(e.toString());
+
+      return PaginatedStudentPaymentResponse(
+        count: 0,
+        results: [],
+      );
+    }
+  }
+
+  Future<PaginatedStudentResponse> getStudentDetails({
+    required String url,
+    required int page,
+    required int pageSize,
+  }) async {
+    try {
+      final separator = url.contains('?') ? '&' : '?';
+      final response = await commonGetRequest(
+        "$url"
+        "${separator}paginate=true"
+        "&page=$page"
+        "&page_size=$pageSize",
+      );
+
+      return PaginatedStudentResponse(
+        count: response['count'] ?? 0,
+        results: (response['results'] as List)
+            .map(
+              (e) => Student.fromJson(e),
+            )
+            .toList(),
+      );
+    } catch (e) {
+      log(e.toString());
+
+      return PaginatedStudentResponse(
+        count: 0,
+        results: [],
+      );
+    }
+  }
+
+  Future<PaginatedTeacherResponse> getTeacherDetails({
+    required String url,
+    required int page,
+    required int pageSize,
+  }) async {
+    try {
+      final separator = url.contains('?') ? '&' : '?';
+
+      final response = await commonGetRequest(
+        "$url"
+        "${separator}paginate=true"
+        "&page=$page"
+        "&page_size=$pageSize",
+      );
+
+      return PaginatedTeacherResponse(
+        count: response['count'] ?? 0,
+        results: (response['results'] as List)
+            .map(
+              (e) => Teacher.fromJson(e),
+            )
+            .toList(),
+      );
+    } catch (e) {
+      log(e.toString());
+
+      return PaginatedTeacherResponse(
+        count: 0,
+        results: [],
+      );
+    }
+  }
+
+  Future<PaginatedMentorResponse> getMentorDetails({
+    required String url,
+    required int page,
+    required int pageSize,
+  }) async {
+    try {
+      final separator = url.contains('?') ? '&' : '?';
+
+      final response = await commonGetRequest(
+        "$url"
+        "${separator}paginate=true"
+        "&page=$page"
+        "&page_size=$pageSize",
+      );
+
+      return PaginatedMentorResponse(
+        count: response['count'] ?? 0,
+        results: (response['results'] as List)
+            .map(
+              (e) => Mentor.fromJson(e),
+            )
+            .toList(),
+      );
+    } catch (e) {
+      log(e.toString());
+
+      return PaginatedMentorResponse(
+        count: 0,
+        results: [],
+      );
+    }
+  }
+
+  Future<PaginatedAdvisorResponse> getAdvisorDetails({
+    required int page,
+    required int pageSize,
+  }) async {
+    try {
+      final response = await commonGetRequest(
+        "${Urls.advisorsList}"
+        "?paginate=true"
+        "&page=$page"
+        "&page_size=$pageSize",
+      );
+
+      return PaginatedAdvisorResponse(
+        count: response['count'] ?? 0,
+        results: (response['results'] as List)
+            .map((e) => Advisor.fromJson(e))
+            .toList(),
+      );
+    } catch (e) {
+      log(e.toString());
+      return PaginatedAdvisorResponse(count: 0, results: []);
+    }
+  }
+
+  Future<PaginatedOtherUserResponse> getOtherUserDetails({
+    required int page,
+    required int pageSize,
+  }) async {
+    try {
+      final response = await commonGetRequest(
+        "${Urls.otherUsers}"
+        "?paginate=true"
+        "&page=$page"
+        "&page_size=$pageSize",
+      );
+
+      return PaginatedOtherUserResponse(
+        count: response['count'] ?? 0,
+        results: (response['results'] as List)
+            .map((e) => OtherUsers.fromJson(e))
+            .toList(),
+      );
+    } catch (e) {
+      log(e.toString());
+      return PaginatedOtherUserResponse(count: 0, results: []);
+    }
+  }
+
+  Future<PaginatedSessionResponse> getSessionDetails({
+    required String category,
+    String search = '',
+    required int page,
+    required int pageSize,
+  }) async {
+    try {
+      final response = await commonGetRequest(
+        "${Urls.classSchedulesStatus}"
+        "?category=$category"
+        "&search=$search"
+        "&page=$page"
+        "&page_size=$pageSize",
+      );
+
+      return PaginatedSessionResponse(
+        count: response['count'] ?? 0,
+        results: (response['results'] as List<dynamic>? ?? [])
+            .map((e) => Session.fromJson(e))
+            .toList(),
+      );
+    } catch (e) {
+      log(e.toString());
+
+      return PaginatedSessionResponse(
+        count: 0,
+        results: [],
+      );
+    }
+  }
+
+  Future<PaginatedBatchSessionResponse> getBatchSessionDetails({
+    required String category,
+    String search = '',
+    required int page,
+    required int pageSize,
+  }) async {
+    try {
+      final response = await commonGetRequest(
+        "${Urls.batchSchedulesStatus}"
+        "?category=$category"
+        "&search=$search"
+        "&page=$page"
+        "&page_size=$pageSize",
+      );
+
+      return PaginatedBatchSessionResponse(
+        count: response['count'] ?? 0,
+        results: (response['results'] as List<dynamic>? ?? [])
+            .map((e) => BatchSession.fromJson(e))
+            .toList(),
+      );
+    } catch (e) {
+      log(e.toString());
+
+      return PaginatedBatchSessionResponse(
+        count: 0,
+        results: [],
+      );
+    }
+  }
+
+  Future<List<Meet>> getMeetSessions() async {
+    try {
+      final response = await commonGetRequest(Urls.meetSessions);
+      log("Response:$response");
+      final List data = response;
+
+      return data.map<Meet>((e) => Meet.fromJson(e)).toList();
+    } catch (e) {
+      log(e.toString());
+      return [];
+    }
+  }
+
+  Future<SessionDetail?> getSessionDetail(String id) async {
+    try {
+      final response = await commonGetRequest(
+        Urls.classScheduleById(id),
+      );
+
+      log("Response: $response");
+
+      return SessionDetail.fromJson(response);
+    } catch (e, s) {
+      log("SESSION DETAIL ERROR: $e");
+      log(s.toString());
+      return null;
+    }
+  }
+
+  Future<BatchSessionDetail?> getBatchSessionDetail(String id) async {
+    try {
+      final response = await commonGetRequest(
+        Urls.batchScheduleById(id),
+      );
+
+      log("Response: $response");
+
+      return BatchSessionDetail.fromJson(response);
+    } catch (e, s) {
+      log("SESSION DETAIL ERROR: $e");
+      log(s.toString());
+      return null;
+    }
+  }
+
+  Future<PaginatedTeacherPaymentResponse> getWalletTeacherTransactions({
+    required int page,
+    required int pageSize,
+    required String status,
+  }) async {
+    final response = await commonGetRequest(
+      "${Urls.teacherTransactions}"
+      "?paginate=true"
+      "&page=$page"
+      "&page_size=$pageSize"
+      "&status=$status",
+    );
+
+    return PaginatedTeacherPaymentResponse(
+      count: response['count'] ?? 0,
+      results: (response['results'] as List)
+          .map((e) => TeacherPaymentModel.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Future<List<BatchPaymentModel>> getBatchTransactions() async {
+    try {
+      final response = await commonGetRequest(Urls.batches);
+      log("Response:$response");
+      final List data = response;
+
+      return data
+          .map<BatchPaymentModel>((e) => BatchPaymentModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      log(e.toString());
+      return [];
+    }
+  }
+
+  Future<BatchListResponse> getStudentBatches({
+    int page = 1,
+    int pageSize = 10,
+    required bool isLive,
+  }) async {
+    try {
+      final response = await commonGetRequest(
+        "${Urls.batchesList}"
+        "?is_live=$isLive"
+        "&page=$page"
+        "&page_size=$pageSize"
+        "&include_details=true",
+      );
+
+      log("Student Batches Response: $response");
+
+      final List data = response['results'] ?? [];
+
+      return BatchListResponse(
+        count: response['count'] ?? 0,
+        results: data.map<Batch>((e) => Batch.fromJson(e)).toList(),
+      );
+    } catch (e) {
+      log(e.toString());
+
+      return BatchListResponse(
+        count: 0,
+        results: [],
+      );
     }
   }
 

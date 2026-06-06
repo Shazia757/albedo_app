@@ -52,7 +52,7 @@ class TrStudentsController extends GetxController {
         syllabus: "CBSE",
         status: "Active",
         packageFee: 5000,
-        takenFee: 2000,
+        // takenFee: 2000,
         balance: 3000,
         withdrawals: [],
         time: "10:00 AM",

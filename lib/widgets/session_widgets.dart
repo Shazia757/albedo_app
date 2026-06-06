@@ -334,15 +334,24 @@ class _EditableDetailCardState extends State<EditableDetailCard> {
   }
 }
 
-Widget buildRoleCard({
+Widget buildRoleCard<T>({
   required BuildContext context,
   required String title,
-  required dynamic user,
+  required T? user,
   required Function(String?) onTap,
 }) {
-  final name = user?.name;
-  final id = user?.id;
-
+  String? name;
+  String? id;
+  if (user is Mentor) {
+    name = user.name;
+    id = user.empId;
+  } else if (user is Coordinator) {
+    name = user.name;
+    id = user.empId;
+  } else if (user is Advisor) {
+    name = user.name;
+    id = user.empId;
+  }
   final isMissing =
       (name == null || name.isEmpty) && (id == null || id.isEmpty);
 
@@ -377,7 +386,8 @@ Widget detailCard(
   final cs = Get.theme.colorScheme;
   final textTheme = Get.textTheme;
 
-  final imageUrl = "assets/images/logo.png";
+  final imageUrl = getImageUrl?.call() ?? "assets/images/logo.png";
+  print("IMAGE URL => $imageUrl");
 
   final isMissing =
       (name == null || name.isEmpty) && (id == null || id.isEmpty);
@@ -847,135 +857,134 @@ void openMentorProfile(
   );
 }
 
-void openBatchProfile(BuildContext context, Batch data) {
-  final primary = Get.theme.colorScheme.primary;
-  openProfileDialog(
-      context: context,
-      title: 'Batch profile',
-      icon: Icons.people,
-      color: Get.theme.colorScheme.primary,
-      content: SingleChildScrollView(
-        child: Column(children: [
-          profileHeader<Batch>(
-            context: context,
-            data: data,
-            color: primary,
-            getName: (b) => b.batchName ?? "-",
-            getEmail: (_) => null,
-            getId: (b) => b.batchID ?? '',
-            getImageUrl: (b) => b.imageUrl ?? '',
-            getStatus: (p0) => p0.status ?? '',
-          ),
-          SizedBox(height: 10),
-          infoCard(
-            context,
-            type: "schedule",
-            icon: Icons.calendar_today,
-            title: "Course Details",
-            children: [
-              infoRow(label: "Course", value: data.course ?? ''),
-              infoRow(
-                label: "Duration",
-                value: "${data.duration ?? 0} days",
-              ),
-            ],
-          ),
-          infoCard(
-            context,
-            type: "batch",
-            icon: Icons.bar_chart,
-            title: "Batch Statistics",
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                      child: infoRow(
-                          label: "Students", value: data.students.toString())),
-                  Expanded(
-                    child: infoRow(
-                        label: "Packages",
-                        value: data.packages?.first.subjectName?.length
-                                .toString() ??
-                            ''), //TODO
-                  ),
-                ],
-              ),
-            ],
-          ),
-          infoCard(
-            context,
-            type: "status",
-            icon: Icons.account_balance_wallet,
-            title: "Payment Summary",
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: infoRow(
-                      label: "Total Fee",
-                      value: data.totalFee.toString(),
-                    ),
-                  ),
-                  Expanded(
-                    child: infoRow(
-                      label: "Total Paid",
-                      value: data.totalPaid.toString(),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: infoRow(
-                      label: "Balance",
-                      value: data.balance.toString(),
-                    ),
-                  ),
-                  Expanded(
-                    child: infoRow(
-                      label: "Expense Ratio",
-                      value: data.expenseRatio.toString(),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          profileCard(
-            context,
-            color: Colors.indigo,
-            title: "Assigned Personnel",
-            children: [
-              if (data.coordinator?.name != null)
-                detailCard(
-                  context,
-                  title: "Coordinator",
-                  name: data.coordinator?.name ?? "-",
-                  id: data.coordinatorId ?? "-",
-                  onTap: () {},
-                ),
-              if (data.coordinator?.name == null)
-                simpleText("No coordinator assigned"),
-              SizedBox(height: 6),
-              EditableDetailCard(
-                type: "mentor",
-                title: "Mentor",
-                name: data.mentor?.name ?? "",
-                id: data.mentor?.empId ?? "",
-                field1Label: "Name",
-                field2Label: "ID",
-                onSave: (name, id) {
-                  data.mentor?.name = name;
-                  data.mentor?.empId = id;
-                },
-              ),
-            ],
-          ),
-        ]),
-      ));
-}
+// void openBatchProfile(BuildContext context, Batch data) {
+//   final primary = Get.theme.colorScheme.primary;
+//   openProfileDialog(
+//       context: context,
+//       title: 'Batch profile',
+//       icon: Icons.people,
+//       color: Get.theme.colorScheme.primary,
+//       content: SingleChildScrollView(
+//         child: Column(children: [
+//           profileHeader<Batch>(
+//             context: context,
+//             data: data,
+//             color: primary,
+//             getName: (b) => b.name ?? "-",
+//             getEmail: (_) => null,
+//             getId: (b) => b.code ?? '',
+//             getImageUrl: (b) => b.imageUrl ?? '',
+//           ),
+//           SizedBox(height: 10),
+//           infoCard(
+//             context,
+//             type: "schedule",
+//             icon: Icons.calendar_today,
+//             title: "Course Details",
+//             children: [
+//               // infoRow(label: "Course", value: data.course ?? ''),
+//               infoRow(
+//                 label: "Duration",
+//                 value: "${data.duration ?? 0} days",
+//               ),
+//             ],
+//           ),
+//           infoCard(
+//             context,
+//             type: "batch",
+//             icon: Icons.bar_chart,
+//             title: "Batch Statistics",
+//             children: [
+//               Row(
+//                 children: [
+//                   Expanded(
+//                       child: infoRow(
+//                           label: "Students", value: data.students.toString())),
+//                   Expanded(
+//                     child: infoRow(
+//                         label: "Packages",
+//                         value: data.packages?.first.subjectName?.length
+//                                 .toString() ??
+//                             ''), //TODO
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//           infoCard(
+//             context,
+//             type: "status",
+//             icon: Icons.account_balance_wallet,
+//             title: "Payment Summary",
+//             children: [
+//               Row(
+//                 children: [
+//                   Expanded(
+//                     child: infoRow(
+//                       label: "Total Fee",
+//                       value: data.totalFee.toString(),
+//                     ),
+//                   ),
+//                   Expanded(
+//                     child: infoRow(
+//                       label: "Total Paid",
+//                       value: data.totalPaid.toString(),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               SizedBox(height: 8),
+//               Row(
+//                 children: [
+//                   Expanded(
+//                     child: infoRow(
+//                       label: "Balance",
+//                       value: data.balance.toString(),
+//                     ),
+//                   ),
+//                   Expanded(
+//                     child: infoRow(
+//                       label: "Expense Ratio",
+//                       value: data.expenseRatio.toString(),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//           profileCard(
+//             context,
+//             color: Colors.indigo,
+//             title: "Assigned Personnel",
+//             children: [
+//               if (data.coordinator?.name != null)
+//                 detailCard(
+//                   context,
+//                   title: "Coordinator",
+//                   name: data.coordinator?.name ?? "-",
+//                   id: data.coordinatorId ?? "-",
+//                   onTap: () {},
+//                 ),
+//               if (data.coordinator?.name == null)
+//                 simpleText("No coordinator assigned"),
+//               SizedBox(height: 6),
+//               EditableDetailCard(
+//                 type: "mentor",
+//                 title: "Mentor",
+//                 name: data.mentor?.name ?? "",
+//                 id: data.mentor?.empId ?? "",
+//                 field1Label: "Name",
+//                 field2Label: "ID",
+//                 onSave: (name, id) {
+//                   data.mentor?.name = name;
+//                   data.mentor?.empId = id;
+//                 },
+//               ),
+//             ],
+//           ),
+//         ]),
+//       ));
+// }
 
 List<Widget> staffSections(BuildContext context, dynamic data, Color color) {
   return [
@@ -1033,7 +1042,7 @@ void openCoordinatorProfile(
     role: "coordinator",
     icon: Icons.school,
     data: data,
-    getName: (m) => m.name,
+    getName: (m) => m.name ?? '',
     getEmail: (m) => m.email,
     getId: (m) => m.id,
     getImageUrl: (m) => m.imageUrl,
@@ -1066,7 +1075,7 @@ void openAdvisorProfile(
     getName: (m) => m.name,
     getEmail: (m) => m.email,
     getId: (m) => m.id,
-    getImageUrl: (m) => m.imageUrl,
+    getImageUrl: (m) => m.photo,
     toUser: (p0) => toUser,
     sections: [
       profileCard(
@@ -1082,7 +1091,7 @@ void openAdvisorProfile(
         color: Colors.teal,
         title: "Converted Students",
         children: [
-          simpleText(data.convertedStudents?.toString() ?? "-"),
+          // simpleText(data.convertedStudents?.toString() ?? "-"),
         ],
       ),
       idCardCTA(
@@ -1386,22 +1395,20 @@ Color getStatusColor(String? status) {
   }
 }
 
-String formatDate(DateTime date) {
-  return DateFormat('dd MMM yyyy').format(date);
-}
+String formatDate(DateTime? date) =>
+    date == null ? '-' : DateFormat('dd MMM yyyy').format(date);
+String formatTime(TimeOfDay? time) {
+  if (time == null) return "-";
 
-String formatTime(TimeOfDay time) {
-  final now = DateTime.now();
-
-  final dateTime = DateTime(
-    now.year,
-    now.month,
-    now.day,
+  final dt = DateTime(
+    2000,
+    1,
+    1,
     time.hour,
     time.minute,
   );
 
-  return DateFormat('hh:mm a').format(dateTime);
+  return DateFormat('hh:mm a').format(dt);
 }
 
 String getMonthName(int month) {
@@ -1416,8 +1423,13 @@ class StatusBadge extends StatelessWidget {
   const StatusBadge({super.key, required this.status, required this.color});
 
   String get _label {
-    final words =
-        status.split('_').map((w) => w[0].toUpperCase() + w.substring(1));
+    if (status.trim().isEmpty) return "-";
+
+    final words = status
+        .split('_')
+        .where((w) => w.isNotEmpty)
+        .map((w) => w[0].toUpperCase() + w.substring(1));
+
     return words.join(' ');
   }
 

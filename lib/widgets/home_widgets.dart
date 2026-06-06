@@ -1056,120 +1056,120 @@ Widget dayChip(BuildContext context, String day) {
   );
 }
 
-Widget nextSessionCard(BuildContext context) {
-  final auth = Get.find<AuthController>();
-  final role = auth.activeUser?.role;
-  final isTeacher = role == "teacher";
+// Widget nextSessionCard(BuildContext context) {
+//   final auth = Get.find<AuthController>();
+//   final role = auth.activeUser?.role;
+//   final isTeacher = role == "teacher";
 
-  return Obx(() {
-    final session = c.nextSession;
-    print("Sessions count: ${c.session.length}");
-    print("Next session: ${c.nextSession}");
-    if (session == null) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: cardDecoration(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Next Session",
-              style: context.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 12),
-            Row(
-              children: [
-                Icon(Icons.event_busy,
-                    color: context.theme.colorScheme.outline),
-                SizedBox(width: 10),
-                Text(
-                  "No upcoming sessions",
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: context.theme.colorScheme.outline,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    }
-    final isStarted = session.status == "started";
+//   return Obx(() {
+//     final session = c.nextSession;
+//     print("Sessions count: ${c.session.length}");
+//     print("Next session: ${c.nextSession}");
+//     if (session == null) {
+//       return Container(
+//         padding: const EdgeInsets.all(16),
+//         decoration: cardDecoration(context),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(
+//               "Next Session",
+//               style: context.textTheme.titleMedium?.copyWith(
+//                 fontWeight: FontWeight.w600,
+//               ),
+//             ),
+//             SizedBox(height: 12),
+//             Row(
+//               children: [
+//                 Icon(Icons.event_busy,
+//                     color: context.theme.colorScheme.outline),
+//                 SizedBox(width: 10),
+//                 Text(
+//                   "No upcoming sessions",
+//                   style: context.textTheme.bodyMedium?.copyWith(
+//                     color: context.theme.colorScheme.outline,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       );
+//     }
+//     final isStarted = session.status == "started";
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: cardDecoration(context),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Next Session"),
+//     return Container(
+//       padding: const EdgeInsets.all(16),
+//       decoration: cardDecoration(context),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text("Next Session"),
 
-          SizedBox(height: 12),
-          sessionMainCard(context, session, isTeacher),
+//           SizedBox(height: 12),
+//           sessionMainCard(context, session, isTeacher),
 
-          SizedBox(height: 12),
+//           SizedBox(height: 12),
 
-          /// 🔹 DETAILS
-          Wrap(
-            spacing: 20,
-            runSpacing: 8,
-            children: [
-              infoCard(context, "Subject", session.package?.subjectName ?? "-"),
-              infoCard(context, "Syllabus", session.syllabus ?? "-"),
-              infoCard(context, "Standard", session.className ?? "-"),
-            ],
-          ),
+//           /// 🔹 DETAILS
+//           Wrap(
+//             spacing: 20,
+//             runSpacing: 8,
+//             children: [
+//               infoCard(context, "Subject", session.package?.subjectName ?? "-"),
+//               infoCard(context, "Syllabus", session.syllabus ?? "-"),
+//               infoCard(context, "Standard", session.className ?? "-"),
+//             ],
+//           ),
 
-          SizedBox(height: 14),
+//           SizedBox(height: 14),
 
-          /// 🔹 ACTIONS
-          if (isStarted)
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                    ),
-                    onPressed: () {},
-                    icon: const Icon(Icons.arrow_forward_rounded,
-                        size: 16, color: Colors.white),
-                    label: Text(
-                      "Join",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium!
-                          .copyWith(color: Colors.white),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                    ),
-                    onPressed: () {},
-                    icon:
-                        const Icon(Icons.share, size: 16, color: Colors.white),
-                    label: Text(
-                      "Share",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium!
-                          .copyWith(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-        ],
-      ),
-    );
-  });
-}
+//           /// 🔹 ACTIONS
+//           if (isStarted)
+//             Row(
+//               children: [
+//                 Expanded(
+//                   child: ElevatedButton.icon(
+//                     style: ElevatedButton.styleFrom(
+//                       backgroundColor: Theme.of(context).colorScheme.secondary,
+//                     ),
+//                     onPressed: () {},
+//                     icon: const Icon(Icons.arrow_forward_rounded,
+//                         size: 16, color: Colors.white),
+//                     label: Text(
+//                       "Join",
+//                       style: Theme.of(context)
+//                           .textTheme
+//                           .bodyMedium!
+//                           .copyWith(color: Colors.white),
+//                     ),
+//                   ),
+//                 ),
+//                 SizedBox(width: 10),
+//                 Expanded(
+//                   child: ElevatedButton.icon(
+//                     style: ElevatedButton.styleFrom(
+//                       backgroundColor: Theme.of(context).colorScheme.primary,
+//                     ),
+//                     onPressed: () {},
+//                     icon:
+//                         const Icon(Icons.share, size: 16, color: Colors.white),
+//                     label: Text(
+//                       "Share",
+//                       style: Theme.of(context)
+//                           .textTheme
+//                           .bodyMedium!
+//                           .copyWith(color: Colors.white),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//         ],
+//       ),
+//     );
+//   });
+// }
 
 Widget sessionMainCard(
   BuildContext context,
@@ -1274,7 +1274,7 @@ Widget sessionMainCard(
 
               /// Date
               Text(
-                formatDate(session.date),
+                formatDate(session.sessionDate),
                 style: context.textTheme.labelSmall?.copyWith(
                   color: cs.outline,
                 ),
@@ -1284,7 +1284,7 @@ Widget sessionMainCard(
 
               /// Time
               Text(
-                formatTime(session.date ?? DateTime.now()),
+                formatTime(session.sessionDate ?? DateTime.now()),
                 style: context.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -1298,9 +1298,9 @@ Widget sessionMainCard(
 }
 
 String startsInText(Session session) {
-  if (session.date == null) return "";
+  if (session.sessionDate == null) return "";
 
-  final diff = session.date!.difference(DateTime.now());
+  final diff = session.sessionDate!.difference(DateTime.now());
 
   if (diff.inMinutes < 60) {
     return "Starts in ${diff.inMinutes} min";

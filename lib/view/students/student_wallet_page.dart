@@ -413,11 +413,11 @@ class StudentWalletPage extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 8),
-                    Text(
-                      "₹${c.totalBalance.toStringAsFixed(2)}",
-                      style: Get.textTheme.headlineLarge!
-                          .copyWith(color: Colors.white, letterSpacing: -0.5),
-                    ),
+                    // Text(
+                    //   "₹${c.totalBalance.toStringAsFixed(2)}",
+                    //   style: Get.textTheme.headlineLarge!
+                    //       .copyWith(color: Colors.white, letterSpacing: -0.5),
+                    // ),
                   ],
                 ),
                 Container(
@@ -447,13 +447,13 @@ class StudentWalletPage extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Expanded(
-                    child: _miniStat(
-                      "Deposited",
-                      c.totalDeposited,
-                      Icons.arrow_downward_rounded,
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: _miniStat(
+                  //     "Deposited",
+                  //     c.totalDeposited,
+                  //     Icons.arrow_downward_rounded,
+                  //   ),
+                  // ),
                   Container(
                     width: 1,
                     height: 30,
@@ -553,7 +553,7 @@ class StudentWalletPage extends StatelessWidget {
         itemCount: c.packages.length,
         itemBuilder: (_, i) {
           final p = c.packages[i];
-          final balance = c.getPackageBalance(p);
+          // final balance = c.getPackageBalance(p);
 
           return GestureDetector(
             onTap: () => _showPackageDialog(context, p),
@@ -627,11 +627,11 @@ class StudentWalletPage extends StatelessWidget {
                               .copyWith(color: cs.onSurfaceVariant),
                         ),
                         SizedBox(height: 2),
-                        Text(
-                          "₹${balance.toStringAsFixed(2)}",
-                          style: Get.textTheme.titleMedium!
-                              .copyWith(color: Color(0xFF10B981)),
-                        ),
+                        // Text(
+                        //   "₹${balance.toStringAsFixed(2)}",
+                        //   style: Get.textTheme.titleMedium!
+                        //       .copyWith(color: Color(0xFF10B981)),
+                        // ),
                       ],
                     ),
                     SizedBox(width: 8),

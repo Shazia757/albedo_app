@@ -27,7 +27,7 @@ class HomeView extends StatelessWidget {
                   return Center(child: CircularProgressIndicator());
                 }
                 final auth = Get.find<AuthController>();
-                final role = auth.activeUser?.position;
+                final role = auth.activeUser?.role;
 
                 return RefreshIndicator(
                   onRefresh: () async {
@@ -86,7 +86,7 @@ class HomeView extends StatelessWidget {
       children: [
         packagesAnalyticsCard(context),
         SizedBox(height: 14),
-        nextSessionCard(context),
+        // nextSessionCard(context),
         SizedBox(height: 14),
         youtubeCard(context),
         SizedBox(height: 14),
@@ -102,7 +102,7 @@ class HomeView extends StatelessWidget {
         SizedBox(height: 14),
         youtubeCard(context),
         SizedBox(height: 14),
-        nextSessionCard(context),
+        // nextSessionCard(context),
         SizedBox(height: 14),
         hiringSection(context),
       ],

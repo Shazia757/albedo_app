@@ -271,12 +271,11 @@ class SettingsController extends GetxController {
   }
 
   Future<void> getSupportCategories() async {
-    final data = await commonFetch(
+    final List<Syllabus> data = await commonFetch(
       apiCall: () => Api().getSupportCategories(),
     );
-    supportCategories.assignAll(
-      data.map<Syllabus>((e) => Syllabus.fromJson(e)).toList(),
-    );
+
+    supportCategories.assignAll(data);
   }
 
   Future<void> getReferralSources() async {

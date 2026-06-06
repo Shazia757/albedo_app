@@ -46,7 +46,7 @@ class SessionReportController extends GetxController {
       studentName: session.student?.name ?? "",
       studentId: session.student?.studentId ?? "",
       package: session.package ?? Package(status: 'false'),
-      sessionDate: session.date.toString(),
+      sessionDate: session.sessionDate.toString(),
       duration: session.duration?.toString() ?? "",
       isCompleted: false,
     );
@@ -57,31 +57,32 @@ class SessionReportController extends GetxController {
     _clearFields();
   }
 
-  void initFromBatchSession(Batch session) {
+  void initFromBatchSession(BatchSession session) {
     batchreport = BatchSessionReport(
-      students: session.student ?? [],
-      package: session.packages?.first ??
-          Package(
-            teacher: Teacher(
-              id: '',
-              name: '',
-              status: '',
-              joinedAt: DateTime.now(),
-              gender: '',
-            ),
-            subjectId: '',
-            subjectName: '',
-            standard: '',
-            syllabus: '',
-            status: '',
-            packageFee: 0,
-            takenFee: 0,
-            balance: 0,
-            withdrawals: [],
-            time: '',
-            duration: '',
-            note: '',
-          ),
+      students: session.students ?? [],
+      // package: session.package ??
+      //     BatchPackage(
+      //       teacher: Teacher(
+      //         id: '',
+      //         name: '',
+      //         status: '',
+      //         joinedAt: DateTime.now(),
+      //         gender: '',
+      //       ),
+      //       subjectId: '',
+      //       subjectName: '',
+      //       standard: '',
+      //       syllabus: '',
+      //       status: '',
+      //       // packageFee: 0,
+      //       takenFee: 0,
+      //       balance: 0,
+      //       withdrawals: [],
+      //       time: '',
+      //       duration: '',
+      //       note: '',
+      //     ),
+      package: Package(),
       sessionDate: session.date.toString(),
       duration: session.duration?.toString() ?? "",
       isCompleted: false,
@@ -96,25 +97,26 @@ class SessionReportController extends GetxController {
     isCompleted.value = value;
   }
 
- saveReport() {
-  final current = report;
-  if (current == null) return null;
+  saveReport() {
+    final current = report;
+    if (current == null) return null;
 
-  current.isCompleted = isCompleted.value;
+    current.isCompleted = isCompleted.value;
 
-  if (isCompleted.value) {
-    current.topicsCovered = topicCtrl.text;
-    current.teacherNotes = notesCtrl.text;
-    current.startTime = startTimeCtrl.text;
-    current.duration = durationCtrl.text;
-  } else {
-    current.reason = reasonCtrl.text;
+    if (isCompleted.value) {
+      current.topicsCovered = topicCtrl.text;
+      current.teacherNotes = notesCtrl.text;
+      current.startTime = startTimeCtrl.text;
+      current.duration = durationCtrl.text;
+    } else {
+      current.reason = reasonCtrl.text;
+    }
+
+    onSave?.call(current);
+
+    return current;
   }
 
-  onSave?.call(current);
-
-  return current;
-}
   void _clearFields() {
     reasonCtrl.clear();
     topicCtrl.clear();

@@ -1,6 +1,7 @@
 import 'package:albedo_app/controller/package_controller.dart';
 import 'package:albedo_app/model/package_model.dart';
 import 'package:albedo_app/model/settings/hiring_ad_model.dart';
+import 'package:albedo_app/model/settings/syllabus_model.dart';
 import 'package:albedo_app/model/users/teacher_model.dart';
 import 'package:albedo_app/widgets/custom_appbar.dart';
 import 'package:albedo_app/widgets/drawer_menu.dart';
@@ -22,7 +23,9 @@ class AddPackagePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await c.initForm();
+
       if (isEdit) {
         c.loadPackage(package!);
       } else {
@@ -90,61 +93,71 @@ class AddPackagePage extends StatelessWidget {
                           CustomWidgets().labelWithAsterisk('Package Name',
                               required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<Package>(
-                            context: context,
-                            hint: 'Select Package',
-                            items: c.packagesList,
-                            value: c.selectedPackage.value,
-                            itemLabel: (p) => p.subjectName ?? "",
-                            onChanged: (p0) => c.selectedPackage.value = p0,
+                          Obx(
+                            () => CustomWidgets().customDropdownField<Syllabus>(
+                                context: context,
+                                hint: 'Select Package',
+                                items: c.packageNamesList,
+                                value: c.selectedPackage.value,
+                                itemLabel: (p) => p.name ?? "",
+                                onChanged: (p0) =>
+                                    c.selectedPackage.value = p0),
                           ),
                           SizedBox(height: 10),
                           CustomWidgets()
                               .labelWithAsterisk('Course', required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<String>(
-                            context: context,
-                            hint: 'Select Course',
-                            items: c.courseList,
-                            onChanged: (p0) => c.selectedCourse.value = p0,
-                            value: c.selectedCourse.value,
-                            itemLabel: (item) => item,
+                          Obx(
+                            () => CustomWidgets().customDropdownField<Syllabus>(
+                              context: context,
+                              hint: 'Select Course',
+                              items: c.courseList,
+                              onChanged: (p0) => c.selectedCourse.value = p0,
+                              value: c.selectedCourse.value,
+                              itemLabel: (item) => item.name,
+                            ),
                           ),
                           SizedBox(height: 10),
                           CustomWidgets()
                               .labelWithAsterisk('Syllabus', required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<String>(
-                            context: context,
-                            hint: 'Select Syllabus',
-                            items: c.syllabusList,
-                            onChanged: (p0) => c.selectedSyllabus.value = p0,
-                            value: c.selectedSyllabus.value,
-                            itemLabel: (item) => item,
+                          Obx(
+                            () => CustomWidgets().customDropdownField<Syllabus>(
+                              context: context,
+                              hint: 'Select Syllabus',
+                              items: c.syllabusList,
+                              onChanged: (p0) => c.selectedSyllabus.value = p0,
+                              value: c.selectedSyllabus.value,
+                              itemLabel: (item) => item.name,
+                            ),
                           ),
                           SizedBox(height: 10),
                           CustomWidgets()
                               .labelWithAsterisk('Category', required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<String>(
-                            context: context,
-                            hint: 'Select Category',
-                            items: c.categoryList,
-                            onChanged: (p0) => c.selectedCategory.value = p0,
-                            value: c.selectedCategory.value,
-                            itemLabel: (item) => item,
+                          Obx(
+                            () => CustomWidgets().customDropdownField<Syllabus>(
+                              context: context,
+                              hint: 'Select Category',
+                              items: c.categoryList,
+                              onChanged: (p0) => c.selectedCategory.value = p0,
+                              value: c.selectedCategory.value,
+                              itemLabel: (item) => item.name,
+                            ),
                           ),
                           SizedBox(height: 10),
                           CustomWidgets()
                               .labelWithAsterisk('Standard', required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<String>(
-                            context: context,
-                            hint: 'Select Standard',
-                            items: c.categoryList,
-                            onChanged: (p0) => c.selectedStandard.value = p0,
-                            value: c.selectedStandard.value,
-                            itemLabel: (item) => item,
+                          Obx(
+                            () => CustomWidgets().customDropdownField<Syllabus>(
+                              context: context,
+                              hint: 'Select Standard',
+                              items: c.standardList,
+                              onChanged: (p0) => c.selectedStandard.value = p0,
+                              value: c.selectedStandard.value,
+                              itemLabel: (item) => item.name,
+                            ),
                           ),
                           SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk('Number of Classes',
@@ -229,25 +242,30 @@ class AddPackagePage extends StatelessWidget {
                           CustomWidgets().labelWithAsterisk('Tuition mode',
                               required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField(
-                            context: context,
-                            hint: 'Select Tution Mode',
-                            items: c.tutionOptions,
-                            value: c.selectedTuitionMode.value,
-                            onChanged: (p0) => c.selectedTuitionMode.value = p0,
-                            itemLabel: (item) => "$item minutes",
+                          Obx(
+                            () => CustomWidgets().customDropdownField(
+                              context: context,
+                              hint: 'Select Tution Mode',
+                              items: c.tutionOptions,
+                              value: c.selectedTuitionMode.value,
+                              onChanged: (p0) =>
+                                  c.selectedTuitionMode.value = p0,
+                              itemLabel: (item) => item,
+                            ),
                           ),
                           SizedBox(height: 10),
                           CustomWidgets()
                               .labelWithAsterisk('Teacher', required: true),
                           SizedBox(height: 10),
-                          CustomWidgets().customDropdownField<Teacher>(
-                            context: context,
-                            hint: 'Select Teacher',
-                            items: c.teacherList,
-                            value: c.selectedTeacher.value,
-                            onChanged: (p0) => c.selectedTeacher.value = p0,
-                            itemLabel: (item) => item.name,
+                          Obx(
+                            () => CustomWidgets().customDropdownField<Teacher>(
+                              context: context,
+                              hint: 'Select Teacher',
+                              items: c.teacherList,
+                              value: c.selectedTeacher.value,
+                              onChanged: (p0) => c.selectedTeacher.value = p0,
+                              itemLabel: (item) => item.name,
+                            ),
                           ),
                           SizedBox(height: 10),
                           CustomWidgets().labelWithAsterisk(

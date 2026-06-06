@@ -143,27 +143,27 @@ class PackageSessionPage extends StatelessWidget {
                           final year = yearEntry.key;
                           final months = yearEntry.value;
 
-                          int totalMinutes = months.values
-                              .expand((e) => e)
-                              .fold(0, (sum, s) => sum + (s.duration ?? 0));
+                          // int totalMinutes = months.values
+                          //     .expand((e) => e)
+                          //     .fold(0, (sum, s) => sum + (s.duration ?? 0));
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: Text(
-                                  "$year • ${(totalMinutes / 60).toStringAsFixed(1)} hrs",
-                                  style: Get.textTheme.titleSmall,
-                                ),
-                              ),
+                              // Padding(
+                              //   padding:
+                              //       const EdgeInsets.symmetric(vertical: 8),
+                              //   child: Text(
+                              //     "$year • ${(totalMinutes / 60).toStringAsFixed(1)} hrs",
+                              //     style: Get.textTheme.titleSmall,
+                              //   ),
+                              // ),
                               ...months.entries.map((monthEntry) {
                                 final month = monthEntry.key;
                                 final list = monthEntry.value;
 
-                                int monthMinutes = list.fold(
-                                    0, (sum, s) => sum + (s.duration ?? 0));
+                                // int monthMinutes = list.fold(
+                                //     0, (sum, s) => sum + (s.duration ?? 0));
 
                                 return InkWell(
                                   onTap: () {
@@ -184,8 +184,8 @@ class PackageSessionPage extends StatelessWidget {
                                       children: [
                                         Text(getMonthName(month)),
                                         Text("${list.length} sessions"),
-                                        Text(
-                                            "${(monthMinutes / 60).toStringAsFixed(1)} hrs"),
+                                        // Text(
+                                        //     "${(monthMinutes / 60).toStringAsFixed(1)} hrs"),
                                       ],
                                     ),
                                   ),
@@ -254,7 +254,7 @@ class PackageSessionPage extends StatelessWidget {
   }
 
   Widget upcomingSessionCard(Session session, ColorScheme cs) {
-    final date = session.date ?? DateTime.now();
+    final date = session.sessionDate ?? DateTime.now();
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -369,7 +369,7 @@ class PackageSessionPage extends StatelessWidget {
     final Map<int, Map<int, List<Session>>> data = {};
 
     for (var s in sessions) {
-      final date = s.date ?? DateTime.now();
+      final date = s.sessionDate ?? DateTime.now();
       final year = date.year;
       final month = date.month;
 

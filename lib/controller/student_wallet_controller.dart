@@ -40,8 +40,7 @@ class StudentWalletController extends GetxController {
       subjectName: "Mathematics",
       syllabus: "CBSE",
       standard: "10",
-      packageFee: 5000,
-      takenFee: 3000,
+      // takenFee: 3000,
       balance: 2000,
       withdrawals: [
         Withdrawal(amount: 500, date: DateTime.now(), note: 'sd'),
@@ -51,19 +50,19 @@ class StudentWalletController extends GetxController {
     ),
   ].obs;
 
-  double get totalBalance {
-    return packages.fold(
-      0.0,
-      (sum, p) => sum + getPackageBalance(p),
-    );
-  }
+  // double get totalBalance {
+  //   return packages.fold(
+  //     0.0,
+  //     (sum, p) => sum + getPackageBalance(p),
+  //   );
+  // }
 
-  double get totalDeposited {
-    return packages.fold(0.0, (sum, p) {
-      final packageFee = p.packageFee ?? 0;
-      return sum + packageFee;
-    });
-  }
+  // double get totalDeposited {
+  //   return packages.fold(0.0, (sum, p) {
+  //     final packageFee = p.packageFee ?? 0;
+  //     return sum + packageFee;
+  //   });
+  // }
 
   double get totalUsed {
     return packages.fold(0.0, (sum, p) {
@@ -72,13 +71,13 @@ class StudentWalletController extends GetxController {
     });
   }
 
-  double getPackageBalance(Package p) {
-    final withdrawals = p.withdrawals ?? [];
+  // double getPackageBalance(Package p) {
+  //   final withdrawals = p.withdrawals ?? [];
 
-    final totalWithdrawals = withdrawals.fold(0.0, (sum, w) => sum + w.amount);
+  //   final totalWithdrawals = withdrawals.fold(0.0, (sum, w) => sum + w.amount);
 
-    return p.packageFee ?? 0 - totalWithdrawals;
-  }
+  //   return p.packageFee ?? 0 - totalWithdrawals;
+  // }
 
   void updateStatus(
     int transactionIndex,

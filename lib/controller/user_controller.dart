@@ -195,19 +195,10 @@ class UserController extends GetxController {
         Advisor(
           id: "ADV001",
           name: "Fathima Noor",
-          joinedAt: DateTime(2025, 3, 10),
           email: "fathima.noor@example.com",
-          status: "Active",
-          gender: "Female",
           phone: "+919812345678",
-          whatsapp: "+919812345678",
-          convertedStudents: 45,
-          imageUrl: "https://example.com/profile/fathima.jpg",
-          dob: "1998-09-21",
-          qualification: "BBA",
-          place: "Kozhikode",
-          pincode: "673001",
-          address: "Noor Manzil, Kozhikode, Kerala",
+          photo: "https://example.com/profile/fathima.jpg",
+         
         ),
       ]);
     } catch (e) {

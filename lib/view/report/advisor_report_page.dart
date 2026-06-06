@@ -51,8 +51,8 @@ Widget advisorsTab(BuildContext context) {
                   ],
                 )),
                 DataCell(Text(s.phone ?? '')),
-                DataCell(Text(s.convertedStudents.toString())),
-                DataCell(Text(s.convertedTotalAmount?.toString() ?? '')),
+                // DataCell(Text(s.convertedStudents.toString())),
+                // DataCell(Text(s.convertedTotalAmount?.toString() ?? '')),
               ],
             );
           }).toList(),
